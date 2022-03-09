@@ -3,13 +3,13 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=0.85">
-	<meta name="description" content="EIBSZ vizsgaoldal">
+	<meta name="description" content="<?=$ablakcim?>">
 	<script src="<?=$RootPath?>/includes/jquery.min.js"></script>
 	<script src="<?=$RootPath?>/includes/greedynav/greedynav.js"></script>
 	<script src="<?=$RootPath?>/includes/tinymce/tinymce.min.js"></script>
 	<link rel="shortcut icon" href="<?=$RootPath?>/favicon.ico">
 	<link rel="stylesheet" href="<?=$RootPath?>/style.css" type="text/css">
-	<title><?=$ablakcim . " - " . $pages[$pagename]['szoveg']?></title>
+	<title><?=$ablakcim . " - " . $currentpage['cimszoveg']?></title>
 	<script>
 		function sortTable(n, t, tname) {
 			var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
@@ -106,7 +106,7 @@
 <!-- Oldaltörzs -->	
 <!-- Tartalom -->
     <div class="content">
-		<?php include("./{$pagename}.php");	?>
+		<?php include("./{$currentpage['url']}.php");	?>
 	</div>
 
 <!-- lábléc -->

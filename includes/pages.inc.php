@@ -6,33 +6,32 @@ $pages = array(
     'belepes' => array('szoveg' => 'Belépés', 'fajl' => 'belepes'),
 
 // Gyüjtő oldalak //
-    'vizsgalista' => array('szoveg' => 'Kitöltött vizsgák', 'fajl' => 'vizsgalista'),
-    'megkezdett' => array('szoveg' => 'Megkezdett vizsgák', 'fajl' => 'megkezdett'),
+    'mindeneszkoz' => array('szoveg' => 'Minden eszköz', 'fajl' => 'mindeneszkoz'),
+    'aktiveszkozok' => array('szoveg' => 'Aktív eszközök', 'fajl' => 'aktiveszkozok'),
+    'halozat' => array('szoveg' => 'Informatikai hálózat', 'fajl' => 'halozat'),
+    'nyomtatok' => array('szoveg' => 'Nyomtatók', 'fajl' => 'nyomtatok'),
+    'rezervaltipk' => array('szoveg' => 'Rezervált IP-k', 'fajl' => 'rezervaltipk'),
+    'epuletek' => array('szoveg' => 'Épületek', 'fajl' => 'epuletek'),
+    'rackek' => array('szoveg' => 'Rackek', 'fajl' => 'rackek'),
     'hibajelzesek' => array('szoveg' => 'Hibajelzések', 'fajl' => 'hibajelzesek'),
     'felhasznalok' => array('szoveg' => 'Felhasználók listája', 'fajl' => 'felhasznalok'),
     'bejelentkezesek' => array('szoveg' => 'Bejelentkezések', 'fajl' => 'bejelentkezesek'),
-
-// Egyes oldalak //
-    'vizsga' => array('szoveg' => 'Vizsga', 'fajl' => 'vizsga'),
-    'kerdes' => array('szoveg' => 'Kérdés', 'fajl' => 'kerdes'),
-    'hiba' => array('szoveg' => 'Hibajelzés küldése', 'fajl' => 'hiba'),
-    'felhasznalo' => array('szoveg' => 'Személyes oldal', 'fajl' => 'felhasznalo'),
-    'vizsgaigazolas' => array('szoveg' => 'Vizsgaigazolás', 'fajl' => 'vizsgaigazolas'),
-    'vizsgareszletezo' => array('szoveg' => 'Vizsgaigarészletező', 'fajl' => 'vizsgareszletezo'),
     'bejelentkezesihibak' => array('szoveg' => 'Bejelentkezési hibák', 'fajl' => 'bejelentkezesihibak'),
 
+// Egyes oldalak //
+    'eszkoz' => array('szoveg' => 'Eszköz részletei', 'fajl' => 'eszkoz'),
+    'hiba' => array('szoveg' => 'Hibajelzés küldése', 'fajl' => 'hiba'),
+    'felhasznalo' => array('szoveg' => 'Személyes oldal', 'fajl' => 'felhasznalo'),
+
 // Admin oldalak //
-    'kerdeslista' => array('szoveg' => 'Kérdések listája', 'fajl' => 'kerdeslista'), 
-    'kerdesszerkeszt' => array('szoveg' => 'Kérdés szerkesztése', 'fajl' => 'kerdesszerkeszt'),
+    'eszkozszerk' => array('szoveg' => 'Eszköz szerkesztése', 'fajl' => 'eszkozszerk'),
+    'beepites' => array('szoveg' => 'Eszköz beépítése', 'fajl' => 'beepites'),
     'beallitasok' => array('szoveg' => 'Beállítások szerkesztése', 'fajl' => 'beallitasok'),
     'hibaszerk' => array('szoveg' => 'Hiba vizsgálata', 'fajl' => 'hibaszerk'),
     'felhasznaloszerkeszt' => array('szoveg' => 'Felhasználó szerkesztése', 'fajl' => 'felhasznaloszerkeszt'),
 
 // Adatbázis funkciók //
-    'kerdesdb' => array('szoveg' => 'Kérdésszerk', 'fajl' => 'db/kerdesdb'),
     'beallitasdb' => array('szoveg' => 'Főoldalszerk', 'fajl' => 'db/beallitasdb'),
-    'vizsgadb' => array('szoveg' => 'Vizsgaszerk', 'fajl' => 'db/vizsgadb'),
-    'valaszdb' => array('szoveg' => 'Valaszszerk', 'fajl' => 'db/valaszdb'),
     'hibadb' => array('szoveg' => 'Hibaszerk', 'fajl' => 'db/hibadb'),
     'felhasznalodb' => array('szoveg' => 'Felhasznaloszerk', 'fajl' => 'db/felhasznalodb'),
 

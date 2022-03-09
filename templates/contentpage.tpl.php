@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title><?=$ablakcim?> - Ablak címe</title>
-    <link rel="stylesheet" href="./style.css" type="text/css">
-</head>
-<body>
 <?php
 if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] == 0)
 {
@@ -21,5 +13,3 @@ else
     ?></div><?php
 }
 ?>
-</body>
-</html>

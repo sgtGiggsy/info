@@ -4,7 +4,6 @@ include('./includes/config.inc.php');
 include('./includes/functions.php');
 include('./includes/pages.inc.php');
 include('./includes/menu.inc.php');
-include('./settings.php');
 $RootPath = getenv('APP_ROOT_PATH');
 
 // Session indítása, vagy folytatása
@@ -202,6 +201,7 @@ if(!isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']))
 
 // Megjelenítendő oldal kiválasztása
 getSettings();
+include('./includes/prepageload.inc.php');
 $pagename = currentPage($pages);
 
 // Oldal megjelenítése

@@ -77,7 +77,7 @@ function ifUser()
 function mySQLConnect($querystring)
 {
 	## MySQL connect ##
-	include('settings.php');
+	include('config.inc.php');
 	
 	@$con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 
@@ -232,7 +232,7 @@ function getSettings()
 
 function checkLDAPConnection($host)
 {
-	include('settings.php');
+	include('config.inc.php');
 
 	if(@fsockopen("$host", $LDAP_PORT, $errno, $errstr, 30))
 	{
@@ -297,6 +297,7 @@ function parseUserAgent($uastring)
 			$opsystem = "Linux";
 		}
 
+		$arch = null;
 		if(str_contains($x, "64"))
 		{
 			$arch = "64bit";
