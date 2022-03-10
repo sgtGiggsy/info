@@ -399,7 +399,7 @@ nav.greedy {
     white-space: nowrap;
   }
   
-  nav.greedy ul.links li:hover {
+  nav.greedy ul.links li:hover, li.nav-active {
     background-color: #666;
   }
   

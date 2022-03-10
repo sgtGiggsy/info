@@ -100,7 +100,7 @@
 <!-- Menürész -->
 	<div class="menubar"></div>
 		<div class="menu">
-			<?php showMenu($menuitems, false); ?>
+			<?php $menuterulet = 1; include('./includes/menu.inc.php'); ?>
 		</div>
 	
 <!-- Oldaltörzs -->	

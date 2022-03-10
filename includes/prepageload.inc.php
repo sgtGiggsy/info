@@ -1,7 +1,7 @@
 <?php
 
 // Betöldendő oldal kiválasztásának elvégzése
-$menu = mySQLConnect("SELECT * FROM menupontok");
+$menu = mySQLConnect("SELECT * FROM menupontok ORDER BY sorrend ASC, id DESC");
 
 if(!(isset($_GET['page'])))
 {
@@ -28,3 +28,33 @@ if(!isset($currentpage))
 }
 
 // Felhasználó jogosultságának ellenőrzése
+$felhid = $_SESSION[getenv('SESSION_NAME').'id'];
+$jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $felhid");
+
+$menuk = array();
+
+foreach($menu as $menupont)
+{
+    if(!isset($menuk[$menupont['menuterulet']]))
+    {
+        $menuk[$menupont['menuterulet']] = array();
+    }
+
+    if($menupont['aktiv'] == 3 || ($menupont['aktiv'] == 2 && $_SESSION[getenv('SESSION_NAME').'id']) || ($menupont['aktiv'] == 4 && !$_SESSION[getenv('SESSION_NAME').'id']))
+    {
+        array_push($menuk[$menupont['menuterulet']], $menupont);
+    }
+    elseif($menupont['aktiv'] == 1 && $_SESSION[getenv('SESSION_NAME').'id'])
+    {
+        foreach($jogosultsagok as $jogosultsag)
+        {
+            if($menupont['id'] == $jogosultsag['menupont'])
+            {
+                if($jogosultsag['csoportolvas'] == 1)
+                {
+                    array_push($menuk[$menupont['menuterulet']], $menupont);
+                }
+            }
+        }
+    }
+}

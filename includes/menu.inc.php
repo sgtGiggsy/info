@@ -1,9 +1,17 @@
 <?php
 
-$menuitems = array(
-    1 => array('cimke' => $pages['/']['szoveg'], 'url' => '/', 'jog' => 0,'parent' => 0, 'aktiv' => true),
-    5 => array('cimke' => $pages['hibajelzesek']['szoveg'], 'url' => 'hibajelzesek', 'jog' => 10,'parent' => 0, 'aktiv' => false),
-    6 => array('cimke' => $pages['felhasznalok']['szoveg'], 'url' => 'felhasznalok', 'jog' => 10,'parent' => 0, 'aktiv' => true),
-    8 => array('cimke' => $pages['bejelentkezesek']['szoveg'], 'url' => 'bejelentkezesek', 'jog' => 10,'parent' => 0, 'aktiv' => true),
-    9 => array('cimke' => $pages['bejelentkezesihibak']['szoveg'], 'url' => 'bejelentkezesihibak', 'jog' => 10,'parent' => 0, 'aktiv' => true)
-);
+if($menuterulet == 1)
+{
+	?><nav class="greedy">
+		<ul class="links"><?php
+		foreach($menuk[1] as $menupont)
+		{
+			?><li <?=(($menupont['url'] == $pagetofind) ? 'class="nav-active"' : '')?>>
+				<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=$menupont['menupont']?></a>	
+			</li><?php
+		}
+		?></ul>
+		<button aria-label="További oldalak"><img src="<?=$RootPath?>/images/hamburger.png" alt="További oldalak"></button>
+		<ul class='hidden-links hidden'></ul>
+	</nav><?php
+}
