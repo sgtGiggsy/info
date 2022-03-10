@@ -53,6 +53,7 @@ foreach($menu as $menupont)
                 if($jogosultsag['csoportolvas'] == 1)
                 {
                     array_push($menuk[$menupont['menuterulet']], $menupont);
+                    break;
                 }
             }
         }

@@ -7,6 +7,12 @@ if(!isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']) || $_SESSION[getenv('
 }
 else
 {
+// Adatbázis írás funkció    
+    if(count($_POST) > 0)
+    {
+        $irhat = true;
+        include("./db/felhasznalodb.php");
+    }
     if(!isset($_GET['id']))
     {
         echo "Nincs kiválasztott felhasználó!";
@@ -29,16 +35,52 @@ else
             <p>Email: <?=$felhasznalo['email']?></p>
             <p>Első belépés ideje: <?=$felhasznalo['elsobelepes']?></p>
 
-            <form action="?page=felhasznalodb&action=update" method="post">
-                <input type ="hidden" id="id" name="id" value=<?=$id?> />
-                <div>
-                    <label for="jogosultsag">Jogosultság szint
-                    <input type="text" accept-charset="utf-8" name="jogosultsag" id="jogosultsag" value="<?=$felhasznalo['jogosultsag']?>"></input></label>
-                    <br><small>Jelen oldalon a számnak nincs nagy jelentősége. 10 alatt mindenki felhasználó, afelett mindenki admin. 51-től lesz valaki kvázi szuperadmin akinek joga van a felhasználók admin státuszának megváltoztatására is.</small>
-                </div>
+            <form action="<?=$RootPath?>/felhasznaloszerkeszt&action=update" method="post">
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th style="width: 15%">Csoport olvas</th>
+                            <th style="width: 15%">Mind olvas</th>
+                            <th style="width: 15%">Saját ír</th>
+                            <th style="width: 15%">Mind ír</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                <input type ="hidden" id="id" name="id" value=<?=$id?> /><?php
+                foreach($menu as $x)
+                {
+                    $jogosultsag = array("csoportolvas" => null, "mindolvas" => null, "sajatir" => null, "mindir" => null);
+                    foreach($jogosultsagok as $y)
+                    {
+                        if($y['menupont'] == $x['id'])
+                        {
+                            $jogosultsag = $y;
+                            break;
+                        }
+                    }
+                    ?><tr id="<?=$x['oldal']?>">
+                        <td>
+                            <label for="<?=$x['oldal']?>"><?=$x['menupont']?></label>
+                        </td>
+                        <td>
+                            <input type="checkbox" value= "1" name="csoportolvas-<?=$x['id']?>" <?=($jogosultsag['csoportolvas']) ? 'checked' : '' ?>>
+                        </td>
+                        <td>
+                            <input type="checkbox" value= "1" name="mindolvas-<?=$x['id']?>" <?=($jogosultsag['mindolvas']) ? 'checked' : '' ?>>
+                        </td>
+                        <td>
+                            <input type="checkbox" value= "1" name="sajatir-<?=$x['id']?>" <?=($jogosultsag['sajatir']) ? 'checked' : '' ?>>
+                        </td>
+                        <td>
+                            <input type="checkbox" value= "1" name="mindir-<?=$x['id']?>" <?=($jogosultsag['mindir']) ? 'checked' : '' ?>>
+                        </td>
+                        <?php
+                }
+                ?></tbody></table>
                 <div class="submit"><input type="submit" value=<?=$button?>></div>
             </form>
-            <form action='?page=felhasznalok' method='post'>
+            <form action='felhasznalok' method='POST'>
                 <div class='submit'><input type='submit' value=Mégsem></div>
             </form><?php
         }
