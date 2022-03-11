@@ -49,16 +49,7 @@ else
         $where = "WHERE nev LIKE '%$keres%' OR felhasznalonev LIKE '%$keres%' OR osztaly LIKE '%$keres%'";
     }
 
-    $lista = mySQLConnect("SELECT id as felhasznaloid, nev, felhasznalonev, jogosultsag, email, elsobelepes, osztaly,
-    (SELECT COUNT(IF(tesztvalaszok.valasz = valaszok.id AND valaszok.helyes, 1, null)) as jovalasz
-        FROM tesztvalaszok
-            INNER JOIN valaszok ON tesztvalaszok.valasz = valaszok.id
-            INNER JOIN kitoltesek ON tesztvalaszok.kitoltes = kitoltesek.id
-        WHERE kitoltesek.felhasznalo = felhasznaloid
-        GROUP BY kitoltesek.id
-        ORDER BY jovalasz DESC
-        LIMIT 1) AS legjobb,
-        (SELECT COUNT(*) FROM kitoltesek WHERE felhasznalo = felhasznaloid) AS kitoltesszam
+    $lista = mySQLConnect("SELECT id as felhasznaloid, nev, felhasznalonev, jogosultsag, email, elsobelepes, osztaly
     FROM felhasznalok
     $where
     LIMIT $start, $megjelenit;");
@@ -97,8 +88,6 @@ else
                 <td>Részleg</td>
                 <td>Jogosultság</td>
                 <td>Első bejelentkezés</td>
-                <td>Legjobb eredmény</td>
-                <td>Kitöltések</td>
             </tr>
         </thead>
         <tbody><?php
@@ -120,8 +109,6 @@ else
                 <td><?=$x['osztaly']?></td>
                 <td><?=($x['jogosultsag'] < 10) ? "Felhasználó" : "Adminisztrátor";?></td>
                 <td><?=$x['elsobelepes']?></td>
-                <td><?=$x['legjobb']?></td>
-                <td><?=$x['kitoltesszam']?></td>
             </tr><?php
         }
         ?></tbody>

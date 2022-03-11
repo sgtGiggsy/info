@@ -48,6 +48,7 @@ else
                     </thead>
                     <tbody>
                 <input type ="hidden" id="id" name="id" value=<?=$id?> /><?php
+                $jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $id");
                 foreach($menu as $x)
                 {
                     $jogosultsag = array("csoportolvas" => null, "mindolvas" => null, "sajatir" => null, "mindir" => null);

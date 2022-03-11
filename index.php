@@ -201,7 +201,7 @@ if(!isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']))
 // Megjelenítendő oldal kiválasztása
 getSettings();
 include('./includes/prepageload.inc.php');
-$pagename = currentPage($pages);
+//$pagename = currentPage($pages);
 
 // Oldal megjelenítése
 include('./templates/index.tpl.php');

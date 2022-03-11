@@ -482,7 +482,7 @@ select, input {
     border: 1px solid lightgray;
     border-radius: 0.25em;
     padding: 0.25em 0.5em;
-    font-size: 1.25rem;
+    font-size: 1rem;
     cursor: auto;
     line-height: 1.1;
     background-color: #fff;
