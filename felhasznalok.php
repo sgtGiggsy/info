@@ -1,5 +1,5 @@
 <?php
-if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] <= 10)
+if(!$csoportolvas)
 {
     echo "<h2>Az oldal kizárólag adminisztrátorok számára érhető el!</h2>";
 }

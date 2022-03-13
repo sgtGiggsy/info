@@ -1,79 +1,5 @@
 <?php
 
-function getAdminState()
-{
-	if(!isset($_SESSION)) 
-    { 
-        session_start(); 
-    }
-	$jog = 0;
-	if (isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']))
-	{
-		$jog = $_SESSION[getenv('SESSION_NAME').'jogosultsag'];
-	}
-	if ($jog > 1)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-function getFoadminState()
-{
-	if(!isset($_SESSION)) 
-    { 
-        session_start(); 
-    }
-	$jog = 0;
-	if (isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']))
-	{
-		$jog = $_SESSION[getenv('SESSION_NAME').'jogosultsag'];
-	}
-	if ($jog > 50)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-function ifUser()
-{
-	if (isset($_SESSION[getenv('SESSION_NAME').'id']))
-	{
-		$con = mySQLConnect(false);
-		if ($stmt = $con->prepare('SELECT id FROM felhasznalok WHERE id = ?'))
-		{
-			$stmt->bind_param('s', $_SESSION[getenv('SESSION_NAME').'id']);
-			$stmt->execute();
-			$stmt->store_result();
-		
-			if ($stmt->num_rows == 0)
-			{
-				session_destroy();
-				return false;
-			}
-			else
-			{
-				return true;
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
-	else
-	{
-		return false;
-	}
-}
-
 function mySQLConnect($querystring)
 {
 	## MySQL connect ##
@@ -140,45 +66,6 @@ function showMenu($menuitems, $admin)
 	</nav><?php
 }
 
-function currentPage($currentpage)
-{
-	$pagename = null;
-	foreach ($currentpage as $x => $oldal)
-	{
-		if (!(isset( $_GET['page'])))
-		{
-			$pagename = "fooldal";
-			break;
-		}
-		if ($x == $_GET['page'])
-		{
-			$pagename = $oldal['fajl'];
-			break;
-		}
-	}
-	$title = $oldal['szoveg'];
-
-	try
-	{
-		$page = @fopen("./{$pagename}.php", "r");
-		if (!$page) {
-			$page = @fopen("../{$pagename}.php", "r");
-			if(!$page)
-			{
-				throw new Exception();
-			}
-		}
-	}
-	catch(Exception $e)
-	{
-		$pagename = "404";
-		$title = "Oldal nem található!";
-		?><title>EIBSZ Vizsga - <?= $title  ?></title><?php
-	}
-
-	return $pagename;
-}
-
 function countVisitor($pagename)
 {
 	$oldal = $pagename;
@@ -208,25 +95,6 @@ function countVisitor($pagename)
 	else
 	{
 		echo "";
-	}
-}
-
-function getSettings()
-{
-	$beallitas = mySQLConnect("SELECT * FROM beallitasok");
-	foreach($beallitas as $x)
-	{
-		$nev = $x['nev'];
-		$ertek = trim($x['ertek']);
-		$_SESSION[getenv('SESSION_NAME')."$nev"] = $ertek;
-	}
-	if($_SESSION[getenv('SESSION_NAME').'ismetelheto'] == 0)
-	{
-		$_SESSION[getenv('SESSION_NAME').'ismetelheto'] = false;
-	}
-	else
-	{
-		$_SESSION[getenv('SESSION_NAME').'ismetelheto'] = true;
 	}
 }
 
@@ -328,4 +196,126 @@ function logLogin($felhasznalo)
         $stmt->bind_param('sssssss', $felhasznalo, $_SERVER['REMOTE_ADDR'], $gepadat['bongeszo'], $gepadat['bongeszover'], $gepadat['oprendszer'], $gepadat['oprendszerver'], $gepadat['architektura']);
 		$stmt->execute();
 	}
+}
+
+function timeStampToDateTimeLocal($timestamp)
+{
+    if($timestamp)
+	{
+		return str_replace(" ", "T", $timestamp);
+	}
+	else
+	{
+		return null;
+	}
+	
+}
+
+function dateTimeLocalToTimeStamp($datetimelocal)
+{
+	if($datetimelocal)
+	{
+		return str_replace("T", " ", $datetimelocal);
+	}
+	else
+	{
+		return null;
+	}
+}
+
+function eszkozPicker($current)
+{
+	$eszkozok = mySQLConnect("SELECT
+            eszkozok.id AS id,
+            sorozatszam,
+            gyartok.nev AS gyarto,
+            modellek.modell AS modell,
+            varians,
+            eszkoztipusok.nev AS tipus
+        FROM
+            eszkozok INNER JOIN
+                modellek ON eszkozok.modell = modellek.id INNER JOIN
+                gyartok ON modellek.gyarto = gyartok.id INNER JOIN
+                eszkoztipusok ON modellek.tipus = eszkoztipusok.id
+        ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, sorozatszam;");
+
+	?><div>
+		<label for="eszkoz">Eszköz:</label><br>
+		<select id="eszkoz" name="eszkoz" required>
+			<option value=""></option><?php
+			foreach($eszkozok as $x)
+			{
+				?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?= $x['gyarto'] . " " . $x['modell'] . $x['varians'] . " (" . $x['sorozatszam'] . ")" ?></option><?php
+			}
+		?></select>
+	</div><?php
+}
+
+function helyisegPicker($current)
+{
+	$helyisegek = mySQLConnect("SELECT
+            helyisegek.id AS id,
+            szam AS epuletszam,
+            helyisegszam,
+            helyisegnev,
+            epulet AS epuletid,
+            epuletek.nev AS epuletnev
+        FROM
+            helyisegek LEFT JOIN
+                epuletek ON helyisegek.epulet = epuletek.id
+        ORDER BY epuletszam, helyisegszam;");
+
+	?><div>
+	<label for="helyiseg">Helyiség:</label><br>
+	<select id="helyiseg" name="helyiseg">
+		<option value="" selected></option><?php
+		foreach($helyisegek as $x)
+		{
+			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?= $x['helyisegszam'] . " (" . $x['helyisegnev'] . ") " . $x['epuletszam'] . ". épület" ?></option><?php
+		}
+	?></select>
+	</div><?php
+}
+
+function rackPicker($current)
+{
+	$rackek = mySQLConnect("SELECT
+            rackszekrenyek.id AS id,
+            szam AS epuletszam,
+            helyisegszam,
+            helyisegnev,
+            epuletek.nev AS epuletnev,
+            rackszekrenyek.nev AS rack
+        FROM
+            rackszekrenyek LEFT JOIN
+                helyisegek ON rackszekrenyek.helyiseg = helyisegek.id LEFT JOIN
+                epuletek ON helyisegek.epulet = epuletek.id
+        ORDER BY epuletszam, helyisegszam, rackszekrenyek.nev;");
+
+	?><div>
+	<label for="rack">Rackszekrény:</label><br>
+	<select id="rack" name="rack">
+		<option value="" selected></option><?php
+		foreach($rackek as $x)
+		{
+			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?= $x['rack'] . " rack, " . $x['helyisegszam'] . " (" . $x['helyisegnev'] . ") " . $x['epuletszam'] . ". épület" ?></option><?php
+		}
+	?></select>
+	</div><?php
+}
+
+function gyartoPicker($current)
+{
+	$gyartok = mySQLConnect("SELECT * FROM gyartok");
+
+	?><div>
+	<label for="gyarto">Gyártó:</label><br>
+	<select id="gyarto" name="gyarto">
+		<option value="" selected></option><?php
+		foreach($gyartok as $x)
+		{
+			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+		}
+	?></select>
+	</div><?php
 }

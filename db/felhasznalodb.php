@@ -4,6 +4,15 @@ if(isset($irhat) && $irhat)
 {
     $con = mySQLConnect(false);
 
+    foreach($_POST as $key => $value)
+    {
+        echo "$key: $value <br>";
+        if ($value == "NULL" || $value == "")
+        {
+            $_POST[$key] = NULL;
+        }
+    }
+
     if($_GET["action"] == "new")
     {
     }
@@ -22,10 +31,10 @@ if(isset($irhat) && $irhat)
                 //echo "nincs $menuid<br>";
                 foreach($_POST as $key => $value)
                 {
-                    if("csoportolvas-$menuid" == $key)
+                    if("sajatolvas-$menuid" == $key)
                     {
-                        $stmt = $con->prepare('INSERT INTO jogosultsagok (felhasznalo, menupont, csoportolvas, mindolvas, sajatir, mindir) VALUES (?, ?, ?, ?, ?, ?)');
-                        $stmt->bind_param('ssssss', $felhasznalo, $menuid, $_POST["csoportolvas-$menuid"], $_POST["mindolvas-$menuid"], $_POST["sajatir-$menuid"], $_POST["mindir-$menuid"]);
+                        $stmt = $con->prepare('INSERT INTO jogosultsagok (felhasznalo, menupont, sajatolvas, csoportolvas, mindolvas, sajatir, csoportir, mindir) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+                        $stmt->bind_param('ssssssss', $felhasznalo, $menuid, $_POST["sajatolvas-$menuid"], $_POST["csoportolvas-$menuid"], $_POST["mindolvas-$menuid"], $_POST["sajatir-$menuid"], $_POST["csoportir-$menuid"], $_POST["mindir-$menuid"]);
                         $stmt->execute();
                         if(mysqli_errno($con) != 0)
                         {
@@ -38,11 +47,12 @@ if(isset($irhat) && $irhat)
             }
             else
             {
-                if(isset($_POST["csoportolvas-$menuid"]))
+                // megoldani, hogy a sajatolvas jog elvétele is működjön
+                if(isset($_POST["sajatolvas-$menuid"]))
                 {
                     $jogid = mysqli_fetch_assoc($xjogosultsag)['id'];
-                    $stmt = $con->prepare('UPDATE jogosultsagok SET csoportolvas=?, mindolvas=?, sajatir=?, mindir=? WHERE id=?');
-                    $stmt->bind_param('ssssi', $_POST["csoportolvas-$menuid"], $_POST["mindolvas-$menuid"], $_POST["sajatir-$menuid"], $_POST["mindir-$menuid"], $jogid);
+                    $stmt = $con->prepare('UPDATE jogosultsagok SET sajatolvas=?, csoportolvas=?, mindolvas=?, sajatir=?, csoportir=?, mindir=? WHERE id=?');
+                    $stmt->bind_param('ssssssi', $_POST["sajatolvas-$menuid"], $_POST["csoportolvas-$menuid"], $_POST["mindolvas-$menuid"], $_POST["sajatir-$menuid"], $_POST["csoportir-$menuid"], $_POST["mindir-$menuid"], $jogid);
                     $stmt->execute();
                     if(mysqli_errno($con) != 0)
                     {
