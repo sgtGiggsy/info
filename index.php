@@ -198,10 +198,116 @@ if(!isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']))
     $_SESSION[getenv('SESSION_NAME').'jogosultsag'] = 0;
 }
 
-// Megjelenítendő oldal kiválasztása
-getSettings();
-include('./includes/prepageload.inc.php');
-//$pagename = currentPage($pages);
+// Oldal működéséhez használt alapbeállítások betöltése
+$beallitas = mySQLConnect("SELECT * FROM beallitasok");
+foreach($beallitas as $x)
+{
+    $nev = $x['nev'];
+    $ertek = trim($x['ertek']);
+    $_SESSION[getenv('SESSION_NAME')."$nev"] = $ertek;
+}
+if($_SESSION[getenv('SESSION_NAME').'ismetelheto'] == 0)
+{
+    $_SESSION[getenv('SESSION_NAME').'ismetelheto'] = false;
+}
+else
+{
+    $_SESSION[getenv('SESSION_NAME').'ismetelheto'] = true;
+}
+
+// Betöldendő oldal kiválasztása, menüterületek feltöltése, és felhasználói jogosultságok megállapítása
+$menu = mySQLConnect("SELECT * FROM menupontok ORDER BY aktiv DESC, menuterulet ASC, sorrend ASC, id DESC");
+
+// Ha nincs betölteni kívánt oldal, a főoldal kiválasztása betöltésre
+if(!(isset($_GET['page'])))
+{
+    $pagetofind = "fooldal";
+}
+else
+{
+    $pagetofind = $_GET['page'];
+}
+
+// Felhasználó jogosultságainak lekérése, a menüpontok is ezalapján jelennek meg
+$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+$jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $felhasznaloid");
+
+// Menüterületeket tároló tömb elkészítése
+$menuk = array();
+
+foreach($menu as $menupont)
+{
+    if(!isset($menuk[$menupont['menuterulet']]))
+    {
+        $menuk[$menupont['menuterulet']] = array();
+    }
+
+    // Ha megvan a jelenlegi oldal, a hozzá tartozó jogosultságok beállítása
+    if($menupont['oldal'] == $pagetofind)
+    {
+        if($_SESSION[getenv('SESSION_NAME').'id'])
+		{
+			foreach($jogosultsagok as $jogosultsag)
+			{
+				if($menupont['id'] == $jogosultsag['menupont'])
+				{
+					($jogosultsag['sajatolvas']) ? $sajatolvas = true : $sajatolvas = false;
+					($jogosultsag['csoportolvas']) ? $csoportolvas = true : $csoportolvas = false;
+					($jogosultsag['mindolvas']) ? $mindolvas = true : $mindolvas = false;
+					($jogosultsag['sajatir']) ? $sajatir = true : $sajatir = false;
+					($jogosultsag['csoportir']) ? $csoportir = true : $csoportir = false;
+					($jogosultsag['mindir']) ? $mindir = true : $mindir = false;
+					break;
+				}
+			}
+		}
+        $currentpage = $menupont;
+    }
+
+    // Ha egy menüpont megjelenése nincs kifejezett joghoz kötve, menüterülethez adása
+    // ha joghoz kötött, a felhasználó jogosultsága szerinti eljárás
+    if($menupont['aktiv'] == 3 || ($menupont['aktiv'] == 2 && $_SESSION[getenv('SESSION_NAME').'id']) || ($menupont['aktiv'] == 4 && !$_SESSION[getenv('SESSION_NAME').'id']))
+    {
+        $sajatolvas = true;
+        array_push($menuk[$menupont['menuterulet']], $menupont);
+    }
+    elseif($menupont['aktiv'] == 1 && $_SESSION[getenv('SESSION_NAME').'id'])
+    {
+        foreach($jogosultsagok as $jogosultsag)
+        {
+            if($menupont['id'] == $jogosultsag['menupont'])
+            {
+                if($jogosultsag['sajatolvas'] == 1)
+                {
+                    array_push($menuk[$menupont['menuterulet']], $menupont);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+// Fallback megoldás arra az esetre, ha a lekérni próbált oldalhoz nincs adatbázis bejegyzés
+if(!isset($currentpage))
+{
+    $currentpage['url'] = $_GET['page'];
+    $currentpage['cimszoveg'] = "Oldal";
+}
+
+// Szükség esetén 404-es hibaoldal generálása
+try
+{
+    $page = @fopen("./{$currentpage['url']}.php", "r");
+    if (!$page) {
+        throw new Exception();
+    }
+}
+catch(Exception $e)
+{
+    http_response_code(404);
+    $currentpage['url'] = "404";
+    $currentpage['cimszoveg'] = "Oldal nem található!";
+}
 
 // Oldal megjelenítése
 include('./templates/index.tpl.php');
