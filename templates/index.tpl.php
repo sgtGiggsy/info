@@ -49,12 +49,12 @@
 					else if(t == "i")
 					{
 						if (dir == "asc") {
-							if (Number(x.innerHTML) > Number(y.innerHTML)) {
+							if (Number(x.innerHTML) < Number(y.innerHTML)) {
 							shouldSwitch = true;
 							break;
 							}
 						} else if (dir == "desc") {
-							if (Number(x.innerHTML) < Number(y.innerHTML)) {
+							if (Number(x.innerHTML) > Number(y.innerHTML)) {
 							shouldSwitch = true;
 							break;
 							}

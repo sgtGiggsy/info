@@ -76,6 +76,16 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
                         @$email = $ldapresults[0]['mail'][0];
                         @$nev = $ldapresults[0]['displayname'][0];
                         @$osztaly = $ldapresults[0]['department'][0];
+                        @$alakulat = alakulatValaszto($ldapresults[0]['company'][0]);
+                        @$telefon = $ldapresults[0]['telephonenumber'][0];
+                        @$beosztas = $ldapresults[0]['title'][0];
+                        /*foreach($ldapresults[0] as $x)
+                        {
+                            print_r($x);
+                            echo "<br>";
+                        }*/
+
+                        //echo $alakulat . " és " . $telefon;
                     }
                     break;
                 }
@@ -105,17 +115,17 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
         {
             if(isset($jelszo)) // Ha létezett már a felhasználó a MySQL adatbázisban, frissítjük az adatait a DC-től kapottakkal
             {
-                if ($stmt = $con->prepare('UPDATE felhasznalok SET jelszo=?, nev=?, email=?, osztaly=? WHERE felhasznalonev=?'))
+                if ($stmt = $con->prepare('UPDATE felhasznalok SET jelszo=?, nev=?, email=?, osztaly=?, alakulat=?, telefon=?, beosztas=? WHERE felhasznalonev=?'))
                 {
-                    $stmt->bind_param('sssss', $hashedpassword, $nev, $email, $osztaly, $samaccountname);
+                    $stmt->bind_param('ssssssss', $hashedpassword, $nev, $email, $osztaly, $alakulat, $telefon, $beosztas, $samaccountname);
                     $stmt->execute();
                 }
             }
             else // Ha nem létezett a felhasználó a MySQL adatbázisban, létrehozzuk (a jelen táblabeállítás szerint a MySQL-ben automatikusan 1-es, azaz legalacsonyabb belépett joggal jön létre minden felhasználó)
             {
-                if ($stmt = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, jelszo, nev, email, osztaly) VALUES (?, ?, ?, ?, ?)'))
+                if ($stmt = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, jelszo, nev, email, osztaly, alakulat, telefon, beosztas) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'))
                 {
-                    $stmt->bind_param('sssss', $samaccountname, $hashedpassword, $nev, $email, $osztaly);
+                    $stmt->bind_param('ssssssss', $samaccountname, $hashedpassword, $nev, $email, $osztaly, $alakulat, $telefon, $beosztas);
                     $stmt->execute();
                 }
             }
@@ -135,7 +145,7 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
                 echo "<h2>Sikeres bejelentkezés!</h2>";
                 $userdbid = mysqli_fetch_assoc($result)['id'];
                 $_SESSION[getenv('SESSION_NAME').'id'] = true;
-                logLogin($userdbid)
+                logLogin($userdbid);
                 ?><head><meta http-equiv="refresh" content="0; URL='./'" /></head><?php
             }
             else
@@ -179,8 +189,7 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
         $_SESSION[getenv('SESSION_NAME').'id'] = $row['id'];
         $_SESSION[getenv('SESSION_NAME').'felhasznalonev'] = $row['felhasznalonev'];
         $_SESSION[getenv('SESSION_NAME').'nev'] =  $row['nev'];
-        $_SESSION[getenv('SESSION_NAME').'jogosultsag'] = $row['jogosultsag'];
-        $_SESSION[getenv('SESSION_NAME').'email'] = $row['email'];
+        $_SESSION[getenv('SESSION_NAME').'jogosultsag'] =  $row['jogosultsag'];
     }
     else
     {

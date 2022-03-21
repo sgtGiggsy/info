@@ -49,8 +49,8 @@ else
         $where = "WHERE nev LIKE '%$keres%' OR felhasznalonev LIKE '%$keres%' OR osztaly LIKE '%$keres%'";
     }
 
-    $lista = mySQLConnect("SELECT id as felhasznaloid, nev, felhasznalonev, jogosultsag, email, elsobelepes, osztaly
-    FROM felhasznalok
+    $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev AS nev, felhasznalonev, jogosultsag, email, elsobelepes, osztaly, telefon, beosztas, alakulatok.nev AS alakulat
+    FROM felhasznalok LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
     $where
     LIMIT $start, $megjelenit;");
     ?><div class='oldalcim'>Felhasználók listája</div>
@@ -85,8 +85,10 @@ else
                 <td>Felhasználó</td>
                 <td>Usernév</td>
                 <td>Emailcím</td>
+                <td>Telefon</td>
+                <td>Alakulat</td>
                 <td>Részleg</td>
-                <td>Jogosultság</td>
+                <td>Beosztás</td>
                 <td>Első bejelentkezés</td>
             </tr>
         </thead>
@@ -106,8 +108,10 @@ else
                 <td><?=$x['nev']?></td>
                 <td><?=$x['felhasznalonev']?></td>
                 <td><?=$x['email']?></td>
+                <td><?=$x['telefon']?></td>
+                <td><?=$x['alakulat']?></td>
                 <td><?=$x['osztaly']?></td>
-                <td><?=($x['jogosultsag'] < 10) ? "Felhasználó" : "Adminisztrátor";?></td>
+                <td><?=$x['beosztas']?></td>
                 <td><?=$x['elsobelepes']?></td>
             </tr><?php
         }

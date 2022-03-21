@@ -66,8 +66,8 @@ else
                     <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
                     <td><?=$eszkoz['sorozatszam']?></td>
                     <td><?=$eszkoz['tipus']?></td>
-                    <td><?=$eszkoz['epuletszam']?> (<?=$eszkoz['epuletnev']?>)</td>
-                    <td><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</td>
+                    <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
+                    <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
                     <td><?=$eszkoz['rack']?></td>
                     <td><?=$eszkoz['tulajdonos']?></td>
                     <td nowrap><?=$eszkoz['beepitesideje']?></td>

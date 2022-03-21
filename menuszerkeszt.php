@@ -1,6 +1,6 @@
 <?php
 
-if(@$irhat)
+if(!@$mindir)
 {
 	echo "Nincs jogosultsága az oldal megtekintésére!";
 }

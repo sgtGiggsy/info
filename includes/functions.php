@@ -223,6 +223,34 @@ function dateTimeLocalToTimeStamp($datetimelocal)
 	}
 }
 
+function alakulatValaszto($ldapres)
+{
+	if(str_contains($ldapres, "59"))
+	{
+		return 1;
+	}
+	elseif(str_contains($ldapres, "43"))
+	{
+		return 2;
+	}
+	elseif(str_contains($ldapres, "Légijármű") || str_contains($ldapres, "LéJÜ"))
+	{
+		return 3;
+	}
+	elseif(str_contains($ldapres, "Légi Műveleti"))
+	{
+		return 4;
+	}
+	elseif(str_contains($ldapres, "Katonai Igazgatási és Központi") || str_contains($ldapres, "KIKNYP"))
+	{
+		return 5;
+	}
+	else
+	{
+		return null;
+	}
+}
+
 function eszkozPicker($current)
 {
 	$eszkozok = mySQLConnect("SELECT
@@ -237,7 +265,7 @@ function eszkozPicker($current)
                 modellek ON eszkozok.modell = modellek.id INNER JOIN
                 gyartok ON modellek.gyarto = gyartok.id INNER JOIN
                 eszkoztipusok ON modellek.tipus = eszkoztipusok.id
-        ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, sorozatszam;");
+        ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
 	?><div>
 		<label for="eszkoz">Eszköz:</label><br>
