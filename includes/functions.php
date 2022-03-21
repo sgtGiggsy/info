@@ -18,6 +18,7 @@ function mySQLConnect($querystring)
 
 	if($querystring && $con)
 	{
+		//echo $querystring;
 		$result = mysqli_query($con, $querystring);
 		$con->close();
 		return $result;

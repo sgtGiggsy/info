@@ -238,8 +238,11 @@ else
 }
 
 // Felhasználó jogosultságainak lekérése, a menüpontok is ezalapján jelennek meg
-$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
-$jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $felhasznaloid");
+if($_SESSION[getenv('SESSION_NAME').'id'])
+{
+    $felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+    $jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $felhasznaloid;");
+}
 
 // Menüterületeket tároló tömb elkészítése
 $menuk = array();

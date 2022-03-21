@@ -18,18 +18,18 @@ else
         $szulo[] = array("id" => $x['id'], "menupont" => $x['menupont']);
     }
     ?><div class="oldalcim">Menük adminisztrációja</div>
-    <table>
+    <table id="menupontok">
         <thead>
             <tr>
-                <th>Sorszám</th>
-                <th>Menüpont</th>
-                <th>Szülő</th>
-                <th>URL</th>
-                <th>Oldal</th>
-                <th>Címszöveg</th>
-                <th>Megjelenik</th>
-                <th>Menüterület</th>
-                <th>Sorrend</th>
+                <th class="tsorth" onclick="sortTable(0, 'i', 'menupontok')">Sorszám</th>
+                <th class="tsorth" onclick="sortTable(1, 's', 'menupontok')">Menüpont</th>
+                <th class="tsorth" onclick="sortTable(2, 's', 'menupontok')">Szülő</th>
+                <th class="tsorth" onclick="sortTable(3, 's', 'menupontok')">URL</th>
+                <th class="tsorth" onclick="sortTable(4, 's', 'menupontok')">Oldal</th>
+                <th class="tsorth" onclick="sortTable(5, 's', 'menupontok')">Címszöveg</th>
+                <th class="tsorth" onclick="sortTable(6, 's', 'menupontok')">Megjelenik</th>
+                <th class="tsorth" onclick="sortTable(7, 's', 'menupontok')">Menüterület</th>
+                <th class="tsorth" onclick="sortTable(8, 's', 'menupontok')">Sorrend</th>
             </tr>
         </thead>
         <tbody><?php
@@ -93,5 +93,12 @@ else
                     </form>
                 </tr>
         </tbody>
-    </table><?php
+    </table>
+    <script>
+    window.onload = function()
+	{
+        sortTable(1, 's', "menupontok");
+    }
+    </script>
+    <?php
 }

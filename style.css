@@ -541,6 +541,23 @@ label {
 
 /* Tartalom */
 
+.infobox {
+    display: grid;
+    display: -ms-grid;
+    -ms-grid-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    margin: auto;
+    width: 500px;
+    background-color: black;
+    color:rgb(224, 224, 224);
+    opacity: 0.5;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.infobox div {
+    padding: 0.1em 0.5em 0.1em 0.5em;
+}
+
 .oldalcim {
     font-size: 1.5em;
     font-weight: bold;
