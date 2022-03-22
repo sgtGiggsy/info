@@ -41,21 +41,21 @@ else
     ?><div class="oldalcim">Rack szerkesztése</div>
     <div class="contentcenter">
 
-    <div>
-        <label for="nev">Rack neve:</label><br>
-        <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$racknev?>"></input>
-    </div>
+        <div>
+            <label for="nev">Rack neve:</label><br>
+            <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$racknev?>"></input>
+        </div>
 
-    <div>
-        <label for="unitszam">Rack unitszáma:</label><br>
-        <input type="text" accept-charset="utf-8" name="unitszam" id="unitszam" value="<?=$rackunitszam?>"></input>
-    </div>
+        <div>
+            <label for="unitszam">Rack unitszáma:</label><br>
+            <input type="text" accept-charset="utf-8" name="unitszam" id="unitszam" value="<?=$rackunitszam?>"></input>
+        </div>
 
-    <?=helyisegPicker($rackhely)?>
+        <?=helyisegPicker($rackhely)?>
 
-    <?=gyartoPicker($rackgyarto)?>
+        <?=gyartoPicker($rackgyarto)?>
 
-    <div class="submit"><input type="submit" name="beKuld" value=<?=$button?>></div>
+        <div class="submit"><input type="submit" name="beKuld" value=<?=$button?>></div>
     </form><?php
 
     if(isset($_GET['id']))

@@ -34,46 +34,37 @@ else
                 epuletek ON helyisegek.epulet = epuletek.id LEFT JOIN
                 ipcimek ON beepitesek.ipcim = ipcimek.id LEFT JOIN
                 alakulatok ON eszkozok.tulajdonos = alakulatok.id
-        ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, sorozatszam;");
+        WHERE modellek.tipus = 1 OR modellek.tipus = 2
+        ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
     ?><div class="oldalcim">Minden eszköz</div>
     <table id="eszkozok">
         <thead>
             <tr>
-                <th class="tsorth" onclick="sortTable(0, 'i', 'eszkozok')">Sorszám</th>
-                <th class="tsorth" onclick="sortTable(1, 's', 'eszkozok')">IP cím</th>
-                <th class="tsorth" onclick="sortTable(2, 's', 'eszkozok')">Eszköznév</th>
-                <th class="tsorth" onclick="sortTable(3, 's', 'eszkozok')">Gyártó</th>
-                <th class="tsorth" onclick="sortTable(4, 's', 'eszkozok')">Modell</th>
-                <th class="tsorth" onclick="sortTable(5, 's', 'eszkozok')">Variáns</th>
-                <th class="tsorth" onclick="sortTable(6, 's', 'eszkozok')">Sorozatszám</th>
-                <th class="tsorth" onclick="sortTable(7, 's', 'eszkozok')">Eszköztípus</th>
-                <th class="tsorth" onclick="sortTable(8, 's', 'eszkozok')">Épület</th>
-                <th class="tsorth" onclick="sortTable(9, 's', 'eszkozok')">Helyiseg</th>
-                <th class="tsorth" onclick="sortTable(10, 's', 'eszkozok')">Rackszekrény</th>
-                <th class="tsorth" onclick="sortTable(11, 's', 'eszkozok')">Tulajdonos</th>
-                <th class="tsorth" onclick="sortTable(12, 's', 'eszkozok')">Beépítve</th>
-                <th class="tsorth" onclick="sortTable(13, 's', 'eszkozok')">Kiépítve</th>
+                <th class="tsorth" onclick="sortTable(0, 's', 'eszkozok')">IP cím</th>
+                <th class="tsorth" onclick="sortTable(1, 's', 'eszkozok')">Eszköznév</th>
+                <th class="tsorth" onclick="sortTable(2, 's', 'eszkozok')">Gyártó</th>
+                <th class="tsorth" onclick="sortTable(3, 's', 'eszkozok')">Modell</th>
+                <th class="tsorth" onclick="sortTable(4, 's', 'eszkozok')">Sorozatszám</th>
+                <th class="tsorth" onclick="sortTable(5, 's', 'eszkozok')">Eszköztípus</th>
+                <th class="tsorth" onclick="sortTable(6, 's', 'eszkozok')">Épület</th>
+                <th class="tsorth" onclick="sortTable(7, 's', 'eszkozok')">Helyiseg</th>
+                <th class="tsorth" onclick="sortTable(8, 's', 'eszkozok')">Rackszekrény</th>
             </tr>
         </thead>
         <tbody><?php
             foreach($mindeneszkoz as $eszkoz)
             {
                 ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
-                    <td><?=$eszkoz['id']?></td>
                     <td><?=$eszkoz['ipcim']?></td>
                     <td><?=$eszkoz['beepitesinev']?></td>
                     <td><?=$eszkoz['gyarto']?></td>
-                    <td><?=$eszkoz['modell']?></td>
-                    <td><?=$eszkoz['varians']?></td>
+                    <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
                     <td><?=$eszkoz['sorozatszam']?></td>
                     <td><?=$eszkoz['tipus']?></td>
-                    <td><?=$eszkoz['epuletszam']?> (<?=$eszkoz['epuletnev']?>)</td>
-                    <td><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</td>
+                    <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
+                    <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
                     <td><?=$eszkoz['rack']?></td>
-                    <td><?=$eszkoz['tulajdonos']?></td>
-                    <td nowrap><?=$eszkoz['beepitesideje']?></td>
-                    <td nowrap><?=$eszkoz['kiepitesideje']?></td>
                 </tr><?php
             }
         ?></tbody>

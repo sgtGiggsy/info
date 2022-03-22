@@ -52,6 +52,7 @@ else
     $epuletportok = mySQLConnect("SELECT * FROM epuletportok WHERE epulet = $epuletid;");
 
     ?><div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
+    <?=($mindir) ? "<a href='$RootPath/eszkozszerkeszt/$id?tipus=aktiv'>Eszköz szerkesztése</a>" : "" ?>
     <div class="infobox"><?php
         if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
         {
@@ -118,15 +119,17 @@ else
                 <th class="tsorth" onclick="sortTable(2, 's', 'switchportok')">VLAN</th>
                 <th class="tsorth" onclick="sortTable(3, 's', 'switchportok')">Állapot</th>
                 <th class="tsorth" onclick="sortTable(4, 's', 'switchportok')">Sebesség</th>
-                <th class="tsorth" onclick="sortTable(5, 's', 'switchportok')">Mód</th>
-                <th class="tsorth" onclick="sortTable(6, 's', 'switchportok')">Végpont</th>
+                <th class="tsorth" onclick="sortTable(5, 's', 'switchportok')">Port Mód</th>
+                <th class="tsorth" onclick="sortTable(6, 's', 'switchportok')">Tipus</th>
+                <th class="tsorth" onclick="sortTable(7, 's', 'switchportok')">Végpont</th>
             </tr>
         </thead>
         <tbody><?php
             foreach($switchportok as $port)
             {
                 ?><tr>
-                    <form action="<?=$RootPath?>/portszerkeszt&action=update" method="post">
+                    <form action="<?=$RootPath?>/switchportdb&action=update" method="post">
+                        <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
                         <td><input type="text" name="port" value="<?=$port['port']?>"></td>
                         <td><input type="text" name="nev" value="<?=$port['nev']?>"></td>
                         <td>
@@ -134,7 +137,7 @@ else
                                 <option value=""></option><?php
                                 foreach($vlanok as $x)
                                 {
-                                    ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['vlan']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                    ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['vlan']) ? "selected" : "" ?>><?=$x['id'] . " " . $x['nev']?></option><?php
                                 }
                             ?></select>
                         </td>
@@ -157,6 +160,12 @@ else
                             <select name="mode">
                                 <option value="1" <?=($port['mode'] == "1") ? "selected" : "" ?>>Trunk</option>
                                 <option value="2" <?=($port['mode'] == "2") ? "selected" : "" ?>>Access</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select name="tipus">
+                                <option value="1" <?=($port['tipus'] == "1") ? "selected" : "" ?>>Uplink</option>
+                                <option value="2" <?=($port['tipus'] == "2") ? "selected" : "" ?>>Access</option>
                             </select>
                         </td>
                         <td>
