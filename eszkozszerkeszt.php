@@ -37,12 +37,13 @@ else
     $tulajdonosok = mySQLConnect("SELECT * FROM alakulatok;");
     
     $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = $uplinkportok = $szoftver = null;
-    $button = "Beépítés";
+    $button = "Új eszköz";
     
     if(isset($_GET['id']))
     {
         $eszkid = $_GET['id'];
         $eszkoz = mySQLConnect("SELECT * FROM eszkozok WHERE id = $eszkid;");
+        $eszkoz = mysqli_fetch_assoc($eszkoz);
 
         if($eszkoztipus == "aktiv")
         {
@@ -55,8 +56,8 @@ else
             $uplinkportok = $aktiveszkoz['uplinkportok'];
             $szoftver = $aktiveszkoz['szoftver'];
 
-            ?><div class="oldalcim">Portok generálása az eszközhöz</div>
-            <div class="contentcenter">
+            ?><div class="oldalcim"><p onclick="rejtMutat('portgeneralas')" style="cursor: pointer">Portok generálása az eszközhöz</p></div>
+            <div class="contentcenter" id="portgeneralas" style='display: none'>
                 <form action="<?=$RootPath?>/switchportdb&action=generate" method="post" onsubmit="beKuld.disabled = true; return true;">
                     <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$eszkid?>>
                     
@@ -117,8 +118,6 @@ else
             </div><?php
         }
 
-        $eszkoz = mysqli_fetch_assoc($eszkoz);
-
         $modell = $eszkoz['modell'];
         $sorozatszam = $eszkoz['sorozatszam'];
         $tulajdonos = $eszkoz['tulajdonos'];
@@ -159,12 +158,12 @@ else
         </div>
 
         <div>
-            <label for="tulajdonos">Tulajdonos :</label><br>
+            <label for="tulajdonos">Tulajdonos:</label><br>
             <select id="tulajdonos" name="tulajdonos">
                 <option value="" selected></option><?php
                 foreach($tulajdonosok as $x)
                 {
-                    ?><option value="<?php echo $x["id"] ?>" <?= ($tulajdonos == $x['id']) ? "selected" : "" ?>><?=$x['rovid']?></option><?php
+                    ?><option value="<?=$x["id"] ?>" <?= ($tulajdonos == $x['id']) ? "selected" : "" ?>><?=$x['rovid']?></option><?php
                 }
             ?></select>
         </div><?php
@@ -172,22 +171,22 @@ else
         if($eszkoztipus == "aktiv")
         {
             ?><div>
-                <label for="mac">MAC Address</label><br>
+                <label for="mac">MAC Address:</label><br>
                 <input type="text" accept-charset="utf-8" name="mac" id="mac" value="<?=$mac?>"></input>
             </div>
 
             <div>
-                <label for="portszam">Access portok száma</label><br>
+                <label for="portszam">Access portok száma:</label><br>
                 <input type="text" accept-charset="utf-8" name="portszam" id="portszam" value="<?=$portszam?>"></input>
             </div>
 
             <div>
-                <label for="uplinkportok">Uplink portok száma</label><br>
+                <label for="uplinkportok">Uplink portok száma:</label><br>
                 <input type="text" accept-charset="utf-8" name="uplinkportok" id="uplinkportok" value="<?=$uplinkportok?>"></input>
             </div>
 
             <div>
-                <label for="szoftver">Szoftver</label><br>
+                <label for="szoftver">Szoftver:</label><br>
                 <input type="text" accept-charset="utf-8" name="szoftver" id="szoftver" value="<?=$szoftver?>"></input>
             </div><?php
         }

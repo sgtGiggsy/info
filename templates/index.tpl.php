@@ -87,7 +87,18 @@
 			$(".kattinthatotr").click(function() {
 			window.document.location = $(this).data("href");
 				});
-			});
+		});
+
+		function rejtMutat(id) {
+			if(document.getElementById(id).style.display == "grid")
+			{
+				document.getElementById(id).style.display = "none"
+			}
+			else
+			{
+				document.getElementById(id).style.display = "grid";
+			}
+		}
 	</script>
 </head>
 

@@ -11,26 +11,37 @@ else
         LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
         LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
     ORDER BY telephely, szam + 0;");
-    ?><div class="oldalcim">Épületek adminisztrációja</div>
-    <table>
-        <thead>
-            <tr>
-                <th>Telephely</th>
-                <th>Épületszám</th>
-                <th>Épület megnevezése</th>
-                <th>Típus</th>
-            </tr>
-        </thead>
-        <tbody><?php
-            foreach($epuletek as $epulet)
+    ?><div class="oldalcim">Épületek listája</div><?php
+    $zar = false;
+    foreach($epuletek as $epulet)
+    {
+        if(@$telephely != $epulet['telephely'])
+        {
+            if($zar)
             {
-                ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/epulet/<?=$epulet['id']?>'>
-                    <td><?=$epulet['telephely']?></td>
-                    <td><?=$epulet['szam']?></td>
-                    <td><?=$epulet['nev']?></td>
-                    <td><?=$epulet['tipus']?></td>
-                </tr><?php
+                ?></tbody>
+                </table><?php
             }
-        ?></tbody>
+
+            $telephely = $epulet['telephely'];
+            ?><h1><?=$epulet['telephely']?></h1>
+            <table id="<?=$telephely?>">
+            <thead>
+                <tr>
+                    <th class="tsorth" onclick="sortTable(0, 'i', '<?=$telephely?>')">Épületszám</th>
+                    <th class="tsorth" onclick="sortTable(1, 's', '<?=$telephely?>')">Épület megnevezése</th>
+                    <th class="tsorth" onclick="sortTable(2, 's', '<?=$telephely?>')">Típus</th>
+                </tr>
+            </thead>
+            <tbody><?php
+        }
+
+        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/epulet/<?=$epulet['id']?>'>
+            <td><?=$epulet['szam']?></td>
+            <td><?=$epulet['nev']?></td>
+            <td><?=$epulet['tipus']?></td>
+        </tr><?php
+    }
+    ?></tbody>
     </table><?php
 }

@@ -32,37 +32,27 @@ if(isset($mindir) && $mindir)
     }
     elseif($_GET["action"] == "generate")
     {
-        for($i = $_POST['kezdoacc']; $i <= $_POST['zaroacc']; $i++)
+        for($i = $_POST['kezdohelyisegszam']; $i <= $_POST['zarohelyisegszam']; $i++)
         {
-            //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
-            $port = $_POST['accportpre'] . $i; //$portsorszam;
-
-            $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg) VALUES (?, ?, ?)');
-            $stmt->bind_param('sss', $_POST['eszkoz'], $port, $_POST['accportsebesseg']);
-            $stmt->execute();
-        }
-
-        for($i = $_POST['kezdoupl']; $i <= $_POST['zaroupl']; $i++)
-        {
-            //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
-            $port = $_POST['uplportpre'] . $i; //$portsorszam;
-
-            $tipus = "1"; // Tipus 1 = uplink, Tipus 2 = access
-
-            $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg, tipus) VALUES (?, ?, ?, ?)');
-            $stmt->bind_param('ssss', $_POST['eszkoz'], $port, $_POST['uplportsebesseg'], $tipus);
-            $stmt->execute();
+            $helyisegszam = str_pad($i, $_POST['szamjegyszam'], "0", STR_PAD_LEFT);
+            $epulet = $_POST['epulet'];
+            $helyiseg = mySQLConnect("SELECT * FROM helyisegek WHERE epulet = $epulet AND helyisegszam = $helyisegszam");
+            if(mysqli_num_rows($helyiseg) == 0)
+            {
+                $stmt = $con->prepare('INSERT INTO helyisegek (epulet, emelet, helyisegszam) VALUES (?, ?, ?)');
+                $stmt->bind_param('sss', $epulet, $_POST['emelet'], $helyisegszam);
+                $stmt->execute();
+            }
         }
 
         if(mysqli_errno($con) != 0)
         {
-            echo "<h2>Portok hozzáadása sikertelen!<br></h2>";
+            echo "<h2>Helyiségek hozzáadása sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
         else
         {
-            $id = $_POST['eszkoz'];
-            header("Location: $RootPath/aktiveszkoz/$id");
+            header("Location: $backtosender");
         }
     }
     elseif($_GET["action"] == "delete")

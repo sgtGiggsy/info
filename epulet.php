@@ -15,6 +15,7 @@ else
     
     $epulet = mysqli_fetch_assoc($epuletek);
     ?><div class="oldalcim"><?=$epulet['telephely']?> - <?=$epulet['szam']?>. <?=$epulet['tipus']?> (<?=$epulet['nev']?>)</div>
+    <?=($mindir) ? "<a href='$RootPath/epuletszerkeszt/$epid'>Épület szerkesztése</a>" : "" ?>
     <table>
         <thead>
             <tr>

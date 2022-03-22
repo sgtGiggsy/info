@@ -35,7 +35,7 @@ else
                 ipcimek ON beepitesek.ipcim = ipcimek.id LEFT JOIN
                 alakulatok ON eszkozok.tulajdonos = alakulatok.id
         WHERE modellek.tipus = 1 OR modellek.tipus = 2
-        ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
+        ORDER BY epuletek.szam + 1, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
     ?><div class="oldalcim">Minden eszköz</div>
     <table id="eszkozok">
