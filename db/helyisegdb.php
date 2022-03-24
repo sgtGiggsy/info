@@ -14,11 +14,23 @@ if(isset($mindir) && $mindir)
     $backtosender = $_SERVER['HTTP_REFERER'];
     if($_GET["action"] == "new")
     {
+        $stmt = $con->prepare('INSERT INTO helyisegek (epulet, emelet, helyisegszam, helyisegnev) VALUES (?, ?, ?, ?)');
+        $stmt->bind_param('ssss', $_POST['epulet'], $_POST['emelet'], $_POST['helyisegszam'], $_POST['helyisegnev']);
+        $stmt->execute();
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>Helyiség hozzáadása sikertelen!<br></h2>";
+            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
+        {
+            header("Location: $backtosender");
+        }
     }
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE switchportok SET port=?, mode=?, vlan=?, sebesseg=?, nev=?, allapot=?, tipus=? WHERE id=?');
-        $stmt->bind_param('sssssssi', $_POST['port'], $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $_POST['id']);
+        $stmt = $con->prepare('UPDATE helyisegek SET epulet=?, emelet=?, helyisegszam=?, helyisegnev=? WHERE id=?');
+        $stmt->bind_param('ssssi', $_POST['epulet'], $_POST['emelet'], $_POST['helyisegszam'], $_POST['helyisegnev'], $_POST['id']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
