@@ -33,8 +33,15 @@ else
                 <input type ="hidden" id="epulet" name="epulet" value=<?=$epid?>>
                 
                 <div>
-                    <label for="emelet">Emelet<small> (földszint = 0)</small>:</label><br>
-                    <input type="text" accept-charset="utf-8" name="emelet" id="emelet"></input>
+                    <label for="emelet">Emelet:</label><br>
+                    <select id="emelet" name="emelet">
+                        <option value=""></option>
+                        <option value="0">Földszint</option>
+                        <option value="1">Első emelet</option>
+                        <option value="2">Második emelet</option>
+                        <option value="3">Harmadik emelet</option>
+                        <option value="4">Negyedik emelet</option>
+                    </select>
                 </div>
 
                 <div>

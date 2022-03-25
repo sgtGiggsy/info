@@ -640,6 +640,41 @@ label {
     font-size: 1.3em;
 }
 
+.breadcumblist {
+    float: left;
+    padding: 0px 0px 15px 0px;
+    font-size: small;
+  }
+
+  .breadcumblist ol {
+    margin: 0;
+    padding: 0;
+  }
+
+.breadcumblist ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333333;
+  }
+  
+  .breadcumblist li {
+    float: left;
+    padding: 0px 5px;
+  }
+  
+  .breadcumblist li a {
+    display: block;
+    color: #000;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  .breadcumblist li a:hover {
+  }
+
+
 /* Egyéni elemek */
 
 #fejlec {

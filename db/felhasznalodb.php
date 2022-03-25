@@ -6,13 +6,14 @@ if(isset($irhat) && $irhat)
 
     foreach($_POST as $key => $value)
     {
-        echo "$key: $value <br>";
+        //echo "$key: $value <br>";
         if ($value == "NULL" || $value == "")
         {
             $_POST[$key] = NULL;
         }
     }
 
+    $backtosender = $_SERVER['HTTP_REFERER'];
     if($_GET["action"] == "new")
     {
     }
@@ -38,8 +39,12 @@ if(isset($irhat) && $irhat)
                         $stmt->execute();
                         if(mysqli_errno($con) != 0)
                         {
-                            echo "<h2>A válasz hozzáadása sikertelen!<br></h2>";
+                            echo "<h2>A jogosultsag hozzáadása sikertelen!<br></h2>";
                             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+                        }
+                        else
+                        {
+                            header("Location: $backtosender");
                         }
                         break;
                     }
@@ -56,8 +61,12 @@ if(isset($irhat) && $irhat)
                     $stmt->execute();
                     if(mysqli_errno($con) != 0)
                     {
-                        echo "<h2>A válasz hozzáadása sikertelen!<br></h2>";
+                        echo "<h2>A jogosultsag hozzáadása sikertelen!<br></h2>";
                         echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+                    }
+                    else
+                    {
+                        header("Location: $backtosender");
                     }
                 }
             }

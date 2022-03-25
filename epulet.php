@@ -18,8 +18,9 @@ else
         ORDER BY helyisegszam ASC;");
     
     $epulet = mysqli_fetch_assoc($epuletek);
-    ?><div class="oldalcim"><?=$epulet['telephely']?> - <?=$epulet['szam']?>. <?=$epulet['tipus']?> (<?=$epulet['nev']?>)</div>
-    <?=($mindir) ? "<a href='$RootPath/epuletszerkeszt/$epid'>Épület szerkesztése</a>" : "" ?>
+    ?><?=($mindir) ? "<a href='$RootPath/epuletszerkeszt/$epid'>Épület szerkesztése</a>" : "" ?>
+    <div class="oldalcim"><?=$epulet['telephely']?> - <?=$epulet['szam']?>. <?=$epulet['tipus']?> (<?=$epulet['nev']?>)</div>
+    
     <div class="oldalcim">Helyiségek</div><?php
     $zar = false;
     foreach($helyisegek as $helyiseg)

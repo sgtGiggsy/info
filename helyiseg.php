@@ -7,7 +7,7 @@ if(!@$mindolvas)
 else
 {
     $helyisegid = $_GET['id'];
-    $helyiseg = mySQLConnect("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely
+    $helyiseg = mySQLConnect("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
         FROM helyisegek
             INNER JOIN epuletek ON helyisegek.epulet = epuletek.id
             INNER JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
@@ -17,7 +17,7 @@ else
 
     $rackek = mySQLConnect("SELECT rackszekrenyek.id AS id, rackszekrenyek.nev AS nev, gyartok.nev AS gyarto, unitszam
         FROM rackszekrenyek
-            INNER JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
+            LEFT JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
         WHERE helyiseg = $helyisegid;");
 
     $eszkozok = mySQLConnect("SELECT
@@ -45,8 +45,40 @@ else
                 alakulatok ON eszkozok.tulajdonos = alakulatok.id
         WHERE helyisegek.id = $helyisegid AND kiepitesideje IS NULL
         ORDER BY pozicio;");
-    ?><div class="oldalcim"><?=$helyiseg['telephely']?> - <?=$helyiseg['epuletszam']?>. <?=$helyiseg['tipus']?> - <?=$helyiseg['helyisegszam']?> (<?=$helyiseg['helyisegnev']?>)</div>
+
+    ?><div class="breadcumblist">
+        <ol vocab="https://schema.org/" typeof="BreadcrumbList">
+            <li property="itemListElement" typeof="ListItem">
+                <a property="item" typeof="WebPage"
+                    href="<?=$RootPath?>/">
+                <span property="name">Kecskemét Informatika</span></a>
+                <meta property="position" content="1">
+            </li>
+            <li><b>></b></li>
+            <li property="itemListElement" typeof="ListItem">
+                <a property="item" typeof="WebPage"
+                    href="<?=$RootPath?>/epuletek/<?=$helyiseg['thelyid']?>">
+                <span property="name"><?=$helyiseg['telephely']?></span></a>
+                <meta property="position" content="2">
+            </li>
+            <li><b>></b></li>
+            <li property="itemListElement" typeof="ListItem">
+                <a property="item" typeof="WebPage"
+                    href="<?=$RootPath?>/epulet/<?=$helyiseg['epid']?>">
+                <span property="name"><?=$helyiseg['epuletszam']?>. <?=$helyiseg['tipus']?></span></a>
+                <meta property="position" content="3">
+            </li>
+            <li><b>></b></li>
+            <li property="itemListElement" typeof="ListItem">
+                <span property="name"><?=$helyiseg['helyisegszam']?> (<?=$helyiseg['helyisegnev']?>)</span>
+                <meta property="position" content="4">
+            </li>
+        </ol>
+    </div>
+
     <?=($mindir) ? "<a href='$RootPath/helyisegszerkeszt/$helyisegid'>Helyiség szerkesztése</a>" : "" ?>
+    <div class="oldalcim"><?=$helyiseg['helyisegszam']?> (<?=$helyiseg['helyisegnev']?>)</div>
+    
     <div class="oldalcim">Eszközök a helyiségben</div>
     <div>
         <table id="eszkozok">
