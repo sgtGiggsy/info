@@ -21,7 +21,8 @@ else
                 gyartok ON rackszekrenyek.gyarto = gyartok.id
         ORDER BY epuletszam, helyisegszam, helyisegnev, rack;");
     
-    ?><div class="oldalcim">Rackszekrények</div>
+    ?><?=($mindir) ? "<a href='$RootPath/rackszerkeszt'>Új rackszekrény hozzáadása</a>" : "" ?>
+    <div class="oldalcim">Rackszekrények</div>
     <table id="rackek">
         <thead>
             <tr>

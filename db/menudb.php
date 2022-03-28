@@ -18,8 +18,12 @@ if(isset($irhat) && $irhat)
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
-            echo "<h2>Vizsga elindítása sikertelen!<br></h2>";
+            echo "<h2>Menüpont hozzáadása sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
+        {
+            header("Location: $RootPath/menuszerkeszt");
         }
     }
     elseif($_GET["action"] == "update")
@@ -29,12 +33,18 @@ if(isset($irhat) && $irhat)
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
-            echo "<h2>Vizsga elindítása sikertelen!<br></h2>";
+            echo "<h2>Menüpont szerkesztése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
+        {
+            header("Location: $RootPath/menuszerkeszt");
         }
     }
     elseif($_GET["action"] == "delete")
     {
+        $record = null;
+        //mySQLConnect("DELETE FROM menupontok WHERE id = $record;");
+        //mySQLConnect("DELETE FROM jogosultsagok WHERE menupont = $record;");
     }
-    ?><head><meta http-equiv="refresh" content="1; URL='<?=$RootPath?>/menuszerkeszt'" /></head><?php
 }

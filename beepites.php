@@ -12,10 +12,24 @@ else
         include("./db/beepitesdb.php");
     }
 
-    $beepid = $beepnev = $beepeszk = $beepip = $beeprack = $beephely = $beeppoz = $beepido = $beepkiep = null;
+    $beepid = $beepnev = $beepeszk = $beepip = $beeprack = $beephely = $beeppoz = $beepido = $beepkiep = $admin = $pass = $megjegyzes = null;
     $button = "Beépítés";
 
-    $ipcimek = mySQLConnect("SELECT * FROM ipcimek ORDER BY ipcim ASC");
+    if(isset($_GET['eszkoz']))
+    {
+        $beepeszk = $_GET['eszkoz'];
+    }
+
+    $where = null;
+    if(!isset($_GET['id']))
+    {
+        $where = "WHERE beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL";
+    }
+    $ipcimek = mySQLConnect("SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim
+        FROM ipcimek
+            LEFT JOIN beepitesek ON ipcimek.id = beepitesek.ipcim
+        $where
+        ORDER BY vlan, ipcimek.ipcim;");
 
     if(isset($_GET['id']))
     {
@@ -31,6 +45,9 @@ else
         $beeppoz = $beepitve['pozicio'];
         $beepido = $beepitve['beepitesideje'];
         $beepkiep = $beepitve['kiepitesideje'];
+        $admin = $beepitve['admin'];
+        $pass = $beepitve['pass'];
+        $megjegyzes = $beepitve['megjegyzes'];
 
         $button = "Szerkesztés";
 
@@ -61,7 +78,7 @@ else
         ?></select>
     </div>
 
-    <?=eszkozPicker($beepeszk)?>
+    <?=eszkozPicker($beepeszk, ($beepid) ? true : false)?>
 
     <?=helyisegPicker($beephely)?>
 
@@ -82,14 +99,23 @@ else
         <input type="datetime-local" id="kiepitesideje" name="kiepitesideje" value="<?=timeStampToDateTimeLocal($beepkiep)?>">
     </div>
 
-    <div class="submit"><input type="submit" name="beKuld" value=<?=$button?>></div>
-    </form><?php
+    <div>
+        <label for="admin">Admin user:</label><br>
+        <input type="text" accept-charset="utf-8" name="admin" id="admin" value="<?=$admin?>"></input>
+    </div>
 
-    if(isset($_GET['id']))
-    {
-        ?><form action = '<?=$RootPath?>/beepites'>
-        <div class='submit'><input type='submit' value=Mégsem></div>
-        </form><?php
-    }
+    <div>
+        <label for="pass">Jelszó:</label><br>
+        <input type="text" accept-charset="utf-8" name="pass" id="pass" value="<?=$pass?>"></input>
+    </div>
+    
+    <div>
+        <label for="megjegyzes">Megjegyzés:</label><br>
+        <input type="text" accept-charset="utf-8" name="megjegyzes" id="megjegyzes" value="<?=$megjegyzes?>"></input>
+    </div>
+
+    <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
+    </form><?php
+    cancelForm();
 ?></div><?php
 }

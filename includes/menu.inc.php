@@ -1,5 +1,4 @@
 <?php
-
 if($menuterulet == 1)
 {
 	?><nav class="greedy">
@@ -7,7 +6,7 @@ if($menuterulet == 1)
 		foreach($menuk[1] as $menupont)
 		{
 			?><li <?=(($menupont['url'] == $pagetofind) ? 'class="nav-active"' : '')?>>
-				<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=$menupont['menupont']?></a>	
+				<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=trim($menupont['menupont'])?></a>	
 			</li><?php
 		}
 		?></ul>

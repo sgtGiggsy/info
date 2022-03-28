@@ -21,14 +21,14 @@ else
     <table id="menupontok">
         <thead>
             <tr>
-                <th class="tsorth" onclick="sortTable(0, 'i', 'menupontok')">Sorszám</th>
+                <th class="tsorth" onclick="sortTable(0, 's', 'menupontok')">ID</th>
                 <th class="tsorth" onclick="sortTable(1, 's', 'menupontok')">Menüpont</th>
                 <th class="tsorth" onclick="sortTable(2, 's', 'menupontok')">Szülő</th>
                 <th class="tsorth" onclick="sortTable(3, 's', 'menupontok')">URL</th>
                 <th class="tsorth" onclick="sortTable(4, 's', 'menupontok')">Oldal</th>
                 <th class="tsorth" onclick="sortTable(5, 's', 'menupontok')">Címszöveg</th>
                 <th class="tsorth" onclick="sortTable(6, 's', 'menupontok')">Megjelenik</th>
-                <th class="tsorth" onclick="sortTable(7, 's', 'menupontok')">Menüterület</th>
+                <th class="tsorth" onclick="sortTable(7, 's', 'menupontok')">Terület</th>
                 <th class="tsorth" onclick="sortTable(8, 's', 'menupontok')">Sorrend</th>
             </tr>
         </thead>
@@ -38,7 +38,7 @@ else
                 ?><tr>
                     <form action="<?=$RootPath?>/menuszerkeszt&action=update" method="post">
                         <td><input type ="hidden" id="id" name="id" value=<?=$menup['id']?>><h3><?=$menup['id']?></h3></td>
-                        <td><input type="text" name="menupont" value="<?=$menup['menupont']?>"></td>
+                        <td><input style="width: 20ch;" type="text" name="menupont" value="<?=$menup['menupont']?>"></td>
                         <td><select name="szulo">
                                 <option value="">Nincs</option><?php
                                 foreach($szulo as $x)
@@ -47,8 +47,8 @@ else
                                 }
                             ?></select>
                         </td>
-                        <td><input type="text" name="url" value="<?=$menup['url']?>"></td>
-                        <td><input type="text" name="oldal" value="<?=$menup['oldal']?>"></td>
+                        <td><input style="width: 20ch;" type="text" name="url" value="<?=$menup['url']?>"></td>
+                        <td><input style="width: 20ch;" type="text" name="oldal" value="<?=$menup['oldal']?>"></td>
                         <td><input type="text" name="cimszoveg" value="<?=$menup['cimszoveg']?>"></td>
                         <td><select name="aktiv">
                                 <option value="" <?=(!$menup['aktiv']) ? "selected" : "" ?>>Senkinek</option>
@@ -58,8 +58,8 @@ else
                                 <option value="4" <?=($menup['aktiv'] == "4") ? "selected" : "" ?>>Csak látogatóknak</option>
                             </select>
                         </td>
-                        <td><input type="text" name="menuterulet" value="<?=$menup['menuterulet']?>"></td>
-                        <td><input type="text" name="sorrend" value="<?=$menup['sorrend']?>"></td>
+                        <td><input style="width: 6ch;" type="text" name="menuterulet" value="<?=$menup['menuterulet']?>"></td>
+                        <td><input style="width: 6ch;" type="text" name="sorrend" value="<?=$menup['sorrend']?>"></td>
                         <td><input type="submit" value="Módosítás"></td>
                     </form>
                 </tr><?php
@@ -67,7 +67,7 @@ else
             ?><tr>
                 <form action="<?=$RootPath?>/menuszerkeszt&action=new" method="post">
                     <td><h3>Új menü</h3></td>
-                    <td><input type="text" name="menupont"></td>
+                    <td><input style="width: 20ch;" type="text" name="menupont"></td>
                     <td><select name="szulo">
                             <option value="">Nincs</option><?php
                             foreach($szulo as $x)
@@ -76,8 +76,8 @@ else
                             }
                         ?></select>
                     </td>
-                    <td><input type="text" name="url"></td>
-                    <td><input type="text" name="oldal"></td>
+                    <td><input style="width: 20ch;" type="text" name="url"></td>
+                    <td><input style="width: 20ch;" type="text" name="oldal"></td>
                     <td><input type="text" name="cimszoveg"></td>
                     <td><select name="aktiv">
                             <option value="">Senkinek</option>
@@ -87,11 +87,11 @@ else
                             <option value="4">Csak látogatóknak</option>
                         </select>
                     </td>
-                    <td><input type="text" name="menuterulet"></td>
-                    <td><input type="text" name="sorrend"></td>
+                    <td><input style="width: 6ch;" type="text" name="menuterulet"></td>
+                    <td><input style="width: 6ch;" type="text" name="sorrend"></td>
                     <td><input type="submit" value="Új"></td>
-                    </form>
-                </tr>
+                </form>
+            </tr>
         </tbody>
     </table>
     <script>

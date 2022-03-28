@@ -13,7 +13,6 @@ if(isset($irhat) && $irhat)
         }
     }
 
-    $backtosender = $_SERVER['HTTP_REFERER'];
     if($_GET["action"] == "new")
     {
     }

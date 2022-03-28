@@ -21,11 +21,16 @@ else
             eszkoztipusok.nev AS tipus,
             epuletek.nev AS epuletnev,
             epuletek.szam AS epuletszam,
+            epulettipusok.tipus AS epulettipus,
+            telephelyek.telephely AS telephely,
+            telephelyek.id AS thelyid,
+            helyisegek.id AS helyisegid,
             helyisegszam,
             helyisegnev,
             beepitesideje,
             kiepitesideje,
             alakulatok.rovid AS tulajdonos,
+            rackszekrenyek.id AS rackid,
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
             ipcimek.ipcim AS ipcim
@@ -38,10 +43,13 @@ else
                 LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
                 LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
                 LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+                LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
+                LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                 LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
         WHERE eszkozok.id = $id AND modellek.tipus < 11
         ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
+
     if(mysqli_num_rows($aktiveszkozok) == 0)
     {
         echo "Nincs ilyen sorszámú aktív eszköz";
@@ -50,34 +58,77 @@ else
     {
         $eszkoz = mysqli_fetch_assoc($aktiveszkozok);
 
+        ?><div class="breadcumblist">
+            <ol vocab="https://schema.org/" typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/">
+                    <span property="name">Kecskemét Informatika</span></a>
+                    <meta property="position" content="1">
+                </li>
+                <li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
+                    <span property="name"><?=$eszkoz['telephely']?></span></a>
+                    <meta property="position" content="2">
+                </li>
+                <li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
+                    <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
+                    <meta property="position" content="3">
+                </li>
+                <li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
+                    <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
+                    <meta property="position" content="4">
+                </li>
+                <?php if($eszkoz['rackid'])
+                {
+                    ?><li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
+                        <span property="name"><?=$eszkoz['rack']?></span></a>
+                        <meta property="position" content="4">
+                    </li><?php
+                }
+                ?><li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <span property="name"><?=$eszkoz['beepitesinev']?> (<?=$eszkoz['ipcim']?>)</span>
+                    <meta property="position" content="4">
+                </li>
+            </ol>
+        </div><?php
+
         $epuletid = $eszkoz['epuletid'];
         $vlanok = mySQLConnect("SELECT * FROM vlanok;");
         $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
-        $switchportok = mySQLConnect("SELECT switchportok.id AS id, allapot, eszkoz, mode, nev, sebesseg, tipus, vlan, portok.port, csatlakozo, portok.id AS portid, kapcsolatportok.id AS kapcsolat
+        $switchportok = mySQLConnect("SELECT switchportok.id AS id, allapot, eszkoz, mode, nev, sebesseg, tipus, vlan, portok.port, csatlakozo, portok.id AS portid, csatlakozas
             FROM switchportok
                 INNER JOIN portok ON switchportok.port = portok.id
-                LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
                 WHERE eszkoz = $id;");
-        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, kapcsolatportok.id AS kapcsolat
+        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
             FROM portok
                 INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-                LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
             WHERE epulet = $epuletid
             UNION
-            SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, kapcsolatportok.id AS kapcsolat
+            SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
             FROM portok
                 INNER JOIN transzportportok ON transzportportok.port = portok.id
-                LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
             WHERE epulet = $epuletid
             UNION
-            SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, kapcsolatportok.id AS kapcsolat
+            SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
             FROM portok
                 INNER JOIN switchportok ON portok.id = switchportok.port
                 INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
                 INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
                 INNER JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
                 INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
-                LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
             WHERE helyisegek.epulet = $epuletid AND eszkozok.id != $id;");
         $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
 
@@ -97,7 +148,7 @@ else
                 <div>Rackszekrény</div>
                 <div><?=$eszkoz['rack']?></div>
                 <div>Beépítés ideje</div>
-                <div><?=$eszkoz['beepitesideje']?></div>
+                <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
                 <?php
             }
             elseif(!$eszkoz['beepitesideje'])
@@ -118,9 +169,9 @@ else
                 <div>Rackszekrény</div>
                 <div><?=$eszkoz['rack']?></div>
                 <div>Utolsó beépítés ideje</div>
-                <div><?=$eszkoz['beepitesideje']?></div>
+                <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
                 <div>Kiépítés ideje</div>
-                <div><?=$eszkoz['kiepitesideje']?></div>
+                <div><?=timeStampToDate($eszkoz['kiepitesideje'])?></div>
                 <?php
             }
             ?><div>Gyártó</div>
@@ -159,11 +210,12 @@ else
                 foreach($switchportok as $port)
                 {
                     ?><tr>
-                        <form action="<?=$RootPath?>/switchportdb&action=update" method="post">
+                        <!--<form action="">-->
+                        <form action="?page=portdb&action=update&tipus=switch" method="post">
                             <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
                             <input type ="hidden" id="portid" name="portid" value=<?=$port['portid']?>>
-                            <td><input type="text" name="port" value="<?=$port['port']?>"></td>
-                            <td><input type="text" name="nev" value="<?=$port['nev']?>"></td>
+                            <td><input style="width: 10ch;" type="text" name="port" value="<?=$port['port']?>"></td>
+                            <td><input style="width: 16ch;" type="text" name="nev" value="<?=$port['nev']?>"></td>
                             <td>
                                 <select name="vlan">
                                     <option value=""></option><?php
@@ -210,11 +262,18 @@ else
                                 ?></select>
                             </td>
                             <td>
-                                <select name="epuletport">
+                                <select name="csatlakozas">
                                     <option value="" selected></option><?php
+                                    $elozo = null;
                                     foreach($epuletportok as $x)
                                     {
-                                        ?><option value="<?=$x['id']?>" <?=($x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                        // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
+                                        // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
+                                        if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                                        {
+                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                        }
+                                        $elozo = $x['id'];
                                     }
                                 ?></select>
                             </td>
@@ -226,3 +285,18 @@ else
         </table><?php
     }
 }
+?><script>
+    $("form").on("submit", function (e) {
+        var dataString = $(this).serialize();
+
+        $.ajax({
+        type: "POST",
+        data: dataString,
+        url: "<?=$RootPath?>/portdb?action=update&tipus=switch",
+        success: function () {
+            showToaster("Port szerkesztése sikeres...");
+        }
+    });
+    e.preventDefault();
+    });
+</script>

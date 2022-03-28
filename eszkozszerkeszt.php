@@ -6,12 +6,6 @@ if(!@$mindir)
 }
 else
 {
-    if(count($_POST))
-    {
-        $irhat = true;
-        include("./db/eszkozdb.php");
-    }
-    
     $wheretip = $eszkoztipus = null;
     if(isset($_GET['tipus']))
     {
@@ -26,6 +20,12 @@ else
             case "szerver": $wheretip = "WHERE modellek.tipus > 30 AND modellek.tipus < 41"; break;
         }
     }
+    
+    if(count($_POST))
+    {
+        $irhat = true;
+        include("./db/eszkozdb.php");
+    }
 
     $modellek = mySQLConnect("SELECT modellek.id AS id, gyartok.nev AS gyarto, modell, eszkoztipusok.nev AS tipus
     FROM modellek
@@ -38,9 +38,11 @@ else
     
     $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = $uplinkportok = $szoftver = null;
     $button = "Új eszköz";
+    $oldalcim = "Új eszköz létrehozása";
     
     if(isset($_GET['id']))
     {
+        $oldalcim = "Eszköz szerkesztése";
         $eszkid = $_GET['id'];
         $eszkoz = mySQLConnect("SELECT * FROM eszkozok WHERE id = $eszkid;");
         $eszkoz = mysqli_fetch_assoc($eszkoz);
@@ -58,7 +60,7 @@ else
 
             ?><div class="oldalcim"><p onclick="rejtMutat('portgeneralas')" style="cursor: pointer">Portok generálása az eszközhöz</p></div>
             <div class="contentcenter" id="portgeneralas" style='display: none'>
-                <form action="<?=$RootPath?>/switchportdb&action=generate" method="post" onsubmit="beKuld.disabled = true; return true;">
+                <form action="<?=$RootPath?>/portdb?action=generate&tipus=switch" method="post" onsubmit="beKuld.disabled = true; return true;">
                     <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$eszkid?>>
                     
                     <div>
@@ -132,8 +134,8 @@ else
     {
         ?><form action="<?=$RootPath?>/eszkozszerkeszt&action=new&tipus=<?=$eszkoztipus?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
     }
-    
-    ?><div class="oldalcim">Eszköz szerkesztése</div>
+
+    ?><div class="oldalcim"><?=$oldalcim?></div>
     <div class="contentcenter">
 
         <div>
@@ -191,7 +193,8 @@ else
             </div><?php
         }
 
-        ?><div class="submit"><input type="submit" name="beKuld" value=<?=$button?>></div>
-    </form>
-    </div><?php
+        ?><div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
+    </form><?php
+        cancelForm();
+    ?></div><?php
 }

@@ -20,7 +20,8 @@ else
     $where
     ORDER BY telephely, szam + 0;");
 
-    ?><div class="oldalcim">Épületek listája</div><?php
+    ?><?=($mindir) ? "<a href='$RootPath/epuletszerkeszt'>Új épület hozzáadása</a>" : "" ?>
+    <div class="oldalcim">Épületek listája</div><?php
     $zar = false;
     foreach($epuletek as $epulet)
     {
@@ -51,7 +52,7 @@ else
             <td><?=$epulet['szam']?></td>
             <td><?=$epulet['nev']?></td>
             <td><?=$epulet['tipus']?></td>
-            <td><a href='./epuletszerkeszt/<?=$epulet['id']?>'>Szerkesztés</a></td>
+            <td><a href='./epuletszerkeszt/<?=$epulet['id']?>'><img src='<?=$RootPath?>/images/edit.png' alt='Épület szerkesztése' title='Épület szerkesztése'/></a></td>
         </tr><?php
     }
     ?></tbody>

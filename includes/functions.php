@@ -199,6 +199,18 @@ function logLogin($felhasznalo)
 	}
 }
 
+function timeStampToDate($timestamp)
+{
+	if($timestamp)
+	{
+		return date('Y M j.', strtotime($timestamp));
+	}
+	else
+	{
+		return null;
+	}
+}
+
 function timeStampToDateTimeLocal($timestamp)
 {
     if($timestamp)
@@ -252,8 +264,43 @@ function alakulatValaszto($ldapres)
 	}
 }
 
-function eszkozPicker($current)
+function eszkozTipusValaszto($tipusid)
 {
+	if($tipusid < 11)
+	{
+		$eszktip = "aktiv";
+	}
+	elseif($tipusid == 11)
+	{
+		$eszktip = "szamitogep";
+	}
+	elseif($tipusid == 12)
+	{
+		$eszktip = "nyomtato";
+	}
+	elseif($tipusid < 21)
+	{
+		$eszktip = "vegponti";
+	}
+	elseif($tipusid < 31)
+	{
+		$eszktip = "konverter";
+	}
+	elseif($tipusid < 41)
+	{
+		$eszktip = "szerver";
+	}
+
+	return $eszktip;
+}
+
+function eszkozPicker($current, $beepitett)
+{
+	$where = null;
+	if(!$beepitett)
+	{
+		$where = "WHERE beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL";
+	}
 	$eszkozok = mySQLConnect("SELECT
             eszkozok.id AS id,
             sorozatszam,
@@ -262,10 +309,12 @@ function eszkozPicker($current)
             varians,
             eszkoztipusok.nev AS tipus
         FROM
-            eszkozok INNER JOIN
-                modellek ON eszkozok.modell = modellek.id INNER JOIN
-                gyartok ON modellek.gyarto = gyartok.id INNER JOIN
-                eszkoztipusok ON modellek.tipus = eszkoztipusok.id
+            eszkozok
+				INNER JOIN modellek ON eszkozok.modell = modellek.id
+				INNER JOIN gyartok ON modellek.gyarto = gyartok.id
+				INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
+				LEFT JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
+		$where
         ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
 	?><div>
@@ -292,7 +341,7 @@ function helyisegPicker($current)
         FROM
             helyisegek LEFT JOIN
                 epuletek ON helyisegek.epulet = epuletek.id
-        ORDER BY epuletszam, helyisegszam;");
+        ORDER BY epuletszam + 0, helyisegszam;");
 
 	?><div>
 	<label for="helyiseg">Helyiség:</label><br>
@@ -335,7 +384,7 @@ function rackPicker($current)
 
 function gyartoPicker($current)
 {
-	$gyartok = mySQLConnect("SELECT * FROM gyartok");
+	$gyartok = mySQLConnect("SELECT * FROM gyartok ORDER BY nev");
 
 	?><div>
 	<label for="gyarto">Gyártó:</label><br>
@@ -347,4 +396,21 @@ function gyartoPicker($current)
 		}
 	?></select>
 	</div><?php
+}
+
+function cancelForm()
+{
+	$RootPath = getenv('APP_ROOT_PATH');
+	if(isset($_SERVER['HTTP_REFERER']))
+	{
+		$backtosender = $_SERVER['HTTP_REFERER'];
+	}
+	else
+	{
+		$backtosender = $RootPath;
+	}
+	
+	?><form action='<?=$backtosender?>' method="post">
+        <div class='submit'><input type='submit' value='Mégsem'></div>
+    </form><?php
 }

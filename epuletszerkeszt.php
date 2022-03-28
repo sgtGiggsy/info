@@ -6,7 +6,7 @@ if(!@$mindir)
 }
 else
 {
-    if(count($_POST))
+    if(count($_POST) > 0)
     {
         $irhat = true;
         include("./db/epuletdb.php");
@@ -156,7 +156,8 @@ else
         ?></select>
     </div>
 
-    <div class="submit"><input type="submit" name="beKuld" value=<?=$button?>></div>
-    </form>
-    </div><?php
+    <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
+    </form><?php
+    cancelForm();
+?></div><?php
 }

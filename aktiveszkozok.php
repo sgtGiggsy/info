@@ -19,6 +19,8 @@ else
             helyisegnev,
             beepitesideje,
             kiepitesideje,
+            modellek.tipus AS tipusid,
+            beepitesek.id AS beepid,
             alakulatok.rovid AS tulajdonos,
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
@@ -37,7 +39,9 @@ else
         WHERE modellek.tipus = 1 OR modellek.tipus = 2
         ORDER BY epuletek.szam + 1, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
-    ?><div class="oldalcim">Minden eszköz</div>
+    $nembeepitett = array();
+    ?><?=($mindir) ? "<a href='$RootPath/eszkozszerkeszt?tipus=aktiv'>Új aktív eszköz hozzáadása</a>" : "" ?>
+    <div class="oldalcim">Aktív eszközök</div>
     <table id="eszkozok">
         <thead>
             <tr>
@@ -50,22 +54,56 @@ else
                 <th class="tsorth" onclick="sortTable(6, 's', 'eszkozok')">Épület</th>
                 <th class="tsorth" onclick="sortTable(7, 's', 'eszkozok')">Helyiseg</th>
                 <th class="tsorth" onclick="sortTable(8, 's', 'eszkozok')">Rackszekrény</th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody><?php
+
             foreach($mindeneszkoz as $eszkoz)
             {
-                ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
-                    <td><?=$eszkoz['ipcim']?></td>
-                    <td><?=$eszkoz['beepitesinev']?></td>
-                    <td><?=$eszkoz['gyarto']?></td>
-                    <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
-                    <td><?=$eszkoz['sorozatszam']?></td>
-                    <td><?=$eszkoz['tipus']?></td>
-                    <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
-                    <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
-                    <td><?=$eszkoz['rack']?></td>
-                </tr><?php
+                if(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
+                {
+                    $nembeepitett[] = $eszkoz;
+                }
+                else
+                {
+                    $beepid = $eszkoz['beepid'];
+                    $eszkid = $eszkoz['id'];
+                    $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
+                    ?><tr class='kattinthatotr' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
+                        <td><?=$eszkoz['ipcim']?></td>
+                        <td><?=$eszkoz['beepitesinev']?></td>
+                        <td><?=$eszkoz['gyarto']?></td>
+                        <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
+                        <td><?=$eszkoz['sorozatszam']?></td>
+                        <td><?=$eszkoz['tipus']?></td>
+                        <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
+                        <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
+                        <td><?=$eszkoz['rack']?></td>
+                        <td><?=($csoportir) ? "<a href='$RootPath/beepites/$beepid'><img src='$RootPath/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a>" : "" ?></td>
+                        <td><?=($csoportir) ? "<a href='$RootPath/eszkozszerkeszt/$eszkid?tipus=$eszktip'><img src='$RootPath/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a>" : "" ?></td>
+                    </tr><?php
+                }
+            }
+            foreach($nembeepitett as $eszkoz)
+            {
+                $beepid = $eszkoz['beepid'];
+                $eszkid = $eszkoz['id'];
+                $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
+                ?><tr style='font-weight: normal' class='kattinthatotr' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
+                        <td><?=$eszkoz['ipcim']?></td>
+                        <td><?=$eszkoz['beepitesinev']?></td>
+                        <td><?=$eszkoz['gyarto']?></td>
+                        <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
+                        <td><?=$eszkoz['sorozatszam']?></td>
+                        <td><?=$eszkoz['tipus']?></td>
+                        <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
+                        <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
+                        <td><?=$eszkoz['rack']?></td>
+                        <td><?=($csoportir) ? "<a href='$RootPath/beepites/$beepid'><img src='$RootPath/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a>" : "" ?></td>
+                        <td><?=($csoportir) ? "<a href='$RootPath/eszkozszerkeszt/$eszkid?tipus=$eszktip'><img src='$RootPath/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a>" : "" ?></td>
+                    </tr><?php
             }
         ?></tbody>
     </table><?php

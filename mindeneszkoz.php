@@ -19,61 +19,79 @@ else
             helyisegnev,
             beepitesideje,
             kiepitesideje,
+            modellek.tipus AS tipusid,
             alakulatok.rovid AS tulajdonos,
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
-            ipcimek.ipcim AS ipcim
-        FROM
-            eszkozok INNER JOIN
-                modellek ON eszkozok.modell = modellek.id INNER JOIN
-                gyartok ON modellek.gyarto = gyartok.id INNER JOIN
-                eszkoztipusok ON modellek.tipus = eszkoztipusok.id LEFT JOIN
-                beepitesek ON beepitesek.eszkoz = eszkozok.id LEFT JOIN
-                rackszekrenyek ON beepitesek.rack = rackszekrenyek.id LEFT JOIN
-                helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id LEFT JOIN
-                epuletek ON helyisegek.epulet = epuletek.id LEFT JOIN
-                ipcimek ON beepitesek.ipcim = ipcimek.id LEFT JOIN
-                alakulatok ON eszkozok.tulajdonos = alakulatok.id
+            ipcimek.ipcim AS ipcim,
+            beepitesek.megjegyzes AS megjegyzes
+        FROM eszkozok
+            INNER JOIN modellek ON eszkozok.modell = modellek.id
+            INNER JOIN gyartok ON modellek.gyarto = gyartok.id
+            INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
+            LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+            LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+            LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+            LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+            LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
+            LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
         ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
-    ?><div class="oldalcim">Minden eszköz</div>
-    <table id="eszkozok">
-        <thead>
-            <tr>
-                <th class="tsorth" onclick="sortTable(0, 'i', 'eszkozok')">Sorszám</th>
-                <th class="tsorth" onclick="sortTable(1, 's', 'eszkozok')">IP cím</th>
-                <th class="tsorth" onclick="sortTable(2, 's', 'eszkozok')">Eszköznév</th>
-                <th class="tsorth" onclick="sortTable(3, 's', 'eszkozok')">Gyártó</th>
-                <th class="tsorth" onclick="sortTable(4, 's', 'eszkozok')">Modell</th>
-                <th class="tsorth" onclick="sortTable(6, 's', 'eszkozok')">Sorozatszám</th>
-                <th class="tsorth" onclick="sortTable(7, 's', 'eszkozok')">Eszköztípus</th>
-                <th class="tsorth" onclick="sortTable(8, 's', 'eszkozok')">Épület</th>
-                <th class="tsorth" onclick="sortTable(9, 's', 'eszkozok')">Helyiseg</th>
-                <th class="tsorth" onclick="sortTable(10, 's', 'eszkozok')">Rackszekrény</th>
-                <th class="tsorth" onclick="sortTable(11, 's', 'eszkozok')">Tulajdonos</th>
-                <th class="tsorth" onclick="sortTable(12, 's', 'eszkozok')">Beépítve</th>
-                <th class="tsorth" onclick="sortTable(13, 's', 'eszkozok')">Kiépítve</th>
-            </tr>
-        </thead>
-        <tbody><?php
-            foreach($mindeneszkoz as $eszkoz)
+    ?><div class="oldalcim">Minden eszköz</div><?php
+    $zar = false;
+    foreach($mindeneszkoz as $eszkoz)
+    {
+        if(@$tipus != $eszkoz['tipus'])
+        {
+            if($zar)
             {
-                ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./eszkoz/<?=$eszkoz['id']?>'>
-                    <td><?=$eszkoz['id']?></td>
-                    <td><?=$eszkoz['ipcim']?></td>
-                    <td><?=$eszkoz['beepitesinev']?></td>
-                    <td><?=$eszkoz['gyarto']?></td>
-                    <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
-                    <td><?=$eszkoz['sorozatszam']?></td>
-                    <td><?=$eszkoz['tipus']?></td>
-                    <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
-                    <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
-                    <td><?=$eszkoz['rack']?></td>
-                    <td><?=$eszkoz['tulajdonos']?></td>
-                    <td nowrap><?=$eszkoz['beepitesideje']?></td>
-                    <td nowrap><?=$eszkoz['kiepitesideje']?></td>
-                </tr><?php
+                ?></tbody>
+                </table><?php
             }
-        ?></tbody>
+
+            $tipus = $eszkoz['tipus']
+            ?><h1 style="text-transform: capitalize;"><?=$tipus?></h1>
+            <table id="<?=$tipus?>">
+            <thead>
+                <tr>
+                    <th class="tsorth" onclick="sortTable(0, 's', '<?=$tipus?>')">IP cím</th>
+                    <th class="tsorth" onclick="sortTable(1, 's', '<?=$tipus?>')">Eszköznév</th>
+                    <th class="tsorth" onclick="sortTable(2, 's', '<?=$tipus?>')">Gyártó</th>
+                    <th class="tsorth" onclick="sortTable(3, 's', '<?=$tipus?>')">Modell</th>
+                    <th class="tsorth" onclick="sortTable(4, 's', '<?=$tipus?>')">Sorozatszám</th>
+                    <th class="tsorth" onclick="sortTable(5, 's', '<?=$tipus?>')">Épület</th>
+                    <th class="tsorth" onclick="sortTable(6, 's', '<?=$tipus?>')">Helyiseg</th>
+                    <th class="tsorth" onclick="sortTable(7, 's', '<?=$tipus?>')">Rack</th>
+                    <th class="tsorth" onclick="sortTable(8, 's', '<?=$tipus?>')">Tulajdonos</th>
+                    <th class="tsorth" onclick="sortTable(9, 's', '<?=$tipus?>')">Beépítve</th>
+                    <th class="tsorth" onclick="sortTable(10, 's', '<?=$tipus?>')">Kiépítve</th>
+                    <th class="tsorth" onclick="sortTable(11, 's', '<?=$tipus?>')">Megjegyzés</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody><?php
+            $zar = true;
+        }
+        
+
+        $eszkid = $eszkoz['id'];
+        $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
+        ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./eszkoz/<?=$eszkoz['id']?>'>
+            <td><?=$eszkoz['ipcim']?></td>
+            <td><?=$eszkoz['beepitesinev']?></td>
+            <td><?=$eszkoz['gyarto']?></td>
+            <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
+            <td><?=$eszkoz['sorozatszam']?></td>
+            <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
+            <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
+            <td><?=$eszkoz['rack']?></td>
+            <td><?=$eszkoz['tulajdonos']?></td>
+            <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td>
+            <td nowrap><?=timeStampToDate($eszkoz['kiepitesideje'])?></td>
+            <td><?=$eszkoz['megjegyzes']?></td>
+            <td><?=($csoportir) ? "<a href='$RootPath/eszkozszerkeszt/$eszkid?tipus=$eszktip'><img src='$RootPath/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a>" : "" ?></td>
+        </tr><?php
+    }
+    ?></tbody>
     </table><?php
 }

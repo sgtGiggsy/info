@@ -11,7 +11,6 @@ if(isset($mindir) && $mindir)
         }
     }
 
-    $backtosender = $_SERVER['HTTP_REFERER'];
     if($_GET["action"] == "new")
     {
         $stmt = $con->prepare('INSERT INTO helyisegek (epulet, emelet, helyisegszam, helyisegnev) VALUES (?, ?, ?, ?)');

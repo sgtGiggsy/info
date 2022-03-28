@@ -20,13 +20,58 @@ else
     if(isset($_GET['id']))
     {
         $rackid = $_GET['id'];
-        $rack = mySQLConnect("SELECT * FROM rackszekrenyek WHERE id = $rackid;");
+        $rack = mySQLConnect("SELECT rackszekrenyek.nev AS nev, rackszekrenyek.helyiseg AS helyiseg, gyarto, unitszam, helyisegek.epulet AS epulet
+            FROM rackszekrenyek
+                INNER JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id
+            WHERE rackszekrenyek.id = $rackid;");
         $rack = mysqli_fetch_assoc($rack);
 
         $racknev = $rack['nev'];
         $rackhely = $rack['helyiseg'];
         $rackgyarto = $rack['gyarto'];
         $rackunitszam = $rack['unitszam'];
+        $epulet = $rack['epulet'];
+
+        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port
+            FROM portok
+                INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
+                LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
+            WHERE epulet = $epulet
+            UNION
+            SELECT portok.id AS id, portok.port AS port
+            FROM portok
+                INNER JOIN transzportportok ON transzportportok.port = portok.id
+                LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
+            WHERE epulet = $epulet;");
+
+        ?><div class="oldalcim"><p onclick="rejtMutat('portokrackbe')" style="cursor: pointer">Épület portok rackhez kötése</p></div>
+        <div class="contentcenter" id="portokrackbe" style='display: none'>
+            <form action="<?=$RootPath?>/portdb?action=generate&tipus=rack" method="post" onsubmit="beKuld.disabled = true; return true;">
+                <input type ="hidden" id="rack" name="rack" value=<?=$rackid?>>
+
+                <div>
+                    <label for="elsoport">Első port:</label><br>
+                    <select id="elsoport" name="elsoport"><?php
+                        foreach($epuletportok as $x)
+                        {
+                            ?><option value="<?=$x["id"]?>"><?=$x['port']?></option><?php
+                        }
+                    ?></select>
+                </div>
+
+                <div>
+                    <label for="utolsoport">Utolsó port:</label><br>
+                    <select id="utolsoport" name="utolsoport"><?php
+                        foreach($epuletportok as $x)
+                        {
+                            ?><option value="<?=$x["id"]?>" selected><?=$x['port']?></option><?php
+                        }
+                    ?></select>
+                </div>
+
+                <div class="submit"><input type="submit" name="beKuld" value="Portok rackhez kötése"></div>
+            </form>
+        </div><?php
 
         $button = "Szerkesztés";
 
@@ -55,14 +100,8 @@ else
 
         <?=gyartoPicker($rackgyarto)?>
 
-        <div class="submit"><input type="submit" name="beKuld" value=<?=$button?>></div>
+        <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
     </form><?php
-
-    if(isset($_GET['id']))
-    {
-        ?><form action='<?=$RootPath?>/rackek' method="post">
-        <div class='submit'><input type='submit' value=Mégsem></div>
-        </form><?php
-    }
+    cancelForm();
 ?></div><?php
 }

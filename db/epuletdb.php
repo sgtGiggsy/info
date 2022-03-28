@@ -12,7 +12,6 @@ if(isset($irhat) && $irhat)
         }
     }
 
-    $backtosender = $_SERVER['HTTP_REFERER'];
     if($_GET["action"] == "new")
     {
         $stmt = $con->prepare('INSERT INTO epuletek (szam, telephely, nev, tipus) VALUES (?, ?, ?, ?)');

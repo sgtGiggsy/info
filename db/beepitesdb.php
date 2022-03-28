@@ -17,28 +17,35 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO beepitesek (nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('ssssssss', $_POST['nev'], $_POST['eszkoz'], $_POST['ipcim'], $_POST['rack'], $_POST['helyiseg'], $_POST['pozicio'], $beepido, $kiepido);
+        $stmt = $con->prepare('INSERT INTO beepitesek (nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, admin, pass, megjegyzes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssssssssss', $_POST['nev'], $_POST['eszkoz'], $_POST['ipcim'], $_POST['rack'], $_POST['helyiseg'], $_POST['pozicio'], $beepido, $kiepido, $_POST['admin'], $_POST['pass'] ,$_POST['megjegyzes']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
-            echo "<h2>Vizsga elindítása sikertelen!<br></h2>";
+            echo "<h2>Eszköz beépítése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
+        {
+            header("Location: $backtosender");
         }
     }
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE beepitesek SET nev=?, eszkoz=?, ipcim=?, rack=?, helyiseg=?, pozicio=?, beepitesideje=?, kiepitesideje=? WHERE id=?');
-        $stmt->bind_param('ssssssssi', $_POST['nev'], $_POST['eszkoz'], $_POST['ipcim'], $_POST['rack'], $_POST['helyiseg'], $_POST['pozicio'], $beepido, $kiepido, $_POST['id']);
+        $stmt = $con->prepare('UPDATE beepitesek SET nev=?, eszkoz=?, ipcim=?, rack=?, helyiseg=?, pozicio=?, beepitesideje=?, kiepitesideje=?, admin=?, pass=?, megjegyzes=? WHERE id=?');
+        $stmt->bind_param('sssssssssssi', $_POST['nev'], $_POST['eszkoz'], $_POST['ipcim'], $_POST['rack'], $_POST['helyiseg'], $_POST['pozicio'], $beepido, $kiepido, $_POST['admin'], $_POST['pass'], $_POST['megjegyzes'], $_POST['id']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
-            echo "<h2>Vizsga elindítása sikertelen!<br></h2>";
+            echo "<h2>Eszköz beépítésének szerkesztése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
+        {
+            header("Location: $backtosender");
         }
     }
     elseif($_GET["action"] == "delete")
     {
     }
-    //header("Location: $RootPath/mindeneszkoz");
 }

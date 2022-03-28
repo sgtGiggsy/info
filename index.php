@@ -35,6 +35,26 @@ if(isset($_GET['page']))
 	}
 }
 
+// Az előző oldal helyének kiderítése
+if(!isset($_SESSION[getenv('SESSION_NAME').'elozo']))
+{
+    $backtosender = @$_SERVER['HTTP_REFERER'];
+    $_SESSION[getenv('SESSION_NAME').'elozo'] = @$_SERVER['HTTP_REFERER'];
+}
+else
+{
+    if(str_contains(@$_SERVER['HTTP_REFERER'], @$_SERVER['REDIRECT_URL']) || isset($_GET['action']))
+    {
+        $backtosender = $_SESSION[getenv('SESSION_NAME').'elozo'];
+    }
+    else
+    {
+        $backtosender = @$_SERVER['HTTP_REFERER'];
+        $_SESSION[getenv('SESSION_NAME').'elozo'] = @$_SERVER['HTTP_REFERER'];
+    } 
+}
+
+// Az lekérdezendő elem ID-jének begyüjtése
 if(isset($_GET['id']))
 {
 	$id = $_GET['id'];
@@ -225,7 +245,7 @@ else
 }
 
 // Betöldendő oldal kiválasztása, menüterületek feltöltése, és felhasználói jogosultságok megállapítása
-$menu = mySQLConnect("SELECT * FROM menupontok ORDER BY aktiv DESC, menuterulet ASC, sorrend ASC, id DESC");
+$menu = mySQLConnect("SELECT * FROM menupontok ORDER BY aktiv DESC, menuterulet ASC, sorrend ASC, id ASC");
 
 // Ha nincs betölteni kívánt oldal, a főoldal kiválasztása betöltésre
 if(!(isset($_GET['page'])))
@@ -235,6 +255,7 @@ if(!(isset($_GET['page'])))
 else
 {
     $pagetofind = $_GET['page'];
+    $sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
 }
 
 // Felhasználó jogosultságainak lekérése, a menüpontok is ezalapján jelennek meg
@@ -278,9 +299,8 @@ foreach($menu as $menupont)
 
     // Ha egy menüpont megjelenése nincs kifejezett joghoz kötve, menüterülethez adása
     // ha joghoz kötött, a felhasználó jogosultsága szerinti eljárás
-    if($menupont['aktiv'] == 3 || ($menupont['aktiv'] == 2 && $_SESSION[getenv('SESSION_NAME').'id']) || ($menupont['aktiv'] == 4 && !$_SESSION[getenv('SESSION_NAME').'id']))
+    if($menupont['aktiv'] == 3 || (($menupont['aktiv'] == 2 && $_SESSION[getenv('SESSION_NAME').'id'])) || ($menupont['aktiv'] == 4 && !$_SESSION[getenv('SESSION_NAME').'id']))
     {
-        $sajatolvas = true;
         array_push($menuk[$menupont['menuterulet']], $menupont);
     }
     elseif($menupont['aktiv'] == 1 && $_SESSION[getenv('SESSION_NAME').'id'])
