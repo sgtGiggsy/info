@@ -61,14 +61,15 @@ else
             <th class="tsorth" onclick="sortTable(7, 's', '<?=$tipus?>')">Fax</th>
             <th class="tsorth" onclick="sortTable(8, 's', '<?=$tipus?>')">Sorozatszám</th>
             <th class="tsorth" onclick="sortTable(9, 's', '<?=$tipus?>')">Épület</th>
-            <th class="tsorth" onclick="sortTable(10, 's', '<?=$tipus?>')">Helyiseg</th>
+            <th class="tsorth" onclick="sortTable(10, 's', '<?=$tipus?>')">Helyiség</th>
             <th class="tsorth" onclick="sortTable(11, 's', '<?=$tipus?>')">Beépítve</th><?php
             if($csoportir)
             {
                 ?><th class="tsorth" onclick="sortTable(12, 's', '<?=$tipus?>')">Admin user</th>
-                <th class="tsorth" onclick="sortTable(13, 's', '<?=$tipus?>')">Jelszó</th><?php
+                <th class="tsorth" onclick="sortTable(13, 's', '<?=$tipus?>')">Jelszó</th>
+                <th class="tsorth" onclick="sortTable(14, 's', '<?=$tipus?>')">Megjegyzés</th><?php
             }
-            ?><th class="tsorth" onclick="sortTable(14, 's', '<?=$tipus?>')">Megjegyzés</th>
+            ?>
             <th></th>
         </tr>
     </thead>
@@ -114,7 +115,7 @@ else
             ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./eszkoz/<?=$eszkoz['id']?>'>
                 <td><?=$eszkoz['ipcim']?></td>
                 <td><?=$eszkoz['beepitesinev']?></td>
-                <td><?=$eszkoz['gyarto']?></td>
+                <td nowrap><?=$eszkoz['gyarto']?></td>
                 <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
                 <td><?=$maxmeret?></td>
                 <td><?=$szines?></td>
@@ -127,9 +128,10 @@ else
                 if($csoportir)
                 {
                     ?><td><?=($eszkoz['admin']) ? $eszkoz['admin'] : $eszkoz['defadmin'] ?></td>
-                    <td><?=($eszkoz['pass']) ? $eszkoz['pass'] : $eszkoz['defpass'] ?></td><?php
+                    <td><?=($eszkoz['pass']) ? $eszkoz['pass'] : $eszkoz['defpass'] ?></td>
+                    <td><?=$eszkoz['megjegyzes']?></td><?php
                 }
-                ?><td><?=$eszkoz['megjegyzes']?></td>
+                ?>
                 <td><?=($csoportir) ? "<a href='$RootPath/beepites$beepid'><img src='$RootPath/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a>" : "" ?></td>
                 <td><?=($csoportir) ? "<a href='$RootPath/eszkozszerkeszt/$eszkid?tipus=$eszktip'><img src='$RootPath/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a>" : "" ?></td>
             </tr><?php

@@ -80,7 +80,7 @@ else
             <li property="itemListElement" typeof="ListItem">
                 <a property="item" typeof="WebPage"
                     href="<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>">
-                <span property="name"><?=$helyiseg['helyisegszam']?> (<?=$helyiseg['helyisegnev']?>)</span></a>
+                <span property="name"><?=$helyiseg['helyisegszam']?>. helyiség (<?=$helyiseg['helyisegnev']?>)</span></a>
                 <meta property="position" content="4">
             </li>
             <li><b>></b></li>

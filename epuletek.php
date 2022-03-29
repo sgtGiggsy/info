@@ -52,7 +52,7 @@ else
             <td><?=$epulet['szam']?></td>
             <td><?=$epulet['nev']?></td>
             <td><?=$epulet['tipus']?></td>
-            <td><a href='./epuletszerkeszt/<?=$epulet['id']?>'><img src='<?=$RootPath?>/images/edit.png' alt='Épület szerkesztése' title='Épület szerkesztése'/></a></td>
+            <td><a href='<?=$RootPath?>/epuletszerkeszt/<?=$epulet['id']?>'><img src='<?=$RootPath?>/images/edit.png' alt='Épület szerkesztése' title='Épület szerkesztése'/></a></td>
         </tr><?php
     }
     ?></tbody>

@@ -92,7 +92,7 @@ else
             </li>
             <li><b>></b></li>
             <li property="itemListElement" typeof="ListItem">
-                <span property="name"><?=$helyiseg['helyisegszam']?> (<?=$helyiseg['helyisegnev']?>)</span>
+                <span property="name"><?=$helyiseg['helyisegszam']?>. helyiség (<?=$helyiseg['helyisegnev']?>)</span>
                 <meta property="position" content="4">
             </li>
         </ol>

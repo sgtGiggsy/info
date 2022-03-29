@@ -64,10 +64,13 @@ else
                     <th class="tsorth" onclick="sortTable(7, 's', '<?=$tipus?>')">Rack</th>
                     <th class="tsorth" onclick="sortTable(8, 's', '<?=$tipus?>')">Tulajdonos</th>
                     <th class="tsorth" onclick="sortTable(9, 's', '<?=$tipus?>')">Beépítve</th>
-                    <th class="tsorth" onclick="sortTable(10, 's', '<?=$tipus?>')">Kiépítve</th>
-                    <th class="tsorth" onclick="sortTable(11, 's', '<?=$tipus?>')">Megjegyzés</th>
-                    <th></th>
-                </tr>
+                    <th class="tsorth" onclick="sortTable(10, 's', '<?=$tipus?>')">Kiépítve</th><?php
+                    if($csoportir)
+                    {
+                        ?><th class="tsorth" onclick="sortTable(11, 's', '<?=$tipus?>')">Megjegyzés</th>
+                        <th></th><?php
+                    }
+                ?></tr>
             </thead>
             <tbody><?php
             $zar = true;
@@ -87,10 +90,13 @@ else
             <td><?=$eszkoz['rack']?></td>
             <td><?=$eszkoz['tulajdonos']?></td>
             <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td>
-            <td nowrap><?=timeStampToDate($eszkoz['kiepitesideje'])?></td>
-            <td><?=$eszkoz['megjegyzes']?></td>
-            <td><?=($csoportir) ? "<a href='$RootPath/eszkozszerkeszt/$eszkid?tipus=$eszktip'><img src='$RootPath/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a>" : "" ?></td>
-        </tr><?php
+            <td nowrap><?=timeStampToDate($eszkoz['kiepitesideje'])?></td><?php
+            if($csoportir)
+            {
+                ?><td><?=$eszkoz['megjegyzes']?></td>
+                <td><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
+            }
+        ?></tr><?php
     }
     ?></tbody>
     </table><?php
