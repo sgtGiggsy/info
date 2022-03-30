@@ -27,7 +27,8 @@
 <!-- Oldaltörzs -->	
 <!-- Tartalom -->
     <div class="content">
-		<?php include("./{$currentpage['url']}.php");	?>
+		<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$_GET['page']?>">Hiba jelzése</a></div>
+		<?php include("./{$currentpage['url']}.php"); ?>
 	</div>
 
 <!-- lábléc -->

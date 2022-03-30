@@ -7,10 +7,9 @@ if(!@$mindolvas)
 else
 {
 	$portid = $_GET['id'];
-	$port = mySQLConnect("SELECT portok.id AS portid,
+	$portres = mySQLConnect("SELECT portok.id AS portid,
 			portok.port AS port,
 			epuletek.nev AS epuletnev,
-			beepitesek.nev AS eszkoz,
 			helyisegszam,
 			helyisegnev,
 			helyisegek.id AS helyisegid,
@@ -18,17 +17,28 @@ else
 			rackszekrenyek.helyiseg AS rackhelyiseg,
 			(SELECT helyisegnev FROM helyisegek WHERE id = rackhelyiseg) as rackhelynev,
 			(SELECT helyisegszam FROM helyisegek WHERE id = rackhelyiseg) as rackhelyszam,
-			(SELECT port FROM portok WHERE csatlakozas = portid LIMIT 1) AS szomszedport,
+			(SELECT port FROM portok WHERE csatlakozas = portid ORDER BY id ASC LIMIT 1) AS szomszedport,
 			(SELECT id FROM portok WHERE csatlakozas = portid LIMIT 1) AS szomszedportid,
 			(SELECT beepitesek.nev FROM switchportok
 					INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
 					INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
 				WHERE switchportok.port = szomszedportid) AS switch,
 			(SELECT ipcimek.ipcim FROM switchportok
-				INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
-				INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
-				INNER JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-			WHERE switchportok.port = szomszedportid) AS switchip
+					INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
+					INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+					INNER JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
+				WHERE switchportok.port = szomszedportid) AS switchip,
+			(SELECT port FROM portok WHERE csatlakozas = portid ORDER BY id DESC LIMIT 1) AS szomszedport2,
+			(SELECT id FROM portok WHERE csatlakozas = portid ORDER BY id DESC LIMIT 1) AS szomszedportid2,
+			(SELECT beepitesek.nev FROM switchportok
+					INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
+					INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+				WHERE switchportok.port = szomszedportid2) AS switch2,
+			(SELECT ipcimek.ipcim FROM switchportok
+					INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
+					INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+					INNER JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
+				WHERE switchportok.port = szomszedportid2) AS switchip2
 		FROM portok
 			LEFT JOIN switchportok ON portok.id = switchportok.port
 			LEFT JOIN vegpontiportok ON portok.id = vegpontiportok.port
@@ -39,7 +49,12 @@ else
 			LEFT JOIN helyisegek ON vegpontiportok.helyiseg = helyisegek.id
 			LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
 		WHERE portok.id = $portid;");
-	$port = mysqli_fetch_assoc($port);
+	$port = mysqli_fetch_assoc($portres);
+	$port2 = mysqli_fetch_assoc($portres);
+
+	//print_r($port);
+	//echo "<br>";
+	//print_r($port2);
 
 	if($port['helyisegid'])
 	{
@@ -100,12 +115,27 @@ else
 		?><div>Állapot</div>
 		<div><?=($port['szomszedport']) ? "Kirendezve" : "Használaton kívül" ?></div>
 		<div>Központi oldal</div>
-		<div><?=$port['rack']?> rack, <?=$port['rackhelyszam']?>. helyiség (<?=$port['rackhelynev']?>)</div>
-		<div><?=($port['szomszedport']) ? "Aktív eszköz" : "" ?></div>
-		<div><?=($port['szomszedport']) ? $port['switch'] . " (" .  $port['switchip'] . ")" : "" ?></div>
-		<div><?=($port['szomszedport']) ? "Eszköz portja" : "" ?></div>
-		<div><?=($port['szomszedport']) ? $port['szomszedport'] : "" ?></div>
-		<div>Végponti oldal</div>
-		<div><?=$port['helyisegszam']?>. helyiség <?=($port['helyisegnev']) ? "(" . $port['helyisegnev'] . ")" : "" ?></div>
-	</div><?php
+		<div><?=$port['rack']?> rack, <?=$port['rackhelyszam']?>. helyiség (<?=$port['rackhelynev']?>)</div><?php
+		if($port['szomszedport'])
+		{
+			?><div>Aktív eszköz</div>
+			<div><?=$port['switch']?> (<?=$port['switchip']?>)</div>
+			<div>Eszköz portja</div>
+			<div><?=$port['szomszedport']?></div><?php
+		}
+		if(isset($port2['rack']) && $port2['rack'])
+		{
+			?><div>Túlsó oldal</div>
+			<div><?=$port2['rack']?> rack, <?=$port2['rackhelyszam']?>. helyiség (<?=$port2['rackhelynev']?>)</div>
+			<div>Túlsó oldali aktív eszköz</div>
+			<div><?=$port2['switch2']?> (<?=$port2['switchip2']?>)</div>
+			<div>Túlsó oldali aktív eszköz portja</div>
+			<div><?=$port2['szomszedport2']?></div><?php
+		}
+		else
+		{
+			?><div>Végponti oldal</div>
+			<div><?=$port['helyisegszam']?>. helyiség <?=($port['helyisegnev']) ? "(" . $port['helyisegnev'] . ")" : "" ?></div><?php
+		}
+	?></div><?php
 }

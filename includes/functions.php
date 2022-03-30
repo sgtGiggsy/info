@@ -398,6 +398,38 @@ function gyartoPicker($current)
 	</div><?php
 }
 
+function priorityPicker($current)
+{
+	$priority = mySQLConnect("SELECT * FROM prioritasok ORDER BY id DESC");
+
+	?><div>
+	<label for="prioritas">Prioritás:</label><br>
+	<select id="prioritas" name="prioritas">
+		<option value="" selected></option><?php
+		foreach($priority as $x)
+		{
+			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+		}
+	?></select>
+	</div><?php
+}
+
+function bugTypePicker($current)
+{
+	$bugtype = mySQLConnect("SELECT * FROM bugtipusok ORDER BY nev");
+
+	?><div>
+	<label for="tipus">A hiba fajtája:</label><br>
+	<select id="tipus" name="tipus">
+		<option value="" selected></option><?php
+		foreach($bugtype as $x)
+		{
+			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+		}
+	?></select>
+	</div><?php
+}
+
 function cancelForm()
 {
 	$RootPath = getenv('APP_ROOT_PATH');

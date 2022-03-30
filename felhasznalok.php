@@ -50,9 +50,10 @@ else
     }
 
     $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev AS nev, felhasznalonev, jogosultsag, email, elsobelepes, osztaly, telefon, beosztas, alakulatok.nev AS alakulat
-    FROM felhasznalok LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
-    $where
-    LIMIT $start, $megjelenit;");
+        FROM felhasznalok
+            LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
+        $where
+        LIMIT $start, $megjelenit;");
     ?><div class='oldalcim'>Felhasználók listája</div>
     <div>
     <div>
