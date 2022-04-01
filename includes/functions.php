@@ -349,7 +349,7 @@ function helyisegPicker($current)
 		<option value="" selected></option><?php
 		foreach($helyisegek as $x)
 		{
-			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?= $x['helyisegszam'] . " (" . $x['helyisegnev'] . ") " . $x['epuletszam'] . ". épület" ?></option><?php
+			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?= $x['epuletszam'] . ". épület" . ", " . $x['helyisegszam'] . " (" . $x['helyisegnev'] . ")" ?></option><?php
 		}
 	?></select>
 	</div><?php

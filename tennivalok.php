@@ -51,10 +51,10 @@ else
         {
             ?><div style="margin: 0 0 15px 0; padding: 4px; background-color: <?php if(!$tennivalo['befejezve']) { switch($tennivalo['prioritasid']) { case 5: echo 'red'; break; case 4: echo 'orange'; break; case 3: echo 'yellow'; break; case 2: echo 'blue'; break; case 1: echo 'grey'; } } else { echo 'green'; } ?> ">
                 <div>
-                    <div style="font-size: 0.9em; padding: 0px"><?=$tennivalo['felhasznalo']?></div>
+                    <div style="font-size: 0.9em; padding: 0px; word-wrap: break-word"><?=$tennivalo['felhasznalo']?></div>
                     <form id="tennivalo" action="<?=$RootPath?>/tennivalodb?action=update" method="POST">
                         <input type ="hidden" id="id" name="id" value=<?=$tennivalo['id']?>>
-                        <label class="checkbox"><?=$tennivalo['leiras']?><?php
+                        <label class="checkbox" style="white-space: pre-wrap"><?=$tennivalo['leiras']?><?php
                         if($mindir)
                         {
                             ?><input type="checkbox" name="befejezve" id="befejezve" value="1" onChange='submit()' <?=($tennivalo['befejezve']) ? "checked" : "" ?>><?php

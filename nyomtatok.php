@@ -44,7 +44,7 @@ else
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
         WHERE modellek.tipus = 12
-        ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
+        ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
     ?><?=($mindir) ? "<a href='$RootPath/eszkozszerkeszt?tipus=nyomtato'>Új nyomtató hozzáadása</a>" : "" ?>
     <div class="oldalcim">Nyomtatók</div><?php
     $tipus = "nyomtatok";

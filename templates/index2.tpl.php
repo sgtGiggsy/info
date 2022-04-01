@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html xml:lang="hu" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=0.85">
+	<meta name="description" content="<?=$ablakcim?>">
+	<script src="<?=$RootPath?>/includes/jquery.min.js"></script>
+	<script src="<?=$RootPath?>/includes/greedynav/greedynav.js"></script>
+	<script src="<?=$RootPath?>/includes/tinymce/tinymce.min.js"></script>
+	<link rel="shortcut icon" href="<?=$RootPath?>/favicon.ico">
+	<link rel="stylesheet" href="<?=$RootPath?>/style2.css" type="text/css">
+	<title><?=$ablakcim . " - " . $currentpage['cimszoveg']?></title>
+</head>
+
+<body>
+<div class="wrapper">	
+<!-- Fejléc -->
+	<div class="topmenubase"></div>
+	<!--<div class="header">
+		<?php //include('./templates/header.tpl.php'); ?>
+	</div>-->
+<!-- Menürész -->
+	<!--<div class="menubar"></div>-->
+	<?php $menuterulet = 2; include('./includes/menu2.inc.php'); ?>
+		<!--<div class="menu">
+			
+		</div>-->
+	
+<!-- Oldaltörzs -->	
+<!-- Tartalom -->
+    <div class="content">
+		<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$_GET['page']?>">Hiba jelzése</a></div>
+		<?php include("./{$currentpage['url']}.php"); ?>
+	</div>
+
+<!-- lábléc -->
+    <div class ="footer">
+		<?php
+			include("./templates/footer.tpl.php");
+		?>
+	</div>
+	<div class="bottom-line"><p>© <a href="mailto:kiraly.bela@mil.hu">Király Béla ftőrm</a> <small>02-43/2488</small></p></div>
+</div>
+<div id="snackbar"></div>
+</body>
+<script>
+	function sortTable(n, t, tname) {
+		var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+		table = document.getElementById(tname);
+		switching = true;
+		if(t == "s") { dir = "asc"; } else { dir = "desc"; }
+		while (switching) {
+			switching = false;
+			rows = table.rows;
+			rowcount = rows.length - 1;
+			if(rows[rowcount].getElementsByTagName("TH")[1])
+			{
+				rowcount = rows.length - 2;
+			}
+			for (i = 1; i < rowcount; i++) {
+				shouldSwitch = false;
+				if(!rows[i].getElementsByTagName("TD")[n])
+				{
+					i++;
+				}
+				x = rows[i].getElementsByTagName("TD")[n];
+				y = rows[i + 1].getElementsByTagName("TD")[n];
+				if(t == "s")
+				{
+					if (dir == "asc") {
+						if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+						shouldSwitch = true;
+						break;
+						}
+					} else if (dir == "desc") {
+						if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+						shouldSwitch = true;
+						break;
+						}
+					}
+				}
+				else if(t == "i")
+				{
+					if (dir == "asc") {
+						if (Number(x.innerHTML) < Number(y.innerHTML)) {
+						shouldSwitch = true;
+						break;
+						}
+					} else if (dir == "desc") {
+						if (Number(x.innerHTML) > Number(y.innerHTML)) {
+						shouldSwitch = true;
+						break;
+						}
+					}
+				}
+			}
+			if (shouldSwitch) {
+			rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+			switching = true;
+			switchcount ++;
+			} else {
+			if(t == "s") {
+					if (switchcount == 0 && dir == "asc") {
+					dir = "desc";
+					switching = true;
+					}
+			}
+			else
+				{
+					if (switchcount == 0 && dir == "desc") {
+					dir = "asc";
+					switching = true;
+					}
+				}  
+			}
+		}
+	};
+
+	$(document).ready(function($) {
+		$(".kattinthatotr").click(function() {
+		window.document.location = $(this).data("href");
+			});
+	});
+
+	function rejtMutat(id) {
+		if(document.getElementById(id).style.display == "grid")
+		{
+			document.getElementById(id).style.display = "none"
+		}
+		else
+		{
+			document.getElementById(id).style.display = "grid";
+		}
+	};
+
+	function showToaster(message) {
+		$("#snackbar").html(message)
+        // Get the snackbar DIV
+        var x = document.getElementById("snackbar");
+
+        // Add the "show" class to DIV
+        x.className = "show";
+
+        // After 3 seconds, remove the show class from DIV
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+</script>
+</html>
