@@ -68,6 +68,7 @@ p {
     .wrapper {
         grid-template-columns: minmax(50px, 200px) 1fr;
         grid-template-rows: 50px minmax(500px, 1fr) minmax(0px, 200px) 30px;
+        min-height: 100vh;
         margin: 0px;
     }
 
@@ -89,7 +90,6 @@ p {
         grid-column-end: 3;
         grid-row-start: 2;
         grid-row-end: 3;
-        
         /*min-width: max-content;*/
     }
 }
@@ -150,7 +150,7 @@ ol, ul {
     grid-column-end: 3;
     padding: 1em;
     background-color: #ededed;
-    justify-content: center;
+    /*justify-content: center;*/
     overflow: auto;
 }
 
@@ -212,6 +212,8 @@ ol, ul {
 }
 
 table {
+    font-family: "roboto", "bench";
+    font-size: 0.9em;
     display: block;
     border: 0px;
     border-collapse: collapse;
@@ -447,10 +449,6 @@ nav.greedy {
   }
   nav.greedy ul.hidden-links li {
     padding: 0rem;
-  }
-
-  table {
-    font-family: "roboto", "bench";
   }
 
 /* Táblázatok */
@@ -803,16 +801,19 @@ label {
     border-right: 1px solid gray;
 }
 
-.leftmenuitem, .leftmenuitem a, .leftmenuitem-active, .leftmenuitem-active a {
+.leftmenuitem, .leftmenuitem a, .leftmenuitem-active, .leftmenuitem-active a, .leftmenuitem :hover {
     width: 100%;
     flex-wrap: wrap;
-    padding-left: 0;
     list-style: none;
     color: rgb(212, 211, 211);
     text-decoration: none;
     border-radius: 0;
-    padding: 6px 25px 6px 15px;
+    padding: 6px 0px 6px 0px;
     display: block;
+}
+
+.leftmenuitem a, .leftmenuitem-active a, .leftmenuitem :hover {
+    padding-left: 25px;
 }
 
 .leftmenuitem-active, .leftmenuitem-active a{
@@ -820,10 +821,45 @@ label {
     background-color: #1f282d;
 } 
 
-.leftmenuitem :hover{
+.leftmenuitem :hover {
     color: #663399;
     background-color: #1f282d;
-} 
+}
+
+.leftmenu-sub {
+    box-shadow: inset 0px 0px 15px 3px #252526;
+    background-color: #707070 !important;
+}
+.leftmenu-sub, .leftmenu-sub :hover {
+    padding: 6px 0 6px 0 !important;
+}
+
+.leftmenu-sub :hover {
+    background-color: transparent !important;
+}
+
+.leftmenusubitem, .leftmenusubitem a, .leftmenusub-active, .leftmenusub-active a {
+    width: 100%;
+    flex-wrap: wrap;
+    list-style: none;
+    color: rgb(212, 211, 211);
+    text-decoration: none;
+    border-radius: 0;
+    padding: 6px 0px 6px 0px;
+    display: block;
+}
+
+.leftmenusubitem a, .leftmenusubitem :hover, .leftmenusub-active, .leftmenusub-active a  {
+    padding-left: 25px !important;
+}
+
+.leftmenusubitem :hover {
+    color: #663399;
+}
+
+.leftmenusub-active, .leftmenusub-active a {
+    color: #007acc;
+}
 
 .bottom-line, .bottom-line a {
     height: 30px;

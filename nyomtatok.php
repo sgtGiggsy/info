@@ -61,13 +61,12 @@ else
             <th class="tsorth" onclick="sortTable(7, 's', '<?=$tipus?>')">Fax</th>
             <th class="tsorth" onclick="sortTable(8, 's', '<?=$tipus?>')">Sorozatszám</th>
             <th class="tsorth" onclick="sortTable(9, 's', '<?=$tipus?>')">Épület</th>
-            <th class="tsorth" onclick="sortTable(10, 's', '<?=$tipus?>')">Helyiség</th>
-            <th class="tsorth" onclick="sortTable(11, 's', '<?=$tipus?>')">Beépítve</th><?php
+            <th class="tsorth" onclick="sortTable(10, 's', '<?=$tipus?>')">Helyiség</th><?php
             if($csoportir)
             {
-                ?><th class="tsorth" onclick="sortTable(12, 's', '<?=$tipus?>')">Admin user</th>
-                <th class="tsorth" onclick="sortTable(13, 's', '<?=$tipus?>')">Jelszó</th>
-                <th class="tsorth" onclick="sortTable(14, 's', '<?=$tipus?>')">Megjegyzés</th><?php
+                ?><th class="tsorth" onclick="sortTable(11, 's', '<?=$tipus?>')">Admin user</th>
+                <th class="tsorth" onclick="sortTable(12, 's', '<?=$tipus?>')">Jelszó</th>
+                <th class="tsorth" onclick="sortTable(13, 's', '<?=$tipus?>')">Megjegyzés</th><?php
             }
             ?>
             <th></th>
@@ -112,7 +111,7 @@ else
                 case 2: $fax = "Alkalmas, modullal"; break;
                 default: $fax = "Nincs";
             }
-            ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./eszkoz/<?=$eszkoz['id']?>'>
+            ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./nyomtato/<?=$eszkoz['id']?>'>
                 <td><?=$eszkoz['ipcim']?></td>
                 <td><?=$eszkoz['beepitesinev']?></td>
                 <td nowrap><?=$eszkoz['gyarto']?></td>
@@ -123,8 +122,7 @@ else
                 <td><?=$fax?></td>
                 <td><?=$eszkoz['sorozatszam']?></td>
                 <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
-                <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
-                <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td><?php
+                <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td><?php
                 if($csoportir)
                 {
                     ?><td><?=($eszkoz['admin']) ? $eszkoz['admin'] : $eszkoz['defadmin'] ?></td>

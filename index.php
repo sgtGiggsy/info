@@ -245,7 +245,7 @@ else
 }
 
 // Betöldendő oldal kiválasztása, menüterületek feltöltése, és felhasználói jogosultságok megállapítása
-$menu = mySQLConnect("SELECT * FROM menupontok ORDER BY aktiv DESC, menuterulet ASC, sorrend ASC, id ASC");
+$menu = mySQLConnect("SELECT * FROM menupontok ORDER BY menuterulet ASC, sorrend ASC, aktiv DESC, id ASC");
 
 // Ha nincs betölteni kívánt oldal, a főoldal kiválasztása betöltésre
 if(!(isset($_GET['page'])))
@@ -342,5 +342,13 @@ catch(Exception $e)
 }
 
 // Oldal megjelenítése
-include('./templates/index.tpl.php');
+if($_SESSION[getenv('SESSION_NAME').'id'] == 1)
+{
+    include('./templates/index2.tpl.php');
+}
+else
+{
+    include('./templates/index.tpl.php');
+}
+
 ?>

@@ -97,7 +97,7 @@ else
     <script>
     window.onload = function()
 	{
-        sortTable(1, 's', "menupontok");
+        //sortTable(1, 's', "menupontok");
     }
     </script>
     <?php
