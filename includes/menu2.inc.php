@@ -32,19 +32,25 @@ if($menuterulet == 2)
 				if($menupont['url'] == "#")
 				{
 					$fomenu = $menupont['id'];
-					?><li class="leftmenuitem"><a href="#" onclick="rejtMutat('<?=$menupont['id']?>')"><?=trim($menupont['menupont'])?></a>
+					?><li class="leftmenuitem"><a style="cursor: pointer" onclick="rejtMutat('<?=$menupont['id']?>')"><?=trim($menupont['menupont'])?><?php
+					if($menupont['szerkoldal']) { ?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php }
+				?></a>
 						<ul class='leftmenu-sub' id="<?=$menupont['id']?>" style="display: none;"><?php
 				}
 				elseif($fomenu && $fomenu == $menupont['szulo'])
 				{
 					?><li <?=(($menupont['url'] == $pagetofind) ? 'class="leftmenusub-active"' : 'class="leftmenusubitem"')?>>
-						<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=trim($menupont['menupont'])?></a>
+						<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=trim($menupont['menupont'])?><?php
+							if($menupont['szerkoldal']) { ?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php }
+						?></a>
 					</li><?php
 				}
 				else
 				{
 					?><li <?=(($menupont['url'] == $pagetofind) ? 'class="leftmenuitem-active"' : 'class="leftmenuitem"')?>>
-						<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=trim($menupont['menupont'])?></a>	
+						<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=trim($menupont['menupont'])?><?php
+							if($menupont['szerkoldal']) { ?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php }
+						?></a>
 					</li><?php
 				}
 			}
@@ -53,8 +59,4 @@ if($menuterulet == 2)
    </div><?php
 }
 ?><script>
-	function hideSubmenu(id)
-	{
-		document.getElementById(id).style.display = "block";
-	}
 </script>

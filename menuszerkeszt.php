@@ -27,9 +27,10 @@ else
                 <th class="tsorth" onclick="sortTable(3, 's', 'menupontok')">URL</th>
                 <th class="tsorth" onclick="sortTable(4, 's', 'menupontok')">Oldal</th>
                 <th class="tsorth" onclick="sortTable(5, 's', 'menupontok')">Címszöveg</th>
-                <th class="tsorth" onclick="sortTable(6, 's', 'menupontok')">Megjelenik</th>
-                <th class="tsorth" onclick="sortTable(7, 's', 'menupontok')">Terület</th>
-                <th class="tsorth" onclick="sortTable(8, 's', 'menupontok')">Sorrend</th>
+                <th class="tsorth" onclick="sortTable(6, 's', 'menupontok')">Szerkesztő</th>
+                <th class="tsorth" onclick="sortTable(7, 's', 'menupontok')">Megjelenik</th>
+                <th class="tsorth" onclick="sortTable(8, 's', 'menupontok')">Terület</th>
+                <th class="tsorth" onclick="sortTable(9, 's', 'menupontok')">Sorrend</th>
             </tr>
         </thead>
         <tbody><?php
@@ -50,6 +51,7 @@ else
                         <td><input style="width: 20ch;" type="text" name="url" value="<?=$menup['url']?>"></td>
                         <td><input style="width: 20ch;" type="text" name="oldal" value="<?=$menup['oldal']?>"></td>
                         <td><input type="text" name="cimszoveg" value="<?=$menup['cimszoveg']?>"></td>
+                        <td><input style="width: 20ch;" type="text" name="szerkoldal" value="<?=$menup['szerkoldal']?>"></td>
                         <td><select name="aktiv">
                                 <option value="" <?=(!$menup['aktiv']) ? "selected" : "" ?>>Senkinek</option>
                                 <option value="1" <?=($menup['aktiv'] == "1") ? "selected" : "" ?>>Jogosultaknak</option>
@@ -79,6 +81,7 @@ else
                     <td><input style="width: 20ch;" type="text" name="url"></td>
                     <td><input style="width: 20ch;" type="text" name="oldal"></td>
                     <td><input type="text" name="cimszoveg"></td>
+                    <td><input style="width: 20ch;" type="text" name="szerkoldal"></td>
                     <td><select name="aktiv">
                             <option value="">Senkinek</option>
                             <option value="1">Jogosultaknak</option>

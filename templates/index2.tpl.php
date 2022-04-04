@@ -17,7 +17,7 @@
 <!-- Fejléc -->
 	<div class="topmenubase"></div>
 	<!--<div class="header">
-		<?php //include('./templates/header.tpl.php'); ?>
+		<?php include('./templates/header.tpl.php'); ?>
 	</div>-->
 <!-- Menürész -->
 	<!--<div class="menubar"></div>-->
@@ -39,7 +39,7 @@
 			include("./templates/footer.tpl.php");
 		?>
 	</div>
-	<div class="bottom-line"><p>© <a href="mailto:kiraly.bela@mil.hu">Király Béla ftőrm</a> <small>02-43/2488</small></p></div>
+	<div class="bottom-line"><p><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p></div>
 </div>
 <div id="snackbar"></div>
 </body>
@@ -115,6 +115,25 @@
 			}
 		}
 	};
+
+	function filterTable(szures, tablazat, oszlop) {
+	var input, filter, table, tr, td, i, txtValue;
+	input = document.getElementById(szures);
+	filter = input.value.toUpperCase();
+	table = document.getElementById(tablazat);
+	tr = table.getElementsByTagName("tr");
+	for (i = 0; i < tr.length; i++) {
+		td = tr[i].getElementsByTagName("td")[oszlop];
+		if (td) {
+		txtValue = td.textContent || td.innerText;
+		if (txtValue.toUpperCase().indexOf(filter) > -1) {
+			tr[i].style.display = "";
+		} else {
+			tr[i].style.display = "none";
+		}
+		}       
+	}
+	}
 
 	$(document).ready(function($) {
 		$(".kattinthatotr").click(function() {

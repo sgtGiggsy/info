@@ -46,7 +46,10 @@ else
         WHERE modellek.tipus = 12
         ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
     ?><?=($mindir) ? "<a href='$RootPath/eszkozszerkeszt?tipus=nyomtato'>Új nyomtató hozzáadása</a>" : "" ?>
-    <div class="oldalcim">Nyomtatók</div><?php
+    <div class="oldalcim">Nyomtatók</div>
+    <input type="text" id="filter" onkeyup="filterTable('filter', 'nyomtatok', 2)" placeholder="Szűrés" title="Szűrés">
+    
+    <?php
     $tipus = "nyomtatok";
     ?><table id="<?=$tipus?>">
     <thead>
