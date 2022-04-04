@@ -44,6 +44,15 @@ if($menuterulet == 2)
 							if($menupont['szerkoldal']) { ?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php }
 						?></a>
 					</li><?php
+					if($menupont['url'] == $pagetofind)
+					{
+						?><script>
+							window.onload = function()
+							{
+								document.getElementById("<?=$menupont['szulo']?>").style.display = "grid";
+							}
+						</script><?php
+					}
 				}
 				else
 				{

@@ -775,6 +775,15 @@ label {
     box-shadow: 0px 5px 10px 0px #252526;
 }
 
+.topmenuikonok {
+    float: right;
+}
+
+.topmenuikonok img {
+    width: 40px;
+    height: 40px;
+}
+
 /* Balmenü */
 .leftmenuareabase {
     background-color: #2d373c;
@@ -858,7 +867,7 @@ label {
     display: block;
 }
 
-.leftmenusubitem a, .leftmenusubitem a:hover, .leftmenusub-active, .leftmenusub-active a  {
+.leftmenusubitem a, .leftmenusubitem a:hover, .leftmenusub-active a, .leftmenusub-active a:hover {
     padding-left: 25px !important;
 }
 

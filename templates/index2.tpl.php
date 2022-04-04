@@ -15,9 +15,9 @@
 <body>
 <div class="wrapper">	
 <!-- Fejléc -->
-	<div class="topmenubase"></div>
+	<div class="topmenubase"><?php include('./templates/header2.tpl.php'); ?></div>
 	<!--<div class="header">
-		<?php include('./templates/header.tpl.php'); ?>
+		
 	</div>-->
 <!-- Menürész -->
 	<!--<div class="menubar"></div>-->
@@ -29,7 +29,7 @@
 <!-- Oldaltörzs -->	
 <!-- Tartalom -->
     <div class="content">
-		<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$_GET['page']?>">Hiba jelzése</a></div>
+		<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$current?>">Hiba jelzése</a></div>
 		<?php include("./{$currentpage['url']}.php"); ?>
 	</div>
 
