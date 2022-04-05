@@ -15,6 +15,11 @@
 <body>
 <div class="wrapper">	
 <!-- Fejléc -->
+<div class="content">
+		<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$current?>">Hiba jelzése</a></div>
+		<?php include("./{$currentpage['url']}.php"); ?>
+	</div>
+
 	<div class="topmenubase"><?php include('./templates/header2.tpl.php'); ?></div>
 	<!--<div class="header">
 		
@@ -28,10 +33,7 @@
 	
 <!-- Oldaltörzs -->	
 <!-- Tartalom -->
-    <div class="content">
-		<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$current?>">Hiba jelzése</a></div>
-		<?php include("./{$currentpage['url']}.php"); ?>
-	</div>
+    
 
 <!-- lábléc -->
     <div class ="footer">
@@ -162,6 +164,25 @@
 
         // After 3 seconds, remove the show class from DIV
         setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+	function showProfile() {
+        // Get the snackbar DIV
+        var x = document.getElementById("profilpopup");
+
+        // Add the "show" class to DIV
+        x.className = "show";
+
+        // After 3 seconds, remove the show class from DIV
+        //setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+	function hideProfile() {
+        // Get the snackbar DIV
+        var x = document.getElementById("profilpopup");
+
+        // After 3 seconds, remove the show class from DIV
+        x.className = x.className.replace("show", "");
     }
 </script>
 </html>

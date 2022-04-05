@@ -14,8 +14,12 @@ else
     }
 
     $vlanok = mySQLConnect("SELECT * FROM vlanok;");
-    ?><?=($mindir) ? "<a href='$RootPath/vlanszerkeszt'>Új VLAN hozzáadása</a>" : "" ?>
-    <div class="oldalcim">VLAN-ok listája</div>
+    if($mindir) 
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/vlanszerkeszt'">Új VLAN</button><?php
+    }
+
+    ?><div class="oldalcim">VLAN-ok listája</div>
     <table id="vlanok">
     <thead>
         <tr>

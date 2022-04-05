@@ -121,7 +121,9 @@ else
     }
     else
     {
-        ?><form action="<?=$RootPath?>/epuletszerkeszt&action=new" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+        ?><div class="oldalcim">Új épület hozzáadása</div>
+        <div class="contentcenter">
+        <form action="<?=$RootPath?>/epuletszerkeszt&action=new" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
     }
     
     ?><div>

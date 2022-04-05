@@ -20,8 +20,12 @@ else
     $where
     ORDER BY telephelyek.id, szam + 0;");
 
-    ?><?=($mindir) ? "<a href='$RootPath/epuletszerkeszt'>Új épület hozzáadása</a>" : "" ?>
-    <div class="oldalcim">Épületek listája</div><?php
+    if($mindir) 
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/epuletszerkeszt'">Új épület</button><?php
+    }
+
+    ?><div class="oldalcim">Épületek listája</div><?php
     $zar = false;
     foreach($epuletek as $epulet)
     {

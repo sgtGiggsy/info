@@ -15,6 +15,8 @@ else
         echo "<h2>Nincs jogosultsága a beállítások elmentésére!</h2>";
     }
 
+    include("./menuszerkeszt.php");
+
     ?><script type ="text/javascript">
         tinymce.init({
             selector: '#udvozloszoveg',

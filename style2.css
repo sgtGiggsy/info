@@ -79,6 +79,19 @@ ol, ul {
     padding-left: 0px;
 }
 
+button {
+    max-width: max-content;
+    font-family: "roboto";
+    font-size: 1em;
+    padding: 6px;
+    cursor: pointer;
+    color: #fff;
+    background-color: #007acc;
+    border: 1px;
+    border-radius: 3px;
+    border-color: #007acc;
+}
+
 .header {
     grid-column-start: 2;
     grid-column-end: 4;
@@ -752,7 +765,8 @@ label {
     background-color: #2d373c;
     width: 200px;
     font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-variant: small-caps;
     border-right: 1px solid gray;
     grid-column-start: 1;
     grid-column-end: 2;
@@ -808,15 +822,17 @@ label {
 }
 
 .leftmenu-sub {
-    box-shadow: inset 0px 5px 5px 0px #252526;
-    background-color: #707070 !important;
-}
-.leftmenu-sub, .leftmenu-sub a:hover {
-    padding: 6px 0 6px 0 !important;
+    /*box-shadow: inset 0px 5px 5px 0px #252526;*/
+    background-color: #717a7f !important;
 }
 
-.leftmenu-sub :hover {
-    background-color: transparent !important;
+.leftmenu-subtop {
+    height: 8px;
+    background-image: linear-gradient(#252526, #717a7f);
+}
+
+.leftmenu-sub a:hover {
+    padding: 6px 0 6px 0 !important;
 }
 
 .leftmenusubitem, .leftmenusubitem a, .leftmenusub-active, .leftmenusub-active a {
@@ -826,20 +842,22 @@ label {
     color: rgb(212, 211, 211);
     text-decoration: none;
     border-radius: 0;
-    padding: 6px 0px 6px 0px;
+    /*padding: 6px 0px 6px 0px;*/
     display: block;
 }
 
 .leftmenusubitem a, .leftmenusubitem a:hover, .leftmenusub-active a, .leftmenusub-active a:hover {
-    padding-left: 25px !important;
+    padding: 12px 0px 12px 25px !important;
 }
 
-.leftmenusubitem :hover {
+.leftmenusubitem a:hover, .leftmenusub-active a:hover {
     color: #663399;
+    background-color: #35454d;
 }
 
 .leftmenusub-active, .leftmenusub-active a {
     color: #007acc;
+    background-color: #35454d;
 }
 
 .bottom-line, .bottom-line a {
@@ -859,3 +877,43 @@ label {
     float: right;
     padding-right: 5px;
 }
+
+#profilpopup {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    visibility: hidden; /* Hidden by default. Visible on click */
+    /*min-width: 200px; /* Set a default minimum width */
+    background-color: #333; /* Black background color */
+    color: #fff; /* White text color */
+    border-radius: 2px; /* Rounded borders */
+    /*position: fixed; /* Sit on top of the screen */
+    position: absolute;
+    z-index: 1; /* Add a z-index if needed */
+    right: 0px; /* Center the snackbar */
+    top: 50px; /* 30px from the bottom */
+}
+
+#profilpopup a {
+    padding: 12px 20px 12px 20px;
+    background-color: #2d373c;
+    text-decoration: none;
+    color: #fff;
+    font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
+    font-variant: small-caps;
+    font-size: 1.2rem;
+}
+
+#profilpopup a:hover {
+    color: #663399;
+    background-color: #1f282d;
+}
+
+#profilpopup.show {
+    visibility: visible; /* Show the snackbar */
+    background-color: #333;
+    /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+    However, delay the fade out process for 2.5 seconds */
+    -webkit-animation: fadein 0.5s;
+    animation: fadein 0.5s;
+  }

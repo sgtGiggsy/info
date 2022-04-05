@@ -19,8 +19,13 @@ else
             INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
         $where
         ORDER BY tipus, gyarto, modell;");
-    ?><?=($mindir) ? "<a href='$RootPath/modellszerkeszt'>Új modell hozzáadása</a>" : "" ?>
-    <div class="oldalcim">Modellek listája</div><?php
+
+    if($mindir) 
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/modellszerkeszt'">Új modell</button><?php
+    }
+
+    ?><div class="oldalcim">Modellek listája</div><?php
     $zar = false;
     foreach($modellek as $modell)
     {

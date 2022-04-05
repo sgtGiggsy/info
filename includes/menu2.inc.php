@@ -20,7 +20,8 @@ if($menuterulet == 1)
 					?><li class="leftmenuitem"><a style="cursor: pointer" onclick="rejtMutat('<?=$menupont['id']?>')"><?=trim($menupont['menupont'])?><?php
 					if($menupont['szerkoldal']) { ?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php }
 				?></a>
-						<ul class='leftmenu-sub' id="<?=$menupont['id']?>" style="display: none;"><?php
+						<ul class='leftmenu-sub' id="<?=$menupont['id']?>" style="display: none;">
+						<div class='leftmenu-subtop'></div><?php
 				}
 				elseif($fomenu && $fomenu == $menupont['szulo'])
 				{

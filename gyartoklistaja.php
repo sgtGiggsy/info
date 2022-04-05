@@ -8,8 +8,12 @@ else
 {
     $gyartok = mySQLConnect("SELECT * FROM gyartok ORDER BY nev;");
 
-    ?><?=($mindir) ? "<a href='$RootPath/gyartoszerkeszt'>Új gyártó hozzáadása</a>" : "" ?>
-    <div class="oldalcim">Gyártók listája</div>
+    if($mindir) 
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/gyartoszerkeszt'">Új gyártó</button><?php
+    }
+
+    ?><div class="oldalcim">Gyártók listája</div>
     <table id="<?=$tipus?>">
         <thead>
             <tr>

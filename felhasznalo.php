@@ -18,7 +18,7 @@ else
         $felhid = $_SESSION[getenv('SESSION_NAME').'id'];
     }
     
-    $query = mySQLConnect("SELECT felhasznalok.id as felhid, felhasznalok.nev AS nev, felhasznalonev, jogosultsag, email, elsobelepes, osztaly, telefon, beosztas, alakulatok.nev AS alakulat
+    $query = mySQLConnect("SELECT felhasznalok.id as felhid, felhasznalok.nev AS nev, felhasznalonev, jogosultsag, email, elsobelepes, osztaly, telefon, beosztas, profilkep, alakulatok.nev AS alakulat
             FROM felhasznalok
                 LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
             WHERE felhasznalok.id = $felhid;");
@@ -26,6 +26,7 @@ else
     $felhasznalo = mysqli_fetch_assoc($query);
     ?><div class='oldalcim'>Felhasználói oldal</div>
     <div class='contentcenter'>
+        <p><img src="data:image/jpeg;base64,<?=base64_encode($felhasznalo['profilkep'])?>" /></p>
         <p>Név: <?=$felhasznalo['nev']?></p>
         <p>Felhasználónév: <?=$felhasznalo['felhasznalonev']?></p>
         <p>Alakulat: <?=$felhasznalo['alakulat']?></p>

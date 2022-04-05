@@ -5,9 +5,13 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
     
     $usernev = $_SESSION[getenv('SESSION_NAME').'nev'];
     $menuterulet = 2; include('./includes/menu2.inc.php');
-    ?><a href="<?=$RootPath?>/felhasznalo">
+    ?><a style="cursor: pointer" onclick="showProfile()"> 
         <img src= <?=($_SESSION['profilkep']) ? "data:image/jpeg;base64," . base64_encode($_SESSION["profilkep"]) : "$RootPath/images/profil.png " ?> title="<?=$usernev?>" alt="<?=$usernev?>">
-    </a><?php
+    </a>
+    <div id="profilpopup" onmouseleave="hideProfile()">
+        <a href="<?=$RootPath?>/felhasznalo">Profil</a>
+        <a href="<?=$RootPath?>/kilep">Kilépés</a>
+    </div><?php
 }
 else
 {

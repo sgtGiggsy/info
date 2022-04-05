@@ -20,9 +20,13 @@ else
                 epuletek ON helyisegek.epulet = epuletek.id LEFT JOIN
                 gyartok ON rackszekrenyek.gyarto = gyartok.id
         ORDER BY epuletszam, helyisegszam, helyisegnev, rack;");
+
+    if($mindir) 
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/rackszerkeszt'">Új rackszekrény</button><?php
+    }
     
-    ?><?=($mindir) ? "<a href='$RootPath/rackszerkeszt'>Új rackszekrény hozzáadása</a>" : "" ?>
-    <div class="oldalcim">Rackszekrények</div>
+    ?><div class="oldalcim">Rackszekrények</div>
     <table id="rackek">
         <thead>
             <tr>
@@ -50,8 +54,4 @@ else
             }
         ?></tbody>
     </table><?php
-    if($sajatir)
-    {
-        ?><a href='./rackszerkeszt'>Új rack felvitele</a><?php
-    }
 }

@@ -45,8 +45,11 @@ else
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
         WHERE modellek.tipus = 12
         ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
-    ?><?=($mindir) ? "<a href='$RootPath/eszkozszerkeszt?tipus=nyomtato'>Új nyomtató hozzáadása</a>" : "" ?>
-    <div class="oldalcim">Nyomtatók</div>
+    if($mindir) 
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/eszkozszerkeszt?tipus=nyomtato'">Új nyomtató</button><?php
+    }
+    ?><div class="oldalcim">Nyomtatók</div>
     <input type="text" id="filter" onkeyup="filterTable('filter', 'nyomtatok', 2)" placeholder="Szűrés" title="Szűrés">
     
     <?php

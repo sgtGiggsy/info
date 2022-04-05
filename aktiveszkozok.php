@@ -41,8 +41,12 @@ else
         ORDER BY epuletek.szam + 1, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
     $nembeepitett = array();
-    ?><?=($mindir) ? "<a href='$RootPath/eszkozszerkeszt?tipus=aktiv'>Új aktív eszköz hozzáadása</a>" : "" ?>
-    <div class="oldalcim">Aktív eszközök</div>
+    if($mindir) 
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/eszkozszerkeszt?tipus=aktiv'">Új aktív eszköz</button><?php
+    }
+
+    ?><div class="oldalcim">Aktív eszközök</div>
     <table id="eszkozok">
         <thead>
             <tr>
@@ -53,7 +57,7 @@ else
                 <th class="tsorth" onclick="sortTable(4, 's', 'eszkozok')">Sorozatszám</th>
                 <th class="tsorth" onclick="sortTable(5, 's', 'eszkozok')">Eszköztípus</th>
                 <th class="tsorth" onclick="sortTable(6, 's', 'eszkozok')">Épület</th>
-                <th class="tsorth" onclick="sortTable(7, 's', 'eszkozok')">Helyiseg</th>
+                <th class="tsorth" onclick="sortTable(7, 's', 'eszkozok')">Helyiség</th>
                 <th class="tsorth" onclick="sortTable(8, 's', 'eszkozok')">Rack</th>
                 <th class="tsorth" onclick="sortTable(9, 's', 'eszkozok')">Megjegyzés</th>
                 <th></th>
