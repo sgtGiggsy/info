@@ -1,21 +1,6 @@
 <?php
-if($menuterulet == 1)
-{
-	?><nav class="greedy">
-		<ul class="links"><?php
-		foreach($menuk[1] as $menupont)
-		{
-			?><li <?=(($menupont['url'] == $pagetofind) ? 'class="nav-active"' : '')?>>
-				<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=trim($menupont['menupont'])?></a>	
-			</li><?php
-		}
-		?></ul>
-		<button aria-label="További oldalak"><img src="<?=$RootPath?>/images/hamburger.png" alt="További oldalak"></button>
-		<ul class='hidden-links hidden'></ul>
-	</nav><?php
-}
 
-if($menuterulet == 2)
+if($menuterulet == 1)
 {
 	$fomenu = null;
 	?><div class="leftmenuareabase">
@@ -66,6 +51,14 @@ if($menuterulet == 2)
 			?></ul>
 		</nav>
    </div><?php
+}
+
+if($menuterulet == 2)
+{
+	foreach($menuk[2] as $menupont)
+	{
+		?><a href="<?=$RootPath?>/<?=$menupont['url']?>"><img src="<?=$RootPath?>/images/<?=$menupont['url']?>.png" title="<?=$menupont['menupont']?>" alt="<?=$menupont['menupont']?>"></a><?php
+	}
 }
 ?><script>
 </script>

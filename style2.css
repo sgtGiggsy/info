@@ -48,55 +48,10 @@ p {
     display: grid;
     justify-content: center;
     background-image: url('./images/backg.png');
-}
-
-@media (max-width: 600px) {
-    .wrapper {
-        grid-template-columns:  minmax(0px, 1fr) minmax(450px, 100%) minmax(0px, 1fr);
-        margin: 0px;
-    }
-
-    .menubar, .content, .footer, .footerinside {
-        margin: 0px;
-    }
-
-    .body {
-        background-image: linear-gradient(to right, #085224, #003366);
-    }
-
-    .content {
-        overflow: scroll;
-    }
-}
-
-@media (min-width: 600px) {
-    .wrapper {
-        grid-template-columns: minmax(50px, 200px) 1fr;
-        grid-template-rows: 50px minmax(500px, 1fr) minmax(0px, 200px) 30px;
-        min-height: 100vh;
-        margin: 0px;
-    }
-
-    .body {
-        background-image: url("./images/bg.jpg");
-    }
-
-    .menubar {
-        margin: 0px 10px 0px 10px;
-    }
-
-    .content {
-        /*margin-top: 0.5em;
-        margin-left: 10px;
-        margin-right: 10px;
-        margin-bottom: 10px;*/
-        box-shadow: 2px 2px 5px dimgrey;
-        grid-column-start: 2;
-        grid-column-end: 3;
-        grid-row-start: 2;
-        grid-row-end: 3;
-        /*min-width: max-content;*/
-    }
+    grid-template-columns: minmax(50px, 200px) 1fr;
+    grid-template-rows: 50px minmax(500px, 1fr) minmax(0px, 200px) 30px;
+    min-height: 100vh;
+    margin: 0;
 }
 
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
@@ -116,7 +71,7 @@ body {
     margin-top: 0px;
     display: block;
     font-family: "sansation", "sansation-eot";
-    background-image: linear-gradient(to right, #085224, #003366);
+    /*background-image: linear-gradient(to right, #085224, #003366);*/
 }
 
 ol, ul {
@@ -132,6 +87,7 @@ ol, ul {
 }
 
 .menubar {
+    margin: 0px 10px 0px 10px;
     grid-column-start: 1;
     grid-column-end: 4;
     grid-row-start: 2;
@@ -151,12 +107,15 @@ ol, ul {
 .content {
     display: flex;
     flex-direction: column;
-    grid-column-start: 2;
-    grid-column-end: 3;
     padding: 1em;
     background-color: #ededed;
     /*justify-content: center;*/
     overflow: auto;
+    box-shadow: 2px 2px 5px dimgrey;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 2;
+    grid-row-end: 3;
 }
 
 .footer {
@@ -777,11 +736,15 @@ label {
 
 .topmenuikonok {
     float: right;
+    display: inline-flex;
 }
 
 .topmenuikonok img {
     width: 40px;
     height: 40px;
+    margin-left: 10px;
+    border-radius: 50%;
+    overflow: hidden;
 }
 
 /* Balmenü */

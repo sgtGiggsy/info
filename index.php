@@ -18,10 +18,11 @@ header('Pragma: no-cache');
 //header("Content-Security-Policy-Report-Only: script-src 'nonce-{RANDOM}' 'strict-dynamic';");
 
 // Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
-$page = null; $id = null;
+$page = null; $id = null; $current = null;
 if(isset($_GET['page']))
 {
-	$page = $_GET['page'];
+    $page = $_GET['page'];
+    $current = $page;
 
 	if($page == "kilep")
 	{
@@ -99,6 +100,7 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
                         @$alakulat = alakulatValaszto($ldapresults[0]['company'][0]);
                         @$telefon = $ldapresults[0]['telephonenumber'][0];
                         @$beosztas = $ldapresults[0]['title'][0];
+                        @$thumb = $ldapresults[0]['thumbnailphoto'][0];
                         /*foreach($ldapresults[0] as $x)
                         {
                             print_r($x);
@@ -112,6 +114,8 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
             }
         }
     }
+
+    
 
     // MySQL-en keresztüli autentikációt elvégző rész
     if ($stmt = $con->prepare('SELECT id, jelszo FROM felhasznalok WHERE felhasznalonev = ?'))
@@ -135,17 +139,17 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
         {
             if(isset($jelszo)) // Ha létezett már a felhasználó a MySQL adatbázisban, frissítjük az adatait a DC-től kapottakkal
             {
-                if ($stmt = $con->prepare('UPDATE felhasznalok SET jelszo=?, nev=?, email=?, osztaly=?, alakulat=?, telefon=?, beosztas=? WHERE felhasznalonev=?'))
+                if ($stmt = $con->prepare('UPDATE felhasznalok SET jelszo=?, nev=?, email=?, osztaly=?, alakulat=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?'))
                 {
-                    $stmt->bind_param('ssssssss', $hashedpassword, $nev, $email, $osztaly, $alakulat, $telefon, $beosztas, $samaccountname);
+                    $stmt->bind_param('sssssssss', $hashedpassword, $nev, $email, $osztaly, $alakulat, $telefon, $beosztas, $thumb, $samaccountname);
                     $stmt->execute();
                 }
             }
             else // Ha nem létezett a felhasználó a MySQL adatbázisban, létrehozzuk (a jelen táblabeállítás szerint a MySQL-ben automatikusan 1-es, azaz legalacsonyabb belépett joggal jön létre minden felhasználó)
             {
-                if ($stmt = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, jelszo, nev, email, osztaly, alakulat, telefon, beosztas) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'))
+                if ($stmt = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, jelszo, nev, email, osztaly, alakulat, telefon, beosztas, profilkep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'))
                 {
-                    $stmt->bind_param('ssssssss', $samaccountname, $hashedpassword, $nev, $email, $osztaly, $alakulat, $telefon, $beosztas);
+                    $stmt->bind_param('sssssssss', $samaccountname, $hashedpassword, $nev, $email, $osztaly, $alakulat, $telefon, $beosztas, $thumb);
                     $stmt->execute();
                 }
             }
@@ -210,6 +214,7 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
         $_SESSION[getenv('SESSION_NAME').'felhasznalonev'] = $row['felhasznalonev'];
         $_SESSION[getenv('SESSION_NAME').'nev'] =  $row['nev'];
         $_SESSION[getenv('SESSION_NAME').'jogosultsag'] =  $row['jogosultsag'];
+        $_SESSION['profilkep'] =  $row['profilkep'];
     }
     else
     {
@@ -348,7 +353,7 @@ if($_SESSION[getenv('SESSION_NAME').'id'] == 1)
 }
 else
 {
-    include('./templates/index.tpl.php');
+    include('./templates/index2.tpl.php');
 }
 
 ?>

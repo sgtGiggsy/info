@@ -18,7 +18,7 @@ else
         LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
         LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
     $where
-    ORDER BY telephely, szam + 0;");
+    ORDER BY telephelyek.id, szam + 0;");
 
     ?><?=($mindir) ? "<a href='$RootPath/epuletszerkeszt'>Új épület hozzáadása</a>" : "" ?>
     <div class="oldalcim">Épületek listája</div><?php

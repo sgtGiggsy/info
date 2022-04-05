@@ -60,7 +60,7 @@ else
                     <th class="tsorth" onclick="sortTable(3, 's', '<?=$tipus?>')">Modell</th>
                     <th class="tsorth" onclick="sortTable(4, 's', '<?=$tipus?>')">Sorozatszám</th>
                     <th class="tsorth" onclick="sortTable(5, 's', '<?=$tipus?>')">Épület</th>
-                    <th class="tsorth" onclick="sortTable(6, 's', '<?=$tipus?>')">Helyiseg</th>
+                    <th class="tsorth" onclick="sortTable(6, 's', '<?=$tipus?>')">Helyiség</th>
                     <th class="tsorth" onclick="sortTable(7, 's', '<?=$tipus?>')">Rack</th>
                     <th class="tsorth" onclick="sortTable(8, 's', '<?=$tipus?>')">Tulajdonos</th>
                     <th class="tsorth" onclick="sortTable(9, 's', '<?=$tipus?>')">Beépítve</th>

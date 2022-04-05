@@ -21,7 +21,7 @@
 	</div>-->
 <!-- Menürész -->
 	<!--<div class="menubar"></div>-->
-	<?php $menuterulet = 2; include('./includes/menu2.inc.php'); ?>
+	<?php $menuterulet = 1; include('./includes/menu2.inc.php'); ?>
 		<!--<div class="menu">
 			
 		</div>-->
