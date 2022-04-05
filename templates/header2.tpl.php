@@ -15,6 +15,6 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
 }
 else
 {
-    ?><a href="<?=$RootPath?>/belepes" title="Belépés" alt="Belépés"><img src="<?=$RootPath?>/images/login.png"></a><?php
+    ?><a href="<?=$RootPath?>/belepes" title="Belépés" alt="Belépés"><span>Belépés</span><!--<img src="<?=$RootPath?>/images/login.png">--></a><?php
 }
 ?></div>

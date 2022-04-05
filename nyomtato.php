@@ -6,32 +6,94 @@ if(!@$mindolvas)
 }
 else
 {
-	$portid = $_GET['id'];
-	$port = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, epuletek.nev AS epuletnev, beepitesek.nev AS eszkoz, helyisegszam, helyisegnev, rackszekrenyek.nev AS rack, rackszekrenyek.helyiseg AS rackhelyiseg,
-			(SELECT helyisegnev FROM helyisegek WHERE id = rackhelyiseg) as rackhelynev,
-			(SELECT helyisegszam FROM helyisegek WHERE id = rackhelyiseg) as rackhelyszam,
-			(SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1) AS szomszedport
-		FROM portok
-			LEFT JOIN switchportok ON portok.id = switchportok.port
-			LEFT JOIN vegpontiportok ON portok.id = vegpontiportok.port
-			LEFT JOIN rackportok ON portok.id = rackportok.port
-			LEFT JOIN rackszekrenyek ON rackportok.rack = rackszekrenyek.id
-			LEFT JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
-			LEFT JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
-			LEFT JOIN helyisegek ON vegpontiportok.helyiseg = helyisegek.id
-			LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
-		WHERE portok.id = $portid;");
-	$port = mysqli_fetch_assoc($port);
+	$mindeneszkoz = mySQLConnect("SELECT
+            eszkozok.id AS id,
+            sorozatszam,
+            gyartok.nev AS gyarto,
+            modellek.modell AS modell,
+            varians,
+            eszkoztipusok.nev AS tipus,
+			epuletek.id AS epuletid,
+            epuletek.nev AS epuletnev,
+            epuletek.szam AS epuletszam,
+            helyisegszam,
+            helyisegnev,
+            beepitesideje,
+            kiepitesideje,
+            modellek.tipus AS tipusid,
+            beepitesek.nev AS beepitesinev,
+            beepitesek.id AS beepid,
+            ipcimek.ipcim AS ipcim,
+            beepitesek.megjegyzes AS megjegyzes,
+            epulettipusok.tipus AS epulettipus,
+			telephelyek.telephely AS telephely,
+            telephelyek.id AS thelyid,
+            helyisegek.id AS helyisegid,
+            szines,
+            scanner,
+            fax,
+            admin,
+            pass,
+            defadmin,
+            defpass,
+            maxmeret
+        FROM eszkozok
+            INNER JOIN modellek ON eszkozok.modell = modellek.id
+            LEFT JOIN nyomtatomodellek ON nyomtatomodellek.modell = modellek.id
+            INNER JOIN gyartok ON modellek.gyarto = gyartok.id
+            INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
+            LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+            LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id
+            LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+			LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
+			LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
+            LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
+        WHERE eszkozok.id = $id
+        ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
+	
+	if(mysqli_num_rows($mindeneszkoz) == 0)
+    {
+        echo "Nincs ilyen sorszámú aktív eszköz";
+    }
+    else
+    {
+		$eszkoz = mysqli_fetch_assoc($mindeneszkoz);
 
-	?><div class="oldalcim">A(z) <?=$port['epuletnev']?> <?=$port['port']?> portjának adatai</div>
-	<div class="infobox"><?php
-		?><div>Állapot</div>
-		<div><?=($port['szomszedport']) ? "Kirendezve" : "Használaton kívül" ?></div>
-		<div>Központi oldal</div>
-		<div><?=$port['rack']?> rack, <?=$port['rackhelyszam']?>. helyiség (<?=$port['rackhelynev']?>)</div>
-		<div><?=($port['szomszedport']) ? "Aktív eszköz" : "" ?></div>
-		<div><?=($port['szomszedport']) ? $port['eszkoz'] : "" ?></div>
-		<div>Végponti oldal</div>
-		<div><?=$port['helyisegszam']?>. helyiség <?=($port['helyisegnev']) ? "(" . $port['helyisegnev'] . ")" : "" ?></div>
-	</div><?php
+        ?><div class="breadcumblist">
+            <ol vocab="https://schema.org/" typeof="BreadcrumbList">
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/">
+                    <span property="name">Kecskemét Informatika</span></a>
+                    <meta property="position" content="1">
+                </li>
+                <li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
+                    <span property="name"><?=$eszkoz['telephely']?></span></a>
+                    <meta property="position" content="2">
+                </li>
+                <li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
+                    <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
+                    <meta property="position" content="3">
+                </li>
+                <li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
+                    <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
+                    <meta property="position" content="4">
+                </li>
+                <li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <span property="name"><?=$eszkoz['beepitesinev']?> (<?=$eszkoz['ipcim']?>)</span>
+                    <meta property="position" content="4">
+                </li>
+            </ol>
+        </div><?php
+	}
 }
