@@ -20,6 +20,7 @@ else
             beepitesideje,
             kiepitesideje,
             modellek.tipus AS tipusid,
+            
             alakulatok.rovid AS tulajdonos,
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
@@ -79,7 +80,7 @@ else
 
         $eszkid = $eszkoz['id'];
         $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
-        ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./eszkoz/<?=$eszkoz['id']?>'>
+        ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./<?=($eszkoz['tipusid'] < 11) ? "aktiveszkoz" : (($eszkoz['tipusid'] == 12) ? "nyomtato" : "") ?>/<?=$eszkoz['id']?>'>
             <td><?=$eszkoz['ipcim']?></td>
             <td><?=$eszkoz['beepitesinev']?></td>
             <td><?=$eszkoz['gyarto']?></td>

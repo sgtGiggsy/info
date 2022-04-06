@@ -87,9 +87,15 @@ button {
     cursor: pointer;
     color: #fff;
     background-color: #007acc;
-    border: 1px;
-    border-radius: 3px;
-    border-color: #007acc;
+    border: 1px solid;
+    border-radius: 4px;
+    border-color: #004b7e;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #1c4663;
+    box-shadow: 0px 0px 5px 1px #012c49;
 }
 
 .header {
@@ -549,15 +555,36 @@ label {
     -ms-grid-columns: 1fr 1fr;
     grid-template-columns: 1fr 1fr;
     margin: auto;
-    width: 500px;
-    background-color: black;
+    width: 70%;
+    background-color: #0f2c3a;
     color:rgb(224, 224, 224);
     opacity: 0.5;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    padding: 20px;
+    border-radius: 5px;
 }
 
 .infobox div {
-    padding: 0.1em 0.5em 0.1em 0.5em;
+    padding: 0.5em 0.5em 0.1em 0.5em;
+}
+
+.kartyak {
+    grid-template-columns: 1fr 1fr;
+    display: grid;
+    grid-gap: 1em;
+}
+
+.kartya {
+    font-family: roboto, Verdana, Geneva, Tahoma, sans-serif;
+    background-color: #0f2c3a;
+    color:rgb(224, 224, 224);
+    opacity: 0.5;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.kartya span {
+    font-weight: bold;
 }
 
 .oldalcim {
