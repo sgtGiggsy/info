@@ -430,6 +430,24 @@ function bugTypePicker($current)
 	</div><?php
 }
 
+function felhasznaloPicker($current, $selectnev, $alakulat)
+{
+	$where = null;
+	if($alakulat)
+	{
+		$where = "WHERE alakulat = $alakulat";
+	}
+	$felhasznalok = mySQLConnect("SELECT id, nev FROM felhasznalok $where ORDER BY nev ASC");
+
+	?><select id="<?=$selectnev?>" name="<?=$selectnev?>">
+		<option value="" selected></option><?php
+		foreach($felhasznalok as $x)
+		{
+			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+		}
+	?></select><?php
+}
+
 function cancelForm()
 {
 	$RootPath = getenv('APP_ROOT_PATH');

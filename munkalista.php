@@ -67,24 +67,27 @@ else
                     <th class="tsorth" onclick="sortTable(9, 's', 'munkalista')">Munkavégző</th>
                     <th class="tsorth" onclick="sortTable(9, 's', 'munkalista')">Telefon</th>
                     <th></th>
+                    <th></th>
                 </tr>
             </thead>
         <tbody><?php
         foreach($munkak as $munka)
         {
+            $munkid = $munka['id'];
             ?><tr>
-                <td><?=$munka['id']?></td>
+                <td><?=$munkid?></td>
                 <td><?=$munka['igenylonev']?></td>
                 <td><?=$munka['igenylotelefon']?></td>
                 <td><?=$munka['igenyloalakulat']?></td>
-                <td><?=$munka['telephely']?> <?=$munka['epulet']?>.  <?=$munka['eptipus']?> <?=$munka['helyiseg']?></td>
-                <td nowrap><?=$munka['igenylesideje']?></td>
-                <td nowrap><?=$munka['vegrehajtasideje']?></td>
+                <td><?=$munka['telephely']?> <?=$munka['epulet']?>.  <?=$munka['eptipus']?> <?=$munka['helyiseg']?>.</td>
+                <td nowrap><?=str_replace("-", ".", $munka['igenylesideje'])?></td>
+                <td nowrap><?=str_replace("-", ".", $munka['vegrehajtasideje'])?></td>
                 <td><?=$munka['leiras']?></td>
                 <td><?=$munka['eszkoz']?></td>
                 <td><?=$munka['munkavegzo1nev']?></td>
                 <td><?=$munka['munkavegzo1telefon']?></td>
-                <td><a href="<?=$RootPath?>/munkaprint/<?=$munka['id']?>"><img src='<?=$RootPath?>/images/print.png' alt='Munkalap nyomtatása' title='Munkalap nyomtatása' /></a></td>
+                <td><a style="cursor: pointer;" onclick="window.open('<?=$RootPath?>/munkaprint/<?=$munka['id']?>')"><img src='<?=$RootPath?>/images/print.png' alt='Munkalap nyomtatása' title='Munkalap nyomtatása' /></a></td>
+                <td><?=($csoportir) ? "<a href='$RootPath/munkaszerkeszt/$munkid'><img src='$RootPath/images/edit.png' alt='Munka szerkesztése' title='Munka szerkesztése'/></a>" : "" ?></td>
             </tr><?php
         }
         ?></tbody>

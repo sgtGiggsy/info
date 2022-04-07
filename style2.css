@@ -28,6 +28,38 @@
     src: url("./includes/Oswald-Regular.ttf") format('truetype');
 }
 
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .PrintArea, .PrintArea * {
+        visibility: visible;
+    }
+
+    .PrintArea {
+        background: white;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    @page {
+        margin-top: 0;
+        margin-bottom: 0;
+        padding-top: 72px;
+        padding-bottom: 72px;
+    }
+
+    @page :header {
+        display: none;
+    }
+
+    @page :footer {
+        display: none;
+    }
+}
+
 *, *:before, *:after {
     box-sizing: border-box;
 }
@@ -95,7 +127,7 @@ button {
 
 button:hover {
     background-color: #1c4663;
-    box-shadow: 0px 0px 5px 1px #012c49;
+    /*box-shadow: 0px 0px 5px 1px #012c49;*/
 }
 
 .header {
