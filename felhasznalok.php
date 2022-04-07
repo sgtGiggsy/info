@@ -46,7 +46,7 @@ else
     if(isset($_GET['kereses']))
     {
         $keres = $_GET['kereses'];
-        $where = "WHERE nev LIKE '%$keres%' OR felhasznalonev LIKE '%$keres%' OR osztaly LIKE '%$keres%'";
+        $where = "WHERE felhasznalok.nev LIKE '%$keres%' OR felhasznalonev LIKE '%$keres%' OR osztaly LIKE '%$keres%'";
     }
 
     $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev AS nev, felhasznalonev, jogosultsag, email, elsobelepes, osztaly, telefon, beosztas, alakulatok.nev AS alakulat
@@ -57,13 +57,6 @@ else
     ?><div class='oldalcim'>Felhasználók listája</div>
     <div>
     <div>
-        <div class="left">
-            <form action="felhasznalok" method="GET">
-                <label for="kereses">Felhasználó keresése</label>
-                <input type="text" name="kereses">
-                <button>Keres</button>
-            </form>
-        </div>
         <div class="right">
             <form action="felhasznalok" method="POST">
                 <label for="oldalankent">Oldalanként</label>

@@ -51,7 +51,7 @@ else
     ?><div class="oldalcim">Munka szerkesztése</div>
     <div class="contentcenter">
 
-        <?=helyisegPicker($hely);?>
+        <?=helyisegPicker($hely, "hely");?>
 
         <div>
 	        <label for="tipus">Igénylő:</label><br>
@@ -60,12 +60,12 @@ else
 
         <div>
             <label for="igenylesideje">Igénylés ideje</label><br>
-            <input type="date" id="igenylesideje" name="igenylesideje" value="<?=$igenylesideje?>">
+            <input type="date" id="igenylesideje" name="igenylesideje" value="<?=$igenylesideje?>"><button style="margin-left: 10px;" onclick="getMa('igenylesideje'); return false;">Ma</button>
         </div>
 
         <div>
             <label for="vegrehajtasideje">Végrehajtás ideje</label><br>
-            <input type="date" id="vegrehajtasideje" name="vegrehajtasideje" value="<?=$vegrehajtasideje?>">
+            <input type="date" id="vegrehajtasideje" name="vegrehajtasideje" value="<?=$vegrehajtasideje?>"><button style="margin-left: 10px;" onclick="getMa('vegrehajtasideje'); return false;">Ma</button>
         </div>
 
         <div>
@@ -96,10 +96,24 @@ else
         <div class="submit">
             <input type="submit" name="beKuld" value="<?=$button?>">
         </div>
-        <div class="submit" style="padding-top: 0;">        
+        <div class="submit" style="padding-top: 5px;">        
             <input type="submit" onclick="window.open('<?=$RootPath?>/munkaprint/<?=$munka['id']?>')" name="nyomtat" value="<?=$button2?>">
         </div>
     </form><?php
     cancelForm();
-?></div><?php
+?></div>
+<script>
+    function getMa(dateselect)
+    {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        today = yyyy + '-' + mm + '-' + dd;
+        document.getElementById(dateselect).value = today;
+    }
+    
+</script>
+<?php
 }

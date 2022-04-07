@@ -14,11 +14,10 @@ else
             helyisegszam,
             epuletek.nev AS epuletnev,
             epuletek.szam AS epuletszam
-        FROM
-            rackszekrenyek INNER JOIN
-                helyisegek ON rackszekrenyek.helyiseg = helyisegek.id LEFT JOIN
-                epuletek ON helyisegek.epulet = epuletek.id LEFT JOIN
-                gyartok ON rackszekrenyek.gyarto = gyartok.id
+        FROM rackszekrenyek
+            LEFT JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id
+            LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+            LEFT JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
         ORDER BY epuletszam, helyisegszam, helyisegnev, rack;");
 
     if($mindir) 
@@ -42,6 +41,7 @@ else
         <tbody><?php
             foreach($rackek as $rack)
             {
+                $rackid = $rack['id'];
                 ?><tr class='kattinthatotr' data-href='./rack/<?=$rack['id']?>'>
                     <td><?=$rack['id']?></td>
                     <td><?=$rack['rack']?></td>
@@ -49,7 +49,7 @@ else
                     <td><?=$rack['unitszam']?></td>
                     <td><?=$rack['helyisegszam']?> (<?=$rack['helyisegnev']?>)</td>
                     <td><?=$rack['epuletszam']?> (<?=$rack['epuletnev']?>)</td>
-                    <td><a href='./rackszerkeszt/<?=$rack['id']?>'>Szerkesztés</a></td>
+                    <td><?=($csoportir) ? "<a href='$RootPath/rackszerkeszt/$rackid'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td>
                 </tr><?php
             }
         ?></tbody>

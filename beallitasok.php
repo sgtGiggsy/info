@@ -53,29 +53,13 @@ else
     $button = "Szerkesztés"; ?> 
     <form action="<?=$RootPath?>/beallitasok?action=update" method="post">
 
+    <?=helyisegPicker($beallitas['defaultmunkahely'], "defaultmunkahely")?>
+
     <div>
-        <label for="vizsgahossz">A vizsga kérdésszáma:
-        <input type="text" accept-charset="utf-8" name="vizsgahossz" id="vizsgahossz" value="<?php if(isset($beallitas['vizsgahossz'])) { echo $beallitas['vizsgahossz']; } ?>"></input></label>
+	<label for="defaultugyintezo">Alapértelmezett ügyintéző a munkalapokon:</label><br>
+        <?=felhasznaloPicker($beallitas['defaultugyintezo'], "defaultugyintezo", false)?>
     </div>
-    <div>
-        <label for="minimumhelyes">Minimális helyes válaszok száma:
-        <input type="text" accept-charset="utf-8" name="minimumhelyes" id="minimumhelyes" value="<?php if(isset($beallitas['minimumhelyes'])) { echo $beallitas['minimumhelyes']; } ?>"></input></label>
-    </div>
-    <div>
-        <label for="vizsgaido">A vizsgára adott idő:
-        <input type="text" accept-charset="utf-8" name="vizsgaido" id="vizsgaido" value="<?php if(isset($beallitas['vizsgaido'])) { echo $beallitas['vizsgaido']; } ?>"></input></label>
-    </div>
-    <div>
-        <label for="ismetelheto">A vizsga ismételhető:</label>
-        <select id="ismetelheto" name="ismetelheto">
-            <option value="1" <?php if(isset($beallitas['ismetelheto']) && $beallitas['ismetelheto'] == 1) { ?> selected <?php } ?>>Igen</option>
-            <option value="0" <?php if(isset($beallitas['ismetelheto']) && $beallitas['ismetelheto'] == 0) { ?> selected <?php } ?>>Nem</option>
-        </select>
-    </div>
-    <div>
-        <label for="maxismetles">Újrapróbálkozások maximális száma:
-        <input type="text" accept-charset="utf-8" name="maxismetles" id="maxismetles" value="<?php if(isset($beallitas['maxismetles'])) { echo $beallitas['maxismetles']; } ?>"></input></label>
-    </div>
+
     <div>
         <label for="udvozloszoveg">Üdvözlőszöveg:
         <textarea name="udvozloszoveg" id="udvozloszoveg"><?php if(isset($beallitas['udvozloszoveg'])) { echo $beallitas['udvozloszoveg']; } ?></textarea></label>

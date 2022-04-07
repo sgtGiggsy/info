@@ -1,8 +1,14 @@
+<div class="kereses">
+    <form method="GET">
+        <label for="kereses">Keresés</label>
+        <input type="text" name="kereses">
+        <button>Keres</button>
+    </form>
+</div>
 <div class="topmenuikonok">
 <?php
 if($_SESSION[getenv('SESSION_NAME').'id'])
 {
-    
     $usernev = $_SESSION[getenv('SESSION_NAME').'nev'];
     $menuterulet = 2; include('./includes/menu2.inc.php');
     ?><a style="cursor: pointer" onclick="showProfile()"> 

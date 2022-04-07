@@ -6,6 +6,43 @@ if(!@$mindolvas)
 }
 else
 {
+    if(isset($_POST['oldalankent']))
+    {
+        $_SESSION['oldalankent'] = $_POST['oldalankent'];
+    }
+    if(isset($_SESSION['oldalankent']))
+    {
+        $megjelenit = $_SESSION['oldalankent'];
+    }
+    else
+    {
+        $megjelenit = 20;
+    }
+
+    $con = mySQLConnect("SELECT count(*) AS db FROM munkalapok");
+    $count = (mysqli_fetch_assoc($con))['db'];
+
+    if(isset($_GET['oldal']))
+    {
+        $oldal = $_GET['oldal'];
+        $start = ($oldal - 1) * $megjelenit;
+    }
+    else
+    {
+        $oldal = 1;
+        $start = 0;
+    }
+
+    if($oldal != 1)
+    {
+        $previd = $oldal - 1;
+    }
+
+    if($oldal * $megjelenit < $count)
+    {
+        $nextid = $oldal + 1;
+    }
+    
     $munkak = mySQLConnect("SELECT munkalapok.id AS id, hely, telephelyek.telephely AS telephely, epuletek.szam AS epulet, epulettipusok.tipus AS eptipus, helyisegek.helyisegszam AS helyiseg, igenylo, igenylesideje, vegrehajtasideje, munkavegzo1, munkavegzo2, leiras, eszkoz,
             (SELECT nev FROM felhasznalok WHERE id = igenylo) AS igenylonev,
             (SELECT telefon FROM felhasznalok WHERE id = igenylo) AS igenylotelefon,
@@ -20,9 +57,30 @@ else
             LEFT JOIN helyisegek ON munkalapok.hely = helyisegek.id
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
-            LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id;");
+            LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
+        ORDER BY munkalapok.id DESC
+        LIMIT $start, $megjelenit;");
 
-    ?><div class="oldalcim">Munkalista</div><?php
+    if($mindir) 
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/munkaszerkeszt'">Új munka</button><?php
+    }
+
+    ?><div class="right">
+        <form method="POST">
+            <label for="oldalankent">Oldalanként</label>
+                <select id="oldalankent" name="oldalankent" onchange="this.form.submit()">
+                    <option value="10" <?=($megjelenit == 10) ? "selected" : "" ?>>10</option>
+                    <option value="20" <?=($megjelenit == 20) ? "selected" : "" ?>>20</option>
+                    <option value="50" <?=($megjelenit == 50) ? "selected" : "" ?>>50</option>
+                    <option value="100" <?=($megjelenit == 100) ? "selected" : "" ?>>100</option>
+                    <option value="200" <?=($megjelenit == 200) ? "selected" : "" ?>>200</option>
+                    <option value="500" <?=($megjelenit == 500) ? "selected" : "" ?>>500</option>
+                    <option value="1000" <?=($megjelenit == 1000) ? "selected" : "" ?>>1000</option>
+                </select>
+        </form>
+    </div>
+    <div class="oldalcim">Munkalista</div><?php
     
     if(isset($_GET['nezet']) && $_GET['nezet'] == "kartya")
     {
@@ -92,6 +150,15 @@ else
         }
         ?></tbody>
         </table><?php
+    }
+    if(@$previd)
+    {
+        ?><div class='left'><a href="<?=$RootPath?>/munkalista/oldal/<?=$previd?>">Előző oldal</a></div><?php
+    }
+
+    if(@$nextid)
+    {
+        ?><div class='right'><a href="<?=$RootPath?>/munkalista/oldal/<?=$nextid?>">Következő oldal</a></div><?php
     }
     ?></div><?php
 }

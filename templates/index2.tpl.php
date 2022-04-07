@@ -20,7 +20,7 @@
 		<?php include("./{$currentpage['url']}.php"); ?>
 	</div>
 
-	<div class="topmenubase"><?php include('./templates/header2.tpl.php'); ?></div>
+	<div class="topmenubase"></div><?php include('./templates/header2.tpl.php'); ?>
 	<!--<div class="header">
 		
 	</div>-->
@@ -38,7 +38,7 @@
 <!-- lábléc -->
     <div class ="footer">
 		<?php
-			include("./templates/footer.tpl.php");
+			//include("./templates/footer.tpl.php");
 		?>
 	</div>
 	<div class="bottom-line"><p><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p></div>

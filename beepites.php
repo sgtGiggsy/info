@@ -80,7 +80,7 @@ else
 
     <?=eszkozPicker($beepeszk, ($beepid) ? true : false)?>
 
-    <?=helyisegPicker($beephely)?>
+    <?=helyisegPicker($beephely, "helyiseg")?>
 
     <?=rackPicker($beeprack)?>
 

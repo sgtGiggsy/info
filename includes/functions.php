@@ -250,7 +250,7 @@ function alakulatValaszto($ldapres)
 	{
 		return 3;
 	}
-	elseif(str_contains($ldapres, "Légi Műveleti"))
+	elseif(str_contains($ldapres, "Légi Műveleti") || str_contains($ldapres, "LMV"))
 	{
 		return 4;
 	}
@@ -329,7 +329,7 @@ function eszkozPicker($current, $beepitett)
 	</div><?php
 }
 
-function helyisegPicker($current)
+function helyisegPicker($current, $selectnev)
 {
 	$helyisegek = mySQLConnect("SELECT
             helyisegek.id AS id,
@@ -344,8 +344,8 @@ function helyisegPicker($current)
         ORDER BY epuletszam + 0, helyisegszam;");
 
 	?><div>
-	<label for="helyiseg">Helyiség:</label><br>
-	<select id="helyiseg" name="helyiseg">
+	<label for="<?=$selectnev?>">Helyiség:</label><br>
+	<select id="<?=$selectnev?>" name="<?=$selectnev?>">
 		<option value="" selected></option><?php
 		foreach($helyisegek as $x)
 		{

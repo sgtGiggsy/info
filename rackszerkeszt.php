@@ -22,7 +22,7 @@ else
         $rackid = $_GET['id'];
         $rack = mySQLConnect("SELECT rackszekrenyek.nev AS nev, rackszekrenyek.helyiseg AS helyiseg, gyarto, unitszam, helyisegek.epulet AS epulet
             FROM rackszekrenyek
-                INNER JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id
+                LEFT JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id
             WHERE rackszekrenyek.id = $rackid;");
         $rack = mysqli_fetch_assoc($rack);
 
@@ -96,7 +96,7 @@ else
             <input type="text" accept-charset="utf-8" name="unitszam" id="unitszam" value="<?=$rackunitszam?>"></input>
         </div>
 
-        <?=helyisegPicker($rackhely)?>
+        <?=helyisegPicker($rackhely, "helyiseg")?>
 
         <?=gyartoPicker($rackgyarto)?>
 
