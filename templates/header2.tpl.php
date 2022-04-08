@@ -1,8 +1,8 @@
 <div class="kereses">
     <form method="GET">
-        <label for="kereses">Keresés</label>
+        <label for="kereses">Keresés
         <input type="text" name="kereses">
-        <button>Keres</button>
+        <button>Keres</button></label>
     </form>
 </div>
 <div class="topmenuikonok">

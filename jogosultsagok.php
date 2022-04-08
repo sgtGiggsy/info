@@ -47,8 +47,31 @@
             <td>
                 <input type="checkbox" value= "1" name="mindir-<?=$x['id']?>" <?=($jogosultsag['mindir']) ? 'checked' : '' ?>>
             </td>
+            <td>
+                <a style="margin-left: 10px; cursor: pointer;" onclick="checkAll('<?=$x['oldal']?>'); return false;">Mind</a>
+            </td>
             <?php
     }
     ?></tbody></table>
     <div class="submit"><input type="submit" value=<?=$button?>></div>
 </form>
+<script>
+    function checkAll(sor)
+    {
+        var jogsor = document.getElementById(sor.dataset.rowid).querySelectorAll('[type="checkbox"]');
+        Array.prototype.forEach.call(jogsor, function(x)) {
+            x.checked = sor.checked;
+        }
+        
+        
+        
+        jogsor = document.getElementById(sor);
+
+        cells = jogsor.getElementsByTagName("td");
+        db = cells.length-2;
+        for(i = 1; i < db; i++)
+        {
+            
+        }
+    }
+</script>

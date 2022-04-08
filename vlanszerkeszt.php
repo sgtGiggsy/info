@@ -31,7 +31,8 @@ else
 
         ?><div class="oldalcim">VLAN szerkesztése</div>
         <div class="contentcenter">
-        <form action="<?=$RootPath?>/vlanszerkeszt?action=update" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+        <form action="<?=$RootPath?>/vlanszerkeszt?action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
+        <input type ="hidden" id="origid" name="origid" value=<?=$id?>><?php
     }
     else
     {

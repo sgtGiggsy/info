@@ -246,7 +246,7 @@ function alakulatValaszto($ldapres)
 	{
 		return 2;
 	}
-	elseif(str_contains($ldapres, "Légijármű") || str_contains($ldapres, "LéJÜ"))
+	elseif(str_contains($ldapres, "Légijármű") || str_contains($ldapres, "LéJÜ") || str_contains($ldapres, "MH Lé.Jü.") || str_contains($ldapres, "MH Lé. Jü.")) 
 	{
 		return 3;
 	}
@@ -257,6 +257,14 @@ function alakulatValaszto($ldapres)
 	elseif(str_contains($ldapres, "Katonai Igazgatási és Központi") || str_contains($ldapres, "KIKNYP"))
 	{
 		return 5;
+	}
+	elseif(str_contains($ldapres, "38"))
+	{
+		return 6;
+	}
+	elseif(str_contains($ldapres, "Nemzetbiztonsági"))
+	{
+		return 7;
 	}
 	else
 	{
