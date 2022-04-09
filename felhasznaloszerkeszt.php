@@ -1,5 +1,5 @@
 <div class="oldalcim">Felhasználó adminisztrációja</div>
-<div class="contentcenter"><h2>
+<div class="contentcenter">
 <?php
 if(!($mindir || ($sajatir && $_GET['id'] == $_SESSION[getenv('SESSION_NAME').'id'])))
 {
@@ -13,9 +13,38 @@ else
         $irhat = true;
         include("./db/felhasznalodb.php");
     }
+
+    $felhasznalonev = $nev = $email = $telefon = $alakulat = null;
     if(!isset($_GET['id']))
     {
-        echo "Nincs kiválasztott felhasználó!";
+        $button = "Új felhasználó";
+        ?><form action="<?=$RootPath?>/felhasznaloszerkeszt&action=new" method="post" onsubmit="beKuld.disabled = true; return true;">
+        
+            <div style="margin: 0 20px 0 0">
+                <label for="felhasznalonev">Felhasználónév:</label><br>
+                <input type="text" accept-charset="utf-8" name="felhasznalonev" id="felhasznalonev" value="<?=$felhasznalonev?>"></input>
+            </div>
+
+            <div style="margin: 0 20px 0 0">
+                <label for="nev">Név:</label><br>
+                <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$nev?>"></input>
+            </div>
+
+            <div style="margin: 0 20px 0 0">
+                <label for="email">Email:</label><br>
+                <input type="text" accept-charset="utf-8" name="email" id="email" value="<?=$email?>"></input>
+            </div>
+
+            <div style="margin: 0 20px 0 0">
+                <label for="telefon">Telefon:</label><br>
+                <input type="text" accept-charset="utf-8" name="telefon" id="telefon" value="<?=$telefon?>"></input>
+            </div>
+
+            <?php alakulatPicker($alakulat, "alakulat"); ?>
+
+            <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
+        </form><?php
+        cancelForm();
     }
     else
     {
@@ -27,7 +56,6 @@ else
         }
         else
         {
-            echo "</h2>";
             $felhasznalo = mysqli_fetch_assoc($query);
             $button = "Szerkesztés"; ?>
             <p>Név: <?=$felhasznalo['nev']?></p>

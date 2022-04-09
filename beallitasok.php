@@ -15,7 +15,13 @@ else
         echo "<h2>Nincs jogosultsága a beállítások elmentésére!</h2>";
     }
 
-    include("./menuszerkeszt.php");
+    $button = "Beállítások mentése";
+    $beallitassql = mySQLConnect("SELECT * FROM beallitasok");
+    $beallitas = array();
+    foreach($beallitassql as $x)
+    {
+        $beallitas[$x['nev']] = $x['ertek'];
+    }    
 
     ?><script type ="text/javascript">
         tinymce.init({
@@ -34,54 +40,40 @@ else
         })
     </script>
 
-    <div class="oldalcim">Beállítások</div>
-    <div class="contentcenter"><?php
-    if(isset($_GET['vizsgareset']))
-    {
-        mySQLConnect("DELETE FROM `tesztvalaszok`;");
-        mySQLConnect("DELETE FROM `kitoltesek`;");
-        mySQLConnect("ALTER TABLE `kitoltesek` AUTO_INCREMENT = 1;");
-        mySQLConnect("ALTER TABLE `tesztvalaszok` AUTO_INCREMENT = 1");
-        header("Location: $RootPath/beallitasok");
-    }
-    $beallitassql = mySQLConnect("SELECT * FROM beallitasok");
-    $beallitas = array();
-    foreach($beallitassql as $x)
-    {
-        $beallitas[$x['nev']] = $x['ertek'];
-    }
-    $button = "Szerkesztés"; ?> 
+    <?php include("./menuszerkeszt.php"); ?>
+
     <form action="<?=$RootPath?>/beallitasok?action=update" method="post">
+    <div class="oldalcim"><p onclick="rejtMutat('munkalapok')" style="cursor: pointer">Munkalapok</p></div>
+    <div class="contentcenter" id="munkalapok"style='display: none'>
 
-    <?=helyisegPicker($beallitas['defaultmunkahely'], "defaultmunkahely")?>
+        <?=helyisegPicker($beallitas['defaultmunkahely'], "defaultmunkahely")?>
 
-    <div>
-	<label for="defaultugyintezo">Alapértelmezett ügyintéző a munkalapokon:</label><br>
-        <?=felhasznaloPicker($beallitas['defaultugyintezo'], "defaultugyintezo", false)?>
+        <div>
+        <label for="defaultugyintezo">Alapértelmezett ügyintéző:</label><br>
+            <?=felhasznaloPicker($beallitas['defaultugyintezo'], "defaultugyintezo", false)?>
+        </div>
     </div>
 
-    <div>
-        <label for="udvozloszoveg">Üdvözlőszöveg:
-        <textarea name="udvozloszoveg" id="udvozloszoveg"><?php if(isset($beallitas['udvozloszoveg'])) { echo $beallitas['udvozloszoveg']; } ?></textarea></label>
+    <div class="oldalcim"><p onclick="rejtMutat('fooldal')" style="cursor: pointer">Főoldal tartalma</p></div>
+    <div class="contentcenter" id="fooldal" style='display: none'>
+        <div>
+            <label for="udvozloszoveg">Üdvözlőszöveg:
+            <textarea name="udvozloszoveg" id="udvozloszoveg"><?php if(isset($beallitas['udvozloszoveg'])) { echo $beallitas['udvozloszoveg']; } ?></textarea></label>
+        </div>
+        <div>
+            <label for="udvozloszovegbelepve">Üdvözlőszöveg bejelentkezett felhasználóknak:
+            <textarea name="udvozloszovegbelepve" id="udvozloszovegbelepve"><?php if(isset($beallitas['udvozloszovegbelepve'])) { echo $beallitas['udvozloszovegbelepve']; } ?></textarea></label>
+        </div>
     </div>
-    <div>
-        <label for="udvozloszovegbelepve">Üdvözlőszöveg bejelentkezett felhasználóknak:
-        <textarea name="udvozloszovegbelepve" id="udvozloszovegbelepve"><?php if(isset($beallitas['udvozloszovegbelepve'])) { echo $beallitas['udvozloszovegbelepve']; } ?></textarea></label>
-    </div>
-    <div>
-        <label for="lablecinfo">Infó rész a láblécben:
-        <textarea name="lablecinfo" id="lablecinfo"><?php if(isset($beallitas['lablecinfo'])) { echo $beallitas['lablecinfo']; } ?></textarea></label>
-    </div>
-    <div class="submit"><input type="submit" value=<?=$button?>></div>
+    <div class="submit"><input type="submit" value='<?=$button?>'></div>
     </form>
-    <?php
-    if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] > 50 && isset($_GET['torlomod']))
-    {
-        ?><a href="?vizsgareset" style="color: red" onclick="return confirm('Biztos vagy benne, hogy törölni akarod az ÖSSZES VISZGÁT?')">Korábbi vizsgák törlése</a><?php
+<?php
+if(isset($_GET['menupontok']))
+{
+    ?><script>window.onload = function()
+	{
+        document.getElementById('menuk').style.display = "grid";
     }
-    elseif($_SESSION[getenv('SESSION_NAME').'jogosultsag'] > 50 && !isset($_GET['torlomod']))
-    {
-        ?><a href="?torlomod" style="color: red" onclick="return confirm('Biztos vagy benne, hogy bekapcsolod a törlő módot?')">Törlőmód bekapcsolása</a><?php
-    }
-    ?></div><?php
+    </script><?php
+}
 }

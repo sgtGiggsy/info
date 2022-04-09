@@ -17,7 +17,7 @@ else
     {
         $szulo[] = array("id" => $x['id'], "menupont" => $x['menupont']);
     }
-    ?><div class="oldalcim"><p onclick="rejtMutat('menuk')" style="cursor: pointer">Menük adminisztrációja</p></div>
+    ?><div class="oldalcim"><p onclick="rejtMutat('menuk')" style="cursor: pointer">Menük</p></div>
     <div id="menuk" style='display: none'>
     <table id="menupontok">
         <thead>

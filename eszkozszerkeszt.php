@@ -33,8 +33,6 @@ else
         INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
     $wheretip
     ORDER BY tipus ASC, gyartok.nev ASC, modell ASC;");
-
-    $tulajdonosok = mySQLConnect("SELECT * FROM alakulatok;");
     
     $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = $uplinkportok = $szoftver = null;
     $button = "Új eszköz";
@@ -159,16 +157,7 @@ else
             <input type="text" accept-charset="utf-8" name="sorozatszam" id="sorozatszam" value="<?=$sorozatszam?>"></input>
         </div>
 
-        <div>
-            <label for="tulajdonos">Tulajdonos:</label><br>
-            <select id="tulajdonos" name="tulajdonos">
-                <option value="" selected></option><?php
-                foreach($tulajdonosok as $x)
-                {
-                    ?><option value="<?=$x["id"] ?>" <?= ($tulajdonos == $x['id']) ? "selected" : "" ?>><?=$x['rovid']?></option><?php
-                }
-            ?></select>
-        </div><?php
+        <?php alakulatPicker($tulajdonos, "tulajdonos");
 
         if($eszkoztipus == "aktiv")
         {

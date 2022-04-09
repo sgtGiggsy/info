@@ -14,12 +14,12 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO vlanok (id, nev, leiras, kceh) VALUES (?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $_POST['id'], $_POST['nev'], $_POST['leiras'], $_POST['kceh']);
+        $stmt = $con->prepare('INSERT INTO alakulatok (nev, rovid) VALUES (?, ?)');
+        $stmt->bind_param('ss', $_POST['nev'], $_POST['rovid']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
-            echo "<h2>Vlan hozzáadása sikertelen!<br></h2>";
+            echo "<h2>Alakulat hozzáadása sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
         else
@@ -29,12 +29,12 @@ if(isset($irhat) && $irhat)
     }
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE vlanok SET id=?, nev=?, leiras=?, kceh=? WHERE id=?');
-        $stmt->bind_param('ssssi', $_POST['id'], $_POST['nev'], $_POST['leiras'], $_POST['kceh'], $_POST['origid']);
+        $stmt = $con->prepare('UPDATE alakulatok SET nev=?, rovid=? WHERE id=?');
+        $stmt->bind_param('ssi', $_POST['nev'], $_POST['rovid'], $_POST['id']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
-            echo "<h2>Vlan szerkesztése sikertelen!<br></h2>";
+            echo "<h2>Alakulat szerkesztése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
         else

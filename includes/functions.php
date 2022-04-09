@@ -456,6 +456,22 @@ function felhasznaloPicker($current, $selectnev, $alakulat)
 	?></select><?php
 }
 
+function alakulatPicker($current, $selectnev)
+{
+	$alakulatok = mySQLConnect("SELECT * FROM alakulatok;");
+
+	?><div>
+		<label for="<?=$selectnev?>">Alakulat:</label><br>
+		<select id="<?=$selectnev?>" name="<?=$selectnev?>">
+			<option value="" selected></option><?php
+			foreach($alakulatok as $x)
+			{
+				?><option value="<?=$x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=$x['rovid']?></option><?php
+			}
+		?></select>
+	</div><?php
+}
+
 function cancelForm()
 {
 	$RootPath = getenv('APP_ROOT_PATH');

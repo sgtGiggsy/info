@@ -1,5 +1,5 @@
-<div class="kereses">
-    <form method="GET">
+<div class="kereses" id="kereses">
+    <form name="kereses" method="GET">
         <label for="kereses">Keresés
         <input type="text" name="kereses">
         <button>Keres</button></label>

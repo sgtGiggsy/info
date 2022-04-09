@@ -148,6 +148,7 @@ button:hover, .submit input:hover {
 }
 
 .kereses {
+    visibility: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: left;

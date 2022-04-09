@@ -54,12 +54,15 @@ else
             LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
         $where
         LIMIT $start, $megjelenit;");
-    ?><div class='oldalcim'>Felhasználók listája</div>
-    <div>
-    <div>
+
+    if($mindir) 
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/felhasznaloszerkeszt'">Új felhasználó</button><?php
+    }
+    ?><div class='oldalcim'>Felhasználók listája
         <div class="right">
             <form action="felhasznalok" method="POST">
-                <label for="oldalankent">Oldalanként</label>
+                <label for="oldalankent" style="font-size: 14px">Oldalanként</label>
                     <select id="oldalankent" name="oldalankent" onchange="this.form.submit()">
                         <option value="10" <?=($megjelenit == 10) ? "selected" : "" ?>>10</option>
                         <option value="20" <?=($megjelenit == 20) ? "selected" : "" ?>>20</option>
@@ -72,6 +75,8 @@ else
             </form>
         </div>
     </div>
+    <div>
+
     <table>
         <thead style="font-size: 1.3em; font-weight: bold">
             <tr>
@@ -110,7 +115,8 @@ else
             </tr><?php
         }
         ?></tbody>
-        </table><?php
+        </table>
+        <?php
         if(@$previd)
         {
             ?><div class='left'><a href="<?=$RootPath?>/felhasznalok/oldal/<?=$previd?>">Előző oldal</a></div><?php
@@ -123,3 +129,8 @@ else
     ?></div><?php
 }
 ?>
+<script>
+    window.addEventListener("load", function () {
+        document.getElementById('kereses').style.visibility = "visible";
+    });
+</script>

@@ -13,7 +13,9 @@
         </thead>
         <tbody>
     <input type ="hidden" id="id" name="id" value=<?=$id?> /><?php
+    $menu = mySQLConnect("SELECT * FROM menupontok ORDER BY menupont ASC");
     $jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $id");
+    //uasort($menu, function ($a, $b) { return $a->menupont > $b->menupont; });
     foreach($menu as $x)
     {
         $jogosultsag = array("sajatolvas" => null, "csoportolvas" => null, "mindolvas" => null, "sajatir" => null, "csoportir" => null, "mindir" => null);
@@ -48,7 +50,7 @@
                 <input type="checkbox" value= "1" name="mindir-<?=$x['id']?>" <?=($jogosultsag['mindir']) ? 'checked' : '' ?>>
             </td>
             <td>
-                <a style="margin-left: 10px; cursor: pointer;" onclick="checkAll('<?=$x['oldal']?>'); return false;">Mind</a>
+                <button style="margin-left: 10px; cursor: pointer;" onclick="checkAll('<?=$x['oldal']?>'); return false;">Mind</button>
             </td>
             <?php
     }
@@ -58,20 +60,20 @@
 <script>
     function checkAll(sor)
     {
-        var jogsor = document.getElementById(sor.dataset.rowid).querySelectorAll('[type="checkbox"]');
-        Array.prototype.forEach.call(jogsor, function(x)) {
-            x.checked = sor.checked;
-        }
-        
-        
-        
-        jogsor = document.getElementById(sor);
-
-        cells = jogsor.getElementsByTagName("td");
-        db = cells.length-2;
-        for(i = 1; i < db; i++)
-        {
-            
+        var tr = document.getElementById(sor);
+        var ele = tr.querySelectorAll('input');
+        for(var i = 0; i < ele.length; i++){
+            if(ele[i].type == 'checkbox')
+            {
+                if(ele[i].checked == false)
+                {
+                    ele[i].checked = true;
+                }
+                else
+                {
+                    ele[i].checked = false;
+                }
+            }
         }
     }
 </script>

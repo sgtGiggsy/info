@@ -23,7 +23,7 @@ if(isset($irhat) && $irhat)
         }
         else
         {
-            header("Location: $RootPath/menuszerkeszt");
+            header("Location: $RootPath/beallitasok?menupontok");
         }
     }
     elseif($_GET["action"] == "update")
@@ -38,7 +38,7 @@ if(isset($irhat) && $irhat)
         }
         else
         {
-            header("Location: $RootPath/menuszerkeszt");
+            header("Location: $RootPath/beallitasok?menupontok");
         }
     }
     elseif($_GET["action"] == "delete")

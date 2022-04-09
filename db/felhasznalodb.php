@@ -15,6 +15,20 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
+        $elsobelepes = null;
+        $stmt = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, nev, email, telefon, alakulat, elsobelepes) VALUES (?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('ssssss', $_POST['felhasznalonev'], $_POST['nev'], $_POST['email'], $_POST['telefon'], $_POST['alakulat'], $elsobelepes);
+        $stmt->execute();
+
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>Felhasználó hozzáadása sikertelen!<br></h2>";
+            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
+        {
+            header("Location: $backtosender");
+        }
     }
     elseif($_GET["action"] == "update")
     {

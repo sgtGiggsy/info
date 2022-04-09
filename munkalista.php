@@ -66,9 +66,10 @@ else
         ?><button type="button" onclick="location.href='<?=$RootPath?>/munkaszerkeszt'">Új munka</button><?php
     }
 
-    ?><div class="right">
+    ?><div class="oldalcim">Munkalista
+    <div class="right">
         <form method="POST">
-            <label for="oldalankent">Oldalanként</label>
+            <label for="oldalankent" style="font-size: 14px">Oldalanként</label>
                 <select id="oldalankent" name="oldalankent" onchange="this.form.submit()">
                     <option value="10" <?=($megjelenit == 10) ? "selected" : "" ?>>10</option>
                     <option value="20" <?=($megjelenit == 20) ? "selected" : "" ?>>20</option>
@@ -79,8 +80,17 @@ else
                     <option value="1000" <?=($megjelenit == 1000) ? "selected" : "" ?>>1000</option>
                 </select>
         </form>
-    </div>
-    <div class="oldalcim">Munkalista</div><?php
+    </div></div><?php
+
+    if(@$previd)
+    {
+        ?><div class='left'><a href="<?=$RootPath?>/munkalista/oldal/<?=$previd?>">Előző oldal</a></div><?php
+    }
+
+    if(@$nextid)
+    {
+        ?><div class='right'><a href="<?=$RootPath?>/munkalista/oldal/<?=$nextid?>">Következő oldal</a></div><?php
+    }
     
     if(isset($_GET['nezet']) && $_GET['nezet'] == "kartya")
     {
@@ -113,7 +123,7 @@ else
         <table id="munkalista">
             <thead>
                 <tr>
-                    <th class="tsorth" onclick="sortTable(0, 'i', 'munkalista')">Sorszam</th>
+                    <th class="tsorth" onclick="sortTable(0, 'i', 'munkalista')">Azonos.</th>
                     <th class="tsorth" onclick="sortTable(1, 's', 'munkalista')">Megrendelő</th>
                     <th class="tsorth" onclick="sortTable(2, 's', 'munkalista')">Telefon</th>
                     <th class="tsorth" onclick="sortTable(3, 's', 'munkalista')">Alakulat</th>
@@ -123,7 +133,6 @@ else
                     <th class="tsorth" onclick="sortTable(7, 's', 'munkalista')">Elvégzett munka</th>
                     <th class="tsorth" onclick="sortTable(8, 's', 'munkalista')">Anyag/eszköz</th>
                     <th class="tsorth" onclick="sortTable(9, 's', 'munkalista')">Munkavégző</th>
-                    <th class="tsorth" onclick="sortTable(9, 's', 'munkalista')">Telefon</th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -143,7 +152,6 @@ else
                 <td><?=$munka['leiras']?></td>
                 <td><?=$munka['eszkoz']?></td>
                 <td><?=$munka['munkavegzo1nev']?></td>
-                <td><?=$munka['munkavegzo1telefon']?></td>
                 <td><a style="cursor: pointer;" onclick="window.open('<?=$RootPath?>/munkaprint/<?=$munka['id']?>')"><img src='<?=$RootPath?>/images/print.png' alt='Munkalap nyomtatása' title='Munkalap nyomtatása' /></a></td>
                 <td><?=($csoportir) ? "<a href='$RootPath/munkaszerkeszt/$munkid'><img src='$RootPath/images/edit.png' alt='Munka szerkesztése' title='Munka szerkesztése'/></a>" : "" ?></td>
             </tr><?php
