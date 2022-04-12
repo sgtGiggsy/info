@@ -184,17 +184,9 @@ else
         foreach($portok as $port)
         {
             $portid = $port['portid'];
-            ?><div ><?php
-                if($mindir)
-                {
-                    ?><a href='<?=$RootPath?>/port/<?=$portid?>'><?php
-                }
-                ?><?=($port['hasznalatban']) ? "<p style='font-weight: bold'>" : "<p style='font-weight: normal'>" ?><?php echo $port['port'] . "</p>";
-                if($mindir)
-                {
-                    echo "</a>";
-                }
-            ?></div><?php
+            ?><div>
+                <a href='<?=$RootPath?>/port/<?=$portid?>'><?=($port['hasznalatban']) ? "<p style='font-weight: bold'>" : "<p style='font-weight: normal'>" ?><?=$port['port']?></p></a>
+            </div><?php
         }
     ?></div><?php
 }

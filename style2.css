@@ -79,7 +79,7 @@ p {
 .wrapper {
     display: grid;
     justify-content: center;
-    background-image: url('./images/backg.png');
+    background-color: #2d373c;
     grid-template-columns: minmax(50px, 200px) 1fr 1fr;
     grid-template-rows: 50px minmax(500px, 1fr) minmax(0px, 200px) 30px;
     min-height: 100vh;
@@ -881,7 +881,7 @@ label {
     left: 0;
     right: 0;
     position: absolute;
-    padding-bottom: 60px;
+    padding-bottom: 0;
 }
 
 .leftmenu{

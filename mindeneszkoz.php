@@ -79,8 +79,16 @@ else
         
 
         $eszkid = $eszkoz['id'];
-        $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
-        ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./<?=($eszkoz['tipusid'] < 11) ? "aktiveszkoz" : (($eszkoz['tipusid'] == 12) ? "nyomtato" : "") ?>/<?=$eszkoz['id']?>'>
+        if($eszkoz['tipusid'] < 11)
+        {
+            $eszktip = "aktiveszkoz";
+        }
+        else
+        {
+            $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
+        }
+
+        ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./<?=$eszktip?>/<?=$eszkoz['id']?>'>
             <td><?=$eszkoz['ipcim']?></td>
             <td><?=$eszkoz['beepitesinev']?></td>
             <td><?=$eszkoz['gyarto']?></td>

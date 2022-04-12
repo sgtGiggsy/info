@@ -14,8 +14,8 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO telefonjogosultsagok (nev, jog) VALUES (?, ?)');
-        $stmt->bind_param('ss', $_POST['nev'], $_POST['jog']);
+        $stmt = $con->prepare('INSERT INTO telefonjogosultsagok (id, nev) VALUES (?, ?)');
+        $stmt->bind_param('ss', $_POST['id'], $_POST['nev']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
@@ -29,8 +29,8 @@ if(isset($irhat) && $irhat)
     }
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE telefonjogosultsagok SET nev=?, jog=? WHERE id=?');
-        $stmt->bind_param('ssi', $_POST['nev'], $_POST['jog'], $_POST['id']);
+        $stmt = $con->prepare('UPDATE telefonjogosultsagok SET id=?, nev=? WHERE id=?');
+        $stmt->bind_param('ssi', $_POST['id'], $_POST['nev'], $_POST['origid']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

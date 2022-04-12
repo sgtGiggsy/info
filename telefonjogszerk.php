@@ -7,7 +7,7 @@ if(@!$mindir)
 }
 else
 {
-    $id = $nev = $jog = null;
+    $id = $nev = null;
 
     if(count($_POST) > 0)
     {
@@ -25,14 +25,13 @@ else
 
         $id = $telefonjogszerk['id'];
         $nev = $telefonjogszerk['nev'];
-        $jog = $telefonjogszerk['jog'];
 
         $button = "Telefonjog szerkesztése";
 
         ?><div class="oldalcim">Telefonjogosultság szerkesztése</div>
         <div class="contentcenter">
         <form action="<?=$RootPath?>/telefonjogszerk?action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
-        <input type ="hidden" id="id" name="id" value=<?=$telefonjogid?>><?php
+        <input type ="hidden" id="origid" name="origid" value=<?=$telefonjogid?>><?php
     }
     else
     {
@@ -42,8 +41,8 @@ else
     }
 
         ?><div>
-            <label for="jog">Telefonjogosultság azonosítója:</label><br>
-            <input type="text" accept-charset="utf-8" name="jog" id="jog" value="<?=$jog?>"></input>
+            <label for="id">Telefonjogosultság azonosítója:</label><br>
+            <input type="text" accept-charset="utf-8" name="id" id="id" value="<?=$id?>"></input>
         </div>
         
         <div>

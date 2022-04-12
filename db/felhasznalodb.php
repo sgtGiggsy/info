@@ -30,6 +30,7 @@ if(isset($irhat) && $irhat)
             header("Location: $backtosender");
         }
     }
+
     elseif($_GET["action"] == "update")
     {
         $felhasznalo = $_POST['id'];
@@ -87,6 +88,60 @@ if(isset($irhat) && $irhat)
         //while(isset($_POST["valasz$i"]) && $_POST["valasz$i"] != null)
         //{}
     }
+
+    elseif($_GET['action'] == "adszinkronizalas")
+    {
+        $ldapusername = $_POST['felhasznalonev'] . "@" . $LDAP_DOMAIN;
+        $plainpassword = $_POST['jelszo'];
+
+        $con = mySQLConnect(false);
+
+        foreach($LDAP_SERVERS as $x)
+        {
+            if(checkLDAPConnection($x))
+            {
+                $ldapconnection = ldap_connect($x, $LDAP_PORT); // LDAP kapcsolat inicializálása
+                
+                ldap_set_option($ldapconnection, LDAP_OPT_PROTOCOL_VERSION, 3);
+                ldap_set_option($ldapconnection, LDAP_OPT_REFERRALS, 0);
+                $ldapbind = ldap_bind($ldapconnection, $ldapusername, $plainpassword); // LDAP bejelentkezés, mivel nem errort, csak warningot dobhat hiba esetén, el kell nyomni a hibaüzenetet
+                if($ldapbind)
+                {
+                    $felhasznalok = mySQLConnect("SELECT * FROM felhasznalok");
+                    foreach($felhasznalok as $felhasznalo)
+                    {
+                        $samaccountname = $felhasznalo['felhasznalonev'];
+                        $filter = "(&(objectClass=user)(sAMAccountName=$samaccountname))";
+                        $ldapsearch = ldap_search($ldapconnection, $LDAP_DIR, $filter); // A felhasználó adatainak lekérése a DC-től
+                        if($ldapsearch)
+                        {
+                            $ldapresults = ldap_get_entries($ldapconnection, $ldapsearch);
+                            // Ha nincs email, vagy megjelenő név valakinél megadva, warningot dobna a lekérés, így el kell nyomnunk az esetleges hibaüzenetet
+                            @$email = $ldapresults[0]['mail'][0];
+                            @$nev = $ldapresults[0]['displayname'][0];
+                            @$osztaly = $ldapresults[0]['department'][0];
+                            @$alakulat = alakulatValaszto($ldapresults[0]['company'][0]);
+                            @$telefon = $ldapresults[0]['telephonenumber'][0];
+                            @$beosztas = $ldapresults[0]['title'][0];
+                            @$thumb = $ldapresults[0]['thumbnailphoto'][0];
+      
+                            if ($stmt = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, alakulat=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?'))
+                            {
+                                $stmt->bind_param('ssssssss', $nev, $email, $osztaly, $alakulat, $telefon, $beosztas, $thumb, $samaccountname);
+                                $stmt->execute();
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            else
+            {
+                echo "$x AD kiszolgáló nem elérhető!<br>";
+            }
+        }
+    }
+
     elseif($_GET["action"] == "delete")
     {
     }

@@ -286,17 +286,21 @@ function eszkozTipusValaszto($tipusid)
 	{
 		$eszktip = "nyomtato";
 	}
-	elseif($tipusid < 21)
+	elseif($tipusid < 20)
 	{
 		$eszktip = "vegponti";
 	}
-	elseif($tipusid < 31)
+	elseif($tipusid < 30)
 	{
 		$eszktip = "konverter";
 	}
-	elseif($tipusid < 41)
+	elseif($tipusid < 40)
 	{
 		$eszktip = "szerver";
+	}
+	elseif($tipusid == 40)
+	{
+		$eszktip = "telefonkozpont";
 	}
 
 	return $eszktip;

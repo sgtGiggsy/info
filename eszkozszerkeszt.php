@@ -35,7 +35,7 @@ else
     $wheretip
     ORDER BY tipus ASC, gyartok.nev ASC, modell ASC;");
     
-    $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = $uplinkportok = $szoftver = null;
+    $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = $uplinkportok = $szoftver = $nev = null;
     $button = "Új eszköz";
     $oldalcim = "Új eszköz létrehozása";
     
@@ -121,6 +121,11 @@ else
 
         if($eszkoztipus == "telefonkozpont")
         {
+            $telefonkozpont = mySQLConnect("SELECT * FROM telefonkozpontok WHERE eszkoz = $eszkid;");
+            $telefonkozpont = mysqli_fetch_assoc($telefonkozpont);
+
+            $nev = $telefonkozpont['nev'];
+
             ?><div class="oldalcim"><p onclick="rejtMutat('portgeneralas')" style="cursor: pointer">Portok generálása az eszközhöz</p></div>
             <div class="contentcenter" id="portgeneralas" style='display: none'>
                 <small>Ez a menüpont a portok genrálását végzi el. A túlbonyolítás elkerülése végett csak az utolsó két tag generálása végezhető el egyszere. Tehát ha négy tagból áll a port,
@@ -198,6 +203,14 @@ else
         </div>
 
         <?php alakulatPicker($tulajdonos, "tulajdonos");
+
+        if($eszkoztipus == "telefonkozpont")
+        {
+            ?><div>
+                <label for="nev">Központ neve:</label><br>
+                <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$nev?>"></input>
+            </div><?php
+        }
 
         if($eszkoztipus == "aktiv")
         {

@@ -25,7 +25,7 @@ else
     {
         $telefonjogosultsagid = $telefonjogosultsag['id'];
         ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/telefonjogszerk/$telefonjogosultsagid'" : "" ?>>
-            <td><?=$telefonjogosultsag['jog']?></td>
+            <td><?=$telefonjogosultsag['id']?></td>
             <td><?=$telefonjogosultsag['nev']?></td>
         </tr><?php
     }
