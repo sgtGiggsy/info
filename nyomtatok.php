@@ -44,6 +44,7 @@ else
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
         WHERE modellek.tipus = 12
+        GROUP BY eszkozok.id
         ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
     if($mindir) 
     {

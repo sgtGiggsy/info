@@ -51,7 +51,7 @@ else
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
             LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
         WHERE eszkozok.id = $id
-        ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
+        ORDER BY beepitesek.id DESC;");
 	
 	if(mysqli_num_rows($mindeneszkoz) == 0)
     {

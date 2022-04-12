@@ -20,7 +20,6 @@ else
             beepitesideje,
             kiepitesideje,
             modellek.tipus AS tipusid,
-            
             alakulatok.rovid AS tulajdonos,
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
@@ -36,6 +35,7 @@ else
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
             LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+        GROUP BY eszkozok.id
         ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
     ?><div class="oldalcim">Minden eszköz</div><?php

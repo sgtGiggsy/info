@@ -15,9 +15,10 @@ else
             case "aktiv": $wheretip = "WHERE modellek.tipus < 11"; break;
             case "szamitogep": $wheretip = "WHERE modellek.tipus = 11"; break;
             case "nyomtato": $wheretip = "WHERE modellek.tipus = 12"; break;
-            case "vegponti": $wheretip = "WHERE modellek.tipus > 10 AND modellek.tipus < 21"; break;
-            case "konverter": $wheretip = "WHERE modellek.tipus > 20 AND modellek.tipus < 31"; break;
-            case "szerver": $wheretip = "WHERE modellek.tipus > 30 AND modellek.tipus < 41"; break;
+            case "vegponti": $wheretip = "WHERE modellek.tipus > 10 AND modellek.tipus < 20"; break;
+            case "konverter": $wheretip = "WHERE modellek.tipus > 20 AND modellek.tipus < 30"; break;
+            case "szerver": $wheretip = "WHERE modellek.tipus > 30 AND modellek.tipus < 40"; break;
+            case "telefonkozpont": $wheretip = "WHERE modellek.tipus = 40"; break;
         }
     }
     
@@ -111,6 +112,45 @@ else
                                 ?><option value="<?=$x["id"]?>"><?=$x['sebesseg']?> Mbit</option><?php
                             }
                         ?></select>
+                    </div>
+
+                    <div class="submit"><input type="submit" name="beKuld" value="Portok generálása"></div>
+                </form>
+            </div><?php
+        }
+
+        if($eszkoztipus == "telefonkozpont")
+        {
+            ?><div class="oldalcim"><p onclick="rejtMutat('portgeneralas')" style="cursor: pointer">Portok generálása az eszközhöz</p></div>
+            <div class="contentcenter" id="portgeneralas" style='display: none'>
+                <small>Ez a menüpont a portok genrálását végzi el. A túlbonyolítás elkerülése végett csak az utolsó két tag generálása végezhető el egyszere. Tehát ha négy tagból áll a port,
+                és van 1-1- valamint 1-2- kezdetű porttartomány is, akkor azokat külön kell legenerálni.</small>
+                <form action="<?=$RootPath?>/portdb?action=generate&tipus=telefonkozpont" method="post" onsubmit="beKuld.disabled = true; return true;">
+                    <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$eszkid?>>
+                    
+                    <div>
+                        <label for="portpre">Port előtag<small> (pl 1-1-)</small>:</label><br>
+                        <input type="text" accept-charset="utf-8" name="portpre" id="portpre"></input>
+                    </div>
+
+                    <div>
+                        <label for="kezdoharmadik">Kezdő harmadik tag port<small> (csak a száma)</small>:</label><br>
+                        <input type="text" accept-charset="utf-8" name="kezdoharmadik" id="kezdoharmadik"></input>
+                    </div>
+
+                    <div>
+                        <label for="zaroharmadik">Záró harmadik tag port<small> (csak a száma)</small>:</label><br>
+                        <input type="text" accept-charset="utf-8" name="zaroharmadik" id="zaroharmadik"></input>
+                    </div>
+
+                    <div>
+                        <label for="kezdonegyedik">Kezdő negyedik tag port<small> (csak a száma)</small>:</label><br>
+                        <input type="text" accept-charset="utf-8" name="kezdonegyedik" id="kezdonegyedik" value="0"></input>
+                    </div>
+
+                    <div>
+                        <label for="zaronegyedik">Záró negyedik tag port<small> (csak a száma)</small>:</label><br>
+                        <input type="text" accept-charset="utf-8" name="zaronegyedik" id="zaronegyedik" value="23"></input>
                     </div>
 
                     <div class="submit"><input type="submit" name="beKuld" value="Portok generálása"></div>

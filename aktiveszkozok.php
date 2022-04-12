@@ -38,6 +38,7 @@ else
                 ipcimek ON beepitesek.ipcim = ipcimek.id LEFT JOIN
                 alakulatok ON eszkozok.tulajdonos = alakulatok.id
         WHERE modellek.tipus = 1 OR modellek.tipus = 2
+        GROUP BY eszkozok.id
         ORDER BY epuletek.szam + 1, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
     $nembeepitett = array();

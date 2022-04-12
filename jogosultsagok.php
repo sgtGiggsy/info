@@ -27,7 +27,7 @@
                 break;
             }
         }
-        ?><tr id="<?=$x['oldal']?>">
+        ?><tr id="<?='szerk' . $x['id']?>">
             <td>
                 <label for="<?=$x['oldal']?>"><?=$x['menupont']?></label>
             </td>
@@ -50,7 +50,7 @@
                 <input type="checkbox" value= "1" name="mindir-<?=$x['id']?>" <?=($jogosultsag['mindir']) ? 'checked' : '' ?>>
             </td>
             <td>
-                <button style="margin-left: 10px; cursor: pointer;" onclick="checkAll('<?=$x['oldal']?>'); return false;">Mind</button>
+                <button style="margin-left: 10px; cursor: pointer;" onclick="checkAll('<?='szerk' . $x['id']?>'); return false;">Mind</button>
             </td>
             <?php
     }

@@ -215,6 +215,40 @@ if(isset($mindir) && $mindir)
         }
     }
 
+    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "telefonkozpont")
+    {
+        if($_POST['portpre'])
+        {
+            for($i = $_POST['kezdoharmadik']; $i <= $_POST['zaroharmadik']; $i++)
+            {
+                for($j = $_POST['kezdonegyedik']; $j <= $_POST['zaronegyedik']; $j++)
+                {
+                    $port = $_POST['portpre'] . $i . "-" . $j; //$portsorszam;
+                    //echo "$port <br>";
+                    $stmt = $con->prepare('INSERT INTO portok (port) VALUES (?)');
+                    $stmt->bind_param('s', $port);
+                    $stmt->execute();
+
+                    $last_id = mysqli_insert_id($con);
+
+                    $stmt = $con->prepare('INSERT INTO tkozpontportok (eszkoz, port) VALUES (?, ?)');
+                    $stmt->bind_param('ss', $_POST['eszkoz'], $last_id);
+                    $stmt->execute();
+                }
+            }
+        }
+
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>Portok hozzáadása sikertelen!<br></h2>";
+            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
+        {
+            header("Location: $backtosender");
+        }
+    }
+
     elseif($_GET["action"] == "new")
     {
     }
