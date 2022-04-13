@@ -1,7 +1,7 @@
 <?php
 //MySQL adatbázis elérés
 $DATABASE_HOST = 'localhost';
-$DATABASE_USER = '';
+$DATABASE_USER = 'root';
 $DATABASE_PASS = '';
 $DATABASE_NAME = 'info';
 
@@ -13,8 +13,6 @@ $LDAP_DIR = "DC=fully,DC=qualified,DC=domain";
 
 $ablakcim = 'Informatika';
 
-$lablec = array(
-    'copyright' => 'Copyright '.date("Y").'.',
-    'ceg' => 'Király Béla'
-);
+$UPLOAD_FOLDER = "./uploads/";
+
 ?>
