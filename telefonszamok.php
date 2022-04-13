@@ -12,6 +12,11 @@ else
         $modelltipid = $_GET['id'];
     }
 
+    if(isset($_GET['csvimport']))
+    {
+        
+    }
+
     $where = null;
     if(isset($_GET['kereses']))
     {
@@ -30,10 +35,10 @@ else
             portok.port AS kozpontport,
             telefonszamok.megjegyzes AS szammegjegyzes,
             tkozpontportok.megjegyzes AS portmegjegyzes,
-            telefonvonaltipusok.nev AS tipus,
+            telefonkeszulektipusok.nev AS tipus,
             telefonkozpontok.nev AS kozpont
         FROM telefonszamok
-            LEFT JOIN telefonvonaltipusok ON telefonszamok.tipus = telefonvonaltipusok.id
+            LEFT JOIN telefonkeszulektipusok ON telefonszamok.tipus = telefonkeszulektipusok.id
             LEFT JOIN telefonjogosultsagok ON telefonszamok.jog = telefonjogosultsagok.id
             LEFT JOIN portok ON telefonszamok.tkozpontport = portok.id
             LEFT JOIN tkozpontportok ON tkozpontportok.port = portok.id
@@ -43,6 +48,11 @@ else
         ORDER BY szam;");
 
     $tipus = "telefonszamok";
+
+    if($mindir)
+    {
+
+    }
     ?><div class="oldalcim">Telefonszámok</div>
     <table id="<?=$tipus?>">
         <thead>

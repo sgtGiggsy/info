@@ -28,6 +28,13 @@ if(isset($irhat) && $irhat)
                 $stmt->bind_param('sssss', $last_id, $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver']);
                 $stmt->execute();
             }
+
+            elseif($eszkoztipus == "telefonkozpont")
+            {
+                $stmt = $con->prepare('INSERT INTO telefonkozpontok (eszkoz, nev) VALUES (?, ?)');
+                $stmt->bind_param('ss', $last_id, $_POST['nev']);
+                $stmt->execute();
+            }
         }
 
         if(mysqli_errno($con) != 0)

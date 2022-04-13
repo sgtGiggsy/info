@@ -199,6 +199,32 @@ function logLogin($felhasznalo)
 	}
 }
 
+function csvToArray($csv)
+{
+	$bom = pack('CCC', 0xEF, 0xBB, 0xBF);
+	$bemenet = file($csv);
+	$bomnelkul = str_replace($bom, '', $bemenet); // Arra az esetre, ha a fájl rendelkezne BOM-mal
+
+	$rows = array_map(function($row) { return str_getcsv($row, ';'); }, $bomnelkul);
+	$fejlec = array_shift($rows);
+
+	$array = array();
+
+	foreach($rows as $row)
+	{
+		$array[] = array_combine($fejlec, $row);
+	}
+
+	return $array;
+}
+
+function trimCimke($cimke)
+{
+	$totrim = array("\"", "*");
+
+	return str_replace($totrim, "", $cimke);
+}
+
 function timeStampToDate($timestamp)
 {
 	if($timestamp)
