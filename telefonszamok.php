@@ -14,14 +14,14 @@ else
 
     if(isset($_GET['csvimport']))
     {
-        
+
     }
 
     $where = null;
     if(isset($_GET['kereses']))
     {
         $keres = $_GET['kereses'];
-        $where = "WHERE szam LIKE '%$keres%' OR cimke LIKE '%$keres%' OR portok.port LIKE '%$keres%'";
+        $where = "WHERE szam LIKE '%$keres%' OR cimke LIKE '%$keres%' OR portok.port LIKE '%$keres%' OR telefonkeszulektipusok.nev LIKE '%$keres%' OR telefonkozpontok.nev LIKE '%$keres%'";
     }
 
     $telefonszamok = mySQLConnect("SELECT telefonszamok.id AS id,
@@ -51,7 +51,7 @@ else
 
     if($mindir)
     {
-
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonszamszerkeszt?csvimport'">Telefonszámok importálása központból</button><?php
     }
     ?><div class="oldalcim">Telefonszámok</div>
     <table id="<?=$tipus?>">

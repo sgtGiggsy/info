@@ -6,7 +6,7 @@ if(!$sajatolvas)
 }
 else
 {
-    $mindeneszkoz = mySQLConnect("SELECT
+    $telefonkozpontok = mySQLConnect("SELECT
             eszkozok.id AS id,
             sorozatszam,
             gyartok.nev AS gyarto,
@@ -61,29 +61,28 @@ else
         </tr>
     </thead>
     <tbody><?php
-        foreach($mindeneszkoz as $eszkoz)
+        foreach($telefonkozpontok as $kozpont)
         {
-            $eszkid = $eszkoz['id'];
-            if($eszkoz['beepid'])
+            $kozpontid = $kozpont['id'];
+            if($kozpont['beepid'])
             {
-                $beepid = "/" . $eszkoz['beepid'];
+                $beepid = "/" . $kozpont['beepid'];
             }
             else
             {
-                $beepid = "?eszkoz=$eszkid";
+                $beepid = "?eszkoz=$kozpontid";
             }
             
-            $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
             
-            ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./telefonkozpont/<?=$eszkoz['id']?>'>
-                <td><?=$eszkoz['beepitesinev']?></td>
-                <td nowrap><?=$eszkoz['gyarto']?></td>
-                <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
-                <td><?=$eszkoz['sorozatszam']?></td>
-                <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
-                <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
+            ?><tr <?=(!($kozpont['beepitesideje'] && !$kozpont['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./telefonkozpont/<?=$kozpont['id']?>'>
+                <td><?=$kozpont['beepitesinev']?></td>
+                <td nowrap><?=$kozpont['gyarto']?></td>
+                <td nowrap><?=$kozpont['modell']?><?=$kozpont['varians']?></td>
+                <td><?=$kozpont['sorozatszam']?></td>
+                <td><?=$kozpont['epuletszam']?> <?=($kozpont['epuletnev']) ? "(" . $kozpont['epuletnev'] . ")" : "" ?></td>
+                <td><?=$kozpont['helyisegszam']?> <?=($kozpont['helyisegnev']) ? "(" . $kozpont['helyisegnev'] . ")" : "" ?></td>
                 <td><?=($csoportir) ? "<a href='$RootPath/beepites$beepid'><img src='$RootPath/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a>" : "" ?></td>
-                <td><?=($csoportir) ? "<a href='$RootPath/eszkozszerkeszt/$eszkid?tipus=$eszktip'><img src='$RootPath/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a>" : "" ?></td>
+                <td><?=($csoportir) ? "<a href='$RootPath/eszkozszerkeszt/$kozpontid?tipus=telefonkozpont'><img src='$RootPath/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a>" : "" ?></td>
             </tr><?php
         }
         ?></tbody>

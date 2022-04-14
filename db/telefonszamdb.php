@@ -67,28 +67,37 @@ if(isset($irhat) && $irhat)
                     $cimke = trimCimke($x['címke']);
                 }
 
+                if($x['jog'])
+                {
+                    $jog = $x['jog'];
+                }
+                else
+                {
+                    $jog = null;
+                }
+
                 $telefonszam = mySQLconnect("SELECT szam FROM telefonszamok WHERE szam = $szam;");
                 if(mysqli_num_rows($telefonszam) == 0)
                 {
                     $stmt = $con->prepare('INSERT INTO telefonszamok (szam, cimke, tipus, tkozpontport, jog, megjegyzes) VALUES (?, ?, ?, ?, ?, ?)');
-                    $stmt->bind_param('ssssss', $szam, $cimke, $tipus, $tkozpontport, $x['jog'], $megjegyzes);
+                    $stmt->bind_param('ssssss', $szam, $cimke, $tipus, $tkozpontport, $jog, $megjegyzes);
                     $stmt->execute();
                     if(mysqli_errno($con) != 0)
                     {
                         $errorcount++;
-                        echo "<h2>Telefonszám hozzáadása sikertelen!<br></h2>";
+                        echo "<h2>Telefonszám hozzáadása sikertelen! $szam, $cimke, $tipus, $tkozpontport, $jog, $megjegyzes<br></h2>";
                         echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
                     }
                 }
                 else
                 {
                     $stmt = $con->prepare('UPDATE telefonszamok SET cimke=?, tipus=?, tkozpontport=?, jog=?, megjegyzes=? WHERE szam=?');
-                    $stmt->bind_param('ssssss', $cimke, $tipus, $tkozpontport, $x['jog'], $megjegyzes, $szam);
+                    $stmt->bind_param('ssssss', $cimke, $tipus, $tkozpontport, $jog, $megjegyzes, $szam);
                     $stmt->execute();
                     if(mysqli_errno($con) != 0)
                     {
                         $errorcount++;
-                        echo "<h2>Telefonszám szerkesztése sikertelen!<br></h2>";
+                        echo "<h2>Telefonszám szerkesztése sikertelen! $szam, $cimke, $tipus, $tkozpontport, $jog, $megjegyzes<br></h2>";
                         echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
                     }
                 }

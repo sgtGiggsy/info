@@ -43,10 +43,11 @@ else
 			LEFT JOIN switchportok ON portok.id = switchportok.port
 			LEFT JOIN vegpontiportok ON portok.id = vegpontiportok.port
 			LEFT JOIN rackportok ON portok.id = rackportok.port
+			LEFT JOIN tkozpontportok ON portok.id = tkozpontportok.port
 			LEFT JOIN rackszekrenyek ON rackportok.rack = rackszekrenyek.id
-			LEFT JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
+			LEFT JOIN eszkozok ON switchportok.eszkoz = eszkozok.id OR tkozpontportok.eszkoz = eszkozok.id
 			LEFT JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
-			LEFT JOIN helyisegek ON vegpontiportok.helyiseg = helyisegek.id
+			LEFT JOIN helyisegek ON vegpontiportok.helyiseg = helyisegek.id OR beepitesek.helyiseg = helyisegek.id
 			LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
 		WHERE portok.id = $portid;");
 	$port = mysqli_fetch_assoc($portres);
