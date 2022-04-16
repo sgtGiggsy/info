@@ -46,7 +46,7 @@ else
     ?><div class="oldalcim">Telefonközpontok</div>
 
     <?php
-    $tipus = "nyomtatok";
+    $tipus = "telefonkozpontok";
     ?><table id="<?=$tipus?>">
     <thead>
         <tr>

@@ -1,12 +1,15 @@
-<div class="kereses" id="kereses">
-    <form name="kereses" method="GET">
-        <label for="kereses">Keresés
-        <input type="text" name="kereses">
-        <button>Keres</button></label>
-    </form>
-</div>
-<div class="topmenuikonok">
 <?php
+if(isset($enablekeres) && $enablekeres)
+{
+    ?><div class="kereses" id="kereses">
+        <form name="kereses" method="GET">
+            <label for="kereses">Keresés</label>
+            <input type="search" name="kereses">
+            <button>Keres</button>
+        </form>
+    </div><?php
+}
+?><div class="topmenuikonok"><?php
 if($_SESSION[getenv('SESSION_NAME').'id'])
 {
     $usernev = $_SESSION[getenv('SESSION_NAME').'nev'];

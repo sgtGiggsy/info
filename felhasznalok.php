@@ -127,10 +127,6 @@ else
             ?><div class='right'><a href="<?=$RootPath?>/felhasznalok/oldal/<?=$nextid?>">Következő oldal</a></div><?php
         }
     ?></div><?php
+    $enablekeres = true;
 }
 ?>
-<script>
-    window.addEventListener("load", function () {
-        document.getElementById('kereses').style.visibility = "visible";
-    });
-</script>

@@ -5,13 +5,9 @@ if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] == 0)
 }
 else
 {
-    if((isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']) || $_SESSION[getenv('SESSION_NAME').'jogosultsag'] >= 10) && isset($_GET['id']))
+    if(isset($_GET['id']))
     {
         $felhid = $_GET['id'];
-        if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] >= 50)
-        {
-            ?><a href='<?=$RootPath?>/felhasznaloszerkeszt/<?=$felhid?>'>Felhasználó szerkesztése</a><?php
-        }
     }
     else
     {
@@ -22,9 +18,10 @@ else
             FROM felhasznalok
                 LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
             WHERE felhasznalok.id = $felhid;");
-
     $felhasznalo = mysqli_fetch_assoc($query);
-    ?><div class='oldalcim'>Felhasználói oldal</div>
+
+    ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/felhasznaloszerkeszt/$felhid'\">Felhasználó szerkesztése</button>" : "" ?>
+    <div class='oldalcim'>Felhasználói oldal</div>
     <div class='contentcenter'>
         <p><img src="data:image/jpeg;base64,<?=base64_encode($felhasznalo['profilkep'])?>" /></p>
         <p>Név: <?=$felhasznalo['nev']?></p>

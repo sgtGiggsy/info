@@ -22,11 +22,16 @@ else
         WHERE rackszekrenyek.id = $rackid;");
     $rack = mysqli_fetch_assoc($rackek);*/
 
-    $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT tkozpontport FROM telefonszamok WHERE tkozpontport = portid LIMIT 1), 1, NULL) AS hasznalatban
+    $portoksqli = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT tkozpontport FROM telefonszamok WHERE tkozpontport = portid LIMIT 1), 1, NULL) AS hasznalatban, telefonszamok.tipus AS tipus, telefonszamok.szam AS szam
         FROM tkozpontportok
             LEFT JOIN portok ON tkozpontportok.port = portok.id
+            LEFT JOIN telefonszamok ON telefonszamok.tkozpontport = portok.id
         WHERE tkozpontportok.eszkoz = $kozpontid
         ORDER BY portok.port;");
+    
+    //LENGTH(portok.port),
+
+    $portok = mysqliNaturalSort($portoksqli, 'port');
 
     $telefonkozpont = mySQLConnect("SELECT
             eszkozok.id AS id,
@@ -103,18 +108,18 @@ else
 
     <div class="oldalcim"><?=$telefonkozpont['kozpontnev']?> Telefonközpont</div><?php
 
-    if(mysqli_num_rows($portok) > 0)
+    if(mysqli_num_rows($portoksqli) > 0)
     {
-        ?><div class="oldalcim">Large portok a központban</div>
+        ?><div class="oldalcim">Lage portok a központban</div>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;"><?php
             $elozokartya = null;
             foreach($portok as $port)
             {
                 $kartya = substr($port['port'], 0, 6);
                 //echo $kartya;
-                if($elozokartya && $kartya != $elozokartya)
+                if($kartya != $elozokartya)
                 {
-                    ?><div style="grid-column-start: 1; grid-column-end: 9">&nbsp</div><?php
+                    ?><div style="grid-column-start: 1; grid-column-end: 9"><h2><?=($port['tipus'] < 10) ? "Analóg" : (($port['tipus'] > 9 && $port['tipus'] < 20) ? "Digitális" : "&nbsp" ) ?></div><?php
                 }
                 $elozokartya = $kartya;
 
@@ -122,9 +127,9 @@ else
                 ?><div><?php
                     if($mindir)
                     {
-                        ?><a href='<?=$RootPath?>/port/<?=$portid?>'><?php
+                        ?><a href='<?=$RootPath?>/port/<?=$portid?>?tipus=lage' style='text-decoration: none;'><?php
                     }
-                    ?><?=($port['hasznalatban']) ? "<p style='font-weight: bold'>" : "<p style='font-weight: normal'>" ?><?php echo $port['port'] . "</p>";
+                    ?><?=($port['hasznalatban']) ? "<p style='font-weight: bold;'>" : "<p style='font-weight: normal;'>" ?><?=$port['port']?><?=($port['szam']) ? " - <small><i>" . $port['szam'] . "</i></small>" : "" ?></p><?php
                     if($mindir)
                     {
                         echo "</a>";

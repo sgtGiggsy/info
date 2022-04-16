@@ -35,7 +35,7 @@ if($menuterulet == 1)
 						?><script>
 							window.onload = function()
 							{
-								document.getElementById("<?=$menupont['szulo']?>").style.display = "grid";
+								document.getElementById("<?=$menupont['szulo']?>").style.display = "block";
 							}
 						</script><?php
 					}

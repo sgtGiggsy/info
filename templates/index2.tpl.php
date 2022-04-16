@@ -70,14 +70,16 @@
 				if(t == "s")
 				{
 					if (dir == "asc") {
-						if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-						shouldSwitch = true;
-						break;
+						if((x.innerHTML.toLowerCase().localeCompare(y.innerHTML.toLowerCase(), navigator.languages[0] || navigator.language, {numeric: true, ignorePunctuation: true})) > 0)
+						{
+							shouldSwitch = true;
+							break;
 						}
 					} else if (dir == "desc") {
-						if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-						shouldSwitch = true;
-						break;
+						if((x.innerHTML.toLowerCase().localeCompare(y.innerHTML.toLowerCase(), navigator.languages[0] || navigator.language, {numeric: true, ignorePunctuation: true})) < 0)
+						{
+							shouldSwitch = true;
+							break;
 						}
 					}
 				}
@@ -118,23 +120,35 @@
 		}
 	};
 
-	function filterTable(szures, tablazat, oszlop) {
-	var input, filter, table, tr, td, i, txtValue;
-	input = document.getElementById(szures);
-	filter = input.value.toUpperCase();
-	table = document.getElementById(tablazat);
-	tr = table.getElementsByTagName("tr");
-	for (i = 0; i < tr.length; i++) {
-		td = tr[i].getElementsByTagName("td")[oszlop];
-		if (td) {
-		txtValue = td.textContent || td.innerText;
-		if (txtValue.toUpperCase().indexOf(filter) > -1) {
-			tr[i].style.display = "";
-		} else {
-			tr[i].style.display = "none";
+	function filterTable(szures, tablazat, oszlop)
+	{
+		var input, filter, table, tr, td, i, txtValue;
+		input = document.getElementById(szures);
+		filter = input.value.toUpperCase();
+		table = document.getElementById(tablazat);
+		tr = table.getElementsByTagName("tr");
+
+		for (i = 0; i < tr.length; i++)
+		{
+			td = tr[i].getElementsByTagName("td")[oszlop];
+			if (td)
+			{
+				txtValue = td.textContent || td.innerText;
+				if (txtValue.toUpperCase().indexOf(filter) > -1)
+				{
+					if(tr[i].style.color == filter)
+					{
+						tr[i].style.display = "";
+						tr[i].style.color = "";
+					}
+				}
+				else
+				{
+					tr[i].style.display = "none";
+					tr[i].style.color = filter;
+				}
+			}       
 		}
-		}       
-	}
 	}
 
 	$(document).ready(function($) {
@@ -144,13 +158,13 @@
 	});
 
 	function rejtMutat(id) {
-		if(document.getElementById(id).style.display == "grid")
+		if(document.getElementById(id).style.display == "block")
 		{
 			document.getElementById(id).style.display = "none"
 		}
 		else
 		{
-			document.getElementById(id).style.display = "grid";
+			document.getElementById(id).style.display = "block";
 		}
 	};
 

@@ -91,8 +91,7 @@ else
         </ol>
     </div>
 
-    <?=($mindir) ? "<a href='$RootPath/rackszerkeszt/$rackid'>Rack szerkesztése</a>" : "" ?>
-
+    <?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/rackszerkeszt/$rackid'\">Rack szerkesztése</button>" : "" ?>
     <div class="oldalcim"><?=$rack['nev']?> Rack</div><?php
     if(mysqli_num_rows($eszkozok) > 0)
     {

@@ -77,6 +77,15 @@ else
                 {
                     $beepid = $eszkoz['beepid'];
                     $eszkid = $eszkoz['id'];
+                    if($eszkoz['beepid'])
+                    {
+                        $beepid = "/" . $eszkoz['beepid'];
+                    }
+                    else
+                    {
+                        $beepid = "?eszkoz=$eszkid";
+                    }
+
                     $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
                     ?><tr class='kattinthatotr' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                         <td><?=$eszkoz['ipcim']?></td>
@@ -91,7 +100,7 @@ else
                         if($csoportir)
                         {
                             ?><td><?=$eszkoz['megjegyzes']?></td>
-                            <td><a href='<?=$RootPath?>/beepites/<?=$beepid?>'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a></td>
+                            <td><a href='<?=$RootPath?>/beepites<?=$beepid?>'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a></td>
                             <td><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
                         }
                     ?></tr><?php
@@ -101,6 +110,17 @@ else
             {
                 $beepid = $eszkoz['beepid'];
                 $eszkid = $eszkoz['id'];
+
+                $eszkid = $eszkoz['id'];
+                if($eszkoz['beepid'])
+                {
+                    $beepid = "/" . $eszkoz['beepid'];
+                }
+                else
+                {
+                    $beepid = "?eszkoz=$eszkid";
+                }
+
                 $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
                 ?><tr style='font-weight: normal' class='kattinthatotr' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                     <td><?=$eszkoz['ipcim']?></td>
@@ -115,7 +135,7 @@ else
                     if($csoportir)
                     {
                         ?><td><?=$eszkoz['megjegyzes']?></td>
-                        <td><a href='<?=$RootPath?>/beepites/<?=$beepid?>'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a></td>
+                        <td><a href='<?=$RootPath?>/beepites<?=$beepid?>'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a></td>
                         <td><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
                     }
                 ?></tr><?php

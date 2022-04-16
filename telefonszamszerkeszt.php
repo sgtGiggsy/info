@@ -61,46 +61,95 @@ else
 
         if(isset($_GET['id']))
         {
-            $vlanid = $_GET['id'];
-            $vlanszerk = mySQLConnect("SELECT * FROM vlanok WHERE id = $vlanid;");
-            $vlanszerk = mysqli_fetch_assoc($vlanszerk);
+            $telefonszamid = $_GET['id'];
+            $telefonszamszerk = mySQLConnect("SELECT * FROM telefonszamok WHERE id = $telefonszamid;");
+            $telefonszamszerk = mysqli_fetch_assoc($telefonszamszerk);
 
-            $id = $vlanszerk['id'];
-            $nev = $vlanszerk['nev'];
-            $leiras = $vlanszerk['leiras'];
-            $kceh = $vlanszerk['kceh'];
+            $portok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev
+                FROM portok
+                    INNER JOIN vegpontiportok ON portok.id = vegpontiportok.port
+                    LEFT JOIN epuletek ON vegpontiportok.epulet = epuletek.id
+                ORDER BY epuletek.szam + 0, LENGTH(portok.port), portok.port;");
+            $jogok = mySQLConnect("SELECT * FROM telefonjogosultsagok;");
+            $tkozpontportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, telefonkozpontok.nev AS kozpontnev
+                FROM portok
+                    INNER JOIN tkozpontportok ON portok.id = tkozpontportok.port
+                    INNER JOIN telefonkozpontok ON tkozpontportok.eszkoz = telefonkozpontok.eszkoz
+                ORDER BY telefonkozpontok.nev, LENGTH(portok.port), portok.port;");
+            $tipusok = mySQLConnect("SELECT * FROM telefonkeszulektipusok;");
+
+            $id = $telefonszamszerk['id'];
+            $szam = $telefonszamszerk['szam'];
+            $cimke = $telefonszamszerk['cimke'];
+            $port = $telefonszamszerk['port'];
+            $jog = $telefonszamszerk['jog'];
+            $tkozpontport = $telefonszamszerk['tkozpontport'];
+            $megjegyzes = $telefonszamszerk['megjegyzes'];
+            $tipus = $telefonszamszerk['tipus'];
 
             $button = "Telefonszám szerkesztése";
-            
 
-            ?><div class="oldalcim">Telefonszám szerkesztése</div>
+            ?><div class="oldalcim"><?=$szam?> telefonszám szerkesztése</div>
             <div class="contentcenter">
-                <small>A telefonszám bizonyos tulajdonságai nem módosíthatóak,
-                    mivel azok a telefonközpontból vett adatokkal történő szinkronizálás során felülíródnak.</small>
                 <form action="<?=$RootPath?>/telefonszamszerkeszt?action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
                     <input type ="hidden" id="id" name="id" value=<?=$id?>>
                     
                     <div>
-                        <label for="id">VLAN azonosító:</label><br>
-                        <input type="text" accept-charset="utf-8" name="id" id="id" value="<?=$id?>"></input>
+                        <small style="color: #940e0e;">Importálás során felülírásra kerül!</small><br>
+                        <label for="cimke">Címke:</label><br>
+                        <input type="text" accept-charset="utf-8" name="cimke" id="cimke" value="<?=$cimke?>"></input>
+                    </div>
+                    
+                    <div>
+                        <small style="color: #940e0e;">Importálás során felülírásra kerül!</small><br>
+                        <label for="jog">Jog:</label><br>
+                        <select name="jog">
+                            <option value=""></option><?php
+                            foreach($jogok as $x)
+                            {
+                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $jog) ? "selected" : "" ?>><?=$x['id']?></option><?php
+                            }
+                        ?></select>
                     </div>
 
                     <div>
-                        <label for="nev">VLAN neve:</label><br>
-                        <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$nev?>"></input>
+                        <label for="port">Végpont:</label><br>
+                        <select name="port">
+                            <option value=""></option><?php
+                            foreach($portok as $x)
+                            {
+                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $port) ? "selected" : "" ?>><?=$x['epuletszam'] . ". épület, " . $x['port'] . " port" ?></option><?php
+                            }
+                        ?></select>
                     </div>
 
                     <div>
-                        <label for="leiras">VLAN leírása:</label><br>
-                        <textarea name="leiras" id="leiras"><?=$leiras?></textarea>
+                        <small style="color: #940e0e;">Importálás során felülírásra kerül!</small><br>
+                        <label for="tkozpontport">Lage:</label><br>
+                        <select name="tkozpontport">
+                            <option value=""></option><?php
+                            foreach($tkozpontportok as $x)
+                            {
+                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $tkozpontport) ? "selected" : "" ?>><?=$x['kozpontnev'] . " központ, " . $x['port'] . " port" ?></option><?php
+                            }
+                        ?></select>
                     </div>
 
                     <div>
-                        <label for="kceh">KCHEH hálózat:</label><br>
-                        <select id="kceh" name="kceh">
-                            <option value="" <?=(!$kceh) ? "selected" : "" ?>>Nem</option>
-                            <option value="1" <?=($kceh == 1) ? "selected" : "" ?>>Igen</option>
-                        </select>
+                        <small style="color: #940e0e;">Importálás során felülírásra kerül!</small><br>
+                        <label for="tipus">Típus:</label><br>
+                        <select name="tipus">
+                            <option value=""></option><?php
+                            foreach($tipusok as $x)
+                            {
+                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $tipus) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                            }
+                        ?></select>
+                    </div>
+
+                    <div>
+                        <label for="megjegyzes">A számhoz tartozó megjegyzés:</label><br>
+                        <input type="text" accept-charset="utf-8" name="megjegyzes" id="megjegyzes" value="<?=$megjegyzes?>"></input>
                     </div>
 
                     <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>

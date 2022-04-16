@@ -5,7 +5,7 @@ if(isset($irhat) && $irhat)
     $con = mySQLConnect(false);
     foreach($_POST as $key => $value)
     {
-        if ($value == "NULL")
+        if($value == "NULL" || $value == "")
         {
             $_POST[$key] = NULL;
         }
@@ -15,6 +15,7 @@ if(isset($irhat) && $irhat)
     {
         $csv = csvToArray($finalfile);
         $errorcount = 0;
+        $manualis = null;
 
         if(isset($csv[0]['kozpont']) && isset($csv[0]['szam']) && (isset($csv[0]['cimke']) || isset($csv[0]['címke'])) && isset($csv[0]['tipus']) && isset($csv[0]['port']) && isset($csv[0]['jog']))
         {
@@ -91,8 +92,8 @@ if(isset($irhat) && $irhat)
                 }
                 else
                 {
-                    $stmt = $con->prepare('UPDATE telefonszamok SET cimke=?, tipus=?, tkozpontport=?, jog=?, megjegyzes=? WHERE szam=?');
-                    $stmt->bind_param('ssssss', $cimke, $tipus, $tkozpontport, $jog, $megjegyzes, $szam);
+                    $stmt = $con->prepare('UPDATE telefonszamok SET cimke=?, tipus=?, tkozpontport=?, jog=?, megjegyzes=?, manualis=? WHERE szam=?');
+                    $stmt->bind_param('sssssss', $cimke, $tipus, $tkozpontport, $jog, $megjegyzes, $manualis, $szam);
                     $stmt->execute();
                     if(mysqli_errno($con) != 0)
                     {
@@ -117,33 +118,32 @@ if(isset($irhat) && $irhat)
 
     elseif($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO menupontok (menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssssssss', $_POST['menupont'], $_POST['szulo'], $_POST['url'], $_POST['oldal'], $_POST['cimszoveg'], $_POST['szerkoldal'], $_POST['aktiv'], $_POST['menuterulet'], $_POST['sorrend']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
-        {
-            echo "<h2>Menüpont hozzáadása sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
-        }
-        else
-        {
-            header("Location: $RootPath/beallitasok?menupontok");
-        }
     }
 
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE menupontok SET menupont=?, szulo=?, url=?, oldal=?, cimszoveg=?, szerkoldal=?, aktiv=?, menuterulet=?, sorrend=? WHERE id=?');
-        $stmt->bind_param('sssssssssi', $_POST['menupont'], $_POST['szulo'], $_POST['url'], $_POST['oldal'], $_POST['cimszoveg'], $_POST['szerkoldal'], $_POST['aktiv'], $_POST['menuterulet'], $_POST['sorrend'], $_POST['id']);
+        $id = $_POST['id'];
+        $szam = $cimke = $port = $jog = $tkozpontport = $megjegyzes = $tipus = null;
+        $original = mySQLConnect("SELECT * FROM telefonszamok WHERE id = $id");
+        $original = mysqli_fetch_assoc($original);
+        $manualis = 1;
+
+        if(!$original['manualis'] && $_POST['cimke'] == $original['cimke'] && $_POST['jog'] == $original['jog'] && $_POST['tkozpontport'] == $original['tkozpontport'] && $_POST['tipus'] == $original['tipus'])
+        {
+            $manualis = null;
+        }
+        
+        $stmt = $con->prepare('UPDATE telefonszamok SET cimke=?, port=?, jog=?, tkozpontport=?, megjegyzes=?, tipus=?, manualis=? WHERE id=?');
+        $stmt->bind_param('sssssssi', $_POST['cimke'], $_POST['port'], $_POST['jog'], $_POST['tkozpontport'], $_POST['megjegyzes'], $_POST['tipus'], $manualis, $_POST['id']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
-            echo "<h2>Menüpont szerkesztése sikertelen!<br></h2>";
+            echo "<h2>A telefonszám szerkesztése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
         else
         {
-            header("Location: $RootPath/beallitasok?menupontok");
+            header("Location: $backtosender");
         }
     }
     elseif($_GET["action"] == "delete")

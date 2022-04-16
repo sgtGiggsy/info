@@ -48,7 +48,7 @@ else
         </ol>
     </div>
 
-    <?=($mindir) ? "<a href='$RootPath/epuletszerkeszt/$epid'>Épület szerkesztése</a>" : "" ?>
+    <?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/epuletszerkeszt/$epid'\">Épület szerkesztése</button>" : "" ?>
     <div class="oldalcim"><?=$epulet['telephely']?> - <?=$epulet['epuletszam']?>. <?=$epulet['tipus']?> (<?=$epulet['nev']?>)</div><?php
 
     if(mysqli_num_rows($rackek) > 0)

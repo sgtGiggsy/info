@@ -65,7 +65,7 @@ if(isset($_GET['id']))
 $admin = false;
 if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION_NAME').'id']) && isset($_POST['felhasznalonev']) && !(isset($_GET['page']) && $_GET['page'] == "kilep"))
 {
-	$con = mySQLConnect(false);
+	$con = mySQLConnect();
 
     $samaccountname = $_POST['felhasznalonev'];
     $plainpassword = $_POST['jelszo'];
@@ -186,7 +186,7 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
 
     if(isset($hiba) && $hiba)
     {
-        $con = mySQLConnect(false);
+        $con = mySQLConnect();
 		if ($stmt = $con->prepare('INSERT INTO failedlogins (felhasznalonev, ipcim) VALUES (?, ?)'))
 		{
 			$stmt->bind_param('ss', $_POST['felhasznalonev'], $_SERVER['REMOTE_ADDR']);

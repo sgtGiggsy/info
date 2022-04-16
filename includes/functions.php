@@ -1,6 +1,6 @@
 <?php
 
-function mySQLConnect($querystring)
+function mySQLConnect($querystring = null)
 {
 	## MySQL connect ##
 	include('config.inc.php');
@@ -486,7 +486,7 @@ function felhasznaloPicker($current, $selectnev, $alakulat)
 	?></select><?php
 }
 
-function alakulatPicker($current, $selectnev)
+function alakulatPicker($current, $selectnev = 'alakulat')
 {
 	$alakulatok = mySQLConnect("SELECT * FROM alakulatok;");
 
@@ -497,6 +497,22 @@ function alakulatPicker($current, $selectnev)
 			foreach($alakulatok as $x)
 			{
 				?><option value="<?=$x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=$x['rovid']?></option><?php
+			}
+		?></select>
+	</div><?php
+}
+
+function vlanPicker($current, $selectnev = 'vlan')
+{
+	$vlanok = mySQLConnect("SELECT * FROM vlanok;");
+	
+	?><div>
+		<label for="<?=$selectnev?>">Vlan:</label><br>
+		<select name="<?=$selectnev?>">
+			<option value=""></option><?php
+			foreach($vlanok as $x)
+			{
+				?><option value="<?=$x['id']?>" <?=($x['id'] == $current) ? "selected" : "" ?>><?=$x['id'] . " " . $x['nev']?></option><?php
 			}
 		?></select>
 	</div><?php
@@ -517,4 +533,37 @@ function cancelForm()
 	?><form action='<?=$backtosender?>' method="post">
         <div class='submit'><input type='submit' value='Mégsem'></div>
     </form><?php
+}
+
+function mysqliNaturalSort($mysqliresult, $sortcriteria)
+{
+	$returnarr = array();
+    foreach($mysqliresult as $sor)
+    {
+        $element = array();
+		foreach($sor as $key => $value)
+		{
+			$element[$key] = $value;
+		}
+
+		//$port = array('portid' => $x['portid'], 'port' => $x['port'], 'hasznalatban' => $x['hasznalatban'], 'tipus' => $x['tipus'], 'szam' => $x['szam']);
+        $returnarr[] = $element;
+    }
+
+    usort($returnarr, function($a, $b) use ($sortcriteria) {
+		if($a[$sortcriteria] == null)
+		{
+			$a[$sortcriteria] = "zzzzz";
+		}
+
+		if($b[$sortcriteria] == null)
+		{
+			$b[$sortcriteria] = "zzzzz";
+		}
+
+        return strnatcmp($a[$sortcriteria], $b[$sortcriteria]); //Case sensitive
+        //return strnatcasecmp($a['manager'],$b['manager']); //Case insensitive
+    });
+
+	return $returnarr;
 }

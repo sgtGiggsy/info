@@ -24,12 +24,20 @@ else
         $where = "WHERE szam LIKE '%$keres%' OR cimke LIKE '%$keres%' OR portok.port LIKE '%$keres%' OR telefonkeszulektipusok.nev LIKE '%$keres%' OR telefonkozpontok.nev LIKE '%$keres%'";
     }
 
+    $orderby = "ORDER BY szam";
+    if(isset($_GET['rendez']) && $_GET['rendez'] != 'kozpontport' && $_GET['rendez'] != 'cimke')
+    {
+        $rendez = $_GET['rendez'];
+        $orderby = "ORDER BY ISNULL($rendez), $rendez ASC";
+    }
+
     $telefonszamok = mySQLConnect("SELECT telefonszamok.id AS id,
             szam,
             cimke,
             telefonszamok.port AS faliportid,
             (SELECT port FROM portok WHERE id = faliportid) AS faliport,
             telefonszamok.jog AS jog,
+            telefonszamok.manualis AS manualis,
             telefonjogosultsagok.nev AS jognev,
             tkozpontport AS kozpontportid,
             portok.port AS kozpontport,
@@ -45,7 +53,17 @@ else
             LEFT JOIN eszkozok ON tkozpontportok.eszkoz = eszkozok.id
             LEFT JOIN telefonkozpontok ON telefonkozpontok.eszkoz = eszkozok.id
         $where
-        ORDER BY szam;");
+        $orderby;");
+
+    if(isset($_GET['rendez']) && $_GET['rendez'] == 'kozpontport')
+    {
+        $telefonszamok = mysqliNaturalSort($telefonszamok, 'kozpontport');
+    }
+
+    if(isset($_GET['rendez']) && $_GET['rendez'] == 'cimke')
+    {
+        $telefonszamok = mysqliNaturalSort($telefonszamok, 'cimke');
+    }
 
     $tipus = "telefonszamok";
 
@@ -57,22 +75,25 @@ else
     <table id="<?=$tipus?>">
         <thead>
             <tr>
-                <th class="tsorth" onclick="sortTable(0, 'i', '<?=$tipus?>')">Telefonszám</th>
-                <th class="tsorth" onclick="sortTable(1, 's', '<?=$tipus?>')">Cimke</th>
-                <th class="tsorth" onclick="sortTable(2, 's', '<?=$tipus?>')">Jog</th>
-                <th class="tsorth" onclick="sortTable(3, 's', '<?=$tipus?>')">Végponti port</th>
-                <th class="tsorth" onclick="sortTable(4, 's', '<?=$tipus?>')">Központ</th>
-                <th class="tsorth" onclick="sortTable(5, 's', '<?=$tipus?>')">Központ port</th>
-                <th class="tsorth" onclick="sortTable(6, 's', '<?=$tipus?>')">Szám megjegyzés</th>
-                <th class="tsorth" onclick="sortTable(7, 's', '<?=$tipus?>')">Port megjegyzés</th>
-                <th class="tsorth" onclick="sortTable(8, 's', '<?=$tipus?>')">Tipus</th>
+                <th><button type="button" id="f0" onclick="filterTable('f0', '<?=$tipus?>', 0)" value='!' placeholder="" title="">!</button></th>
+                <th class='tsorth'><p><input type="text" id="f1" onchange="filterTable('f1', '<?=$tipus?>', 1)" placeholder="Telefonszám" title="Telefonszám"><br><span onclick="location.href='./telefonszamok?rendez=szam'">Telefonszám</th>
+                <th class='tsorth'><p><input type="text" id="f2" onchange="filterTable('f2', '<?=$tipus?>', 2)" placeholder="Cimke" title="Cimke"><br><span onclick="location.href='./telefonszamok?rendez=cimke'">Cimke</th>
+                <th class='tsorth'><p><input type="text" id="f3" onchange="filterTable('f3', '<?=$tipus?>', 3)" placeholder="Jog" title="Jog"><br><span onclick="location.href='./telefonszamok?rendez=jog'">Jog</th>
+                <th class='tsorth'><p><input type="text" id="f4" onchange="filterTable('f4', '<?=$tipus?>', 4)" placeholder="Végpont" title="Végpont"><br><span onclick="location.href='./telefonszamok?rendez=faliport'">Végpont</th>
+                <th class='tsorth'><p><input type="text" id="f5" onchange="filterTable('f5', '<?=$tipus?>', 5)" placeholder="Központ" title="Központ"><br><span onclick="location.href='./telefonszamok?rendez=kozpont'">Központ</th>
+                <th class='tsorth'><p><input type="text" id="f6" onchange="filterTable('f6', '<?=$tipus?>', 6)" placeholder="Lage" title="Lage"><br><span onclick="location.href='./telefonszamok?rendez=kozpontport'">Lage</th>
+                <th class='tsorth'><p><input type="text" id="f7" onchange="filterTable('f7', '<?=$tipus?>', 7)" placeholder="Szám megjegyzés" title="Szám megjegyzés"><br><span onclick="location.href='./telefonszamok?rendez=szammegjegyzes'">Szám megjegyzés</th>
+                <th class='tsorth'><p><input type="text" id="f8" onchange="filterTable('f8', '<?=$tipus?>', 8)" placeholder="Port megjegyzés" title="Port megjegyzés"><br><span onclick="location.href='./telefonszamok?rendez=portmegjegyzes'">Port megjegyzés</th>
+                <th class='tsorth'><p><input type="text" id="f9" onchange="filterTable('f9', '<?=$tipus?>', 9)" placeholder="Tipus" title="Tipus"><br><span onclick="location.href='./telefonszamok?rendez=tipus'">Tipus</th>
                 <th></th>
             </tr>
         </thead>
         <tbody><?php
         foreach($telefonszamok as $telefonszam)
         {
-            ?><tr>
+            $telszamid = $telefonszam['id'];
+            ?><tr <?=($telefonszam['manualis']) ? 'style="font-style: italic"' : "" ?>>
+                <td><?=($telefonszam['manualis']) ? '!' : "" ?></td>
                 <td><?=$telefonszam['szam']?></td>
                 <td><?=$telefonszam['cimke']?></td>
                 <td title="<?=$telefonszam['jognev']?>"><?=$telefonszam['jog']?></td>
@@ -82,14 +103,10 @@ else
                 <td><?=$telefonszam['szammegjegyzes']?></td>
                 <td><?=$telefonszam['portmegjegyzes']?></td>
                 <td><?=$telefonszam['tipus']?></td>
+                <td><?=($csoportir) ? "<a href='$RootPath/telefonszamszerkeszt/$telszamid'><img src='$RootPath/images/edit.png' alt='Telefonszám szerkesztése' title='Telefonszám szerkesztése'/></a>" : "" ?></td>
             </tr><?php
         }
         ?></tbody>
-        </table>
-        
-        <script>
-            window.addEventListener("load", function () {
-                document.getElementById('kereses').style.visibility = "visible";
-            });
-        </script><?php
+    </table><?php
+    $enablekeres = true;
 }
