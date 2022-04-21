@@ -1,5 +1,5 @@
 Options -Indexes
-SetEnv APP_ROOT_PATH /eibszteszt
+SetEnv APP_ROOT_PATH /info
 RewriteEngine On
 RewriteRule \.(css|jpe?g|gif|png|js|ico)$ - [L]
 RewriteCond %{REQUEST_FILENAME} -f [OR]
