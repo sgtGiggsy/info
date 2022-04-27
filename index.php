@@ -2,7 +2,6 @@
 // Alap includolások
 include('./includes/config.inc.php');
 include('./includes/functions.php');
-include('./includes/pages.inc.php');
 $RootPath = getenv('APP_ROOT_PATH');
 
 // Session indítása, vagy folytatása

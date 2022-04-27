@@ -140,7 +140,7 @@ else
                 ?><div>Állapot</div>
                 <div>Beépítve</div>
                 <div>IP cím</div>
-                <div><?=$eszkoz['ipcim']?></div>
+                <div><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$eszkoz['ipcim']?></a></div>
                 <div>Beépítési név</div>
                 <div><?=$eszkoz['beepitesinev']?></div>
                 <div>Beépítés helye</div>

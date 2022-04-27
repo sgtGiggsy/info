@@ -249,6 +249,75 @@ if(isset($mindir) && $mindir)
         }
     }
 
+    elseif($_GET["action"] == "new" && $_GET["tipus"] == "mediakonverter")
+    {
+        $eszkozmodell = mySQLConnect("SELECT modell FROM eszkozok WHERE id = $eszkoz");
+        $modell = mysqli_fetch_assoc($eszkozmodell)['modell'];
+        $konvertermodell = mySQLConnect("SELECT * FROM mediakonvertermodellek WHERE modell = $modell");
+        $konvertermodell = mysqli_fetch_assoc($konvertermodell);
+
+        // TRANSZPORT PORT
+        $transzpszabvany = $konvertermodell['transzpszabvany'];
+        $transzpszabvany = mySQLConnect("SELECT * FROM atviteliszabvanyok WHERE id = $transzpszabvany;");
+        $transzpszabvany = mysqli_fetch_assoc($transzpszabvany)['nev'];
+
+        $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+        $stmt->bind_param('ss', $transzpszabvany, $konvertermodell['transzpcsatlakozo']);
+        $stmt->execute();
+
+        $last_id = mysqli_insert_id($con);
+
+        $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany) VALUES (?, ?, ?, ?)');
+        $stmt->bind_param('ssss', $eszkoz, $last_id, $konvertermodell['transzpsebesseg'], $konvertermodell['transzpszabvany']);
+        $stmt->execute();
+
+        // LAN OLDALI PORT
+        $lanszabvany = $konvertermodell['lanszabvany'];
+        $lanszabvany = mySQLConnect("SELECT * FROM atviteliszabvanyok WHERE id = $lanszabvany;");
+        $lanszabvany = mysqli_fetch_assoc($lanszabvany)['nev'];
+
+        $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+        $stmt->bind_param('ss', $lanszabvany, $konvertermodell['lancsatlakozo']);
+        $stmt->execute();
+
+        $last_id = mysqli_insert_id($con);
+
+        $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany) VALUES (?, ?, ?, ?)');
+        $stmt->bind_param('ssss', $eszkoz, $last_id, $konvertermodell['lansebesseg'], $konvertermodell['lanszabvany']);
+        $stmt->execute();
+    }
+
+    elseif($_GET["action"] == "update" && $_GET["tipus"] == "mediakonverter")
+    {
+        /* Erre valószínű nem lesz szükség, majd később eldöntöm
+        
+        // TRANSZPORT PORT
+        $szabvany = $_POST['szabvany'];
+        $atviteliszabvany = mySQLConnect("SELECT * FROM atviteliszabvanyok WHERE id = $szabvany;");
+        $szabvany = mysqli_fetch_assoc($atviteliszabvany)['nev'];
+
+        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=? WHERE id=?');
+        $stmt->bind_param('sss', $szabvany, $_POST['transzpcsatlakozo'], $_POST['transzportid']);
+        $stmt->execute();
+
+        $stmt = $con->prepare('UPDATE mediakonverterportok SET sebesseg=?, szabvany=? WHERE id=?');
+        $stmt->bind_param('sss', $_POST['transzpsebesseg'], $_POST['szabvany'], $_POST['transzportkonvid']);
+        $stmt->execute();
+
+        // LAN OLDALI PORT
+        $lanszabvany = $_POST['lanszabvany'];
+        $lanszabvany = mySQLConnect("SELECT * FROM atviteliszabvanyok WHERE id = $lanszabvany;");
+        $lanszabvany = mysqli_fetch_assoc($lanszabvany)['nev'];
+
+        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=? WHERE id=?');
+        $stmt->bind_param('sss', $lanszabvany, $_POST['lancsatlakozo'], $_POST['lanportid']);
+        $stmt->execute();
+
+        $stmt = $con->prepare('UPDATE mediakonverterportok SET sebesseg=?, szabvany=? WHERE id=?');
+        $stmt->bind_param('sss', $_POST['lansebesseg'], $_POST['lanszabvany'], $_POST['lanportkonvid']);
+        $stmt->execute();*/
+    }
+
     elseif($_GET["action"] == "new")
     {
     }

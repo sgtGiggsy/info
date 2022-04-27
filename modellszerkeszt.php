@@ -49,6 +49,25 @@ else
             $maxmeret = @$nyomtato['maxmeret'];
         }
 
+        if(@$tipusnev == "mediakonverter" || @$tipus > 20 && @$tipus < 26)
+        {
+            $tipusnev = "mediakonverter";
+            $fizikairetegek = mySQLConnect("SELECT * FROM fizikairetegek;");
+            $csatlakozok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
+            $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
+            $atviteliszabvanyok = mySQLConnect("SELECT * FROM atviteliszabvanyok;");
+
+            $mediakonverter = mySQLConnect("SELECT * FROM mediakonvertermodellek WHERE modell = $modellid;");
+            $mediakonverter = mysqli_fetch_assoc($mediakonverter);
+            $fizikaireteg = @$mediakonverter['fizikaireteg'];
+            $transzpszabvany = @$mediakonverter['transzpszabvany'];
+            $transzpcsatlakozo = @$mediakonverter['transzpcsatlakozo'];
+            $transzpsebesseg = @$mediakonverter['transzpsebesseg'];
+            $lanszabvany = @$mediakonverter['lanszabvany'];
+            $lancsatlakozo = @$mediakonverter['lancsatlakozo'];
+            $lansebesseg = @$mediakonverter['lansebesseg'];
+        }
+
         $button = "Szerkesztés";
 
         ?><form action="<?=$RootPath?>/modellszerkeszt?action=update&tipus=<?=$tipusnev?>" method="post" onsubmit="beKuld.disabled = true; return true;">
@@ -126,6 +145,86 @@ else
             <div>
                 <label for="defpass">Alapértelmezett jelszó:</label><br>
                 <input type="text" accept-charset="utf-8" name="defpass" id="defpass" value="<?=$defpass?>"></input>
+            </div><?php
+        }
+
+        if(@$tipusnev == "mediakonverter")
+        {
+            ?><div>
+                <label for="fizikaireteg">Transzporthálózat típusa:</label><br>
+                <select id="fizikaireteg" name="fizikaireteg">
+                    <option value="" selected></option><?php
+                    foreach($fizikairetegek as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>" <?= ($fizikaireteg == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                    }
+                ?></select>
+            </div>
+
+            <div>
+                <label for="transzpszabvany">Transzport szabvány:</label><br>
+                <select id="transzpszabvany" name="transzpszabvany">
+                    <option value="" selected></option><?php
+                    foreach($atviteliszabvanyok as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>" <?= ($transzpszabvany == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                    }
+                ?></select>
+            </div>
+
+            <div>
+                <label for="transzpcsatlakozo">Transzport csatlakozó:</label><br>
+                <select id="transzpcsatlakozo" name="transzpcsatlakozo">
+                    <option value="" selected></option><?php
+                    foreach($csatlakozok as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>" <?= ($transzpcsatlakozo == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                    }
+                ?></select>
+            </div>
+            
+            <div>
+                <label for="transzpsebesseg">Transzport sebesség:</label><br>
+                <select id="transzpsebesseg" name="transzpsebesseg">
+                    <option value="" selected></option><?php
+                    foreach($sebessegek as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>" <?= ($transzpsebesseg == $x['id']) ? "selected" : "" ?>><?=$x['sebesseg']?></option><?php
+                    }
+                ?></select>
+            </div>
+
+            <div>
+                <label for="lanszabvany">LAN szabvány:</label><br>
+                <select id="lanszabvany" name="lanszabvany">
+                    <option value="" selected></option><?php
+                    foreach($atviteliszabvanyok as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>" <?= ($lanszabvany == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                    }
+                ?></select>
+            </div>
+
+            <div>
+                <label for="lancsatlakozo">LAN csatlakozó:</label><br>
+                <select id="lancsatlakozo" name="lancsatlakozo">
+                    <option value="" selected></option><?php
+                    foreach($csatlakozok as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>" <?= ($lancsatlakozo == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                    }
+                ?></select>
+            </div>
+            
+            <div>
+                <label for="lansebesseg">LAN sebesség:</label><br>
+                <select id="lansebesseg" name="lansebesseg">
+                    <option value="" selected></option><?php
+                    foreach($sebessegek as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>" <?= ($lansebesseg == $x['id']) ? "selected" : "" ?>><?=$x['sebesseg']?></option><?php
+                    }
+                ?></select>
             </div><?php
         }
 

@@ -61,6 +61,25 @@ if(isset($irhat) && $irhat)
             }
         }
 
+        if($tipusnev == "mediakonverter")
+        {
+            $modellid = $_POST['id'];
+            $tocount = mySQLConnect("SELECT id FROM mediakonvertermodellek WHERE modell = $modellid;");
+
+            if(mysqli_num_rows($tocount) == 0)
+            {
+                $stmt = $con->prepare('INSERT INTO mediakonvertermodellek (modell, fizikaireteg, transzpszabvany, transzpcsatlakozo, transzpsebesseg, lanszabvany, lancsatlakozo, lansebesseg) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->bind_param('ssssssss', $modellid, $_POST['fizikaireteg'], $_POST['transzpszabvany'], $_POST['transzpcsatlakozo'], $_POST['transzpsebesseg'], $_POST['lanszabvany'], $_POST['lancsatlakozo'], $_POST['lansebesseg']);
+                $stmt->execute();
+            }
+            else
+            {
+                $stmt = $con->prepare('UPDATE mediakonvertermodellek SET fizikaireteg=?, transzpszabvany=?, transzpcsatlakozo=?, transzpsebesseg=?, lanszabvany=?, lancsatlakozo=?, lansebesseg=? WHERE modell=?');
+                $stmt->bind_param('sssssssi', $_POST['fizikaireteg'], $_POST['transzpszabvany'], $_POST['transzpcsatlakozo'], $_POST['transzpsebesseg'], $_POST['lanszabvany'], $_POST['lancsatlakozo'], $_POST['lansebesseg'], $_POST['id']);
+                $stmt->execute();
+            }
+        }
+
         if(mysqli_errno($con) != 0)
         {
             echo "<h2>Rack szerkesztése sikertelen!<br></h2>";

@@ -12,7 +12,7 @@ else
         include("./db/beepitesdb.php");
     }
 
-    $beepid = $beepnev = $beepeszk = $beepip = $beeprack = $beephely = $beeppoz = $beepido = $beepkiep = $admin = $pass = $megjegyzes = null;
+    $beepid = $beepnev = $beepeszk = $beepip = $beeprack = $beephely = $beeppoz = $beepido = $beepkiep = $admin = $pass = $megjegyzes = $vlan = $raktar = null;
     $button = "Beépítés";
 
     if(isset($_GET['eszkoz']))
@@ -25,6 +25,8 @@ else
     {
         $where = "WHERE beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL";
     }
+
+    $raktarak = mySQLConnect("SELECT * FROM raktarak;");
     $ipcimek = mySQLConnect("SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim
         FROM ipcimek
             LEFT JOIN beepitesek ON ipcimek.id = beepitesek.ipcim
@@ -48,6 +50,8 @@ else
         $admin = $beepitve['admin'];
         $pass = $beepitve['pass'];
         $megjegyzes = $beepitve['megjegyzes'];
+        $vlan = $beepitve['vlan'];
+        $raktar = $beepitve['raktar'];
 
         $button = "Szerkesztés";
 
@@ -84,6 +88,19 @@ else
 
     <?=rackPicker($beeprack)?>
 
+	<div>
+		<label for="raktar">Raktárban:</label><br>
+		<select name="raktar">
+			<option value=""></option><?php
+			foreach($raktarak as $x)
+			{
+				?><option value="<?=$x['id']?>" <?=($x['id'] == $raktar) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+			}
+		?></select>
+	</div>
+
+    <?=vlanPicker($vlan)?>
+
     <div>
         <label for="pozicio">Pozíció:</label><br>
         <input type="text" id="pozicio" name="pozicio" value="<?=$beeppoz?>">
@@ -108,6 +125,8 @@ else
         <label for="pass">Jelszó:</label><br>
         <input type="text" accept-charset="utf-8" name="pass" id="pass" value="<?=$pass?>"></input>
     </div>
+
+
     
     <div>
         <label for="megjegyzes">Megjegyzés:</label><br>

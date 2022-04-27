@@ -318,7 +318,7 @@ function eszkozTipusValaszto($tipusid)
 	}
 	elseif($tipusid < 30)
 	{
-		$eszktip = "konverter";
+		$eszktip = "mediakonverter";
 	}
 	elseif($tipusid < 40)
 	{
@@ -507,7 +507,7 @@ function vlanPicker($current, $selectnev = 'vlan')
 	$vlanok = mySQLConnect("SELECT * FROM vlanok;");
 	
 	?><div>
-		<label for="<?=$selectnev?>">Vlan:</label><br>
+		<label for="<?=$selectnev?>">VLAN:</label><br>
 		<select name="<?=$selectnev?>">
 			<option value=""></option><?php
 			foreach($vlanok as $x)

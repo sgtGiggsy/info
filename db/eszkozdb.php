@@ -35,6 +35,12 @@ if(isset($irhat) && $irhat)
                 $stmt->bind_param('ss', $last_id, $_POST['nev']);
                 $stmt->execute();
             }
+
+            elseif($eszkoztipus == "mediakonverter")
+            {
+                $eszkoz = $last_id;
+                include("./db/portdb.php");
+            }
         }
 
         if(mysqli_errno($con) != 0)
@@ -59,6 +65,13 @@ if(isset($irhat) && $irhat)
             {
                 $stmt = $con->prepare('UPDATE aktiveszkozok SET mac=?, portszam=?, uplinkportok=?, szoftver=? WHERE eszkoz=?');
                 $stmt->bind_param('ssssi', $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $_POST['id']);
+                $stmt->execute();
+            }
+
+            elseif($eszkoztipus == "telefonkozpont")
+            {
+                $stmt = $con->prepare('UPDATE telefonkozpontok SET nev=? WHERE eszkoz=?');
+                $stmt->bind_param('ss', $_POST['nev'], $_POST['id']);
                 $stmt->execute();
             }
         }

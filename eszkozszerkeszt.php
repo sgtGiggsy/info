@@ -16,7 +16,7 @@ else
             case "szamitogep": $wheretip = "WHERE modellek.tipus = 11"; break;
             case "nyomtato": $wheretip = "WHERE modellek.tipus = 12"; break;
             case "vegponti": $wheretip = "WHERE modellek.tipus > 10 AND modellek.tipus < 20"; break;
-            case "konverter": $wheretip = "WHERE modellek.tipus > 20 AND modellek.tipus < 30"; break;
+            case "mediakonverter": $wheretip = "WHERE modellek.tipus > 20 AND modellek.tipus < 26"; break;
             case "szerver": $wheretip = "WHERE modellek.tipus > 30 AND modellek.tipus < 40"; break;
             case "telefonkozpont": $wheretip = "WHERE modellek.tipus = 40"; break;
         }
