@@ -12,7 +12,7 @@ else
         include("./db/beepitesdb.php");
     }
 
-    $beepid = $beepnev = $beepeszk = $beepip = $beeprack = $beephely = $beeppoz = $beepido = $beepkiep = $admin = $pass = $megjegyzes = $vlan = $raktar = null;
+    $beepid = $beepnev = $beepeszk = $beepip = $beeprack = $beephely = $beeppoz = $beepido = $beepkiep = $admin = $pass = $megjegyzes = $vlan = $switchport = null;
     $button = "Beépítés";
 
     if(isset($_GET['eszkoz']))
@@ -26,12 +26,19 @@ else
         $where = "WHERE beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL";
     }
 
-    $raktarak = mySQLConnect("SELECT * FROM raktarak;");
     $ipcimek = mySQLConnect("SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim
         FROM ipcimek
             LEFT JOIN beepitesek ON ipcimek.id = beepitesek.ipcim
         $where
-        ORDER BY vlan, ipcimek.ipcim;");
+        ORDER BY ipcimek.vlan, ipcimek.ipcim;");
+    
+    $switchportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
+        FROM portok
+            INNER JOIN switchportok ON portok.id = switchportok.port
+            INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
+            INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
+        WHERE switchportok.tipus = 1 AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)
+        ORDER BY aktiveszkoz, id;");
 
     if(isset($_GET['id']))
     {
@@ -51,7 +58,7 @@ else
         $pass = $beepitve['pass'];
         $megjegyzes = $beepitve['megjegyzes'];
         $vlan = $beepitve['vlan'];
-        $raktar = $beepitve['raktar'];
+        $switchport = $beepitve['switchport'];
 
         $button = "Szerkesztés";
 
@@ -88,13 +95,13 @@ else
 
     <?=rackPicker($beeprack)?>
 
-	<div>
-		<label for="raktar">Raktárban:</label><br>
-		<select name="raktar">
+    <div>
+		<label for="switchport">Switchport:</label><br>
+		<select name="switchport">
 			<option value=""></option><?php
-			foreach($raktarak as $x)
+			foreach($switchportok as $x)
 			{
-				?><option value="<?=$x['id']?>" <?=($x['id'] == $raktar) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+				?><option value="<?=$x['id']?>" <?=($x['id'] == $switchport) ? "selected" : "" ?>><?=$x['aktiveszkoz']?> - <?=$x['port']?></option><?php
 			}
 		?></select>
 	</div>
@@ -125,8 +132,6 @@ else
         <label for="pass">Jelszó:</label><br>
         <input type="text" accept-charset="utf-8" name="pass" id="pass" value="<?=$pass?>"></input>
     </div>
-
-
     
     <div>
         <label for="megjegyzes">Megjegyzés:</label><br>

@@ -116,9 +116,13 @@ else
                     {
                         $beepid = $eszkoz['beepid'];
                         $eszkid = $eszkoz['id'];
-                        $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
+                        $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
+                        if($eszktip == "aktiv")
+                        {
+                            $eszktip = "aktiveszkoz";
+                        }
 
-                        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip?>eszkoz/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td nowrap><?=$eszkoz['beepitesinev']?></td>
                             <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>

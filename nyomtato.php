@@ -37,7 +37,8 @@ else
             pass,
             defadmin,
             defpass,
-            maxmeret
+            maxmeret,
+            raktar
         FROM eszkozok
             INNER JOIN modellek ON eszkozok.modell = modellek.id
             LEFT JOIN nyomtatomodellek ON nyomtatomodellek.modell = modellek.id
@@ -125,7 +126,12 @@ else
         }
 
         ?><div class="infobox"><?php
-        if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
+        if($eszkoz['beepitesideje'] && $eszkoz['raktar'])
+        {
+            ?><div>Állapot</div>
+            <div>Raktárban</div><?php
+        }
+        elseif($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
         {
             ?><div>Állapot</div>
             <div>Beépítve</div>

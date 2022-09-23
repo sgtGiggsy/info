@@ -14,8 +14,8 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO eszkozok (modell, sorozatszam, tulajdonos, varians, megjegyzes) VALUES (?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssss', $_POST['modell'], $_POST['sorozatszam'], $_POST['tulajdonos'], $_POST['varians'], $_POST['megjegyzes']);
+        $stmt = $con->prepare('INSERT INTO eszkozok (modell, sorozatszam, tulajdonos, varians, megjegyzes, raktar) VALUES (?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('ssssss', $_POST['modell'], $_POST['sorozatszam'], $_POST['tulajdonos'], $_POST['varians'], $_POST['megjegyzes'], $_POST['raktar']);
         $stmt->execute();
 
         $last_id = mysqli_insert_id($con);
@@ -55,8 +55,8 @@ if(isset($irhat) && $irhat)
     }
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE eszkozok SET modell=?, sorozatszam=?, tulajdonos=?, varians=?, megjegyzes=? WHERE id=?');
-        $stmt->bind_param('sssssi', $_POST['modell'], $_POST['sorozatszam'], $_POST['tulajdonos'], $_POST['varians'], $_POST['megjegyzes'], $_POST['id']);
+        $stmt = $con->prepare('UPDATE eszkozok SET modell=?, sorozatszam=?, tulajdonos=?, varians=?, megjegyzes=?, leadva=?, hibas=?, raktar=? WHERE id=?');
+        $stmt->bind_param('ssssssssi', $_POST['modell'], $_POST['sorozatszam'], $_POST['tulajdonos'], $_POST['varians'], $_POST['megjegyzes'], $_POST['leadva'], $_POST['hibas'], $_POST['raktar'], $_POST['id']);
         $stmt->execute();
 
         if($eszkoztipus)

@@ -8,6 +8,7 @@ else
 {
     $aktiveszkozok = mySQLConnect("SELECT
             eszkozok.id AS id,
+            beepitesek.id AS beepid,
             sorozatszam,
             mac,
             portszam,
@@ -33,7 +34,8 @@ else
             rackszekrenyek.id AS rackid,
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
-            ipcimek.ipcim AS ipcim
+            ipcimek.ipcim AS ipcim,
+            raktarak.nev AS raktar
         FROM eszkozok
                 INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
                 INNER JOIN modellek ON eszkozok.modell = modellek.id
@@ -47,8 +49,9 @@ else
                 LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                 LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
         WHERE eszkozok.id = $id AND modellek.tipus < 11
-        ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
+        ORDER BY beepitesek.id DESC;");
 
     if(mysqli_num_rows($aktiveszkozok) == 0)
     {
@@ -106,6 +109,7 @@ else
         </div><?php
 
         $epuletid = $eszkoz['epuletid'];
+        $helyisegid = $eszkoz['helyisegid'];
         $vlanok = mySQLConnect("SELECT * FROM vlanok;");
         $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
         $switchportok = mySQLConnect("SELECT switchportok.id AS id, allapot, eszkoz, mode, nev, sebesseg, tipus, vlan, portok.port, csatlakozo, portok.id AS portid, csatlakozas
@@ -129,7 +133,8 @@ else
                 INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
                 INNER JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
                 INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
-            WHERE helyisegek.epulet = $epuletid AND eszkozok.id != $id;");
+            WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
+            ORDER BY aktiveszkoz, id;");
         $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
         
         ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/eszkozszerkeszt/$id?tipus=aktiv'\">Eszköz szerkesztése</button>" : "" ?>
@@ -151,7 +156,7 @@ else
                 <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
                 <?php
             }
-            elseif(!$eszkoz['beepitesideje'])
+            elseif(!$eszkoz['beepid'])
             {
                 ?><div>Állapot</div>
                 <div>Új, sosem beépített</div><?php
@@ -160,19 +165,8 @@ else
             {
                 ?><div>Állapot</div>
                 <div>Kiépítve</div>
-                <div>Utolsó IP cím</div>
-                <div><?=$eszkoz['ipcim']?></div>
-                <div>Utolsó beépítési név</div>
-                <div><?=$eszkoz['beepitesinev']?></div>
-                <div>Utolsó beépítési helye</div>
-                <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
-                <div>Rackszekrény</div>
-                <div><?=$eszkoz['rack']?></div>
-                <div>Utolsó beépítés ideje</div>
-                <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
-                <div>Kiépítés ideje</div>
-                <div><?=timeStampToDate($eszkoz['kiepitesideje'])?></div>
-                <?php
+                <div>Raktár</div>
+                <div><?=$eszkoz['raktar']?></div><?php
             }
             ?><div>Gyártó</div>
             <div><?=$eszkoz['gyarto']?></div>
@@ -190,8 +184,45 @@ else
             <div><?=$eszkoz['uplinkportok']?></div>
             <div>Tulajdonos</div>
             <div><?=$eszkoz['tulajdonos']?></div>
-        </div>
-        <div class="oldalcim">Portok</div>
+        </div><?php
+
+        if(mysqli_num_rows($aktiveszkozok) > 1 || $eszkoz['kiepitesideje'])
+        {
+            ?><div class="oldalcim"><?=(mysqli_num_rows($aktiveszkozok) > 2) ? "Korábbi beépítések" : "Korábbi beépítés" ?></div>
+            <table id="eszkozok">
+                <thead>
+                    <tr>
+                        <th>IP cím</th>
+                        <th>Beépítési név</th>
+                        <th>Beépítés ideje</th>
+                        <th>Kiépítés ideje</th>
+                        <th>Beépítés helye</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody><?php
+                foreach($aktiveszkozok as $x)
+                {
+                    if($eszkoz['beepid'] != $x['beepid'] || mysqli_num_rows($aktiveszkozok) == 1)
+                    {
+                        ?><tr>
+                            <td><?=$x['ipcim']?></td>
+                            <td><?=$x['beepitesinev']?></td>
+                            <td><?=$x['beepitesideje']?></td>
+                            <td><?=$x['kiepitesideje']?></td>
+                            <td><?=$x['epuletszam']?> <?=($x['epuletnev']) ? "(" . $x['epuletnev'] . ")" : "" ?> <?=$x['helyisegszam']?> <?=($x['helyisegnev']) ? "(" . $x['helyisegnev'] . ")" : "" ?>
+                            <td><?php if($csoportir)
+                            {
+                                ?><a href='<?=$RootPath?>/beepites/<?=$x['beepid']?>'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
+                            } ?></td>
+                        </tr><?php
+                    }
+                }
+                ?></tbody>
+            </table><?php
+        }
+
+        ?><div class="oldalcim">Portok</div>
         <table id="switchportok">
             <thead>
                 <tr>

@@ -43,8 +43,7 @@ else
             LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-        WHERE modellek.tipus = 12
-        GROUP BY eszkozok.id
+        WHERE modellek.tipus = 12  AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL)
         ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
     if($mindir) 
     {

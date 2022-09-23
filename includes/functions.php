@@ -316,9 +316,13 @@ function eszkozTipusValaszto($tipusid)
 	{
 		$eszktip = "vegponti";
 	}
-	elseif($tipusid < 30)
+	elseif($tipusid < 26)
 	{
 		$eszktip = "mediakonverter";
+	}
+	elseif($tipusid < 31)
+	{
+		$eszktip = "bovitomodul";
 	}
 	elseif($tipusid < 40)
 	{

@@ -80,6 +80,25 @@ if(isset($irhat) && $irhat)
             }
         }
 
+        if($tipusnev == "bovitomodul")
+        {
+            $modellid = $_POST['id'];
+            $tocount = mySQLConnect("SELECT id FROM bovitomodellek WHERE modell = $modellid;");
+
+            if(mysqli_num_rows($tocount) == 0)
+            {
+                $stmt = $con->prepare('INSERT INTO bovitomodellek (modell, fizikaireteg, transzpszabvany, transzpcsatlakozo, transzpsebesseg) VALUES (?, ?, ?, ?, ?)');
+                $stmt->bind_param('sssss', $modellid, $_POST['fizikaireteg'], $_POST['transzpszabvany'], $_POST['transzpcsatlakozo'], $_POST['transzpsebesseg']);
+                $stmt->execute();
+            }
+            else
+            {
+                $stmt = $con->prepare('UPDATE bovitomodellek SET fizikaireteg=?, transzpszabvany=?, transzpcsatlakozo=?, transzpsebesseg=? WHERE modell=?');
+                $stmt->bind_param('ssssi', $_POST['fizikaireteg'], $_POST['transzpszabvany'], $_POST['transzpcsatlakozo'], $_POST['transzpsebesseg'], $_POST['id']);
+                $stmt->execute();
+            }
+        }
+
         if(mysqli_errno($con) != 0)
         {
             echo "<h2>Rack szerkesztése sikertelen!<br></h2>";

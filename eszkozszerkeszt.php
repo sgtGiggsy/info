@@ -17,6 +17,7 @@ else
             case "nyomtato": $wheretip = "WHERE modellek.tipus = 12"; break;
             case "vegponti": $wheretip = "WHERE modellek.tipus > 10 AND modellek.tipus < 20"; break;
             case "mediakonverter": $wheretip = "WHERE modellek.tipus > 20 AND modellek.tipus < 26"; break;
+            case "bovitomodul": $wheretip = "WHERE modellek.tipus > 25 AND modellek.tipus < 31"; break;
             case "szerver": $wheretip = "WHERE modellek.tipus > 30 AND modellek.tipus < 40"; break;
             case "telefonkozpont": $wheretip = "WHERE modellek.tipus = 40"; break;
         }
@@ -34,8 +35,10 @@ else
         INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
     $wheretip
     ORDER BY tipus ASC, gyartok.nev ASC, modell ASC;");
+
+    $raktarak = mySQLConnect("SELECT * FROM raktarak;");
     
-    $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = $uplinkportok = $szoftver = $nev = null;
+    $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = $uplinkportok = $szoftver = $nev = $leadva = $hibas = $raktar = $megjegyzes = null;
     $button = "Új eszköz";
     $oldalcim = "Új eszköz létrehozása";
     
@@ -52,10 +55,10 @@ else
             $aktiveszkoz = mySQLConnect("SELECT * FROM aktiveszkozok WHERE eszkoz = $eszkid;");
             $aktiveszkoz = mysqli_fetch_assoc($aktiveszkoz);
 
-            $mac = $aktiveszkoz['mac'];
-            $portszam = $aktiveszkoz['portszam'];
-            $uplinkportok = $aktiveszkoz['uplinkportok'];
-            $szoftver = $aktiveszkoz['szoftver'];
+            $mac = @$aktiveszkoz['mac'];
+            $portszam = @$aktiveszkoz['portszam'];
+            $uplinkportok = @$aktiveszkoz['uplinkportok'];
+            $szoftver = @$aktiveszkoz['szoftver'];
 
             ?><div class="oldalcim"><p onclick="rejtMutat('portgeneralas')" style="cursor: pointer">Portok generálása az eszközhöz</p></div>
             <div class="contentcenter" id="portgeneralas" style='display: none'>
@@ -167,6 +170,10 @@ else
         $sorozatszam = $eszkoz['sorozatszam'];
         $tulajdonos = $eszkoz['tulajdonos'];
         $varians = $eszkoz['varians'];
+        $leadva = $eszkoz['leadva'];
+        $hibas = $eszkoz['hibas'];
+        $raktar = $eszkoz['raktar'];
+        $megjegyzes = $eszkoz['megjegyzes'];
 
         $button = "Szerkesztés";
 
@@ -200,9 +207,22 @@ else
         <div>
             <label for="sorozatszam">Sorozatszám:</label><br>
             <input type="text" accept-charset="utf-8" name="sorozatszam" id="sorozatszam" value="<?=$sorozatszam?>"></input>
-        </div>
+        </div><?php
 
-        <?php alakulatPicker($tulajdonos, "tulajdonos");
+        if(isset($_GET['id']))
+        {
+            ?><div>
+                <label for="leadva">Leadva:</label><br>
+                <input type="checkbox" accept-charset="utf-8" name="leadva" id="leadva" value="1" <?= ($leadva) ? "checked" : "" ?>></input>
+            </div>
+
+            <div>
+                <label for="hibas">Hibás:</label><br>
+                <input type="checkbox" accept-charset="utf-8" name="hibas" id="hibas" value="1" <?= ($hibas) ? "checked" : "" ?>></input>
+            </div><?php
+        }
+
+        alakulatPicker($tulajdonos, "tulajdonos");
 
         if($eszkoztipus == "telefonkozpont")
         {
@@ -235,7 +255,23 @@ else
             </div><?php
         }
 
-        ?><div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
+        ?><div>
+            <label for="raktar">Raktárban:</label><br>
+            <select name="raktar">
+                <option value=""></option><?php
+                foreach($raktarak as $x)
+                {
+                    ?><option value="<?=$x['id']?>" <?=($x['id'] == $raktar) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                }
+            ?></select>
+        </div>
+
+        <div>
+                <label for="megjegyzes">Megjegyzés:</label><br>
+                <input type="text" accept-charset="utf-8" name="megjegyzes" id="megjegyzes" value="<?=$megjegyzes?>"></input>
+            </div>
+
+        <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
     </form><?php
         cancelForm();
     ?></div><?php
