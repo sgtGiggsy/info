@@ -571,3 +571,69 @@ function mysqliNaturalSort($mysqliresult, $sortcriteria)
 
 	return $returnarr;
 }
+
+function getWhere($eszktip)
+{
+	if(isset($_GET['szures']) && $_GET['szures'] != "keszleten")
+    {
+        $filter = $_GET['szures'];
+        if($filter == "mind")
+        {
+            $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL)";
+            $szures = "- Mind";
+        }
+        elseif ($filter == "leadva")
+        {
+            $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NOT NULL";
+            $szures = "- Leadva";
+        }
+        elseif ($filter == "beepitve")
+        {
+            $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)";
+            $szures = "- Beépítve";
+        }
+        elseif ($filter == "raktaron")
+        {
+            $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL AND (beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL OR beepitesek.id IS NULL)";
+            $szures = "- Raktáron";
+        }
+    }
+    else
+    {
+        $filter = false;
+        $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL";
+        $szures = "- Készleten";
+    }
+
+	return array('filter' => $filter, 'where' => $where, 'szures' => $szures);
+}
+
+function keszletFilter($action, $filter)
+{
+	?><div class="right">
+		<form action="<?=$action?>" method="GET">
+			<label for="szures" style="font-size: 14px">Szűrés</label>
+				<select id="szures" name="szures" onchange="this.form.submit()">
+					<option value="keszleten" <?=($filter) ? "" : "selected" ?>>Készleten</option>
+					<option value="beepitve" <?=($filter == "beepitve") ? "selected" : "" ?>>Beépítve</option>
+					<option value="raktaron" <?=($filter == "raktaron") ? "selected" : "" ?>>Raktáron</option>
+					<option value="leadva" <?=($filter == "leadva") ? "selected" : "" ?>>Leadva</option>
+					<option value="mind" <?=($filter == "mind") ? "selected" : "" ?>>Mind</option>
+				</select>
+		</form>
+	</div><?php
+}
+
+function szerkSor($beepid, $eszkid, $eszktip)
+{
+	$RootPath = getenv('APP_ROOT_PATH');
+
+	?><td><?php
+	if($beepid)
+	{
+		?><a href='<?=$RootPath?>/beepites/<?=$beepid?>'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
+	}
+	?></td>
+	<td><a href='<?=$RootPath?>/beepites?eszkoz=<?=$eszkid?>'><img src='<?=$RootPath?>/images/newbeep.png' alt='Új beépítés' title='Új beépítés' /></a></td>
+	<td><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
+}

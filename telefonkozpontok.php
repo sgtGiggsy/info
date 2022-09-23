@@ -55,35 +55,32 @@ else
             <th class="tsorth" onclick="sortTable(2, 's', '<?=$tipus?>')">Modell</th>
             <th class="tsorth" onclick="sortTable(3, 's', '<?=$tipus?>')">Sorozatszám</th>
             <th class="tsorth" onclick="sortTable(4, 's', '<?=$tipus?>')">Épület</th>
-            <th class="tsorth" onclick="sortTable(5, 's', '<?=$tipus?>')">Helyiség</th>
-            <th></th>
-            <th></th>
-        </tr>
+            <th class="tsorth" onclick="sortTable(5, 's', '<?=$tipus?>')">Helyiség</th><?php
+            if($csoportir)
+            {
+                ?><th class="tsorth" onclick="sortTable(6, 's', '<?=$tipus?>')">Megjegyzés</th>
+                <th></th>
+                <th></th>
+                <th></th><?php
+            }
+        ?></tr>
     </thead>
     <tbody><?php
         foreach($telefonkozpontok as $kozpont)
         {
-            $kozpontid = $kozpont['id'];
-            if($kozpont['beepid'])
-            {
-                $beepid = "/" . $kozpont['beepid'];
-            }
-            else
-            {
-                $beepid = "?eszkoz=$kozpontid";
-            }
-            
-            
             ?><tr <?=(!($kozpont['beepitesideje'] && !$kozpont['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./telefonkozpont/<?=$kozpont['id']?>'>
                 <td><?=$kozpont['beepitesinev']?></td>
                 <td nowrap><?=$kozpont['gyarto']?></td>
                 <td nowrap><?=$kozpont['modell']?><?=$kozpont['varians']?></td>
                 <td><?=$kozpont['sorozatszam']?></td>
                 <td><?=$kozpont['epuletszam']?> <?=($kozpont['epuletnev']) ? "(" . $kozpont['epuletnev'] . ")" : "" ?></td>
-                <td><?=$kozpont['helyisegszam']?> <?=($kozpont['helyisegnev']) ? "(" . $kozpont['helyisegnev'] . ")" : "" ?></td>
-                <td><?=($csoportir) ? "<a href='$RootPath/beepites$beepid'><img src='$RootPath/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a>" : "" ?></td>
-                <td><?=($csoportir) ? "<a href='$RootPath/eszkozszerkeszt/$kozpontid?tipus=telefonkozpont'><img src='$RootPath/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a>" : "" ?></td>
-            </tr><?php
+                <td><?=$kozpont['helyisegszam']?> <?=($kozpont['helyisegnev']) ? "(" . $kozpont['helyisegnev'] . ")" : "" ?></td><?php
+                if($csoportir)
+                {
+                    ?><td><?=$kozpont['megjegyzes']?></td><?php
+                    szerkSor($kozpont['beepid'], $kozpont['id'], "telefonkozpont");
+                }
+            ?></tr><?php
         }
         ?></tbody>
     </table><?php

@@ -6,6 +6,9 @@ if(!$sajatolvas)
 }
 else
 {
+    $szuresek = getWhere("modellek.tipus > 0");
+    $where = $szuresek['where'];
+
     $mindeneszkoz = mySQLConnect("SELECT
             eszkozok.id AS id,
             sorozatszam,
@@ -24,7 +27,9 @@ else
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
             ipcimek.ipcim AS ipcim,
-            beepitesek.megjegyzes AS megjegyzes
+            beepitesek.megjegyzes AS megjegyzes,
+            eszkozok.megjegyzes AS emegjegyzes,
+            hibas
         FROM eszkozok
             INNER JOIN modellek ON eszkozok.modell = modellek.id
             INNER JOIN gyartok ON modellek.gyarto = gyartok.id
@@ -35,10 +40,10 @@ else
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
             LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
-        GROUP BY eszkozok.id
+        WHERE $where
         ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
-    ?><div class="oldalcim">Minden eszköz</div><?php
+    ?><div class="oldalcim">Minden eszköz <?=$szuresek['szures']?> <?=keszletFilter($_GET['page'], $szuresek['filter'])?></div><?php
     $zar = false;
     foreach($mindeneszkoz as $eszkoz)
     {
@@ -88,7 +93,7 @@ else
             $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
         }
 
-        ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./<?=$eszktip?>/<?=$eszkoz['id']?>'>
+        ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal " . (($eszkoz['hibas']) ? "; text-decoration: line-through'" : "'" ) : "" ?> class='kattinthatotr' data-href='./<?=$eszktip?>/<?=$eszkoz['id']?>'>
             <td><?=$eszkoz['ipcim']?></td>
             <td><?=$eszkoz['beepitesinev']?></td>
             <td><?=$eszkoz['gyarto']?></td>
@@ -102,7 +107,7 @@ else
             <td nowrap><?=timeStampToDate($eszkoz['kiepitesideje'])?></td><?php
             if($csoportir)
             {
-                ?><td><?=$eszkoz['megjegyzes']?></td>
+                ?><td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td>
                 <td><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
             }
         ?></tr><?php

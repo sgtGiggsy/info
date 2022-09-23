@@ -6,6 +6,12 @@ if(@!$sajatolvas)
 }
 else
 {
+    $tipus = null;
+    if(isset($_GET['tipus']))
+    {
+        $tipus = $_GET['tipus'];
+    }
+
     if(count($_POST) > 0)
     {
         $irhat = true;
@@ -46,8 +52,8 @@ else
         $beepitve = mySQLConnect("SELECT * FROM beepitesek WHERE id = $beepid;");
         $beepitve = mysqli_fetch_assoc($beepitve);
 
-        $beepnev = $beepitve['nev'];
         $beepeszk = $beepitve['eszkoz'];
+        $beepnev = $beepitve['nev'];
         $beepip = $beepitve['ipcim'];
         $beeprack = $beepitve['rack'];
         $beephely = $beepitve['helyiseg'];
@@ -60,6 +66,12 @@ else
         $vlan = $beepitve['vlan'];
         $switchport = $beepitve['switchport'];
 
+        $eszkoztipus = mySQLConnect("SELECT tipus FROM eszkozok INNER JOIN modellek ON eszkozok.modell = modellek.id WHERE eszkozok.id = $beepeszk");
+        $tip = mysqli_fetch_assoc($eszkoztipus);
+        $tipus = eszkozTipusValaszto($tip['tipus']);
+
+        
+
         $button = "Szerkesztés";
 
         ?><form action="<?=$RootPath?>/beepites&action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
@@ -71,69 +83,94 @@ else
     }
 
     ?><div class="oldalcim">Eszköz beépítése</div>
-    <div class="contentcenter">
+    <div class="contentcenter"><?php
 
-    <div>
-        <label for="nev">Beépítési név:</label><br>
-        <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$beepnev?>"></input>
-    </div>
+    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "telefonkozpont")
+    {
+        
+        ?><div>
+            <label for="nev">Beépítési név:</label><br>
+            <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$beepnev?>"></input>
+        </div><?php
+    }
     
-    <div>
-        <label for="ipcim">IP cím:</label><br>
-        <select id="ipcim" name="ipcim">
-            <option value="" selected></option><?php
-            foreach($ipcimek as $x)
-            {
-                ?><option value="<?php echo $x["id"] ?>" <?= ($beepip == $x['id']) ? "selected" : "" ?>><?=$x['ipcim']?></option><?php
-            }
-        ?></select>
-    </div>
+    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato")
+    {
+        ?><div>
+            <label for="ipcim">IP cím:</label><br>
+            <select id="ipcim" name="ipcim">
+                <option value="" selected></option><?php
+                foreach($ipcimek as $x)
+                {
+                    ?><option value="<?php echo $x["id"] ?>" <?= ($beepip == $x['id']) ? "selected" : "" ?>><?=$x['ipcim']?></option><?php
+                }
+            ?></select>
+        </div><?php
+    }
 
-    <?=eszkozPicker($beepeszk, ($beepid) ? true : false)?>
+    eszkozPicker($beepeszk, ($beepid) ? true : false);
 
-    <?=helyisegPicker($beephely, "helyiseg")?>
+    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "mediakonverter")
+    {
+        helyisegPicker($beephely, "helyiseg");
+    }
 
-    <?=rackPicker($beeprack)?>
+    if(!$tipus || $tipus == "aktiv" || $tipus == "mediakonverter")
+    {
+        rackPicker($beeprack);
+    }
 
-    <div>
-		<label for="switchport">Switchport:</label><br>
-		<select name="switchport">
-			<option value=""></option><?php
-			foreach($switchportok as $x)
-			{
-				?><option value="<?=$x['id']?>" <?=($x['id'] == $switchport) ? "selected" : "" ?>><?=$x['aktiveszkoz']?> - <?=$x['port']?></option><?php
-			}
-		?></select>
-	</div>
+    if(!$tipus || $tipus == "bovitomodul")
+    {
+        ?><div>
+            <label for="switchport">Switchport:</label><br>
+            <select name="switchport">
+                <option value=""></option><?php
+                foreach($switchportok as $x)
+                {
+                    ?><option value="<?=$x['id']?>" <?=($x['id'] == $switchport) ? "selected" : "" ?>><?=$x['aktiveszkoz']?> - <?=$x['port']?></option><?php
+                }
+            ?></select>
+        </div><?php
+    }
 
-    <?=vlanPicker($vlan)?>
+    if(!$tipus || $tipus == "aktiv" || $tipus == "mediakonverter")
+    {
+        vlanPicker($vlan);
+    }
 
-    <div>
-        <label for="pozicio">Pozíció:</label><br>
-        <input type="text" id="pozicio" name="pozicio" value="<?=$beeppoz?>">
-    </div>
+    if(!$tipus || $tipus == "aktiv")
+    {
+        ?><div>
+            <label for="pozicio">Pozíció:</label><br>
+            <input type="text" id="pozicio" name="pozicio" value="<?=$beeppoz?>">
+        </div><?php
+    }
 
-    <div>
+    ?><div>
         <label for="beepitesideje">Beépítés ideje</label><br>
-        <input type="datetime-local" id="beepitesideje" name="beepitesideje" value="<?=timeStampToDateTimeLocal($beepido)?>">
+        <input type="datetime-local" id="beepitesideje" name="beepitesideje" value="<?=timeStampToDateTimeLocal($beepido)?>"><button style="margin-left: 10px;" onclick="getMa('beepitesideje'); return false;">Most</button>
     </div>
 
     <div>
         <label for="kiepitesideje">Kiépítés ideje</label><br>
-        <input type="datetime-local" id="kiepitesideje" name="kiepitesideje" value="<?=timeStampToDateTimeLocal($beepkiep)?>">
-    </div>
+        <input type="datetime-local" id="kiepitesideje" name="kiepitesideje" value="<?=timeStampToDateTimeLocal($beepkiep)?>"><button style="margin-left: 10px;" onclick="getMa('kiepitesideje'); return false;">Most</button>
+    </div><?php
 
-    <div>
-        <label for="admin">Admin user:</label><br>
-        <input type="text" accept-charset="utf-8" name="admin" id="admin" value="<?=$admin?>"></input>
-    </div>
+    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato")
+    {
+        ?><div>
+            <label for="admin">Admin user:</label><br>
+            <input type="text" accept-charset="utf-8" name="admin" id="admin" value="<?=$admin?>"></input>
+        </div>
 
-    <div>
-        <label for="pass">Jelszó:</label><br>
-        <input type="text" accept-charset="utf-8" name="pass" id="pass" value="<?=$pass?>"></input>
-    </div>
+        <div>
+            <label for="pass">Jelszó:</label><br>
+            <input type="text" accept-charset="utf-8" name="pass" id="pass" value="<?=$pass?>"></input>
+        </div><?php
+    }
     
-    <div>
+    ?><div>
         <label for="megjegyzes">Megjegyzés:</label><br>
         <input type="text" accept-charset="utf-8" name="megjegyzes" id="megjegyzes" value="<?=$megjegyzes?>"></input>
     </div>
@@ -141,5 +178,21 @@ else
     <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
     </form><?php
     cancelForm();
-?></div><?php
+?></div>
+<script>
+    function getMa(dateselect)
+    {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        var hour = today.getHours();
+        var minute = today.getMinutes();
+
+        today = yyyy + '-' + mm + '-' + dd + ' ' + hour + ':' + minute;
+        document.getElementById(dateselect).value = today;
+    }
+</script>
+<?php
 }
+

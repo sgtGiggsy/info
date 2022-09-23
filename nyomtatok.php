@@ -6,6 +6,9 @@ if(!$sajatolvas)
 }
 else
 {
+    $szuresek = getWhere("modellek.tipus = 12");
+    $where = $szuresek['where'];
+
     $mindeneszkoz = mySQLConnect("SELECT
             eszkozok.id AS id,
             sorozatszam,
@@ -32,7 +35,8 @@ else
             pass,
             defadmin,
             defpass,
-            maxmeret
+            maxmeret,
+            hibas
         FROM eszkozok
             INNER JOIN modellek ON eszkozok.modell = modellek.id
             LEFT JOIN nyomtatomodellek ON nyomtatomodellek.modell = modellek.id
@@ -43,7 +47,7 @@ else
             LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-        WHERE modellek.tipus = 12  AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL)
+        WHERE $where
         ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
     if($mindir) 
     {
@@ -75,7 +79,7 @@ else
         <option>Nincs</option>
     </datalist>
     
-    <div class="oldalcim">Nyomtatók</div><?php
+    <div class="oldalcim">Nyomtatók <?=$szuresek['szures']?> <?=keszletFilter($_GET['page'], $szuresek['filter'])?></div><?php
     $tipus = "nyomtatok";
     ?><table id="<?=$tipus?>">
     <thead>
@@ -95,26 +99,75 @@ else
             {
                 ?><th class="tsorth" onclick="sortTable(11, 's', '<?=$tipus?>')">Admin</th>
                 <th class="tsorth" onclick="sortTable(12, 's', '<?=$tipus?>')">Jelszó</th>
-                <th class="tsorth" onclick="sortTable(13, 's', '<?=$tipus?>')">Megjegyzés</th><?php
+                <th class="tsorth" onclick="sortTable(13, 's', '<?=$tipus?>')">Megjegyzés</th>
+                <th></th>
+                <th></th>
+                <th></th><?php
             }
-            ?>
-            <th></th>
-        </tr>
+        ?></tr>
     </thead>
     <tbody><?php
+        $nembeepitett = array();
+        $eszkoztip = mysqli_fetch_assoc($mindeneszkoz);
+        $eszktip = @eszkozTipusValaszto($eszkoztip['tipusid']);
         foreach($mindeneszkoz as $eszkoz)
-        {
-            $eszkid = $eszkoz['id'];
-            if($eszkoz['beepid'])
+        {            
+            if(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
             {
-                $beepid = "/" . $eszkoz['beepid'];
+                $nembeepitett[] = $eszkoz;
             }
             else
             {
-                $beepid = "?eszkoz=$eszkid";
+                switch($eszkoz['maxmeret'])
+                {
+                    case 1: $maxmeret = "A4"; break;
+                    case 2: $maxmeret = "A3"; break;
+                    case 3: $maxmeret = "A2"; break;
+                    case 4: $maxmeret = "A1"; break;
+                    case 5: $maxmeret = "A0"; break;
+                    default: $maxmeret = "A4";
+                }
+                switch($eszkoz['szines'])
+                {
+                    case 1: $szines = "Színes"; break;
+                    default: $szines = "Fekete-Fehér";
+                }
+                switch($eszkoz['scanner'])
+                {
+                    case 1: $scanner = "Van"; break;
+                    default: $scanner = "Nincs";
+                }
+                switch($eszkoz['fax'])
+                {
+                    case 1: $fax = "Van, beépített"; break;
+                    case 2: $fax = "Alkalmas, modullal"; break;
+                    default: $fax = "Nincs";
+                }
+                ?><tr class='kattinthatotr' data-href='./nyomtato/<?=$eszkoz['id']?>'>
+                    <td><?=$eszkoz['ipcim']?></td>
+                    <td><?=$eszkoz['beepitesinev']?></td>
+                    <td nowrap><?=$eszkoz['gyarto']?></td>
+                    <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
+                    <td><?=$maxmeret?></td>
+                    <td><?=$szines?></td>
+                    <td><?=$scanner?></td>
+                    <td><?=$fax?></td>
+                    <td><?=$eszkoz['sorozatszam']?></td>
+                    <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
+                    <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td><?php
+                    if($csoportir)
+                    {
+                        ?><td><?=($eszkoz['admin']) ? $eszkoz['admin'] : $eszkoz['defadmin'] ?></td>
+                        <td><?=($eszkoz['pass']) ? $eszkoz['pass'] : $eszkoz['defpass'] ?></td>
+                        <td><?=$eszkoz['megjegyzes']?></td>
+                        <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
+                    }
+                ?></tr><?php
             }
-            
-            $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
+        }
+
+        foreach($nembeepitett as $eszkoz)
+        {            
             switch($eszkoz['maxmeret'])
             {
                 case 1: $maxmeret = "A4"; break;
@@ -140,7 +193,8 @@ else
                 case 2: $fax = "Alkalmas, modullal"; break;
                 default: $fax = "Nincs";
             }
-            ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./nyomtato/<?=$eszkoz['id']?>'>
+
+            ?><tr style='font-weight: normal <?=($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr' data-href='./nyomtato/<?=$eszkoz['id']?>'>
                 <td><?=$eszkoz['ipcim']?></td>
                 <td><?=$eszkoz['beepitesinev']?></td>
                 <td nowrap><?=$eszkoz['gyarto']?></td>
@@ -156,12 +210,10 @@ else
                 {
                     ?><td><?=($eszkoz['admin']) ? $eszkoz['admin'] : $eszkoz['defadmin'] ?></td>
                     <td><?=($eszkoz['pass']) ? $eszkoz['pass'] : $eszkoz['defpass'] ?></td>
-                    <td><?=$eszkoz['megjegyzes']?></td><?php
+                    <td><?=$eszkoz['megjegyzes']?></td>
+                    <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
                 }
-                ?>
-                <td><?=($csoportir) ? "<a href='$RootPath/beepites$beepid'><img src='$RootPath/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a>" : "" ?></td>
-                <td><?=($csoportir) ? "<a href='$RootPath/eszkozszerkeszt/$eszkid?tipus=$eszktip'><img src='$RootPath/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a>" : "" ?></td>
-            </tr><?php
+            ?></tr><?php
         }
         ?></tbody>
     </table><?php

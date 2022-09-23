@@ -58,7 +58,7 @@ else
             LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
             LEFT JOIN fizikairetegek ON mediakonvertermodellek.fizikaireteg = fizikairetegek.id
             LEFT JOIN vlanok ON beepitesek.vlan = vlanok.id
-            LEFT JOIN raktarak ON beepitesek.raktar = raktarak.id
+            LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
         WHERE eszkozok.id = $id
         ORDER BY beepitesek.id DESC;");
 	
