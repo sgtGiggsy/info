@@ -29,6 +29,13 @@ if(isset($irhat) && $irhat)
                 $stmt->execute();
             }
 
+            if($eszkoztipus == "soho")
+            {
+                $stmt = $con->prepare('INSERT INTO sohoeszkozok (eszkoz, mac, lanportok, wanportok, szoftver) VALUES (?, ?, ?, ?, ?)');
+                $stmt->bind_param('sssss', $last_id, $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver']);
+                $stmt->execute();
+            }
+
             elseif($eszkoztipus == "telefonkozpont")
             {
                 $stmt = $con->prepare('INSERT INTO telefonkozpontok (eszkoz, nev) VALUES (?, ?)');
@@ -64,6 +71,13 @@ if(isset($irhat) && $irhat)
             if($eszkoztipus == "aktiv")
             {
                 $stmt = $con->prepare('UPDATE aktiveszkozok SET mac=?, portszam=?, uplinkportok=?, szoftver=? WHERE eszkoz=?');
+                $stmt->bind_param('ssssi', $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $_POST['id']);
+                $stmt->execute();
+            }
+
+            elseif($eszkoztipus == "soho")
+            {
+                $stmt = $con->prepare('UPDATE sohoeszkozok SET mac=?, lanportok=?, wanportok=?, szoftver=? WHERE eszkoz=?');
                 $stmt->bind_param('ssssi', $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $_POST['id']);
                 $stmt->execute();
             }

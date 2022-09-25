@@ -117,22 +117,22 @@ else
                         $beepid = $eszkoz['beepid'];
                         $eszkid = $eszkoz['id'];
                         $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
-                        if($eszktip == "aktiv")
-                        {
-                            $eszktip = "aktiveszkoz";
-                        }
 
-                        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip['teljes']?>/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td nowrap><?=$eszkoz['beepitesinev']?></td>
                             <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
                             <td><?=$eszkoz['tipus']?></td>
                             <td><?=$eszkoz['pozicio']?></td>
                             <td><?=$eszkoz['tulajdonos']?></td>
-                            <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td>
-                            <td><?=($csoportir) ? "<a href='$RootPath/beepites/$beepid'><img src='$RootPath/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a>" : "" ?></td>
-                            <td><?=($csoportir) ? "<a href='$RootPath/eszkozszerkeszt/$eszkid?tipus=$eszktip'><img src='$RootPath/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a>" : "" ?></td>
-                        </tr><?php
+                            <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td><?php
+                            if($csoportir)
+                            {
+                                szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip['tipus']);
+                                ?><td></td>
+                                <td></td><?php
+                            }
+                        ?></tr><?php
                     }
                 ?></tbody>
             </table>

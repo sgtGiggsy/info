@@ -116,28 +116,25 @@ else
             FROM switchportok
                 INNER JOIN portok ON switchportok.port = portok.id
                 WHERE eszkoz = $id;");
-        if($epuletid)
-        {
-            $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
-                FROM portok
-                    INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-                WHERE epulet = $epuletid
-                UNION
-                SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
-                FROM portok
-                    INNER JOIN transzportportok ON transzportportok.port = portok.id
-                WHERE epulet = $epuletid
-                UNION
-                SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
-                FROM portok
-                    INNER JOIN switchportok ON portok.id = switchportok.port
-                    INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
-                    INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
-                    INNER JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
-                    INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
-                WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
-                ORDER BY aktiveszkoz, id;");
-        }
+        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
+            FROM portok
+                INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
+            WHERE epulet = $epuletid
+            UNION
+            SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
+            FROM portok
+                INNER JOIN transzportportok ON transzportportok.port = portok.id
+            WHERE epulet = $epuletid
+            UNION
+            SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
+            FROM portok
+                INNER JOIN switchportok ON portok.id = switchportok.port
+                INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
+                INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
+                INNER JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+            WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
+            ORDER BY aktiveszkoz, id;");
         $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
         
         ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/eszkozszerkeszt/$id?tipus=aktiv'\">Eszköz szerkesztése</button>" : "" ?>

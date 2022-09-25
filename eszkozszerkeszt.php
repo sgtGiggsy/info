@@ -12,7 +12,8 @@ else
         $eszkoztipus = $_GET['tipus'];
         switch($eszkoztipus)
         {
-            case "aktiv": $wheretip = "WHERE modellek.tipus < 11"; break;
+            case "aktiv": $wheretip = "WHERE modellek.tipus < 6"; break;
+            case "soho": $wheretip = "WHERE modellek.tipus > 5 AND modellek.tipus < 11"; break;
             case "szamitogep": $wheretip = "WHERE modellek.tipus = 11"; break;
             case "nyomtato": $wheretip = "WHERE modellek.tipus = 12"; break;
             case "vegponti": $wheretip = "WHERE modellek.tipus > 10 AND modellek.tipus < 20"; break;
@@ -49,20 +50,31 @@ else
         $eszkoz = mySQLConnect("SELECT * FROM eszkozok WHERE id = $eszkid;");
         $eszkoz = mysqli_fetch_assoc($eszkoz);
 
-        if($eszkoztipus == "aktiv")
+        if($eszkoztipus == "aktiv" || $eszkoztipus == "soho")
         {
             $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
-            $aktiveszkoz = mySQLConnect("SELECT * FROM aktiveszkozok WHERE eszkoz = $eszkid;");
-            $aktiveszkoz = mysqli_fetch_assoc($aktiveszkoz);
-
-            $mac = @$aktiveszkoz['mac'];
-            $portszam = @$aktiveszkoz['portszam'];
-            $uplinkportok = @$aktiveszkoz['uplinkportok'];
-            $szoftver = @$aktiveszkoz['szoftver'];
+            if($eszkoztipus == "aktiv")
+            {
+                $aktiveszkoz = mySQLConnect("SELECT * FROM aktiveszkozok WHERE eszkoz = $eszkid;");
+                $aktiveszkoz = mysqli_fetch_assoc($aktiveszkoz);
+                $mac = @$aktiveszkoz['mac'];
+                $portszam = @$aktiveszkoz['portszam'];
+                $uplinkportok = @$aktiveszkoz['uplinkportok'];
+                $szoftver = @$aktiveszkoz['szoftver'];
+            }
+            else
+            {
+                $aktiveszkoz = mySQLConnect("SELECT * FROM sohoeszkozok WHERE eszkoz = $eszkid;");
+                $aktiveszkoz = mysqli_fetch_assoc($aktiveszkoz);
+                $mac = @$aktiveszkoz['mac'];
+                $portszam = @$aktiveszkoz['lanportok'];
+                $uplinkportok = @$aktiveszkoz['wanportok'];
+                $szoftver = @$aktiveszkoz['szoftver'];
+            }
 
             ?><div class="oldalcim"><p onclick="rejtMutat('portgeneralas')" style="cursor: pointer">Portok generálása az eszközhöz</p></div>
             <div class="contentcenter" id="portgeneralas" style='display: none'>
-                <form action="<?=$RootPath?>/portdb?action=generate&tipus=switch" method="post" onsubmit="beKuld.disabled = true; return true;">
+                <form action="<?=$RootPath?>/portdb?action=generate&tipus=<?=($eszkoztipus == "switch") ? "switch" : "soho" ?>" method="post" onsubmit="beKuld.disabled = true; return true;">
                     <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$eszkid?>>
                     
                     <div>
@@ -232,7 +244,7 @@ else
             </div><?php
         }
 
-        if($eszkoztipus == "aktiv")
+        if($eszkoztipus == "aktiv" || $eszkoztipus == "soho")
         {
             ?><div>
                 <label for="mac">MAC Address:</label><br>
@@ -240,12 +252,12 @@ else
             </div>
 
             <div>
-                <label for="portszam">Access portok száma:</label><br>
+                <label for="portszam"><?=($eszkoztipus == "aktiv") ? "Access" : "LAN" ?> portok száma:</label><br>
                 <input type="text" accept-charset="utf-8" name="portszam" id="portszam" value="<?=$portszam?>"></input>
             </div>
 
             <div>
-                <label for="uplinkportok">Uplink portok száma:</label><br>
+                <label for="uplinkportok"><?=($eszkoztipus == "aktiv") ? "Uplink" : "WAN" ?> portok száma:</label><br>
                 <input type="text" accept-charset="utf-8" name="uplinkportok" id="uplinkportok" value="<?=$uplinkportok?>"></input>
             </div>
 

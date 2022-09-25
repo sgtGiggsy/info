@@ -93,6 +93,27 @@ if(isset($mindir) && $mindir)
         }
     }
 
+    if($_GET["action"] == "update" && $_GET["tipus"] == "soho")
+    {
+        $stmt = $con->prepare('UPDATE sohoportok SET sebesseg=? WHERE id=?');
+        $stmt->bind_param('si', $_POST['sebesseg'], $_POST['id']);
+        $stmt->execute();
+
+        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=?, csatlakozas=? WHERE id=?');
+        $stmt->bind_param('sssi', $_POST['port'], $_POST['csatlakozo'], $_POST['csatlakozas'], $_POST['portid']);
+        $stmt->execute();
+
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>A port szerkesztése sikertelen!<br></h2>";
+            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
+        {
+            header("Location: $backtosender");
+        }
+    }
+
     elseif($_GET["action"] == "generate" && $_GET["tipus"] == "switch")
     {
         $tipus = "1"; // Tipus 1 = uplink, Tipus 2 = access
@@ -131,6 +152,60 @@ if(isset($mindir) && $mindir)
 
                 $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg, tipus) VALUES (?, ?, ?, ?)');
                 $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['uplportsebesseg'], $tipus);
+                $stmt->execute();
+            }
+        }
+
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>Portok hozzáadása sikertelen!<br></h2>";
+            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
+        {
+            header("Location: $backtosender");
+        }
+    }
+
+    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "soho")
+    {
+        $tipus = "1"; // Tipus 1 = uplink, Tipus 2 = access
+        $csatlakozo = "1";
+        if($_POST['accportpre'])
+        {
+            for($i = $_POST['kezdoacc']; $i <= $_POST['zaroacc']; $i++)
+            {
+                //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
+                $port = $_POST['accportpre'] . $i; //$portsorszam;
+
+                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+                $stmt->bind_param('ss', $port, $csatlakozo);
+                $stmt->execute();
+
+                $last_id = mysqli_insert_id($con);
+
+                $stmt = $con->prepare('INSERT INTO sohoportok (eszkoz, port, sebesseg) VALUES (?, ?, ?)');
+                $stmt->bind_param('sss', $_POST['eszkoz'], $last_id, $_POST['accportsebesseg']);
+                $stmt->execute();
+            }
+        }
+
+        if($_POST['uplportpre'])
+        {
+            for($i = $_POST['kezdoupl']; $i <= $_POST['zaroupl']; $i++)
+            {
+                
+                //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
+                $port = $_POST['uplportpre'] . $i; //$portsorszam;
+
+                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+                $stmt->bind_param('ss', $port, $csatlakozo);
+                $stmt->execute();
+
+                $last_id = mysqli_insert_id($con);
+
+                $stmt = $con->prepare('INSERT INTO sohoportok (eszkoz, port, sebesseg) VALUES (?, ?, ?)');
+                $stmt->bind_param('sss', $_POST['eszkoz'], $last_id, $_POST['uplportsebesseg']);
                 $stmt->execute();
             }
         }
@@ -334,6 +409,26 @@ if(isset($mindir) && $mindir)
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
         else
+        {
+            header("Location: $backtosender");
+        }
+    }
+
+    elseif($_GET["action"] == "clearportassign")
+    {
+        if(!isset($eszkoz))
+        {
+            $eszkoz = $_POST['eszkoz'];
+            $reload = true;
+        }
+        mySQLConnect("UPDATE portok SET csatlakozas = null WHERE csatlakozas IN (
+            SELECT csatlakozas
+            FROM portok
+                LEFT JOIN switchportok ON portok.id = switchportok.port
+                LEFT JOIN sohoportok ON portok.id = sohoportok.port
+            WHERE switchportok.eszkoz = $eszkoz OR sohoportok.eszkoz = $eszkoz)");
+
+        if(@$reload)
         {
             header("Location: $backtosender");
         }

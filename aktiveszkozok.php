@@ -10,7 +10,7 @@ else
     $where = $szuresek['where'];
 
     $mindeneszkoz = mySQLConnect("SELECT
-            DISTINCT eszkozok.id AS id,
+            eszkozok.id AS id,
             sorozatszam,
             gyartok.nev AS gyarto,
             modellek.modell AS modell,
@@ -78,8 +78,6 @@ else
         </thead>
         <tbody><?php
             $nembeepitett = array();
-            $eszkoztip = mysqli_fetch_assoc($mindeneszkoz);
-            $eszktip = @eszkozTipusValaszto($eszkoztip['tipusid']);
             foreach($mindeneszkoz as $eszkoz)
             {
                 if(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
@@ -102,7 +100,7 @@ else
                         <td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
                         if($csoportir)
                         {
-                            szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip); ?>
+                            szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiv"); ?>
                             <td><a href="telnet://<?=$eszkoz['ipcim']?>"><img src='<?=$RootPath?>/images/ssh.png' alt='Eszköz adminisztrálása' title='Eszköz adminisztrálása'/></a></td><?php
                         }
                     ?></tr><?php
@@ -110,7 +108,6 @@ else
             }
             foreach($nembeepitett as $eszkoz)
             {
-                $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
                 ?><tr style='font-weight: normal <?= ($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                     <td><?=$eszkoz['ipcim']?></td>
                     <td><?=$eszkoz['beepitesinev']?></td>
@@ -125,8 +122,7 @@ else
                     <td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
                     if($csoportir)
                     {
-                        szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip); ?>
-                        <td><a href="telnet://<?=$eszkoz['ipcim']?>"><img src='<?=$RootPath?>/images/ssh.png' alt='Eszköz adminisztrálása' title='Eszköz adminisztrálása'/></a></td><?php
+                        szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiv");
                     }
                 ?></tr><?php
             }

@@ -108,8 +108,6 @@ else
     </thead>
     <tbody><?php
         $nembeepitett = array();
-        $eszkoztip = mysqli_fetch_assoc($mindeneszkoz);
-        $eszktip = @eszkozTipusValaszto($eszkoztip['tipusid']);
         foreach($mindeneszkoz as $eszkoz)
         {            
             if(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
@@ -160,7 +158,7 @@ else
                         ?><td><?=($eszkoz['admin']) ? $eszkoz['admin'] : $eszkoz['defadmin'] ?></td>
                         <td><?=($eszkoz['pass']) ? $eszkoz['pass'] : $eszkoz['defpass'] ?></td>
                         <td><?=$eszkoz['megjegyzes']?></td>
-                        <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
+                        <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], "nyomtato");
                     }
                 ?></tr><?php
             }
@@ -211,7 +209,7 @@ else
                     ?><td><?=($eszkoz['admin']) ? $eszkoz['admin'] : $eszkoz['defadmin'] ?></td>
                     <td><?=($eszkoz['pass']) ? $eszkoz['pass'] : $eszkoz['defpass'] ?></td>
                     <td><?=$eszkoz['megjegyzes']?></td>
-                    <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
+                    <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], "nyomtato");
                 }
             ?></tr><?php
         }

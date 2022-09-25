@@ -300,40 +300,53 @@ function alakulatValaszto($ldapres)
 
 function eszkozTipusValaszto($tipusid)
 {
-	if($tipusid < 11)
+	if($tipusid < 6)
 	{
 		$eszktip = "aktiv";
+		$teljesnev =  "aktiveszkoz";
+	}
+	elseif($tipusid < 11)
+	{
+		$eszktip = "soho";
+		$teljesnev = "sohoeszkoz";
 	}
 	elseif($tipusid == 11)
 	{
 		$eszktip = "szamitogep";
+		$teljesnev = "szamitogep";
 	}
 	elseif($tipusid == 12)
 	{
 		$eszktip = "nyomtato";
+		$teljesnev = "nyomtato";
 	}
 	elseif($tipusid < 20)
 	{
 		$eszktip = "vegponti";
+		$teljesnev = "vegponti";
 	}
 	elseif($tipusid < 26)
 	{
 		$eszktip = "mediakonverter";
+		$teljesnev = "mediakonverter";
 	}
 	elseif($tipusid < 31)
 	{
 		$eszktip = "bovitomodul";
+		$teljesnev = "bovitomodul";
 	}
 	elseif($tipusid < 40)
 	{
 		$eszktip = "szerver";
+		$teljesnev = "szerver";
 	}
 	elseif($tipusid == 40)
 	{
 		$eszktip = "telefonkozpont";
+		$teljesnev = "telefonkozpont";
 	}
 
-	return $eszktip;
+	return array("tipus" => $eszktip, "teljes" => $teljesnev);
 }
 
 function eszkozPicker($current, $beepitett)

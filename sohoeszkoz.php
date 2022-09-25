@@ -11,8 +11,8 @@ else
             beepitesek.id AS beepid,
             sorozatszam,
             mac,
-            portszam,
-            uplinkportok,
+            lanportok AS portszam,
+            wanportok AS uplinkportok,
             szoftver,
             alakulatok.nev AS tulajdonos,
             gyartok.nev AS gyarto,
@@ -35,9 +35,10 @@ else
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
             ipcimek.ipcim AS ipcim,
-            raktarak.nev AS raktar
+            raktarak.nev AS raktar,
+            vlanok.nev AS vlan
         FROM eszkozok
-                INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
+                INNER JOIN sohoeszkozok ON eszkozok.id = sohoeszkozok.eszkoz
                 INNER JOIN modellek ON eszkozok.modell = modellek.id
                 INNER JOIN gyartok ON modellek.gyarto = gyartok.id
                 INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
@@ -50,12 +51,13 @@ else
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                 LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
-        WHERE eszkozok.id = $id AND modellek.tipus < 11
+                LEFT JOIN vlanok ON vlanok.id = beepitesek.vlan
+        WHERE eszkozok.id = $id AND modellek.tipus > 5 AND modellek.tipus < 11
         ORDER BY beepitesek.id DESC;");
 
     if(mysqli_num_rows($aktiveszkozok) == 0)
     {
-        echo "Nincs ilyen sorszámú aktív eszköz";
+        echo "Nincs ilyen sorszámú soho eszköz";
     }
     else
     {
@@ -112,9 +114,9 @@ else
         $helyisegid = $eszkoz['helyisegid'];
         $vlanok = mySQLConnect("SELECT * FROM vlanok;");
         $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
-        $switchportok = mySQLConnect("SELECT switchportok.id AS id, allapot, eszkoz, mode, nev, sebesseg, tipus, vlan, portok.port, csatlakozo, portok.id AS portid, csatlakozas
-            FROM switchportok
-                INNER JOIN portok ON switchportok.port = portok.id
+        $switchportok = mySQLConnect("SELECT sohoportok.id AS id, eszkoz, sebesseg, portok.port, csatlakozo, portok.id AS portid, csatlakozas
+            FROM sohoportok
+                INNER JOIN portok ON sohoportok.port = portok.id
                 WHERE eszkoz = $id;");
         if($epuletid)
         {
@@ -122,22 +124,9 @@ else
                 FROM portok
                     INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
                 WHERE epulet = $epuletid
-                UNION
-                SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
-                FROM portok
-                    INNER JOIN transzportportok ON transzportportok.port = portok.id
-                WHERE epulet = $epuletid
-                UNION
-                SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
-                FROM portok
-                    INNER JOIN switchportok ON portok.id = switchportok.port
-                    INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
-                    INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
-                    INNER JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
-                    INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
-                WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
                 ORDER BY aktiveszkoz, id;");
         }
+        
         $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
         
         ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/eszkozszerkeszt/$id?tipus=aktiv'\">Eszköz szerkesztése</button>" : "" ?>
@@ -149,6 +138,8 @@ else
                 <div>Beépítve</div>
                 <div>IP cím</div>
                 <div><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$eszkoz['ipcim']?></a></div>
+                <div>VLAN</div>
+                <div><?=$eszkoz['vlan']?></div>
                 <div>Beépítési név</div>
                 <div><?=$eszkoz['beepitesinev']?></div>
                 <div>Beépítés helye</div>
@@ -181,9 +172,9 @@ else
             <div><?=$eszkoz['mac']?></div>
             <div>Szoftver</div>
             <div><?=$eszkoz['szoftver']?></div>
-            <div>Access portok</div>
+            <div>LAN portok</div>
             <div><?=$eszkoz['portszam']?></div>
-            <div>Uplink portok</div>
+            <div>WAN portok</div>
             <div><?=$eszkoz['uplinkportok']?></div>
             <div>Tulajdonos</div>
             <div><?=$eszkoz['tulajdonos']?></div>
@@ -230,14 +221,9 @@ else
             <thead>
                 <tr>
                     <th class="tsorth" onclick="sortTable(0, 's', 'switchportok')">Port</th>
-                    <th class="tsorth" onclick="sortTable(1, 's', 'switchportok')">Név</th>
-                    <th class="tsorth" onclick="sortTable(2, 's', 'switchportok')">VLAN</th>
-                    <th class="tsorth" onclick="sortTable(3, 's', 'switchportok')">Állapot</th>
-                    <th class="tsorth" onclick="sortTable(4, 's', 'switchportok')">Sebesség</th>
-                    <th class="tsorth" onclick="sortTable(5, 's', 'switchportok')">Port Mód</th>
-                    <th class="tsorth" onclick="sortTable(6, 's', 'switchportok')">Tipus</th>
-                    <th class="tsorth" onclick="sortTable(7, 's', 'switchportok')">Csatlakozó</th>
-                    <th class="tsorth" onclick="sortTable(8, 's', 'switchportok')">Végpont</th>
+                    <th class="tsorth" onclick="sortTable(1, 's', 'switchportok')">Sebesség</th>
+                    <th class="tsorth" onclick="sortTable(2, 's', 'switchportok')">Csatlakozó</th>
+                    <th class="tsorth" onclick="sortTable(3, 's', 'switchportok')">Végpont</th>
                 </tr>
             </thead>
             <tbody><?php
@@ -249,22 +235,6 @@ else
                             <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
                             <input type ="hidden" id="portid" name="portid" value=<?=$port['portid']?>>
                             <td><input style="width: 10ch;" type="text" name="port" value="<?=$port['port']?>"></td>
-                            <td><input style="width: 16ch;" type="text" name="nev" value="<?=$port['nev']?>"></td>
-                            <td>
-                                <select name="vlan">
-                                    <option value=""></option><?php
-                                    foreach($vlanok as $x)
-                                    {
-                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['vlan']) ? "selected" : "" ?>><?=$x['id'] . " " . $x['nev']?></option><?php
-                                    }
-                                ?></select>
-                            </td>
-                            <td>
-                                <select name="allapot">
-                                    <option value="0" <?=($port['allapot'] == "0") ? "selected" : "" ?>>Letiltva</option>
-                                    <option value="1" <?=($port['allapot'] == "1") ? "selected" : "" ?>>Engedélyezve</option>
-                                </select>
-                            </td>
                             <td>
                                 <select name="sebesseg">
                                     <option value=""></option><?php
@@ -273,18 +243,6 @@ else
                                         ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['sebesseg']) ? "selected" : "" ?>><?=$x['sebesseg']?></option><?php
                                     }
                                 ?></select>
-                            </td>
-                            <td>
-                                <select name="mode">
-                                    <option value="1" <?=($port['mode'] == "1") ? "selected" : "" ?>>Trunk</option>
-                                    <option value="2" <?=($port['mode'] == "2") ? "selected" : "" ?>>Access</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="tipus">
-                                    <option value="1" <?=($port['tipus'] == "1") ? "selected" : "" ?>>Uplink</option>
-                                    <option value="2" <?=($port['tipus'] == "2") ? "selected" : "" ?>>Access</option>
-                                </select>
                             </td>
                             <td>
                                 <select name="csatlakozo">
@@ -326,7 +284,7 @@ else
         $.ajax({
         type: "POST",
         data: dataString,
-        url: "<?=$RootPath?>/portdb?action=update&tipus=switch",
+        url: "<?=$RootPath?>/portdb?action=update&tipus=soho",
         success: function () {
             showToaster("Port szerkesztése sikeres...");
         }

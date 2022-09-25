@@ -77,8 +77,6 @@ else
         </thead>
         <tbody><?php
             $nembeepitett = array();
-            $eszkoztip = mysqli_fetch_assoc($mindeneszkoz);
-            $eszktip = @eszkozTipusValaszto($eszkoztip['tipusid']);
             foreach($mindeneszkoz as $eszkoz)
             {
                 if(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
@@ -87,7 +85,7 @@ else
                 }
                 else
                 {
-                    ?><tr class='kattinthatotr' data-href='./<?=$eszktip?>/<?=$eszkoz['id']?>'>
+                    ?><tr class='kattinthatotr' data-href='./bovitomodul/<?=$eszkoz['id']?>'>
                         <td><?=$eszkoz['gyarto']?></td>
                         <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
                         <td><?=$eszkoz['sorozatszam']?></td>
@@ -99,7 +97,7 @@ else
                         if($csoportir)
                         {
                             ?><td><?=$eszkoz['megjegyzes']?></td>
-                            <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
+                            <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], "bovitomodul");
                         }
                     ?></tr><?php
                 }
@@ -118,7 +116,7 @@ else
                     if($csoportir)
                     {
                         ?><td><?=$eszkoz['megjegyzes']?></td>
-                        <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
+                        <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], "bovitomodul");
                     }
                 ?></tr><?php
             }

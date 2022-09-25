@@ -11,6 +11,7 @@ else
 
     $mindeneszkoz = mySQLConnect("SELECT
             eszkozok.id AS id,
+            beepitesek.id AS beepid,
             sorozatszam,
             gyartok.nev AS gyarto,
             modellek.modell AS modell,
@@ -84,16 +85,9 @@ else
         
 
         $eszkid = $eszkoz['id'];
-        if($eszkoz['tipusid'] < 11)
-        {
-            $eszktip = "aktiveszkoz";
-        }
-        else
-        {
-            $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
-        }
+        $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
 
-        ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal " . (($eszkoz['hibas']) ? "; text-decoration: line-through'" : "'" ) : "" ?> class='kattinthatotr' data-href='./<?=$eszktip?>/<?=$eszkoz['id']?>'>
+        ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal " . (($eszkoz['hibas']) ? "; text-decoration: line-through'" : "'" ) : "" ?> class='kattinthatotr' data-href='./<?=$eszktip['teljes']?>/<?=$eszkoz['id']?>'>
             <td><?=$eszkoz['ipcim']?></td>
             <td><?=$eszkoz['beepitesinev']?></td>
             <td><?=$eszkoz['gyarto']?></td>
@@ -107,8 +101,13 @@ else
             <td nowrap><?=timeStampToDate($eszkoz['kiepitesideje'])?></td><?php
             if($csoportir)
             {
-                ?><td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td>
-                <td><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
+                ?><td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
+                if($csoportir)
+                {
+                    szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip['tipus']);
+                    ?><td></td>
+                    <td></td><?php
+                }
             }
         ?></tr><?php
     }

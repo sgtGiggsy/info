@@ -68,9 +68,7 @@ else
 
         $eszkoztipus = mySQLConnect("SELECT tipus FROM eszkozok INNER JOIN modellek ON eszkozok.modell = modellek.id WHERE eszkozok.id = $beepeszk");
         $tip = mysqli_fetch_assoc($eszkoztipus);
-        $tipus = eszkozTipusValaszto($tip['tipus']);
-
-        
+        $tipus = eszkozTipusValaszto($tip['tipus'])['tipus'];
 
         $button = "Szerkesztés";
 
@@ -85,7 +83,7 @@ else
     ?><div class="oldalcim">Eszköz beépítése</div>
     <div class="contentcenter"><?php
 
-    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "telefonkozpont")
+    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "soho")
     {
         
         ?><div>
@@ -94,7 +92,7 @@ else
         </div><?php
     }
     
-    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato")
+    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "soho")
     {
         ?><div>
             <label for="ipcim">IP cím:</label><br>
@@ -110,12 +108,12 @@ else
 
     eszkozPicker($beepeszk, ($beepid) ? true : false);
 
-    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "mediakonverter")
+    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "mediakonverter" || $tipus == "soho")
     {
         helyisegPicker($beephely, "helyiseg");
     }
 
-    if(!$tipus || $tipus == "aktiv" || $tipus == "mediakonverter")
+    if(!$tipus || $tipus == "aktiv" || $tipus == "mediakonverter" || $tipus == "soho")
     {
         rackPicker($beeprack);
     }
@@ -134,7 +132,7 @@ else
         </div><?php
     }
 
-    if(!$tipus || $tipus == "aktiv" || $tipus == "mediakonverter")
+    if(!$tipus || $tipus == "aktiv" || $tipus == "mediakonverter" || $tipus == "soho")
     {
         vlanPicker($vlan);
     }
@@ -157,7 +155,7 @@ else
         <input type="datetime-local" id="kiepitesideje" name="kiepitesideje" value="<?=timeStampToDateTimeLocal($beepkiep)?>"><button style="margin-left: 10px;" onclick="getMa('kiepitesideje'); return false;">Most</button>
     </div><?php
 
-    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato")
+    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "soho")
     {
         ?><div>
             <label for="admin">Admin user:</label><br>
@@ -176,8 +174,17 @@ else
     </div>
 
     <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
-    </form><?php
+    </form>
+    <?php
     cancelForm();
+    if(isset($_GET['id']) && (!$tipus || $tipus == "aktiv" || $tipus == "soho"))
+    {
+        ?><br>
+        <form action="<?=$RootPath?>/portdb&action=clearportassign" method="post" onsubmit="return confirm('Figyelem!!!\nEzzel a switch ÖSSZES porthozzárendelését törlöd, nem csak a jelen beépítéshez tartozókat!\nBiztosan törölni szeretnéd a switch porthozzárendeléseit?');">
+            <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$beepeszk?>>
+            <div class="submit"><input type="submit" name="beKuld" value="Porthozzárendelések törlése"></div>
+        </form><?php
+    }
 ?></div>
 <script>
     function getMa(dateselect)
