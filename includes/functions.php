@@ -623,7 +623,7 @@ function getWhere($eszktip)
 
 function keszletFilter($action, $filter)
 {
-	?><div class="right">
+	?><div class="szuresvalaszto">
 		<form action="<?=$action?>" method="GET">
 			<label for="szures" style="font-size: 14px">Szűrés</label>
 				<select id="szures" name="szures" onchange="this.form.submit()">
@@ -641,12 +641,12 @@ function szerkSor($beepid, $eszkid, $eszktip)
 {
 	$RootPath = getenv('APP_ROOT_PATH');
 
-	?><td><?php
+	?><td class="dontprint"><?php
 	if($beepid)
 	{
 		?><a href='<?=$RootPath?>/beepites/<?=$beepid?>'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
 	}
 	?></td>
-	<td><a href='<?=$RootPath?>/beepites?eszkoz=<?=$eszkid?>'><img src='<?=$RootPath?>/images/newbeep.png' alt='Új beépítés' title='Új beépítés' /></a></td>
-	<td><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
+	<td class="dontprint"><a href='<?=$RootPath?>/beepites?eszkoz=<?=$eszkid?>&tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/newbeep.png' alt='Új beépítés' title='Új beépítés' /></a></td>
+	<td class="dontprint"><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
 }

@@ -193,8 +193,8 @@ else
         var dd = String(today.getDate()).padStart(2, '0');
         var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
         var yyyy = today.getFullYear();
-        var hour = today.getHours();
-        var minute = today.getMinutes();
+        var hour = String(today.getHours()).padStart(2, '0');
+        var minute = String(today.getMinutes()).padStart(2, '0');
 
         today = yyyy + '-' + mm + '-' + dd + ' ' + hour + ':' + minute;
         document.getElementById(dateselect).value = today;

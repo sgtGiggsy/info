@@ -157,6 +157,18 @@
 			});
 	});
 
+	$(document).ready(function($) {
+		$(".kattinthatotr-1").click(function() {
+		window.document.location = $(this).data("href");
+			});
+	});
+
+	$(document).ready(function($) {
+		$(".kattinthatotr-2").click(function() {
+		window.document.location = $(this).data("href");
+			});
+	});
+
 	function rejtMutat(id) {
 		if(document.getElementById(id).style.display == "block")
 		{

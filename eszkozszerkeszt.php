@@ -74,7 +74,7 @@ else
 
             ?><div class="oldalcim"><p onclick="rejtMutat('portgeneralas')" style="cursor: pointer">Portok generálása az eszközhöz</p></div>
             <div class="contentcenter" id="portgeneralas" style='display: none'>
-                <form action="<?=$RootPath?>/portdb?action=generate&tipus=<?=($eszkoztipus == "switch") ? "switch" : "soho" ?>" method="post" onsubmit="beKuld.disabled = true; return true;">
+                <form action="<?=$RootPath?>/portdb?action=generate&tipus=<?=($eszkoztipus == "aktiv") ? "switch" : "soho" ?>" method="post" onsubmit="beKuld.disabled = true; return true;">
                     <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$eszkid?>>
                     
                     <div>

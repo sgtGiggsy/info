@@ -34,7 +34,7 @@
     }
 
     .PrintArea, .PrintArea * {
-        visibility: visible;
+       visibility: visible;
     }
 
     .PrintArea {
@@ -42,6 +42,25 @@
         position: absolute;
         left: 0;
         top: 0;
+    }
+
+    .dontprint, .dontprint td, .dontprint th, .szuresvalaszto {
+        visibility: hidden !important;
+        display: none;
+    }
+
+    th {
+        color-adjust: exact;
+        background-color: #888;
+    }
+
+    .kattinthatotr-1 {
+        color-adjust: exact;
+    }
+    
+    .kattinthatotr-2 {
+        background-color: #ddd !important;
+        color-adjust: exact;
     }
 
     @page {
@@ -236,6 +255,12 @@ button:hover, .submit input:hover {
     grid-row-end: 4;
 }
 
+.PrintArea {
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+}
+
 /*
 .footer {
     grid-column-start: 2;
@@ -269,6 +294,13 @@ button:hover, .submit input:hover {
 
 .contentcenter div, .column div {
     padding: 1em 0 0 0;
+}
+
+.szuresvalaszto {
+    position: relative;
+    float: right;
+    text-align: right;
+    padding-top: 0px;
 }
 
 .column {
@@ -330,6 +362,19 @@ tr a, td a, th a {
 
 .kattinthatotr {
     cursor:pointer;
+    color: #000;
+    font-weight: bold;
+}
+
+.kattinthatotr-1 {
+    cursor:pointer;
+    color: #000;
+    font-weight: bold;
+}
+
+.kattinthatotr-2 {
+    cursor:pointer;
+    background-color: #bbb;
     color: #000;
     font-weight: bold;
 }
@@ -666,6 +711,8 @@ label {
 }
 
 .oldalcim {
+    position: relative;
+    height: 1.6em;
     font-size: 1.5em;
     font-weight: bold;
     padding: 3px;

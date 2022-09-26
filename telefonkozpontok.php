@@ -47,41 +47,45 @@ else
 
     <?php
     $tipus = "telefonkozpontok";
-    ?><table id="<?=$tipus?>">
-    <thead>
-        <tr>
-            <th class="tsorth" onclick="sortTable(0, 's', '<?=$tipus?>')">Eszköznév</th>
-            <th class="tsorth" onclick="sortTable(1, 's', '<?=$tipus?>')">Gyártó</th>
-            <th class="tsorth" onclick="sortTable(2, 's', '<?=$tipus?>')">Modell</th>
-            <th class="tsorth" onclick="sortTable(3, 's', '<?=$tipus?>')">Sorozatszám</th>
-            <th class="tsorth" onclick="sortTable(4, 's', '<?=$tipus?>')">Épület</th>
-            <th class="tsorth" onclick="sortTable(5, 's', '<?=$tipus?>')">Helyiség</th><?php
-            if($csoportir)
-            {
-                ?><th class="tsorth" onclick="sortTable(6, 's', '<?=$tipus?>')">Megjegyzés</th>
-                <th></th>
-                <th></th>
-                <th></th><?php
-            }
-        ?></tr>
-    </thead>
-    <tbody><?php
-        foreach($telefonkozpontok as $kozpont)
-        {
-            ?><tr <?=(!($kozpont['beepitesideje'] && !$kozpont['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./telefonkozpont/<?=$kozpont['id']?>'>
-                <td><?=$kozpont['beepitesinev']?></td>
-                <td nowrap><?=$kozpont['gyarto']?></td>
-                <td nowrap><?=$kozpont['modell']?><?=$kozpont['varians']?></td>
-                <td><?=$kozpont['sorozatszam']?></td>
-                <td><?=$kozpont['epuletszam']?> <?=($kozpont['epuletnev']) ? "(" . $kozpont['epuletnev'] . ")" : "" ?></td>
-                <td><?=$kozpont['helyisegszam']?> <?=($kozpont['helyisegnev']) ? "(" . $kozpont['helyisegnev'] . ")" : "" ?></td><?php
+    $szamoz = 1;
+    ?><div class="PrintArea">
+        <table id="<?=$tipus?>">
+        <thead>
+            <tr>
+                <th class="tsorth" onclick="sortTable(0, 's', '<?=$tipus?>')">Eszköznév</th>
+                <th class="tsorth" onclick="sortTable(1, 's', '<?=$tipus?>')">Gyártó</th>
+                <th class="tsorth" onclick="sortTable(2, 's', '<?=$tipus?>')">Modell</th>
+                <th class="tsorth" onclick="sortTable(3, 's', '<?=$tipus?>')">Sorozatszám</th>
+                <th class="tsorth" onclick="sortTable(4, 's', '<?=$tipus?>')">Épület</th>
+                <th class="tsorth" onclick="sortTable(5, 's', '<?=$tipus?>')">Helyiség</th><?php
                 if($csoportir)
                 {
-                    ?><td><?=$kozpont['megjegyzes']?></td><?php
-                    szerkSor($kozpont['beepid'], $kozpont['id'], "telefonkozpont");
+                    ?><th class="tsorth" onclick="sortTable(6, 's', '<?=$tipus?>')">Megjegyzés</th>
+                    <th class="dontprint"></th>
+                    <th class="dontprint"></th>
+                    <th class="dontprint"></th><?php
                 }
-            ?></tr><?php
-        }
-        ?></tbody>
-    </table><?php
+            ?></tr>
+        </thead>
+        <tbody><?php
+            foreach($telefonkozpontok as $kozpont)
+            {
+                ?><tr <?=(!($kozpont['beepitesideje'] && !$kozpont['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./telefonkozpont/<?=$kozpont['id']?>'>
+                    <td><?=$kozpont['beepitesinev']?></td>
+                    <td nowrap><?=$kozpont['gyarto']?></td>
+                    <td nowrap><?=$kozpont['modell']?><?=$kozpont['varians']?></td>
+                    <td><?=$kozpont['sorozatszam']?></td>
+                    <td><?=$kozpont['epuletszam']?> <?=($kozpont['epuletnev']) ? "(" . $kozpont['epuletnev'] . ")" : "" ?></td>
+                    <td><?=$kozpont['helyisegszam']?> <?=($kozpont['helyisegnev']) ? "(" . $kozpont['helyisegnev'] . ")" : "" ?></td><?php
+                    if($csoportir)
+                    {
+                        ?><td><?=$kozpont['megjegyzes']?></td><?php
+                        szerkSor($kozpont['beepid'], $kozpont['id'], "telefonkozpont");
+                    }
+                ?></tr><?php
+                $szamoz++;
+            }
+            ?></tbody>
+        </table>
+    </div><?php
 }
