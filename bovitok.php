@@ -31,8 +31,8 @@ else
             portok.port AS portnev,
             switchportok.eszkoz AS swpeszk,
             hibas,
-            (SELECT nev FROM beepitesek WHERE eszkoz = swpeszk) AS switch,
-            (SELECT ipcimek.ipcim AS ip FROM ipcimek INNER JOIN beepitesek ON ipcimek.id = beepitesek.ipcim WHERE beepitesek.eszkoz = swpeszk) AS switchip
+            (SELECT nev FROM beepitesek WHERE eszkoz = swpeszk ORDER BY beepitesek.id DESC LIMIT 1) AS switch,
+            (SELECT ipcimek.ipcim AS ip FROM ipcimek INNER JOIN beepitesek ON ipcimek.id = beepitesek.ipcim WHERE beepitesek.eszkoz = swpeszk ORDER BY beepitesek.id LIMIT 1) AS switchip
         FROM eszkozok
                 INNER JOIN modellek ON eszkozok.modell = modellek.id
                 INNER JOIN bovitomodellek ON bovitomodellek.modell = modellek.id

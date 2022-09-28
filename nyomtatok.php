@@ -162,7 +162,7 @@ else
                             <td><?=($eszkoz['pass']) ? $eszkoz['pass'] : $eszkoz['defpass'] ?></td>
                             <td><?=$eszkoz['megjegyzes']?></td>
                             <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], "nyomtato"); ?>
-                            <td class="dontprint"><a href="http://<?=$eszkoz['ipcim']?>" onclick='window.open("http://<?=$eszkoz['ipcim']?>"); return false;'><img src='<?=$RootPath?>/images/webmanage.png' alt='Webes adminisztráció' title='Webes adminisztráció'/></a></td><?php
+                            <td class="dontprint"><a href="" onclick='window.open("http://<?=$eszkoz['ipcim']?>");'><img src='<?=$RootPath?>/images/webmanage.png' alt='Webes adminisztráció' title='Webes adminisztráció'/></a></td><?php
                         }
                     ?></tr><?php
                     $szamoz++;

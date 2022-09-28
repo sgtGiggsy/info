@@ -1,4 +1,8 @@
 <?php
+?><div class="headlogo" id="headlogo">
+    <img src="<?=$RootPath?>/images/headlogo.png">
+</div><?php
+
 if(isset($enablekeres) && $enablekeres)
 {
     ?><div class="kereses" id="kereses">

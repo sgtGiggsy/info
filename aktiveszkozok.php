@@ -44,7 +44,7 @@ else
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
             LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
         WHERE $where
-        ORDER BY telephely, epuletek.szam + 1, helyisegszam, pozicio, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
+        ORDER BY telephely, epuletek.szam + 1, helyisegszam, rack, pozicio, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
     if($mindir) 
     {
