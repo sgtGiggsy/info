@@ -116,6 +116,18 @@ else
             FROM switchportok
                 INNER JOIN portok ON switchportok.port = portok.id
                 WHERE eszkoz = $id;");
+        $bovitok = mySQLConnect("SELECT eszkozok.id AS bovid, portok.id AS portid, portok.port AS port, modellek.modell AS modell, gyartok.nev AS gyarto, sorozatszam, atviteliszabvanyok.nev AS szabvany, sebessegek.sebesseg AS sebessegek
+                FROM eszkozok
+                INNER JOIN modellek ON eszkozok.modell = modellek.id
+                INNER JOIN bovitomodellek ON modellek.id = bovitomodellek.modell
+                INNER JOIN sebessegek ON bovitomodellek.transzpsebesseg = sebessegek.id
+                INNER JOIN atviteliszabvanyok ON bovitomodellek.transzpszabvany = atviteliszabvanyok.id
+                INNER JOIN gyartok ON modellek.gyarto = gyartok.id
+                INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+                INNER JOIN portok ON beepitesek.switchport = portok.id
+                INNER JOIN switchportok ON portok.id = switchportok.port
+            WHERE switchportok.eszkoz = $id
+            ORDER BY portok.id;");
         if($epuletid)
         {
             $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
@@ -186,7 +198,21 @@ else
             <div>Uplink portok</div>
             <div><?=$eszkoz['uplinkportok']?></div>
             <div>Tulajdonos</div>
-            <div><?=$eszkoz['tulajdonos']?></div>
+            <div><?=($eszkoz['tulajdonos']) ? $eszkoz['tulajdonos'] : "Nem ismert" ?></div>
+            <div>Bővítők</div>
+            <div><?php
+            if(mysqli_num_rows($bovitok))
+            {
+                foreach($bovitok as $x)
+                {
+                    echo $x['port'] . " - " . $x['gyarto'] . " " . $x['modell'] . " " . $x['szabvany'] . "<br>";
+                }
+            }
+            else
+            {
+                echo "Nincs csatlakoztatott bővítő";
+            }
+            ?></div>
         </div><?php
 
         if(mysqli_num_rows($aktiveszkozok) > 1 || $eszkoz['kiepitesideje'])
@@ -241,9 +267,10 @@ else
                 </tr>
             </thead>
             <tbody><?php
+                $szamoz = 1;
                 foreach($switchportok as $port)
                 {
-                    ?><tr>
+                    ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
                         <!--<form action="">-->
                         <form action="?page=portdb&action=update&tipus=switch" method="post">
                             <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
@@ -311,9 +338,10 @@ else
                                     }
                                 ?></select>
                             </td>
-                            <td><input type="submit" value="Módosítás"></td>
+                            <td style="width: 6.5em"><input type="submit" value="Módosítás"></td>
                         </form>
                     </tr><?php
+                    $szamoz++;
                 }
             ?></tbody>
         </table><?php

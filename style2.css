@@ -182,7 +182,7 @@ ol, ul {
     padding-left: 0px;
 }
 
-button, .submit input {
+button, .submit input, input[type="submit"] {
     max-width: max-content;
     font-family: "roboto";
     font-size: 1em;
@@ -197,7 +197,7 @@ button, .submit input {
     background-image: none;
 }
 
-button:hover, .submit input:hover {
+button:hover, .submit input:hover, input[type="submit"]:hover {
     background-color: #1c4663;
     /*box-shadow: 0px 0px 5px 1px #012c49;*/
 }
@@ -370,23 +370,29 @@ tr a, td a, th a {
     text-decoration: none;
 }
 
-.kattinthatotr {
+.valtottsor-1, .kattinthatotr, .kattinthatotr-1 {
+    color: #000;
+    font-weight: bold;
+}
+
+.kattinthatotr, .kattinthatotr-1 {
     cursor:pointer;
     color: #000;
     font-weight: bold;
 }
 
-.kattinthatotr-1 {
-    cursor:pointer;
+.valtottsor-2, .kattinthatotr-2 {
+    background-color: #bbb;
     color: #000;
     font-weight: bold;
+}
+
+.valtottsor-1 select, .valtottsor-1 input[type="text"], .valtottsor-2 select, .valtottsor-2 input[type="text"] {
+    background: none;
 }
 
 .kattinthatotr-2 {
     cursor:pointer;
-    background-color: #bbb;
-    color: #000;
-    font-weight: bold;
 }
 
 a {

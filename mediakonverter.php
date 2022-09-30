@@ -109,7 +109,7 @@ else
         
         <div class="infobox">
             <div>Tulajdonos</div>
-            <div><?=$eszkoz['tulajdonos']?></div>
+            <div><?=($eszkoz['tulajdonos']) ? $eszkoz['tulajdonos'] : "Nem ismert" ?></div>
             <div>Sorozatszám</div>
             <div><?=$eszkoz['sorozatszam']?></div>
             <div>Megjegyzés</div>
