@@ -40,7 +40,7 @@ if(isset($mindir) && $mindir)
             $stmt->execute();
         }
 
-        if(mysqli_num_rows($iftulportchange) == 1)
+        if(!$tulportid && mysqli_num_rows($iftulportchange) == 1)
         {
             $oldportid = mysqli_fetch_assoc($iftulportchange)['id'];
             $null = null;
