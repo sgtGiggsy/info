@@ -72,6 +72,11 @@ else
         ?><form action="<?=$RootPath?>/beepites&action=new" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
     }
 
+    if(!$switchport)
+    {
+        $switchport = 0;
+    }
+
     $switchportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
     FROM portok
         INNER JOIN switchportok ON portok.id = switchportok.port
@@ -80,11 +85,13 @@ else
         LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
         LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
         LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
-    WHERE switchportok.tipus = 1 AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL) AND ((SELECT count(id) FROM beepitesek WHERE switchport = portok.id) = 0 OR (SELECT count(id) FROM beepitesek WHERE eszkoz <> $beepeszk) = 1)
+    WHERE switchportok.tipus = 1 AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL) AND ((SELECT count(id) FROM beepitesek WHERE switchport = portok.id) = 0 OR portok.id = $switchport)
     ORDER BY telephely, epuletek.szam + 1, helyisegszam, pozicio, aktiveszkoz, id;");
 
     ?><div class="oldalcim">Eszköz beépítése</div>
     <div class="contentcenter"><?php
+
+    eszkozPicker($beepeszk, ($beepid) ? true : false);
 
     if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "soho")
     {
@@ -109,10 +116,9 @@ else
         </div><?php
     }
 
-    eszkozPicker($beepeszk, ($beepid) ? true : false);
-
     if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "mediakonverter" || $tipus == "soho")
     {
+        
         helyisegPicker($beephely, "helyiseg");
     }
 

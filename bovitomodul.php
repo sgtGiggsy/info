@@ -1,65 +1,56 @@
 <?php
 
-if(!@$mindolvas)
+if(!@$csoportir)
 {
 	echo "Nincs jogosultsága az oldal megtekintésére!";
 }
 else
 {
-    $aktiveszkozok = mySQLConnect("SELECT
+    $bovitok = mySQLConnect("SELECT
             eszkozok.id AS id,
             beepitesek.id AS beepid,
+            (SELECT switchportok.eszkoz
+                FROM switchportok
+                    INNER JOIN beepitesek ON beepitesek.switchport = switchportok.port
+                WHERE beepitesek.id = beepid) AS switchid,
             sorozatszam,
-            mac,
-            portszam,
-            uplinkportok,
-            szoftver,
             alakulatok.nev AS tulajdonos,
             gyartok.nev AS gyarto,
             modellek.modell AS modell,
             varians,
-            epuletek.id AS epuletid,
-            eszkoztipusok.nev AS tipus,
-            epuletek.nev AS epuletnev,
-            epuletek.szam AS epuletszam,
-            epulettipusok.tipus AS epulettipus,
-            telephelyek.telephely AS telephely,
-            telephelyek.id AS thelyid,
-            helyisegek.id AS helyisegid,
-            helyisegszam,
-            helyisegnev,
             beepitesideje,
             kiepitesideje,
             alakulatok.rovid AS tulajdonos,
-            rackszekrenyek.id AS rackid,
-            rackszekrenyek.nev AS rack,
-            beepitesek.nev AS beepitesinev,
-            ipcimek.ipcim AS ipcim,
-            raktarak.nev AS raktar
+            raktarak.nev AS raktar,
+            portok.port AS portnev,
+            fizikairetegek.nev AS fizikaireteg,
+            atviteliszabvanyok.nev AS szabvany,
+            sebessegek.sebesseg AS sebesseg,
+            csatlakozotipusok.nev AS csatlakozo
         FROM eszkozok
-                INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
                 INNER JOIN modellek ON eszkozok.modell = modellek.id
+                INNER JOIN bovitomodellek ON modellek.id = bovitomodellek.modell
                 INNER JOIN gyartok ON modellek.gyarto = gyartok.id
                 INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
                 LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
-                LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
-                LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
-                LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
-                LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
-                LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
-                LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
+                LEFT JOIN portok ON beepitesek.switchport = portok.id
                 LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
-        WHERE eszkozok.id = $id AND modellek.tipus < 11
+                LEFT JOIN fizikairetegek ON bovitomodellek.fizikaireteg = fizikairetegek.id
+                LEFT JOIN atviteliszabvanyok ON bovitomodellek.transzpszabvany = atviteliszabvanyok.id
+                LEFT JOIN sebessegek ON bovitomodellek.transzpsebesseg = sebessegek.id
+                LEFT JOIN csatlakozotipusok ON bovitomodellek.transzpcsatlakozo = csatlakozotipusok.id
+        WHERE eszkozok.id = $id AND modellek.tipus > 25 AND modellek.tipus < 31
         ORDER BY beepitesek.id DESC;");
 
-    if(mysqli_num_rows($aktiveszkozok) == 0)
+    if(mysqli_num_rows($bovitok) == 0)
     {
         echo "Nincs ilyen sorszámú aktív eszköz";
     }
     else
     {
-        $eszkoz = mysqli_fetch_assoc($aktiveszkozok);
+        $eszkoz = mysqli_fetch_assoc($bovitok);
+        $akteszkid = $eszkoz['switchid'];
 
         ?><div class="breadcumblist">
             <ol vocab="https://schema.org/" typeof="BreadcrumbList">
@@ -69,89 +60,133 @@ else
                     <span property="name">Kecskemét Informatika</span></a>
                     <meta property="position" content="1">
                 </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
-                    <span property="name"><?=$eszkoz['telephely']?></span></a>
-                    <meta property="position" content="2">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
-                    <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
-                    <meta property="position" content="3">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
-                    <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
-                    <meta property="position" content="4">
-                </li>
-                <?php if($eszkoz['rackid'])
+                <li><b>></b></li><?php
+
+                if($akteszkid)
                 {
-                    ?><li><b>></b></li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage"
-                            href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
-                        <span property="name"><?=$eszkoz['rack']?></span></a>
+                    $aktiveszkozok = mySQLConnect("SELECT
+                        eszkozok.id AS id,
+                        beepitesek.id AS beepid,
+                        sorozatszam,
+                        mac,
+                        portszam,
+                        uplinkportok,
+                        szoftver,
+                        alakulatok.nev AS tulajdonos,
+                        gyartok.nev AS gyarto,
+                        modellek.modell AS modell,
+                        varians,
+                        epuletek.id AS epuletid,
+                        eszkoztipusok.nev AS tipus,
+                        epuletek.nev AS epuletnev,
+                        epuletek.szam AS epuletszam,
+                        epulettipusok.tipus AS epulettipus,
+                        telephelyek.telephely AS telephely,
+                        telephelyek.id AS thelyid,
+                        helyisegek.id AS helyisegid,
+                        helyisegszam,
+                        helyisegnev,
+                        beepitesideje,
+                        kiepitesideje,
+                        alakulatok.rovid AS tulajdonos,
+                        rackszekrenyek.id AS rackid,
+                        rackszekrenyek.nev AS rack,
+                        beepitesek.nev AS beepitesinev,
+                        ipcimek.ipcim AS ipcim,
+                        raktarak.nev AS raktar
+                        FROM eszkozok
+                            INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
+                            INNER JOIN modellek ON eszkozok.modell = modellek.id
+                            INNER JOIN gyartok ON modellek.gyarto = gyartok.id
+                            INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
+                            LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+                            LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                            LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+                            LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+                            LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
+                            LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
+                            LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
+                            LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                            LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
+                        WHERE eszkozok.id = $akteszkid AND modellek.tipus < 11
+                        ORDER BY beepitesek.id DESC;");
+                    
+                    $aktiveszkoz = mysqli_fetch_assoc($aktiveszkozok);
+
+                    ?>
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage"
+                                href="<?=$RootPath?>/epuletek/<?=$aktiveszkoz['thelyid']?>">
+                            <span property="name"><?=$aktiveszkoz['telephely']?></span></a>
+                            <meta property="position" content="2">
+                        </li>
+                        <li><b>></b></li>
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage"
+                                href="<?=$RootPath?>/epulet/<?=$aktiveszkoz['epuletid']?>">
+                            <span property="name"><?=$aktiveszkoz['epuletszam']?>. <?=$aktiveszkoz['epulettipus']?></span></a>
+                            <meta property="position" content="3">
+                        </li>
+                        <li><b>></b></li>
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage"
+                                href="<?=$RootPath?>/helyiseg/<?=$aktiveszkoz['helyisegid']?>">
+                            <span property="name"><?=$aktiveszkoz['helyisegszam']?> (<?=$aktiveszkoz['helyisegnev']?>)</span></a>
+                            <meta property="position" content="4">
+                        </li>
+                        <?php if($aktiveszkoz['rackid'])
+                        {
+                            ?><li><b>></b></li>
+                            <li property="itemListElement" typeof="ListItem">
+                                <a property="item" typeof="WebPage"
+                                    href="<?=$RootPath?>/rack/<?=$aktiveszkoz['rackid']?>">
+                                <span property="name"><?=$aktiveszkoz['rack']?></span></a>
+                                <meta property="position" content="4">
+                            </li><?php
+                        }
+                        ?><li><b>></b></li>
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage"
+                                href="<?=$RootPath?>/aktiveszkoz/<?=$aktiveszkoz['id']?>">
+                            <span property="name"><?=$aktiveszkoz['beepitesinev']?> (<?=$aktiveszkoz['ipcim']?>)</span></a>
+                            <meta property="position" content="4">
+                        </li>
+                        <li><b>></b></li>
+                        <li property="itemListElement" typeof="ListItem">
+                            <span property="name"><?=$eszkoz['portnev']?></span>
+                            <meta property="position" content="4">
+                        </li>
+                    <?php
+                    $epuletid = $aktiveszkoz['epuletid'];
+                    $helyisegid = $aktiveszkoz['helyisegid'];
+                }
+                else
+                {
+                    ?><li property="itemListElement" typeof="ListItem">
+                        <span property="name"><?=$eszkoz['raktar']?></span></a>
                         <meta property="position" content="4">
                     </li><?php
                 }
-                ?><li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <span property="name"><?=$eszkoz['beepitesinev']?> (<?=$eszkoz['ipcim']?>)</span>
-                    <meta property="position" content="4">
-                </li>
-            </ol>
+            ?></ol>
         </div><?php
-
-        $epuletid = $eszkoz['epuletid'];
-        $helyisegid = $eszkoz['helyisegid'];
-        $vlanok = mySQLConnect("SELECT * FROM vlanok;");
-        $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
-        $switchportok = mySQLConnect("SELECT switchportok.id AS id, allapot, eszkoz, mode, nev, sebesseg, tipus, vlan, portok.port, csatlakozo, portok.id AS portid, csatlakozas
-            FROM switchportok
-                INNER JOIN portok ON switchportok.port = portok.id
-                WHERE eszkoz = $id;");
-        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
-            FROM portok
-                INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-            WHERE epulet = $epuletid
-            UNION
-            SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
-            FROM portok
-                INNER JOIN transzportportok ON transzportportok.port = portok.id
-            WHERE epulet = $epuletid
-            UNION
-            SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
-            FROM portok
-                INNER JOIN switchportok ON portok.id = switchportok.port
-                INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
-                INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
-                INNER JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
-                INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
-            WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
-            ORDER BY aktiveszkoz, id;");
-        $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
         
-        ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/eszkozszerkeszt/$id?tipus=aktiv'\">Eszköz szerkesztése</button>" : "" ?>
-        <div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
+        ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/eszkozszerkeszt/$id?tipus=bovito'\">Eszköz szerkesztése</button>" : "" ?>
+        <div class="oldalcim"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
         <div class="infobox"><?php
             if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
             {
                 ?><div>Állapot</div>
                 <div>Beépítve</div>
-                <div>IP cím</div>
-                <div><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$eszkoz['ipcim']?></a></div>
-                <div>Beépítési név</div>
-                <div><?=$eszkoz['beepitesinev']?></div>
-                <div>Beépítés helye</div>
-                <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
-                <div>Rackszekrény</div>
-                <div><?=$eszkoz['rack']?></div>
+                <div>Port</div>
+                <div><?=$eszkoz['portnev']?></div>
+                <div>Beépítési eszköz IP címe</div>
+                <div><a href="telnet://<?=$aktiveszkoz['ipcim']?>"><?=$aktiveszkoz['ipcim']?></a></div>
+                <div>Beépítési eszköz neve</div>
+                <div><?=$aktiveszkoz['beepitesinev']?></div>
+                <div>Beépítési eszköz  helye</div>
+                <div><?=$aktiveszkoz['epuletszam']?> <?=($aktiveszkoz['epuletnev']) ? "(" . $aktiveszkoz['epuletnev'] . ")" : "" ?> <?=$aktiveszkoz['helyisegszam']?> <?=($aktiveszkoz['helyisegnev']) ? "(" . $aktiveszkoz['helyisegnev'] . ")" : "" ?></div>
+                <div>Beépítési eszköz rackszekrénye</div>
+                <div><?=$aktiveszkoz['rack']?></div>
                 <div>Beépítés ideje</div>
                 <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
                 <?php
@@ -159,7 +194,9 @@ else
             elseif(!$eszkoz['beepid'])
             {
                 ?><div>Állapot</div>
-                <div>Új, sosem beépített</div><?php
+                <div>Új, sosem beépített</div>
+                <div>Raktár</div>
+                <div><?=$eszkoz['raktar']?></div><?php
             }
             else
             {
@@ -168,32 +205,34 @@ else
                 <div>Raktár</div>
                 <div><?=$eszkoz['raktar']?></div><?php
             }
-            ?><div>Gyártó</div>
+            ?><div>Tulajdonos</div>
+            <div><?=($eszkoz['tulajdonos']) ? $eszkoz['tulajdonos'] : "Nem ismert" ?></div>
+            <div>Gyártó</div>
             <div><?=$eszkoz['gyarto']?></div>
             <div>Modell</div>
             <div><?=$eszkoz['modell'] . $eszkoz['varians']?></div>
             <div>Sorozatszám</div>
             <div><?=$eszkoz['sorozatszam']?></div>
-            <div>MAC Address</div>
-            <div><?=$eszkoz['mac']?></div>
-            <div>Szoftver</div>
-            <div><?=$eszkoz['szoftver']?></div>
-            <div>Access portok</div>
-            <div><?=$eszkoz['portszam']?></div>
-            <div>Uplink portok</div>
-            <div><?=$eszkoz['uplinkportok']?></div>
-            <div>Tulajdonos</div>
-            <div><?=$eszkoz['tulajdonos']?></div>
+            <div>Fizikai adatátvitel módja</div>
+            <div><?=$eszkoz['fizikaireteg']?></div>
+            <div>Átviteli szabvány</div>
+            <div><?=$eszkoz['szabvany']?></div>
+            <div>Csatlakozó</div>
+            <div><?=$eszkoz['csatlakozo']?></div>
+            <div>Sebesség</div>
+            <div><?=$eszkoz['sebesseg']?> Mbit</div>
+            
         </div><?php
 
-        if(mysqli_num_rows($aktiveszkozok) > 1 || $eszkoz['kiepitesideje'])
+        if(mysqli_num_rows($bovitok) > 1 || $eszkoz['kiepitesideje'])
         {
-            ?><div class="oldalcim"><?=(mysqli_num_rows($aktiveszkozok) > 2) ? "Korábbi beépítések" : "Korábbi beépítés" ?></div>
+            ?><div class="oldalcim"><?=(mysqli_num_rows($bovitok) > 2) ? "Korábbi beépítések" : "Korábbi beépítés" ?></div>
             <table id="eszkozok">
                 <thead>
                     <tr>
-                        <th>IP cím</th>
-                        <th>Beépítési név</th>
+                        <th>Eszköz IP címe</th>
+                        <th>Eszköze neve</th>
+                        <th>Port</th>
                         <th>Beépítés ideje</th>
                         <th>Kiépítés ideje</th>
                         <th>Beépítés helye</th>
@@ -201,16 +240,68 @@ else
                     </tr>
                 </thead>
                 <tbody><?php
-                foreach($aktiveszkozok as $x)
+                foreach($bovitok as $x)
                 {
-                    if($eszkoz['beepid'] != $x['beepid'] || mysqli_num_rows($aktiveszkozok) == 1)
+                    $akteszkid = $x['switchid'];
+
+                    $aktiveszkozok = mySQLConnect("SELECT
+                        eszkozok.id AS id,
+                        beepitesek.id AS beepid,
+                        sorozatszam,
+                        mac,
+                        portszam,
+                        uplinkportok,
+                        szoftver,
+                        alakulatok.nev AS tulajdonos,
+                        gyartok.nev AS gyarto,
+                        modellek.modell AS modell,
+                        varians,
+                        epuletek.id AS epuletid,
+                        eszkoztipusok.nev AS tipus,
+                        epuletek.nev AS epuletnev,
+                        epuletek.szam AS epuletszam,
+                        epulettipusok.tipus AS epulettipus,
+                        telephelyek.telephely AS telephely,
+                        telephelyek.id AS thelyid,
+                        helyisegek.id AS helyisegid,
+                        helyisegszam,
+                        helyisegnev,
+                        beepitesideje,
+                        kiepitesideje,
+                        alakulatok.rovid AS tulajdonos,
+                        rackszekrenyek.id AS rackid,
+                        rackszekrenyek.nev AS rack,
+                        beepitesek.nev AS beepitesinev,
+                        ipcimek.ipcim AS ipcim,
+                        raktarak.nev AS raktar
+                        FROM eszkozok
+                            INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
+                            INNER JOIN modellek ON eszkozok.modell = modellek.id
+                            INNER JOIN gyartok ON modellek.gyarto = gyartok.id
+                            INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
+                            LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+                            LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                            LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+                            LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+                            LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
+                            LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
+                            LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
+                            LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                            LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
+                        WHERE eszkozok.id = $akteszkid AND modellek.tipus < 11
+                        ORDER BY beepitesek.id DESC;");
+                    
+                    $aktiveszkoz = mysqli_fetch_assoc($aktiveszkozok);
+
+                    if($eszkoz['beepid'] != $x['beepid'])
                     {
                         ?><tr>
-                            <td><?=$x['ipcim']?></td>
-                            <td><?=$x['beepitesinev']?></td>
+                            <td><?=$aktiveszkoz['ipcim']?></td>
+                            <td><?=$aktiveszkoz['beepitesinev']?></td>
+                            <td><?=$x['portnev']?></td>
                             <td><?=$x['beepitesideje']?></td>
                             <td><?=$x['kiepitesideje']?></td>
-                            <td><?=$x['epuletszam']?> <?=($x['epuletnev']) ? "(" . $x['epuletnev'] . ")" : "" ?> <?=$x['helyisegszam']?> <?=($x['helyisegnev']) ? "(" . $x['helyisegnev'] . ")" : "" ?>
+                            <td><?=$aktiveszkoz['epuletszam']?> <?=($aktiveszkoz['epuletnev']) ? "(" . $aktiveszkoz['epuletnev'] . ")" : "" ?> <?=$aktiveszkoz['helyisegszam']?> <?=($aktiveszkoz['helyisegnev']) ? "(" . $aktiveszkoz['helyisegnev'] . ")" : "" ?>
                             <td><?php if($csoportir)
                             {
                                 ?><a href='<?=$RootPath?>/beepites/<?=$x['beepid']?>'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
@@ -221,113 +312,7 @@ else
                 ?></tbody>
             </table><?php
         }
-
-        ?><div class="oldalcim">Portok</div>
-        <table id="switchportok">
-            <thead>
-                <tr>
-                    <th class="tsorth" onclick="sortTable(0, 's', 'switchportok')">Port</th>
-                    <th class="tsorth" onclick="sortTable(1, 's', 'switchportok')">Név</th>
-                    <th class="tsorth" onclick="sortTable(2, 's', 'switchportok')">VLAN</th>
-                    <th class="tsorth" onclick="sortTable(3, 's', 'switchportok')">Állapot</th>
-                    <th class="tsorth" onclick="sortTable(4, 's', 'switchportok')">Sebesség</th>
-                    <th class="tsorth" onclick="sortTable(5, 's', 'switchportok')">Port Mód</th>
-                    <th class="tsorth" onclick="sortTable(6, 's', 'switchportok')">Tipus</th>
-                    <th class="tsorth" onclick="sortTable(7, 's', 'switchportok')">Csatlakozó</th>
-                    <th class="tsorth" onclick="sortTable(8, 's', 'switchportok')">Végpont</th>
-                </tr>
-            </thead>
-            <tbody><?php
-                foreach($switchportok as $port)
-                {
-                    ?><tr>
-                        <!--<form action="">-->
-                        <form action="?page=portdb&action=update&tipus=switch" method="post">
-                            <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
-                            <input type ="hidden" id="portid" name="portid" value=<?=$port['portid']?>>
-                            <td><input style="width: 10ch;" type="text" name="port" value="<?=$port['port']?>"></td>
-                            <td><input style="width: 16ch;" type="text" name="nev" value="<?=$port['nev']?>"></td>
-                            <td>
-                                <select name="vlan">
-                                    <option value=""></option><?php
-                                    foreach($vlanok as $x)
-                                    {
-                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['vlan']) ? "selected" : "" ?>><?=$x['id'] . " " . $x['nev']?></option><?php
-                                    }
-                                ?></select>
-                            </td>
-                            <td>
-                                <select name="allapot">
-                                    <option value="0" <?=($port['allapot'] == "0") ? "selected" : "" ?>>Letiltva</option>
-                                    <option value="1" <?=($port['allapot'] == "1") ? "selected" : "" ?>>Engedélyezve</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="sebesseg">
-                                    <option value=""></option><?php
-                                    foreach($sebessegek as $x)
-                                    {
-                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['sebesseg']) ? "selected" : "" ?>><?=$x['sebesseg']?></option><?php
-                                    }
-                                ?></select>
-                            </td>
-                            <td>
-                                <select name="mode">
-                                    <option value="1" <?=($port['mode'] == "1") ? "selected" : "" ?>>Trunk</option>
-                                    <option value="2" <?=($port['mode'] == "2") ? "selected" : "" ?>>Access</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="tipus">
-                                    <option value="1" <?=($port['tipus'] == "1") ? "selected" : "" ?>>Uplink</option>
-                                    <option value="2" <?=($port['tipus'] == "2") ? "selected" : "" ?>>Access</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="csatlakozo">
-                                    <option value=""></option><?php
-                                    foreach($csatlakozotipusok as $x)
-                                    {
-                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozo']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
-                                    }
-                                ?></select>
-                            </td>
-                            <td>
-                                <select name="csatlakozas">
-                                    <option value="" selected></option><?php
-                                    $elozo = null;
-                                    foreach($epuletportok as $x)
-                                    {
-                                        // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
-                                        // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
-                                        if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
-                                        {
-                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
-                                        }
-                                        $elozo = $x['id'];
-                                    }
-                                ?></select>
-                            </td>
-                            <td><input type="submit" value="Módosítás"></td>
-                        </form>
-                    </tr><?php
-                }
-            ?></tbody>
-        </table><?php
+        ?><?php
     }
 }
-?><script>
-    $("form").on("submit", function (e) {
-        var dataString = $(this).serialize();
-
-        $.ajax({
-        type: "POST",
-        data: dataString,
-        url: "<?=$RootPath?>/portdb?action=update&tipus=switch",
-        success: function () {
-            showToaster("Port szerkesztése sikeres...");
-        }
-    });
-    e.preventDefault();
-    });
-</script>
+?>

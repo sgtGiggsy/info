@@ -107,7 +107,7 @@ else
                 }
                 foreach($nembeepitett as $eszkoz)
                 {
-                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./<?=$eszktip?>/<?=$eszkoz['id']?>'>
+                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./bovitomodul/<?=$eszkoz['id']?>'>
                         <td><?=$eszkoz['gyarto']?></td>
                             <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
                             <td><?=$eszkoz['sorozatszam']?></td>

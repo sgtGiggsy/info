@@ -349,39 +349,52 @@ function eszkozTipusValaszto($tipusid)
 	return array("tipus" => $eszktip, "teljes" => $teljesnev);
 }
 
-function eszkozPicker($current, $beepitett)
+function eszkozPicker($current = false, $beepitett)
 {
 	$where = null;
-	if(!$beepitett)
+	if($current)
+	{
+		$where = "WHERE eszkozok.id = $current";
+	}
+	elseif(!$beepitett)
 	{
 		$where = "WHERE beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL";
 	}
 	$eszkozok = mySQLConnect("SELECT
-            eszkozok.id AS id,
-            sorozatszam,
-            gyartok.nev AS gyarto,
-            modellek.modell AS modell,
-            varians,
-            eszkoztipusok.nev AS tipus
-        FROM
-            eszkozok
+			eszkozok.id AS id,
+			sorozatszam,
+			gyartok.nev AS gyarto,
+			modellek.modell AS modell,
+			varians,
+			eszkoztipusok.nev AS tipus
+		FROM
+			eszkozok
 				INNER JOIN modellek ON eszkozok.modell = modellek.id
 				INNER JOIN gyartok ON modellek.gyarto = gyartok.id
 				INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
 				LEFT JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
 		$where
-        ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
+		ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
-	?><div>
-		<label for="eszkoz">Eszköz:</label><br>
-		<select id="eszkoz" name="eszkoz" required>
-			<option value=""></option><?php
-			foreach($eszkozok as $x)
-			{
-				?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?= $x['gyarto'] . " " . $x['modell'] . $x['varians'] . " (" . $x['sorozatszam'] . ")" ?></option><?php
-			}
-		?></select>
-	</div><?php
+	if(!$current)
+	{
+		?><div>
+			<label for="eszkoz">Eszköz:</label><br>
+			<select id="eszkoz" name="eszkoz" required>
+				<option value=""></option><?php
+				foreach($eszkozok as $x)
+				{
+					?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?= $x['gyarto'] . " " . $x['modell'] . $x['varians'] . " (" . $x['sorozatszam'] . ")" ?></option><?php
+				}
+			?></select>
+		</div><?php
+	}
+	else
+	{
+		$eszkoz = mysqli_fetch_assoc($eszkozok);
+		?><h2><label><?= $eszkoz['gyarto'] . " " . $eszkoz['modell'] . $eszkoz['varians'] . " (" . $eszkoz['sorozatszam'] . ")" ?></h2></label>
+		<input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$current?>><?php
+	}
 }
 
 function helyisegPicker($current, $selectnev)
