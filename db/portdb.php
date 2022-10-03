@@ -3,6 +3,9 @@
 if(isset($mindir) && $mindir)
 {
     $con = mySQLConnect(false);
+    $user = $_SESSION[getenv('SESSION_NAME').'id'];
+    $timestamp = date('Y-m-d H:i:s');
+
     foreach($_POST as $key => $value)
     {
         if ($value == "NULL" || $value == "")
@@ -11,41 +14,69 @@ if(isset($mindir) && $mindir)
         }
     }
 
-    if($_GET["action"] == "update" && $_GET["tipus"] == "switch")
+    if($_GET["action"] == "update" && $_GET["tipus"] == "switch") // Verziókövetés kész
     {
         $tulportid = $_POST['csatlakozas'];
         $helyiportid = $_POST['portid'];
+        $switchportid = $_POST['id'];
+
         if($tulportid)
         {
             $iftulportswitch = mySQLConnect("SELECT portok.id AS id FROM portok INNER JOIN switchportok ON switchportok.port = portok.id WHERE portok.id = $tulportid;");
         }
         $iftulportchange = mySQLConnect("SELECT id FROM portok WHERE csatlakozas = $helyiportid;");
 
-        $stmt = $con->prepare('UPDATE switchportok SET mode=?, vlan=?, sebesseg=?, nev=?, allapot=?, tipus=? WHERE id=?');
-        $stmt->bind_param('ssssssi', $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $_POST['id']);
+        mySQLConnect("INSERT INTO switchportok_history (switchportid, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
+            SELECT id, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+            FROM switchportok
+            WHERE id = $switchportid");
+
+        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
+            SELECT id, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+            FROM portok
+            WHERE id = $helyiportid");
+        
+        $stmt = $con->prepare('UPDATE switchportok SET mode=?, vlan=?, sebesseg=?, nev=?, allapot=?, tipus=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
+        $stmt->bind_param('ssssssssi', $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $user, $timestamp, $_POST['id']);
         $stmt->execute();
 
-        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=?, csatlakozas=? WHERE id=?');
-        $stmt->bind_param('sssi', $_POST['port'], $_POST['csatlakozo'], $_POST['csatlakozas'], $_POST['portid']);
+        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=?, csatlakozas=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
+        $stmt->bind_param('sssssi', $_POST['port'], $_POST['csatlakozo'], $_POST['csatlakozas'], $user, $timestamp, $_POST['portid']);
         $stmt->execute();
 
         if($tulportid && mysqli_num_rows($iftulportswitch) == 1)
         {
-            $stmt = $con->prepare('UPDATE portok SET csatlakozo=?, csatlakozas=? WHERE id=?');
-            $stmt->bind_param('ssi', $_POST['csatlakozo'], $_POST['portid'], $_POST['csatlakozas']);
+            mySQLConnect("INSERT INTO switchportok_history (switchportid, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
+                SELECT id, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+                FROM switchportok
+                WHERE port = $tulportid");
+
+            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
+                SELECT id, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+                FROM portok
+                WHERE id = $tulportid");
+            
+            $stmt = $con->prepare('UPDATE portok SET csatlakozo=?, csatlakozas=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
+            $stmt->bind_param('ssssi', $_POST['csatlakozo'], $_POST['portid'], $user, $timestamp, $tulportid);
             $stmt->execute();
 
-            $stmt = $con->prepare('UPDATE switchportok SET mode=?, vlan=?, sebesseg=?, nev=?, allapot=?, tipus=? WHERE port=?');
-            $stmt->bind_param('ssssssi', $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $_POST['csatlakozas']);
+            $stmt = $con->prepare('UPDATE switchportok SET mode=?, vlan=?, sebesseg=?, nev=?, allapot=?, tipus=?, utolsomodosito=?, utolsomodositasideje=? WHERE port=?');
+            $stmt->bind_param('ssssssssi', $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $user, $timestamp, $tulportid);
             $stmt->execute();
         }
 
         if(!$tulportid && mysqli_num_rows($iftulportchange) == 1)
         {
             $oldportid = mysqli_fetch_assoc($iftulportchange)['id'];
+            
+            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
+                SELECT id, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+                FROM portok
+                WHERE id = $oldportid");
+            
             $null = null;
-            $stmt = $con->prepare('UPDATE portok SET csatlakozas=? WHERE id=?');
-            $stmt->bind_param('si', $null, $oldportid);
+            $stmt = $con->prepare('UPDATE portok SET csatlakozas=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
+            $stmt->bind_param('sssi', $null, $user, $timestamp, $oldportid);
             $stmt->execute();
         }
 
@@ -93,14 +124,27 @@ if(isset($mindir) && $mindir)
         }
     }
 
-    if($_GET["action"] == "update" && $_GET["tipus"] == "soho")
+    if($_GET["action"] == "update" && $_GET["tipus"] == "soho") // Verziókövetés kész
     {
-        $stmt = $con->prepare('UPDATE sohoportok SET sebesseg=? WHERE id=?');
-        $stmt->bind_param('si', $_POST['sebesseg'], $_POST['id']);
+        $sohid = $_POST['id'];
+        $portid = $_POST['portid'];
+
+        mySQLConnect("INSERT INTO sohoportok_history (sohoportid, eszkoz, port, sebesseg, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
+            SELECT id, eszkoz, port, sebesseg, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+            FROM sohoportok
+            WHERE id = $sohid");
+
+        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
+            SELECT id, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+            FROM portok
+            WHERE id = $portid");        
+
+        $stmt = $con->prepare('UPDATE sohoportok SET sebesseg=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
+        $stmt->bind_param('sssi', $_POST['sebesseg'], $user, $timestamp, $_POST['id']);
         $stmt->execute();
 
-        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=?, csatlakozas=? WHERE id=?');
-        $stmt->bind_param('sssi', $_POST['port'], $_POST['csatlakozo'], $_POST['csatlakozas'], $_POST['portid']);
+        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=?, csatlakozas=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
+        $stmt->bind_param('sssssi', $_POST['port'], $_POST['csatlakozo'], $_POST['csatlakozas'], $user, $timestamp, $_POST['portid']);
         $stmt->execute();
 
         if(mysqli_errno($con) != 0)
@@ -114,7 +158,7 @@ if(isset($mindir) && $mindir)
         }
     }
 
-    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "switch")
+    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "switch") // Verziókövetés kész
     {
         $tipus = "1"; // Tipus 1 = uplink, Tipus 2 = access
         $csatlakozo = "1";
@@ -125,14 +169,14 @@ if(isset($mindir) && $mindir)
                 //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
                 $port = $_POST['accportpre'] . $i; //$portsorszam;
 
-                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
-                $stmt->bind_param('ss', $port, $csatlakozo);
+                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
+                $stmt->bind_param('sss', $port, $csatlakozo, $user);
                 $stmt->execute();
 
                 $last_id = mysqli_insert_id($con);
 
-                $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg) VALUES (?, ?, ?)');
-                $stmt->bind_param('sss', $_POST['eszkoz'], $last_id, $_POST['accportsebesseg']);
+                $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg, letrehozo) VALUES (?, ?, ?, ?)');
+                $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['accportsebesseg'], $user);
                 $stmt->execute();
             }
         }
@@ -144,14 +188,14 @@ if(isset($mindir) && $mindir)
                 //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
                 $port = $_POST['uplportpre'] . $i; //$portsorszam;
 
-                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
-                $stmt->bind_param('ss', $port, $csatlakozo);
+                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
+                $stmt->bind_param('sss', $port, $csatlakozo, $user);
                 $stmt->execute();
 
                 $last_id = mysqli_insert_id($con);
 
-                $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg, tipus) VALUES (?, ?, ?, ?)');
-                $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['uplportsebesseg'], $tipus);
+                $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg, tipus, letrehozo) VALUES (?, ?, ?, ?, ?)');
+                $stmt->bind_param('sssss', $_POST['eszkoz'], $last_id, $_POST['uplportsebesseg'], $tipus, $user);
                 $stmt->execute();
             }
         }
@@ -167,7 +211,7 @@ if(isset($mindir) && $mindir)
         }
     }
 
-    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "soho")
+    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "soho") // Verziókövetés kész
     {
         $tipus = "1"; // Tipus 1 = uplink, Tipus 2 = access
         $csatlakozo = "1";
@@ -178,14 +222,14 @@ if(isset($mindir) && $mindir)
                 //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
                 $port = $_POST['accportpre'] . $i; //$portsorszam;
 
-                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
-                $stmt->bind_param('ss', $port, $csatlakozo);
+                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
+                $stmt->bind_param('sss', $port, $csatlakozo, $user);
                 $stmt->execute();
 
                 $last_id = mysqli_insert_id($con);
 
-                $stmt = $con->prepare('INSERT INTO sohoportok (eszkoz, port, sebesseg) VALUES (?, ?, ?)');
-                $stmt->bind_param('sss', $_POST['eszkoz'], $last_id, $_POST['accportsebesseg']);
+                $stmt = $con->prepare('INSERT INTO sohoportok (eszkoz, port, sebesseg, letrehozo) VALUES (?, ?, ?, ?)');
+                $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['accportsebesseg'], $user);
                 $stmt->execute();
             }
         }
@@ -198,14 +242,14 @@ if(isset($mindir) && $mindir)
                 //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
                 $port = $_POST['uplportpre'] . $i; //$portsorszam;
 
-                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
-                $stmt->bind_param('ss', $port, $csatlakozo);
+                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
+                $stmt->bind_param('sss', $port, $csatlakozo, $user);
                 $stmt->execute();
 
                 $last_id = mysqli_insert_id($con);
 
-                $stmt = $con->prepare('INSERT INTO sohoportok (eszkoz, port, sebesseg) VALUES (?, ?, ?)');
-                $stmt->bind_param('sss', $_POST['eszkoz'], $last_id, $_POST['uplportsebesseg']);
+                $stmt = $con->prepare('INSERT INTO sohoportok (eszkoz, port, sebesseg, letrehozo) VALUES (?, ?, ?, ?)');
+                $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['uplportsebesseg'], $user);
                 $stmt->execute();
             }
         }
@@ -221,21 +265,21 @@ if(isset($mindir) && $mindir)
         }
     }
 
-    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "vegpont")
+    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "vegpont") // Verziókövetés kész
     {
         for($i = $_POST['kezdoport']; $i <= $_POST['zaroport']; $i++)
         {
             $portsorszam = str_pad($i, $_POST['nullara'], "0", STR_PAD_LEFT);
             $port = $_POST['portelotag'] . $portsorszam;
 
-            $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
-            $stmt->bind_param('ss', $port, $_POST['csatlakozo']);
+            $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
+            $stmt->bind_param('sss', $port, $_POST['csatlakozo'], $user);
             $stmt->execute();
 
             $last_id = mysqli_insert_id($con);
 
-            $stmt = $con->prepare('INSERT INTO vegpontiportok (epulet, port) VALUES (?, ?)');
-            $stmt->bind_param('ss', $_POST['epulet'], $last_id);
+            $stmt = $con->prepare('INSERT INTO vegpontiportok (epulet, port, letrehozo) VALUES (?, ?, ?)');
+            $stmt->bind_param('sss', $_POST['epulet'], $last_id, $user);
             $stmt->execute();
         }
 
@@ -250,12 +294,12 @@ if(isset($mindir) && $mindir)
         }
     }
 
-    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "rack")
+    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "rack") // Verziókövetés kész
     {
         for($i = $_POST['elsoport']; $i <= $_POST['utolsoport']; $i++)
         {
-            $stmt = $con->prepare('INSERT INTO rackportok (rack, port) VALUES (?, ?)');
-            $stmt->bind_param('ss', $_POST['rack'], $i);
+            $stmt = $con->prepare('INSERT INTO rackportok (rack, port, letrehozo) VALUES (?, ?, ?)');
+            $stmt->bind_param('sss', $_POST['rack'], $i, $user);
             $stmt->execute();
         }
 
@@ -270,12 +314,17 @@ if(isset($mindir) && $mindir)
         }
     }
 
-    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "helyiseg")
+    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "helyiseg") // Verziókövetés kész
     {
         for($i = $_POST['elsoport']; $i <= $_POST['utolsoport']; $i++)
         {
-            $stmt = $con->prepare('UPDATE vegpontiportok SET helyiseg=? WHERE port=?');
-            $stmt->bind_param('si', $_POST['helyiseg'], $i);
+            mySQLConnect("INSERT INTO vegpontiportok_history (vegpontiportid, epulet, port, helyiseg, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
+                SELECT id, epulet, port, helyiseg, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+                FROM vegpontiportok
+                WHERE port = $i");
+            
+            $stmt = $con->prepare('UPDATE vegpontiportok SET helyiseg=? utolsomodosito=?, utolsomodositasideje=? WHERE port=?');
+            $stmt->bind_param('sssi', $_POST['helyiseg'], $user, $timestamp, $i);
             $stmt->execute();
         }
 
@@ -290,7 +339,7 @@ if(isset($mindir) && $mindir)
         }
     }
 
-    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "telefonkozpont")
+    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "telefonkozpont") // Verziókövetés kész
     {
         if($_POST['portpre'])
         {
@@ -300,14 +349,14 @@ if(isset($mindir) && $mindir)
                 {
                     $port = $_POST['portpre'] . $i . "-" . $j; //$portsorszam;
                     //echo "$port <br>";
-                    $stmt = $con->prepare('INSERT INTO portok (port) VALUES (?)');
-                    $stmt->bind_param('s', $port);
+                    $stmt = $con->prepare('INSERT INTO portok (port, letrehozo) VALUES (?, ?)');
+                    $stmt->bind_param('ss', $port, $user);
                     $stmt->execute();
 
                     $last_id = mysqli_insert_id($con);
 
-                    $stmt = $con->prepare('INSERT INTO tkozpontportok (eszkoz, port) VALUES (?, ?)');
-                    $stmt->bind_param('ss', $_POST['eszkoz'], $last_id);
+                    $stmt = $con->prepare('INSERT INTO tkozpontportok (eszkoz, port, letrehozo) VALUES (?, ?, ?)');
+                    $stmt->bind_param('sss', $_POST['eszkoz'], $last_id, $user);
                     $stmt->execute();
                 }
             }
@@ -324,7 +373,7 @@ if(isset($mindir) && $mindir)
         }
     }
 
-    elseif($_GET["action"] == "new" && $_GET["tipus"] == "mediakonverter")
+    elseif($_GET["action"] == "new" && $_GET["tipus"] == "mediakonverter") // Verziókövetés kész
     {
         $eszkozmodell = mySQLConnect("SELECT modell FROM eszkozok WHERE id = $eszkoz");
         $modell = mysqli_fetch_assoc($eszkozmodell)['modell'];
@@ -336,14 +385,14 @@ if(isset($mindir) && $mindir)
         $transzpszabvany = mySQLConnect("SELECT * FROM atviteliszabvanyok WHERE id = $transzpszabvany;");
         $transzpszabvany = mysqli_fetch_assoc($transzpszabvany)['nev'];
 
-        $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
-        $stmt->bind_param('ss', $transzpszabvany, $konvertermodell['transzpcsatlakozo']);
+        $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
+        $stmt->bind_param('sss', $transzpszabvany, $konvertermodell['transzpcsatlakozo'], $user);
         $stmt->execute();
 
         $last_id = mysqli_insert_id($con);
 
-        $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany) VALUES (?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $eszkoz, $last_id, $konvertermodell['transzpsebesseg'], $konvertermodell['transzpszabvany']);
+        $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany, letrehozo) VALUES (?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssss', $eszkoz, $last_id, $konvertermodell['transzpsebesseg'], $konvertermodell['transzpszabvany'], $user);
         $stmt->execute();
 
         // LAN OLDALI PORT
@@ -351,14 +400,14 @@ if(isset($mindir) && $mindir)
         $lanszabvany = mySQLConnect("SELECT * FROM atviteliszabvanyok WHERE id = $lanszabvany;");
         $lanszabvany = mysqli_fetch_assoc($lanszabvany)['nev'];
 
-        $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
-        $stmt->bind_param('ss', $lanszabvany, $konvertermodell['lancsatlakozo']);
+        $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
+        $stmt->bind_param('sss', $lanszabvany, $konvertermodell['lancsatlakozo'], $user);
         $stmt->execute();
 
         $last_id = mysqli_insert_id($con);
 
-        $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany) VALUES (?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $eszkoz, $last_id, $konvertermodell['lansebesseg'], $konvertermodell['lanszabvany']);
+        $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany, letrehozo) VALUES (?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssss', $eszkoz, $last_id, $konvertermodell['lansebesseg'], $konvertermodell['lanszabvany'], $user);
         $stmt->execute();
     }
 
