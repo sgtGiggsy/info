@@ -15,6 +15,7 @@ else
             gyartok.nev AS gyarto,
             modellek.modell AS modell,
             varians,
+            aktiveszkozok.web AS web,
             eszkoztipusok.nev AS tipus,
             epuletek.nev AS epuletnev,
             epuletek.szam AS epuletszam,
@@ -73,6 +74,7 @@ else
                         <th class="dontprint"></th>
                         <th class="dontprint"></th>
                         <th class="dontprint"></th>
+                        <th class="dontprint"></th>
                         <th class="dontprint"></th><?php
                     }
                 ?></tr>
@@ -103,7 +105,13 @@ else
                             if($csoportir)
                             {
                                 szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiv"); ?>
-                                <td class="dontprint"><a href="telnet://<?=$eszkoz['ipcim']?>"><img src='<?=$RootPath?>/images/ssh.png' alt='Eszköz adminisztrálása' title='Eszköz adminisztrálása'/></a></td><?php
+                                <td class="dontprint"><a href="telnet://<?=$eszkoz['ipcim']?>"><img src='<?=$RootPath?>/images/ssh.png' alt='Eszköz adminisztrálása' title='Eszköz adminisztrálása'/></a></td>
+                                <td class="dontprint"><?php
+                                if($eszkoz['web'])
+                                {
+                                    ?><a href="" onclick='window.open("http://<?=$eszkoz['ipcim']?>");'><img src='<?=$RootPath?>/images/webmanage.png' alt='Webes adminisztráció' title='Webes adminisztráció'/></a><?php
+                                }
+                                ?></td><?php
                             }
                         ?></tr><?php
                         $szamoz++;
@@ -126,7 +134,8 @@ else
                         if($csoportir)
                         {
                             szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiv");
-                            ?><td class="dontprint"></td><?php
+                            ?><td class="dontprint"></td>
+                            <td class="dontprint"></td><?php
                         }
                     ?></tr><?php
                     $szamoz++;

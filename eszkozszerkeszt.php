@@ -39,7 +39,7 @@ else
 
     $raktarak = mySQLConnect("SELECT * FROM raktarak;");
     
-    $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = $uplinkportok = $szoftver = $nev = $leadva = $hibas = $raktar = $megjegyzes = null;
+    $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = $uplinkportok = $szoftver = $nev = $leadva = $hibas = $raktar = $megjegyzes = $poe = $ssh = $web = null;
     $button = "Új eszköz";
     $oldalcim = "Új eszköz létrehozása";
     
@@ -58,6 +58,9 @@ else
                 $aktiveszkoz = mySQLConnect("SELECT * FROM aktiveszkozok WHERE eszkoz = $eszkid;");
                 $aktiveszkoz = mysqli_fetch_assoc($aktiveszkoz);
                 $mac = @$aktiveszkoz['mac'];
+                $poe = @$aktiveszkoz['poe'];
+                $ssh = @$aktiveszkoz['ssh'];
+                $web = @$aktiveszkoz['web'];
                 $portszam = @$aktiveszkoz['portszam'];
                 $uplinkportok = @$aktiveszkoz['uplinkportok'];
                 $szoftver = @$aktiveszkoz['szoftver'];
@@ -264,6 +267,24 @@ else
             <div>
                 <label for="szoftver">Szoftver:</label><br>
                 <input type="text" accept-charset="utf-8" name="szoftver" id="szoftver" value="<?=$szoftver?>"></input>
+            </div><?php
+        }
+
+        if($eszkoztipus == "aktiv")
+        {
+            ?><div>
+                <label for="poe">POE képes:</label><br>
+                <input type="checkbox" accept-charset="utf-8" name="poe" id="poe" value="1" <?= ($poe) ? "checked" : "" ?>></input>
+            </div>
+            
+            <div>
+                <label for="ssh">SSH képes:</label><br>
+                <input type="checkbox" accept-charset="utf-8" name="ssh" id="ssh" value="1" <?= ($ssh) ? "checked" : "" ?>></input>
+            </div>
+
+            <div>
+                <label for="web">Webes felület:</label><br>
+                <input type="checkbox" accept-charset="utf-8" name="web" id="web" value="1" <?= ($web) ? "checked" : "" ?>></input>
             </div><?php
         }
 

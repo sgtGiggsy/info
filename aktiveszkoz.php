@@ -11,6 +11,9 @@ else
             beepitesek.id AS beepid,
             sorozatszam,
             mac,
+            poe,
+            ssh,
+            web,
             portszam,
             uplinkportok,
             szoftver,
@@ -69,43 +72,55 @@ else
                     <span property="name">Kecskemét Informatika</span></a>
                     <meta property="position" content="1">
                 </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
-                    <span property="name"><?=$eszkoz['telephely']?></span></a>
-                    <meta property="position" content="2">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
-                    <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
-                    <meta property="position" content="3">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
-                    <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
-                    <meta property="position" content="4">
-                </li>
-                <?php if($eszkoz['rackid'])
+                <li><b>></b></li><?php
+                if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
                 {
-                    ?><li><b>></b></li>
+                    ?><li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
+                        <span property="name"><?=$eszkoz['telephely']?></span></a>
+                        <meta property="position" content="2">
+                    </li>
+                    <li><b>></b></li>
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage"
-                            href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
-                        <span property="name"><?=$eszkoz['rack']?></span></a>
+                            href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
+                        <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
+                        <meta property="position" content="3">
+                    </li>
+                    <li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
+                        <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
                         <meta property="position" content="4">
+                    </li>
+                    <?php if($eszkoz['rackid'])
+                    {
+                        ?><li><b>></b></li>
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage"
+                                href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
+                            <span property="name"><?=$eszkoz['rack']?></span></a>
+                            <meta property="position" content="5">
+                        </li><?php
+                    }
+                    ?><li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name"><?=$eszkoz['beepitesinev']?> (<?=$eszkoz['ipcim']?>)</span>
+                        <meta property="position" content="6">
                     </li><?php
                 }
-                ?><li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <span property="name"><?=$eszkoz['beepitesinev']?> (<?=$eszkoz['ipcim']?>)</span>
-                    <meta property="position" content="4">
-                </li>
-            </ol>
+                else
+                {
+                    ?><li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/aktiveszkozok">
+                        <span property="name">Aktív eszközök</span></a>
+                        <meta property="position" content="2">
+                    </li><?php
+                }
+            ?></ol>
         </div><?php
 
         $epuletid = $eszkoz['epuletid'];
@@ -159,9 +174,16 @@ else
             {
                 ?><div>Állapot</div>
                 <div>Beépítve</div>
-                <div>IP cím</div>
-                <div><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$eszkoz['ipcim']?></a></div>
-                <div>Beépítési név</div>
+                <div>IP cím</div><?php
+                if($eszkoz['web'])
+                {
+                    ?><div><a style="cursor: pointer;" id="manage"><?=$eszkoz['ipcim']?></a></div><?php
+                }
+                else
+                {
+                    ?><div><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$eszkoz['ipcim']?></a></div><?php
+                }
+                ?><div>Beépítési név</div>
                 <div><?=$eszkoz['beepitesinev']?></div>
                 <div>Beépítés helye</div>
                 <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
@@ -191,6 +213,12 @@ else
             <div><?=$eszkoz['sorozatszam']?></div>
             <div>MAC Address</div>
             <div><?=$eszkoz['mac']?></div>
+            <div>POE</div>
+            <div><?=($eszkoz['poe']) ? "Képes" : "Nem képes" ?></div>
+            <div>SSH</div>
+            <div><?=($eszkoz['ssh']) ? "Igen" : "Nem" ?></div>
+            <div>Weben menedzselhető</div>
+            <div><?=($eszkoz['web']) ? "Igen" : "Nem" ?></div>
             <div>Szoftver</div>
             <div><?=$eszkoz['szoftver']?></div>
             <div>Access portok</div>
@@ -213,7 +241,17 @@ else
                 echo "Nincs csatlakoztatott bővítő";
             }
             ?></div>
-        </div><?php
+        </div>
+
+        <div id="atfedes" class="atfedes">
+            <div class="atfedes-content">
+                <span class="close">&times;</span>
+                <p><a href="telnet://<?=$eszkoz['ipcim']?>">Switch menedzselése Telneten keresztül</a></p>
+                <p><a href="http://<?=$eszkoz['ipcim']?>" target="_blank">Switch menedzselése a webes felülettel</a></p>
+            </div>
+        </div>
+        
+        <?php
 
         if(mysqli_num_rows($aktiveszkozok) > 1 || $eszkoz['kiepitesideje'])
         {
@@ -251,100 +289,102 @@ else
             </table><?php
         }
 
-        ?><div class="oldalcim">Portok</div>
-        <table id="switchportok">
-            <thead>
-                <tr>
-                    <th class="tsorth" onclick="sortTable(0, 's', 'switchportok')">Port</th>
-                    <th class="tsorth" onclick="sortTable(1, 's', 'switchportok')">Név</th>
-                    <th class="tsorth" onclick="sortTable(2, 's', 'switchportok')">VLAN</th>
-                    <th class="tsorth" onclick="sortTable(3, 's', 'switchportok')">Állapot</th>
-                    <th class="tsorth" onclick="sortTable(4, 's', 'switchportok')">Sebesség</th>
-                    <th class="tsorth" onclick="sortTable(5, 's', 'switchportok')">Port Mód</th>
-                    <th class="tsorth" onclick="sortTable(6, 's', 'switchportok')">Tipus</th>
-                    <th class="tsorth" onclick="sortTable(7, 's', 'switchportok')">Csatlakozó</th>
-                    <th class="tsorth" onclick="sortTable(8, 's', 'switchportok')">Végpont</th>
-                </tr>
-            </thead>
-            <tbody><?php
-                $szamoz = 1;
-                foreach($switchportok as $port)
-                {
-                    ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
-                        <!--<form action="">-->
-                        <form action="?page=portdb&action=update&tipus=switch" method="post">
-                            <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
-                            <input type ="hidden" id="portid" name="portid" value=<?=$port['portid']?>>
-                            <td><input style="width: 10ch;" type="text" name="port" value="<?=$port['port']?>"></td>
-                            <td><input style="width: 16ch;" type="text" name="nev" value="<?=$port['nev']?>"></td>
-                            <td>
-                                <select name="vlan">
-                                    <option value=""></option><?php
-                                    foreach($vlanok as $x)
-                                    {
-                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['vlan']) ? "selected" : "" ?>><?=$x['id'] . " " . $x['nev']?></option><?php
-                                    }
-                                ?></select>
-                            </td>
-                            <td>
-                                <select name="allapot">
-                                    <option value="0" <?=($port['allapot'] == "0") ? "selected" : "" ?>>Letiltva</option>
-                                    <option value="1" <?=($port['allapot'] == "1") ? "selected" : "" ?>>Engedélyezve</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="sebesseg">
-                                    <option value=""></option><?php
-                                    foreach($sebessegek as $x)
-                                    {
-                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['sebesseg']) ? "selected" : "" ?>><?=$x['sebesseg']?></option><?php
-                                    }
-                                ?></select>
-                            </td>
-                            <td>
-                                <select name="mode">
-                                    <option value="1" <?=($port['mode'] == "1") ? "selected" : "" ?>>Trunk</option>
-                                    <option value="2" <?=($port['mode'] == "2") ? "selected" : "" ?>>Access</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="tipus">
-                                    <option value="1" <?=($port['tipus'] == "1") ? "selected" : "" ?>>Uplink</option>
-                                    <option value="2" <?=($port['tipus'] == "2") ? "selected" : "" ?>>Access</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="csatlakozo">
-                                    <option value=""></option><?php
-                                    foreach($csatlakozotipusok as $x)
-                                    {
-                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozo']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
-                                    }
-                                ?></select>
-                            </td>
-                            <td>
-                                <select name="csatlakozas">
-                                    <option value="" selected></option><?php
-                                    $elozo = null;
-                                    foreach($epuletportok as $x)
-                                    {
-                                        // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
-                                        // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
-                                        if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+        ?><div class="PrintArea">
+            <div class="oldalcim">Portok</div>
+            <table id="switchportok">
+                <thead>
+                    <tr>
+                        <th class="tsorth" onclick="sortTable(0, 's', 'switchportok')">Port</th>
+                        <th class="tsorth portnev" onclick="sortTable(1, 's', 'switchportok')">Név</th>
+                        <th class="tsorth" onclick="sortTable(2, 's', 'switchportok')">VLAN</th>
+                        <th class="tsorth" onclick="sortTable(3, 's', 'switchportok')">Állapot</th>
+                        <th class="tsorth dontprint" onclick="sortTable(4, 's', 'switchportok')">Sebesség</th>
+                        <th class="tsorth" onclick="sortTable(5, 's', 'switchportok')">Port Mód</th>
+                        <th class="tsorth dontprint" onclick="sortTable(6, 's', 'switchportok')">Tipus</th>
+                        <th class="tsorth dontprint" onclick="sortTable(7, 's', 'switchportok')">Csatlakozó</th>
+                        <th class="tsorth" onclick="sortTable(8, 's', 'switchportok')">Végpont</th>
+                    </tr>
+                </thead>
+                <tbody><?php
+                    $szamoz = 1;
+                    foreach($switchportok as $port)
+                    {
+                        ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
+                            <!--<form action="">-->
+                            <form action="?page=portdb&action=update&tipus=switch" method="post">
+                                <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
+                                <input type ="hidden" id="portid" name="portid" value=<?=$port['portid']?>>
+                                <td><input style="width: 10ch;" type="text" name="port" value="<?=$port['port']?>"></td>
+                                <td class="portnev"><input style="width: 16ch;" type="text" name="nev" value="<?=$port['nev']?>"></td>
+                                <td>
+                                    <select name="vlan">
+                                        <option value=""></option><?php
+                                        foreach($vlanok as $x)
                                         {
-                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['vlan']) ? "selected" : "" ?>><?=$x['id'] . " " . $x['nev']?></option><?php
                                         }
-                                        $elozo = $x['id'];
-                                    }
-                                ?></select>
-                            </td>
-                            <td style="width: 6.5em"><input type="submit" value="Módosítás"></td>
-                        </form>
-                    </tr><?php
-                    $szamoz++;
-                }
-            ?></tbody>
-        </table><?php
+                                    ?></select>
+                                </td>
+                                <td>
+                                    <select name="allapot">
+                                        <option value="0" <?=($port['allapot'] == "0") ? "selected" : "" ?>>Letiltva</option>
+                                        <option value="1" <?=($port['allapot'] == "1") ? "selected" : "" ?>>Engedélyezve</option>
+                                    </select>
+                                </td>
+                                <td class="dontprint">
+                                    <select name="sebesseg">
+                                        <option value=""></option><?php
+                                        foreach($sebessegek as $x)
+                                        {
+                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['sebesseg']) ? "selected" : "" ?>><?=$x['sebesseg']?></option><?php
+                                        }
+                                    ?></select>
+                                </td>
+                                <td>
+                                    <select name="mode">
+                                        <option value="1" <?=($port['mode'] == "1") ? "selected" : "" ?>>Trunk</option>
+                                        <option value="2" <?=($port['mode'] == "2") ? "selected" : "" ?>>Access</option>
+                                    </select>
+                                </td>
+                                <td class="dontprint">
+                                    <select name="tipus">
+                                        <option value="1" <?=($port['tipus'] == "1") ? "selected" : "" ?>>Uplink</option>
+                                        <option value="2" <?=($port['tipus'] == "2") ? "selected" : "" ?>>Access</option>
+                                    </select>
+                                </td>
+                                <td class="dontprint">
+                                    <select name="csatlakozo">
+                                        <option value=""></option><?php
+                                        foreach($csatlakozotipusok as $x)
+                                        {
+                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozo']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                        }
+                                    ?></select>
+                                </td>
+                                <td>
+                                    <select name="csatlakozas">
+                                        <option value="" selected></option><?php
+                                        $elozo = null;
+                                        foreach($epuletportok as $x)
+                                        {
+                                            // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
+                                            // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
+                                            if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                                            {
+                                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                            }
+                                            $elozo = $x['id'];
+                                        }
+                                    ?></select>
+                                </td>
+                                <td style="width: 6.5em" class="dontprint"><input type="submit" value="Módosítás"></td>
+                            </form>
+                        </tr><?php
+                        $szamoz++;
+                    }
+                ?></tbody>
+            </table>
+        </div><?php
     }
 }
 ?><script>
@@ -361,4 +401,28 @@ else
     });
     e.preventDefault();
     });
-</script>
+
+    <?php
+    if($eszkoz['web'])
+    {
+        ?>
+        var atfedes = document.getElementById("atfedes");
+        var btn = document.getElementById("manage");
+        var span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function() {
+            atfedes.style.display = "block";
+        }
+
+        span.onclick = function() {
+            atfedes.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == atfedes) {
+                atfedes.style.display = "none";
+            }
+        }
+        <?php
+    }
+?></script>
