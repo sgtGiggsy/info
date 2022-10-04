@@ -220,7 +220,8 @@ else
                 }
             ?></ol>
         </div><?php
-        
+
+// Szerkesztő gombok
         if($mindir)
         {
             ?><div style='display: inline-flex'>
@@ -232,14 +233,15 @@ else
             ?></div><?php
         }
 
+// Szerkesztési előzmények megjelenítése
         if(mysqli_num_rows($elozmenyek) > 0)
         {
             ?><div id="elozmenyek" style="display: none">
                 <div class="oldalcim">Szerkesztési előzmények</div>
                 <table id="verzioelozmenyek">
                     <thead>
-                        <th>Módosítás ideje</th>
-                        <th>Módosító</th>
+                        <th>Létrehozás / Módosítás ideje</th>
+                        <th>Létrehozó / Módosító</th>
                         <th>Modell</th>
                         <th>Sorozatszám</th>
                         <th>MAC</th>
@@ -261,8 +263,8 @@ else
                         foreach($elozmenyek as $x)
                         {
                             ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
-                                <td><?=$x['utolsomodositasideje']?></td>
-                                <td <?=($elozoverzio && $elozoverzio['utolsomodositoid'] != $x['utolsomodositoid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['utolsomodosito']?></td>
+                                <td><?=($x['utolsomodositasideje']) ? $x['utolsomodositasideje'] : $x['letrehozasideje'] ?></td>
+                                <td><?=($x['utolsomodosito']) ? $x['utolsomodosito'] : $x['letrehozo'] ?></td>
                                 <td <?=($elozoverzio && $elozoverzio['gyarto'] != $x['gyarto'] && $elozoverzio['modell'] != $x['modell'] && $elozoverzio['varians'] != $x['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$x['gyarto']?> <?=$x['modell']?><?=$x['varians']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['sorozatszam'] != $x['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$x['sorozatszam']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['mac'] != $x['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$x['mac']?></td>
@@ -282,7 +284,7 @@ else
                         }
                         ?><tr style="font-weight: normal; font-style: italic;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
                             <td><?=$eszkoz['utolsomodositasideje']?></td>
-                            <td <?=($elozoverzio['utolsomodositoid'] != $eszkoz['utolsomodositoid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['utolsomodosito']?></td>
+                            <td><?=$eszkoz['utolsomodosito']?></td>
                             <td <?=($elozoverzio['gyarto'] != $eszkoz['gyarto'] && $elozoverzio['modell'] != $eszkoz['modell'] && $elozoverzio['varians'] != $eszkoz['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
                             <td <?=($elozoverzio['sorozatszam'] != $eszkoz['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['sorozatszam']?></td>
                             <td <?=($elozoverzio['mac'] != $eszkoz['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['mac']?></td>
@@ -302,6 +304,7 @@ else
             </div><?php
         }
 
+// Infobox
         ?><div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
         <div class="infobox"><?php
             if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
@@ -393,10 +396,9 @@ else
                 <p><a href="telnet://<?=$eszkoz['ipcim']?>">Switch menedzselése Telneten keresztül</a></p>
                 <p><a href="http://<?=$eszkoz['ipcim']?>" target="_blank">Switch menedzselése a webes felülettel</a></p>
             </div>
-        </div>
-        
-        <?php
+        </div><?php
 
+// Korábbi beépítések
         if(mysqli_num_rows($aktiveszkozok) > 1 || $eszkoz['kiepitesideje'])
         {
             ?><div class="oldalcim"><?=(mysqli_num_rows($aktiveszkozok) > 2) ? "Korábbi beépítések" : "Korábbi beépítés" ?></div>
@@ -433,6 +435,7 @@ else
             </table><?php
         }
 
+// Port táblázat
         ?><div class="PrintArea">
             <div class="oldalcim">Portok</div>
             <table id="switchportok">
