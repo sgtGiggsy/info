@@ -1,8 +1,9 @@
 <?php
-
+$kinyit = false;
 if($menuterulet == 1)
 {
 	$fomenu = null;
+	$keresszulo = null;
 	?><div class="leftmenuareabase">
 		<nav class="leftmenuarea">
 			<ul class="leftmenu"><?php
@@ -25,28 +26,28 @@ if($menuterulet == 1)
 				}
 				elseif($fomenu && $fomenu == $menupont['szulo'])
 				{
-					?><li <?=(($menupont['url'] == $pagetofind) ? 'class="leftmenusub-active"' : 'class="leftmenusubitem"')?>>
+					?><li <?=(($menupont['url'] == $pagetofind || $menupont['id'] == $keresszulo) ? 'class="leftmenusub-active"' : 'class="leftmenusubitem"')?>>
 						<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=trim($menupont['menupont'])?><?php
 							if($menupont['szerkoldal']) { ?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php }
 						?></a>
 					</li><?php
-					if($menupont['url'] == $pagetofind)
-					{
-						?><script>
-							window.onload = function()
-							{
-								document.getElementById("<?=$menupont['szulo']?>").style.display = "block";
-							}
-						</script><?php
-					}
 				}
-				else
+				elseif($menupont['aktiv'] > 0)
 				{
 					?><li <?=(($menupont['url'] == $pagetofind) ? 'class="leftmenuitem-active"' : 'class="leftmenuitem"')?>>
 						<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=trim($menupont['menupont'])?><?php
 							if($menupont['szerkoldal']) { ?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php }
 						?></a>
 					</li><?php
+				}
+
+				if($menupont['url'] == $pagetofind && $menupont['aktiv'] > 0 || $menupont['id'] == $keresszulo)
+				{
+					$kinyit = $menupont['szulo'];
+				}
+				elseif($menupont['url'] == $pagetofind)
+				{
+					$keresszulo = $menupont['szulo'];
 				}
 			}
 			?></ul>
@@ -61,5 +62,13 @@ if($menuterulet == 2)
 		?><a href="<?=$RootPath?>/<?=$menupont['url']?>"><img src="<?=$RootPath?>/images/<?=$menupont['url']?>.png" title="<?=$menupont['menupont']?>" alt="<?=$menupont['menupont']?>"></a><?php
 	}
 }
-?><script>
-</script>
+
+if($kinyit)
+{
+	?><script>
+		window.onload = function()
+		{
+			document.getElementById("<?=$kinyit?>").style.display = "block";
+		}
+	</script><?php
+}

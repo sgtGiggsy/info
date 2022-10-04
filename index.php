@@ -303,7 +303,13 @@ foreach($menu as $menupont)
 
     // Ha egy menüpont megjelenése nincs kifejezett joghoz kötve, menüterülethez adása
     // ha joghoz kötött, a felhasználó jogosultsága szerinti eljárás
-    if($menupont['aktiv'] == 3 || (($menupont['aktiv'] == 2 && $_SESSION[getenv('SESSION_NAME').'id'])) || ($menupont['aktiv'] == 4 && !$_SESSION[getenv('SESSION_NAME').'id']))
+    // Megjelenési jogok:
+    // aktiv 0 = senkinek
+    // aktiv 1 = jogosultaknak
+    // aktiv 2 = bejelentkezetteknek
+    // aktiv 3 = mindenkinek
+    // aktiv 4 = kijelentkezetteknek
+    if($menupont['aktiv'] == 0 || $menupont['aktiv'] == 3 || (($menupont['aktiv'] == 2 && $_SESSION[getenv('SESSION_NAME').'id'])) || ($menupont['aktiv'] == 4 && !$_SESSION[getenv('SESSION_NAME').'id']))
     {
         array_push($menuk[$menupont['menuterulet']], $menupont);
     }

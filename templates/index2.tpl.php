@@ -13,7 +13,7 @@
 </head>
 
 <body>
-<div class="wrapper">	
+<div class="wrapper">
 <!-- Fejléc -->
 <div class="content">
 		<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$current?>">Hiba jelzése</a></div>

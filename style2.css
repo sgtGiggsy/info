@@ -28,7 +28,29 @@
     src: url("./includes/Oswald-Regular.ttf") format('truetype');
 }
 
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+h1, h4 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+p {
+    margin-top: 0em;
+    margin-bottom: 0.5em;
+}
+
+body {
+    background-color: #000;
+}
+
 @media print {
+    body {
+        background-color: #FFF !important;
+    }
+
     body * {
         visibility: hidden;
     }
@@ -99,24 +121,6 @@
     @page :footer {
         display: none;
     }
-}
-
-*, *:before, *:after {
-    box-sizing: border-box;
-}
-
-h1, h4 {
-    margin-top: 0px;
-    margin-bottom: 0px;
-}
-
-p {
-    margin-top: 0em;
-    margin-bottom: 0.5em;
-}
-
-body {
-    background-color: #fff;
 }
 
 /* Grid */
@@ -653,8 +657,8 @@ label {
 .infobox {
     display: grid;
     display: -ms-grid;
-    -ms-grid-columns: 1fr 1fr;
-    grid-template-columns: 1fr 1fr;
+    -ms-grid-columns: 1fr 2fr;
+    grid-template-columns: 1fr 2fr;
     margin: 0 auto auto auto;
     width: 70%;
     background-color: #0f2c3a;
@@ -663,6 +667,12 @@ label {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     padding: 20px;
     border-radius: 5px;
+}
+
+.infobox a {
+    text-decoration: none;
+    color:#007acc;
+    font-weight: normal
 }
 
 .infobox div {
@@ -952,7 +962,7 @@ label {
     border-right: 1px solid gray;
 }
 
-.leftmenuitem, .leftmenuitem a, .leftmenuitem-active, .leftmenuitem-active a{
+.leftmenuitem, .leftmenuitem a, .leftmenuitem-active, .leftmenuitem-active a {
     width: 100%;
     flex-wrap: wrap;
     list-style: none;
@@ -961,6 +971,10 @@ label {
     border-radius: 0;
     /*padding: 6px 0px 6px 0px;*/
     display: inline-block;
+}
+
+.leftmenuitem {
+    background-color: #2d373c;
 }
 
  .leftmenuitem a:hover, .leftmenuitem a, .leftmenuitem-active a {

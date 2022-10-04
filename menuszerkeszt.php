@@ -17,6 +17,11 @@ else
     {
         $szulo[] = array("id" => $x['id'], "menupont" => $x['menupont']);
     }
+    $sortcriteria = 'menupont';
+    usort($szulo, function($a, $b)
+    {
+		return $a['menupont'] > $b['menupont'];
+    });
     ?><div class="oldalcim"><p onclick="rejtMutat('menuk')" style="cursor: pointer">Menük</p></div>
     <div id="menuk" style='display: none'>
     <table id="menupontok">
