@@ -90,7 +90,7 @@ else
                     }
                     else
                     {
-                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' style='<?=($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td><?=$eszkoz['beepitesinev']?></td>
                             <td><?=$eszkoz['gyarto']?></td>
@@ -119,7 +119,7 @@ else
                 }
                 foreach($nembeepitett as $eszkoz)
                 {
-                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
+                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas'] == 2) ? "; text-decoration: line-through; color: grey" : (($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "") ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                         <td><?=$eszkoz['ipcim']?></td>
                         <td><?=$eszkoz['beepitesinev']?></td>
                         <td><?=$eszkoz['gyarto']?></td>

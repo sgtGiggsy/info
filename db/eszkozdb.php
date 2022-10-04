@@ -66,8 +66,10 @@ if(isset($irhat) && $irhat)
         $timestamp = date('Y-m-d H:i:s');
         $eszkoz = $_POST['id'];
 
-        mySQLConnect("INSERT INTO eszkozok_history (eszkozid, modell, sorozatszam, tulajdonos, varians, megjegyzes, leadva, hibas, raktar, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
-            SELECT id, modell, sorozatszam, tulajdonos, varians, megjegyzes, leadva, hibas, raktar, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+        $last_id = modId($con);
+
+        mySQLConnect("INSERT INTO eszkozok_history (eszkozid, modell, sorozatszam, tulajdonos, varians, megjegyzes, leadva, hibas, raktar, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
+            SELECT id, modell, sorozatszam, tulajdonos, varians, megjegyzes, leadva, hibas, raktar, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
             FROM eszkozok
             WHERE id = $eszkoz");
         
@@ -79,8 +81,8 @@ if(isset($irhat) && $irhat)
         {
             if($eszkoztipus == "aktiv")
             {
-                mySQLConnect("INSERT INTO aktiveszkozok_history (akteszkid, eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
-                    SELECT id, eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+                mySQLConnect("INSERT INTO aktiveszkozok_history (akteszkid, eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
+                    SELECT id, eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
                     FROM aktiveszkozok
                     WHERE eszkoz = $eszkoz");
 
@@ -91,8 +93,8 @@ if(isset($irhat) && $irhat)
 
             elseif($eszkoztipus == "soho")
             {
-                mySQLConnect("INSERT INTO sohoeszkozok_history (sohoeszkozid, eszkoz, wanportok, lanportok, mac, szoftver, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
-                    SELECT id, eszkoz, wanportok, lanportok, mac, szoftver, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+                mySQLConnect("INSERT INTO sohoeszkozok_history (sohoeszkozid, eszkoz, wanportok, lanportok, mac, szoftver, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
+                    SELECT id, eszkoz, wanportok, lanportok, mac, szoftver, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
                     FROM sohoeszkozok
                     WHERE eszkoz = $eszkoz");
                 

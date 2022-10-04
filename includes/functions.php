@@ -663,3 +663,14 @@ function szerkSor($beepid, $eszkid, $eszktip)
 	<td class="dontprint"><a href='<?=$RootPath?>/beepites?eszkoz=<?=$eszkid?>&tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/newbeep.png' alt='Új beépítés' title='Új beépítés' /></a></td>
 	<td class="dontprint"><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
 }
+
+function modId($con)
+{
+	$null = null;
+	$stmt = $con->prepare('INSERT INTO modositasok () VALUES (?)');
+	$stmt->bind_param('s', $null);
+	$stmt->execute();
+	$last_id = mysqli_insert_id($con);
+
+	return $last_id;
+}

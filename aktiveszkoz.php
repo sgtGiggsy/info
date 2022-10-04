@@ -6,6 +6,7 @@ if(!@$mindolvas)
 }
 else
 {
+// Adatbázis műveletek rész    
     $aktiveszkozok = mySQLConnect("SELECT
             eszkozok.id AS id,
             beepitesek.id AS beepid,
@@ -17,7 +18,6 @@ else
             portszam,
             uplinkportok,
             szoftver,
-            alakulatok.nev AS tulajdonos,
             gyartok.nev AS gyarto,
             modellek.modell AS modell,
             varians,
@@ -33,12 +33,23 @@ else
             helyisegnev,
             beepitesideje,
             kiepitesideje,
+            eszkozok.tulajdonos AS tulajid,
             alakulatok.rovid AS tulajdonos,
             rackszekrenyek.id AS rackid,
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
             ipcimek.ipcim AS ipcim,
-            raktarak.nev AS raktar
+            raktarak.id AS raktarid,
+            raktarak.nev AS raktar,
+            hibas,
+            eszkozok.megjegyzes AS megjegyzes,
+            eszkozok.letrehozo AS letrehozoid,
+            (SELECT nev FROM felhasznalok WHERE id = letrehozoid) AS letrehozo,
+            eszkozok.utolsomodosito AS utolsomodositoid,
+            (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
+            eszkozok.letrehozasideje AS letrehozasideje,
+            eszkozok.utolsomodositasideje AS utolsomodositasideje,
+            beepitesek.megjegyzes AS beepmegjegyz
         FROM eszkozok
                 INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
                 INNER JOIN modellek ON eszkozok.modell = modellek.id
@@ -64,6 +75,88 @@ else
     {
         $eszkoz = mysqli_fetch_assoc($aktiveszkozok);
 
+        $epuletid = $eszkoz['epuletid'];
+        $helyisegid = $eszkoz['helyisegid'];
+        $vlanok = mySQLConnect("SELECT * FROM vlanok;");
+        $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
+        $switchportok = mySQLConnect("SELECT switchportok.id AS id, allapot, eszkoz, mode, nev, sebesseg, tipus, vlan, portok.port, csatlakozo, portok.id AS portid, csatlakozas
+            FROM switchportok
+                INNER JOIN portok ON switchportok.port = portok.id
+                WHERE eszkoz = $id;");
+        $bovitok = mySQLConnect("SELECT eszkozok.id AS bovid, portok.id AS portid, portok.port AS port, modellek.modell AS modell, gyartok.nev AS gyarto, sorozatszam, atviteliszabvanyok.nev AS szabvany, sebessegek.sebesseg AS sebessegek
+                FROM eszkozok
+                INNER JOIN modellek ON eszkozok.modell = modellek.id
+                INNER JOIN bovitomodellek ON modellek.id = bovitomodellek.modell
+                INNER JOIN sebessegek ON bovitomodellek.transzpsebesseg = sebessegek.id
+                INNER JOIN atviteliszabvanyok ON bovitomodellek.transzpszabvany = atviteliszabvanyok.id
+                INNER JOIN gyartok ON modellek.gyarto = gyartok.id
+                INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+                INNER JOIN portok ON beepitesek.switchport = portok.id
+                INNER JOIN switchportok ON portok.id = switchportok.port
+            WHERE switchportok.eszkoz = $id
+            ORDER BY portok.id;");
+
+        if($epuletid)
+        {
+            $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
+                FROM portok
+                    INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
+                WHERE epulet = $epuletid
+                UNION
+                SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
+                FROM portok
+                    INNER JOIN transzportportok ON transzportportok.port = portok.id
+                WHERE epulet = $epuletid
+                UNION
+                SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
+                FROM portok
+                    INNER JOIN switchportok ON portok.id = switchportok.port
+                    INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
+                    INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
+                    INNER JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                    INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+                WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
+                ORDER BY aktiveszkoz, id;");
+        }
+
+        $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
+        $elozmenyek = mySQLConnect("SELECT eszkozid,
+                akteszkid,
+                eszkozok_history.modell AS modellid,
+                modellek.modell AS modell,
+                gyartok.nev AS gyarto,
+                sorozatszam,
+                tulajdonos AS tulajid,
+                alakulatok.rovid AS tulajdonos,
+                varians,
+                megjegyzes,
+                leadva,
+                hibas,
+                raktar AS raktarid,
+                raktarak.nev AS raktar,
+                eszkozok_history.letrehozo AS letrehozoid,
+                (SELECT nev FROM felhasznalok WHERE id = letrehozoid) AS letrehozo,
+                eszkozok_history.utolsomodosito AS utolsomodositoid,
+                (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
+                eszkozok_history.letrehozasideje AS letrehozasideje,
+                eszkozok_history.utolsomodositasideje AS utolsomodositasideje,
+                mac,
+                web,
+                ssh,
+                poe,
+                portszam,
+                uplinkportok,
+                szoftver
+            FROM eszkozok_history
+            INNER JOIN aktiveszkozok_history ON eszkozok_history.modid = aktiveszkozok_history.modid
+            LEFT JOIN raktarak ON eszkozok_history.raktar = raktarak.id
+            LEFT JOIN modellek ON eszkozok_history.modell = modellek.id
+            LEFT JOIN gyartok ON modellek.gyarto = gyartok.id
+            LEFT JOIN alakulatok ON eszkozok_history.tulajdonos = alakulatok.id
+            WHERE eszkozok_history.eszkozid = $id
+            ORDER BY eszkozok_history.modid");
+
+// Megjelenés rész
         ?><div class="breadcumblist">
             <ol vocab="https://schema.org/" typeof="BreadcrumbList">
                 <li property="itemListElement" typeof="ListItem">
@@ -118,57 +211,98 @@ else
                             href="<?=$RootPath?>/aktiveszkozok">
                         <span property="name">Aktív eszközök</span></a>
                         <meta property="position" content="2">
+                    </li>
+                    <li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</span>
+                        <meta property="position" content="3">
                     </li><?php
                 }
             ?></ol>
         </div><?php
-
-        $epuletid = $eszkoz['epuletid'];
-        $helyisegid = $eszkoz['helyisegid'];
-        $vlanok = mySQLConnect("SELECT * FROM vlanok;");
-        $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
-        $switchportok = mySQLConnect("SELECT switchportok.id AS id, allapot, eszkoz, mode, nev, sebesseg, tipus, vlan, portok.port, csatlakozo, portok.id AS portid, csatlakozas
-            FROM switchportok
-                INNER JOIN portok ON switchportok.port = portok.id
-                WHERE eszkoz = $id;");
-        $bovitok = mySQLConnect("SELECT eszkozok.id AS bovid, portok.id AS portid, portok.port AS port, modellek.modell AS modell, gyartok.nev AS gyarto, sorozatszam, atviteliszabvanyok.nev AS szabvany, sebessegek.sebesseg AS sebessegek
-                FROM eszkozok
-                INNER JOIN modellek ON eszkozok.modell = modellek.id
-                INNER JOIN bovitomodellek ON modellek.id = bovitomodellek.modell
-                INNER JOIN sebessegek ON bovitomodellek.transzpsebesseg = sebessegek.id
-                INNER JOIN atviteliszabvanyok ON bovitomodellek.transzpszabvany = atviteliszabvanyok.id
-                INNER JOIN gyartok ON modellek.gyarto = gyartok.id
-                INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
-                INNER JOIN portok ON beepitesek.switchport = portok.id
-                INNER JOIN switchportok ON portok.id = switchportok.port
-            WHERE switchportok.eszkoz = $id
-            ORDER BY portok.id;");
-        if($epuletid)
-        {
-            $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
-                FROM portok
-                    INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-                WHERE epulet = $epuletid
-                UNION
-                SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
-                FROM portok
-                    INNER JOIN transzportportok ON transzportportok.port = portok.id
-                WHERE epulet = $epuletid
-                UNION
-                SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
-                FROM portok
-                    INNER JOIN switchportok ON portok.id = switchportok.port
-                    INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
-                    INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
-                    INNER JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
-                    INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
-                WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
-                ORDER BY aktiveszkoz, id;");
-        }
-        $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
         
-        ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/eszkozszerkeszt/$id?tipus=aktiv'\">Eszköz szerkesztése</button>" : "" ?>
-        <div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
+        if($mindir)
+        {
+            ?><div style='display: inline-flex'>
+                <button type='button' onclick="location.href='<?=$RootPath?>/eszkozszerkeszt/<?=$id?>?tipus=aktiv'">Eszköz szerkesztése</button><?php
+                if(mysqli_num_rows($elozmenyek) > 0)
+                {
+                    ?><button type='button' onclick=rejtMutat("elozmenyek")>Szerkesztési előzmények</button><?php
+                }
+            ?></div><?php
+        }
+
+        if(mysqli_num_rows($elozmenyek) > 0)
+        {
+            ?><div id="elozmenyek" style="display: none">
+                <div class="oldalcim">Szerkesztési előzmények</div>
+                <table id="verzioelozmenyek">
+                    <thead>
+                        <th>Módosítás ideje</th>
+                        <th>Módosító</th>
+                        <th>Modell</th>
+                        <th>Sorozatszám</th>
+                        <th>MAC</th>
+                        <th>Szoftver</th>
+                        <th>Access portok</th>
+                        <th>Uplink portok</th>
+                        <th>PoE</th>
+                        <th>SSH</th>
+                        <th>Webes felület</th>
+                        <th>Tulajdonos</th>
+                        <th>Állapot</th>
+                        <th>Raktár</th>
+                        <th>Megjegyzés</th>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $szamoz = 1;
+                        $elozoverzio = null;
+                        foreach($elozmenyek as $x)
+                        {
+                            ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
+                                <td><?=$x['utolsomodositasideje']?></td>
+                                <td <?=($elozoverzio && $elozoverzio['utolsomodositoid'] != $x['utolsomodositoid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['utolsomodosito']?></td>
+                                <td <?=($elozoverzio && $elozoverzio['gyarto'] != $x['gyarto'] && $elozoverzio['modell'] != $x['modell'] && $elozoverzio['varians'] != $x['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$x['gyarto']?> <?=$x['modell']?><?=$x['varians']?></td>
+                                <td <?=($elozoverzio && $elozoverzio['sorozatszam'] != $x['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$x['sorozatszam']?></td>
+                                <td <?=($elozoverzio && $elozoverzio['mac'] != $x['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$x['mac']?></td>
+                                <td <?=($elozoverzio && $elozoverzio['szoftver'] != $x['szoftver']) ? "style='font-weight: bold;'" : "" ?>><?=$x['szoftver']?></td>
+                                <td <?=($elozoverzio && $elozoverzio['portszam'] != $x['portszam']) ? "style='font-weight: bold;'" : "" ?>><?=$x['portszam']?></td>
+                                <td <?=($elozoverzio && $elozoverzio['uplinkportok'] != $x['uplinkportok']) ? "style='font-weight: bold;'" : "" ?>><?=$x['uplinkportok']?></td>
+                                <td <?=($elozoverzio && $elozoverzio['poe'] != $x['poe']) ? "style='font-weight: bold;'" : "" ?>><?=($x['poe']) ? "Képes" : "Nincs" ?></td>
+                                <td <?=($elozoverzio && $elozoverzio['ssh'] != $x['ssh']) ? "style='font-weight: bold;'" : "" ?>><?=($x['ssh']) ? "Elérhető" : "Nem elérhető" ?></td>
+                                <td <?=($elozoverzio && $elozoverzio['web'] != $x['web']) ? "style='font-weight: bold;'" : "" ?>><?=($x['web']) ? "Van" : "Nincs" ?></td>
+                                <td <?=($elozoverzio && $elozoverzio['tulajid'] != $x['tulajid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['tulajdonos']?></td>
+                                <td <?=($elozoverzio && $elozoverzio['hibas'] != $x['hibas']) ? "style='font-weight: bold;'" : "" ?>><?php switch($x['hibas']) { case 1: echo "Részlegesen működőképes"; Break; case 2: echo "Működésképtelen"; Break; default: echo "Működőképes"; } ?></td>
+                                <td <?=($elozoverzio && $elozoverzio['raktarid'] != $x['raktarid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['raktar']?></td>
+                                <td <?=($elozoverzio && $elozoverzio['megjegyzes'] != $x['megjegyzes']) ? "style='font-weight: bold;'" : "" ?>><?=$x['megjegyzes']?></td>
+                            </tr><?php
+                            $szamoz++;
+                            $elozoverzio = $x;
+                        }
+                        ?><tr style="font-weight: normal; font-style: italic;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
+                            <td><?=$eszkoz['utolsomodositasideje']?></td>
+                            <td <?=($elozoverzio['utolsomodositoid'] != $eszkoz['utolsomodositoid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['utolsomodosito']?></td>
+                            <td <?=($elozoverzio['gyarto'] != $eszkoz['gyarto'] && $elozoverzio['modell'] != $eszkoz['modell'] && $elozoverzio['varians'] != $eszkoz['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
+                            <td <?=($elozoverzio['sorozatszam'] != $eszkoz['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['sorozatszam']?></td>
+                            <td <?=($elozoverzio['mac'] != $eszkoz['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['mac']?></td>
+                            <td <?=($elozoverzio['szoftver'] != $eszkoz['szoftver']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['szoftver']?></td>
+                            <td <?=($elozoverzio['portszam'] != $eszkoz['portszam']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['portszam']?></td>
+                            <td <?=($elozoverzio['uplinkportok'] != $eszkoz['uplinkportok']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['uplinkportok']?></td>
+                            <td <?=($elozoverzio['poe'] != $eszkoz['poe']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['poe']) ? "Képes" : "Nincs" ?></td>
+                            <td <?=($elozoverzio['ssh'] != $eszkoz['ssh']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['ssh']) ? "Elérhető" : "Nem elérhető" ?></td>
+                            <td <?=($elozoverzio['web'] != $eszkoz['web']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['web']) ? "Van" : "Nincs" ?></td>
+                            <td <?=($elozoverzio['tulajid'] != $eszkoz['tulajid']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['tulajdonos']?></td>
+                            <td <?=($elozoverzio['hibas'] != $eszkoz['hibas']) ? "style='font-weight: bold;'" : "" ?>><?php switch($eszkoz['hibas']) { case 1: echo "Részlegesen működőképes"; Break; case 2: echo "Működésképtelen"; Break; default: echo "Működőképes"; } ?></td>
+                            <td <?=($elozoverzio['raktarid'] != $eszkoz['raktarid']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['raktar']?></td>
+                            <td <?=($elozoverzio['megjegyzes'] != $eszkoz['megjegyzes']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['megjegyzes']?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div><?php
+        }
+
+        ?><div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
         <div class="infobox"><?php
             if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
             {
@@ -191,6 +325,8 @@ else
                 <div><?=$eszkoz['rack']?></div>
                 <div>Beépítés ideje</div>
                 <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
+                <div>Beépítéshez tartozó megjegyzés</div>
+                <div><?=$eszkoz['beepmegjegyz']?></div>
                 <?php
             }
             elseif(!$eszkoz['beepid'])
@@ -226,14 +362,22 @@ else
             <div>Uplink portok</div>
             <div><?=$eszkoz['uplinkportok']?></div>
             <div>Tulajdonos</div>
-            <div><?=($eszkoz['tulajdonos']) ? $eszkoz['tulajdonos'] : "Nem ismert" ?></div>
+            <div><?=($eszkoz['tulajdonos']) ? $eszkoz['tulajdonos'] : "Nem ismert" ?></div><?php
+            if($eszkoz['hibas'])
+            {
+                ?><div>Hibás</div>
+                <div><?=($eszkoz['hibas'] == 1) ? "Részlegesen" : "Működésképtelen" ?></div><?php
+            }            
+            ?>
+            <div>Eszközhöz tartozó megjegyzés</div>
+            <div><?=$eszkoz['megjegyzes']?></div>
             <div>Bővítők</div>
             <div><?php
             if(mysqli_num_rows($bovitok))
             {
                 foreach($bovitok as $x)
                 {
-                    echo $x['port'] . " - " . $x['gyarto'] . " " . $x['modell'] . " " . $x['szabvany'] . "<br>";
+                    ?><a href="<?=$RootPath?>/bovitomodul/<?=$x['bovid']?>"><?=$x['port']?> - <?=$x['gyarto']?> <?=$x['modell']?> <?=$x['szabvany']?> (<?=$x['sorozatszam']?>)</a><br><?php
                 }
             }
             else

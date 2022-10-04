@@ -35,8 +35,10 @@ if(isset($irhat) && $irhat)
         $timestamp = date('Y-m-d H:i:s');
         $beepid = $_POST['id'];
 
-        mySQLConnect("INSERT INTO beepitesek_history (beepitesid, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
-            SELECT id, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+        $last_id = modId($con);
+        
+        mySQLConnect("INSERT INTO beepitesek_history (beepitesid, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
+            SELECT id, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
             FROM beepitesek
             WHERE id = $beepid");
 

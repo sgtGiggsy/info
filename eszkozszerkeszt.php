@@ -233,7 +233,11 @@ else
 
             <div>
                 <label for="hibas">Hibás:</label><br>
-                <input type="checkbox" accept-charset="utf-8" name="hibas" id="hibas" value="1" <?= ($hibas) ? "checked" : "" ?>></input>
+                <select name="hibas">
+                    <option value="" selected></option>
+                    <option value="1" <?= ($hibas == "1") ? "selected" : "" ?>>Részlegesen</option>
+                    <option value="2" <?= ($hibas == "2") ? "selected" : "" ?>>Működésképtelen</option>
+                </select>
             </div><?php
         }
 
