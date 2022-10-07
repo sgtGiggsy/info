@@ -6,7 +6,19 @@ if(!$sajatolvas)
 }
 else
 {
-    $szuresek = getWhere("(modellek.tipus = 1 OR modellek.tipus = 2)");
+    if(!$_SESSION[getenv('SESSION_NAME').'onlinefigyeles'])
+    {
+        $szuresek = getWhere("(modellek.tipus = 1 OR modellek.tipus = 2)");
+        $onfigy = "";
+        $onjoin = "";
+    }
+    else
+    {
+        $szuresek = getWhere("(modellek.tipus = 1 OR modellek.tipus = 2) AND (aktiveszkoz_allapot.id = (SELECT MAX(ac.id) FROM aktiveszkoz_allapot ac WHERE ac.eszkozid = aktiveszkoz_allapot.eszkozid) OR aktiveszkoz_allapot.id IS NULL)");
+        $onfigy = "online, ";
+        $onjoin = "LEFT JOIN aktiveszkoz_allapot ON eszkozok.id = aktiveszkoz_allapot.eszkozid ";
+    }
+    
     $where = $szuresek['where'];
 
     $mindeneszkoz = mySQLConnect("SELECT
@@ -31,6 +43,7 @@ else
             ipcimek.ipcim AS ipcim,
             beepitesek.megjegyzes AS megjegyzes,
             eszkozok.megjegyzes AS emegjegyzes,
+            $onfigy
             hibas,
             portszam
         FROM eszkozok
@@ -44,6 +57,7 @@ else
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
             LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+            $onjoin
         WHERE $where
         ORDER BY telephely, epuletek.szam + 1, helyisegszam, rack, pozicio, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
@@ -90,7 +104,7 @@ else
                     }
                     else
                     {
-                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' style='<?=($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?> <?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && !$eszkoz['online']) ? "offline" : "" ?>' style='<?=($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td><?=$eszkoz['beepitesinev']?></td>
                             <td><?=$eszkoz['gyarto']?></td>

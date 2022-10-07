@@ -96,6 +96,11 @@ else
             WHERE switchportok.eszkoz = $id
             ORDER BY portok.id;");
 
+        if($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'])
+        {
+            $allapotelozmenyek = mySQLConnect("SELECT * FROM aktiveszkoz_allapot WHERE eszkozid = $id");
+        }
+
         if($epuletid)
         {
             $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
@@ -434,6 +439,22 @@ else
                 ?></tbody>
             </table><?php
         }
+// Állapot előzmények
+        if($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'])
+        {
+            ?><div class="oldalcim"><p onclick="rejtMutat('allapotelozmenyek')" style="cursor: pointer">Állapot előzmények</p></div>
+            <div id="allapotelozmenyek" style="display: none">
+                <div class="twocolgrid">
+                <div style="background-color: grey;"><strong>Időpont</strong></div>
+                <div style="background-color: grey;"><strong>Állapot</strong></div><?php
+                foreach($allapotelozmenyek as $x)
+                {
+                    ?><div class="<?=($x['online']) ? "online" : "offline" ?>"><?=$x['timestamp']?></div>
+                    <div class="<?=($x['online']) ? "online" : "offline" ?>"><?=($x['online']) ? "Online" : "Offline" ?></div><?php
+                }
+                ?></div>
+            </div><?php
+        }
 
 // Port táblázat
         ?><div class="PrintArea">
@@ -450,6 +471,7 @@ else
                         <th class="tsorth dontprint" onclick="sortTable(6, 's', 'switchportok')">Tipus</th>
                         <th class="tsorth dontprint" onclick="sortTable(7, 's', 'switchportok')">Csatlakozó</th>
                         <th class="tsorth" onclick="sortTable(8, 's', 'switchportok')">Végpont</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody><?php

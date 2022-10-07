@@ -17,27 +17,21 @@ else
         $con = mySQLConnect(false);
         foreach($_POST as $key => $value)
         {
-            if ($stmt = $con->prepare('UPDATE beallitasok SET ertek=? WHERE nev=?'))
+            if ($value == "NULL" || $value == "")
             {
-                $stmt->bind_param('ss', $value, $key);
-                $stmt->execute();
-                if(mysqli_errno($con) != 0)
-                {
-                    echo "<h2>Az érték megváltoztatása sikertelen!<br></h2>";
-                    echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
-                }
-                else
-                {
-                    echo "<h2>A beállítási érték szerkesztése sikeres!</h2>";
-                }
+                $value = NULL;
             }
-            else
+
+            $stmt = $con->prepare('UPDATE beallitasok SET ertek=? WHERE nev=?');
+            $stmt->bind_param('ss', $value, $key);
+            $stmt->execute();
+            if(mysqli_errno($con) != 0)
             {
                 echo "<h2>Az érték megváltoztatása sikertelen!<br></h2>";
                 echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
             }
         }
-        ?><head><meta http-equiv="refresh" content="1; URL='<?=$RootPath?>/beallitasok'" /></head><?php
+        //header("Location: $backtosender");
     }
 }
 ?>

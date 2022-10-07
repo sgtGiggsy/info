@@ -87,6 +87,10 @@ body {
     .kattinthatotr-1 {
         color-adjust: exact;
     }
+
+    .offline {
+        background-color: transparent !important;
+    }
     
     .kattinthatotr-2 {
         background-color: #ddd !important;
@@ -313,6 +317,7 @@ button:hover, .submit input:hover, input[type="submit"]:hover {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    position: relative;
     margin: 0 auto;
     width: 100%;
     min-width: 20ch;
@@ -330,6 +335,8 @@ button:hover, .submit input:hover, input[type="submit"]:hover {
 
 .contentcenter div, .column div {
     padding: 1em 0 0 0;
+    margin: 0 auto;
+    width: 70%;
 }
 
 .szuresvalaszto {
@@ -368,6 +375,10 @@ table {
     display: block;
     border: 0px;
     border-collapse: collapse;
+}
+
+thead {
+    background-color: #666;
 }
 
 tr, td, th {
@@ -411,6 +422,24 @@ tr a, td a, th a {
     background-color: #bbb;
     color: #000;
     font-weight: bold;
+}
+
+.online {
+    background-color: rgb(0, 121, 26);
+    font-weight: bold;
+}
+
+.offline {
+    background-color: #990000;
+}
+
+.twocolgrid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+}
+
+.twocolgrid div {
+    padding: 0.5em;
 }
 
 .valtottsor-1 select, .valtottsor-1 input[type="text"], .valtottsor-2 select, .valtottsor-2 input[type="text"] {
@@ -632,6 +661,62 @@ textarea {
     width: 1.1em;
     height: 1.1em;
 }
+
+/* The switch - the box around the slider */
+.kapcsolo {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  /* Hide default HTML checkbox */
+  .kapcsolo input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  /* The slider */
+  .slider {
+    border-radius: 34px;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    border-radius: 50%;
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
 
 .submit {
     width: 100%;

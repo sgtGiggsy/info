@@ -17,6 +17,7 @@ else
 
     $button = "Beállítások mentése";
     $beallitassql = mySQLConnect("SELECT * FROM beallitasok");
+    $telephelyek = mySQLConnect("SELECT * FROM telephelyek;");
     $beallitas = array();
     foreach($beallitassql as $x)
     {
@@ -51,6 +52,71 @@ else
         <div>
         <label for="defaultugyintezo">Alapértelmezett ügyintéző:</label><br>
             <?=felhasznaloPicker($beallitas['defaultugyintezo'], "defaultugyintezo", false)?>
+        </div>
+    </div>
+
+    <div class="oldalcim"><p onclick="rejtMutat('switchonline')" style="cursor: pointer">Switchek Online ellenőrzése</p></div>
+    <div class="contentcenter" id="switchonline"style='display: none'>
+        <div>
+            <label for="telephely">Telephely:</label><br>
+            <select id="telephely" name="telephely">
+                <option value="" selected>Mind</option><?php
+                foreach($telephelyek as $x)
+                {
+                    ?><option value="<?=$x["id"]?>" <?= ($beallitas['telephely'] == $x['id']) ? "selected" : "" ?>><?=$x['telephely']?></option><?php
+                }
+            ?></select>
+        </div>
+
+        <div>
+            <label for="onlinefigyeles">Switchek online állapotának mutatása:</label><br>
+            <label class="kapcsolo">
+                <input type="hidden" name="onlinefigyeles" id="onlinefigyeleshidden" value="">
+                <input type="checkbox" name="onlinefigyeles" id="onlinefigyeles" value="1" <?= ($beallitas['onlinefigyeles']) ? "checked" : "" ?>>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="oldalcim"><p onclick="rejtMutat('levelezes')" style="cursor: pointer">Mail beállítások</p></div>
+    <div class="contentcenter" id="levelezes"style='display: none'>
+        <div>
+            <label for="mailkuld">Automatikus mailküldés:</label><br>
+            <label class="kapcsolo">
+                <input type="hidden" name="mailkuld" id="mailkuldhidden" value="">
+                <input type="checkbox" name="mailkuld" id="mailkuld" value="1" <?= ($beallitas['mailkuld']) ? "checked" : "" ?>>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div>
+            <label for="mailserver">Mail szerver:</label><br>
+            <input type="text" accept-charset="utf-8" name="mailserver" id="mailserver" value="<?=$beallitas['mailserver']?>"></input>
+        </div>
+
+        <div>
+            <label for="mailport">Mail port:</label><br>
+            <input type="text" accept-charset="utf-8" name="mailport" id="mailport" value="<?=$beallitas['mailport']?>"></input>
+        </div>
+
+        <div>
+            <label for="mailuser">Mail felhasználó:</label><br>
+            <input type="text" accept-charset="utf-8" name="mailuser" id="mailuser" value="<?=$beallitas['mailuser']?>"></input>
+        </div>
+
+        <div>
+            <label for="mailpassword">Mail jelszó:</label><br>
+            <input type="text" accept-charset="utf-8" name="mailpassword" id="mailpassword" value="<?=$beallitas['mailpassword']?>"></input>
+        </div>
+
+        <div>
+            <label for="mailfrom">Mail küldő címe:</label><br>
+            <input type="text" accept-charset="utf-8" name="mailfrom" id="mailfrom" value="<?=$beallitas['mailfrom']?>"></input>
+        </div>
+
+        <div>
+            <label for="mailto">Mail címzett:</label><br>
+            <input type="text" accept-charset="utf-8" name="mailto" id="mailto" value="<?=$beallitas['mailto']?>"></input>
         </div>
     </div>
 
