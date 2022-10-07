@@ -348,7 +348,7 @@ else
     
     ?><div>
         <label for="megjegyzes">Megjegyzés:</label><br>
-        <input type="text" accept-charset="utf-8" name="megjegyzes" id="megjegyzes" value="<?=$megjegyzes?>"></input>
+        <textarea accept-charset="utf-8" name="megjegyzes" id="megjegyzes"><?=$megjegyzes?></textarea>
     </div>
 
     <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>

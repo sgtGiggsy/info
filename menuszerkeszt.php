@@ -6,7 +6,7 @@ if(!@$mindir)
 }
 else
 {
-    if(count($_POST) > 0)
+    if(count($_POST) > 0 && !isset($_POST['telephely']))
     {
         $irhat = true;
         include("./db/menudb.php");
