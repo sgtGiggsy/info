@@ -623,13 +623,34 @@ function getWhere($eszktip)
             $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL AND (beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL OR beepitesek.id IS NULL)";
             $szures = "- Raktáron";
         }
+		elseif ($filter == "hibatlan")
+        {
+            $where = "$eszktip AND eszkozok.hibas IS NULL";
+            $szures = "- Hibátlan eszközök";
+        }
+		elseif ($filter == "reszleges")
+        {
+            $where = "$eszktip AND eszkozok.hibas = 1";
+            $szures = "- Részlegesen működőképes eszközök";
+        }
+		elseif ($filter == "mukodeskeptelen")
+        {
+            $where = "$eszktip AND eszkozok.hibas = 2";
+            $szures = "- Működésképtelen eszközök";
+        }
     }
-    else
+    elseif(!$_GET['page'] == "raktar")
     {
         $filter = false;
         $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL";
         $szures = "- Készleten";
     }
+	else
+	{
+		$filter = false;
+        $where = "$eszktip";
+        $szures = "- Teljes készlet";
+	}
 
 	return array('filter' => $filter, 'where' => $where, 'szures' => $szures);
 }
@@ -640,11 +661,26 @@ function keszletFilter($action, $filter)
 		<form action="<?=$action?>" method="GET">
 			<label for="szures" style="font-size: 14px">Szűrés</label>
 				<select id="szures" name="szures" onchange="this.form.submit()">
-					<option value="keszleten" <?=($filter) ? "" : "selected" ?>>Készleten</option>
+					<option value="keszleten" <?=($filter) ? "" : "selected" ?>>Teljes készlet</option>
 					<option value="beepitve" <?=($filter == "beepitve") ? "selected" : "" ?>>Beépítve</option>
 					<option value="raktaron" <?=($filter == "raktaron") ? "selected" : "" ?>>Raktáron</option>
 					<option value="leadva" <?=($filter == "leadva") ? "selected" : "" ?>>Leadva</option>
 					<option value="mind" <?=($filter == "mind") ? "selected" : "" ?>>Mind</option>
+				</select>
+		</form>
+	</div><?php
+}
+
+function raktarKeszlet($action, $filter)
+{
+	?><div class="szuresvalaszto">
+		<form action="<?=$action?>" method="GET">
+			<label for="szures" style="font-size: 14px">Szűrés</label>
+				<select id="szures" name="szures" onchange="this.form.submit()">
+					<option value="keszleten" <?=($filter) ? "" : "selected" ?>>Készleten</option>
+					<option value="hibatlan" <?=($filter == "hibatlan") ? "selected" : "" ?>>Hibátlan</option>
+					<option value="reszleges" <?=($filter == "reszleges") ? "selected" : "" ?>>Részlegesen működőképes</option>
+					<option value="mukodeskeptelen" <?=($filter == "mukodeskeptelen") ? "selected" : "" ?>>Működésképtelen</option>
 				</select>
 		</form>
 	</div><?php
