@@ -37,8 +37,8 @@ if(isset($irhat) && $irhat)
 
         $last_id = modId($con);
         
-        mySQLConnect("INSERT INTO beepitesek_history (beepitesid, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
-            SELECT id, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO beepitesek_history (beepitesid, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, utolsomodosito, utolsomodositasideje, modid)
+            SELECT id, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, utolsomodosito, utolsomodositasideje, $last_id
             FROM beepitesek
             WHERE id = $beepid");
 

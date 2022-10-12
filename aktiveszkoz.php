@@ -47,8 +47,8 @@ else
             (SELECT nev FROM felhasznalok WHERE id = letrehozoid) AS letrehozo,
             eszkozok.utolsomodosito AS utolsomodositoid,
             (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
-            eszkozok.letrehozasideje AS letrehozasideje,
             eszkozok.utolsomodositasideje AS utolsomodositasideje,
+            eszkozok.letrehozasideje AS letrehozasideje,
             beepitesek.megjegyzes AS beepmegjegyz
         FROM eszkozok
                 INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
@@ -139,11 +139,8 @@ else
                 hibas,
                 raktar AS raktarid,
                 raktarak.nev AS raktar,
-                eszkozok_history.letrehozo AS letrehozoid,
-                (SELECT nev FROM felhasznalok WHERE id = letrehozoid) AS letrehozo,
                 eszkozok_history.utolsomodosito AS utolsomodositoid,
                 (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
-                eszkozok_history.letrehozasideje AS letrehozasideje,
                 eszkozok_history.utolsomodositasideje AS utolsomodositasideje,
                 mac,
                 web,
@@ -268,8 +265,8 @@ else
                         foreach($elozmenyek as $x)
                         {
                             ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
-                                <td><?=($x['utolsomodositasideje']) ? $x['utolsomodositasideje'] : $x['letrehozasideje'] ?></td>
-                                <td><?=($x['utolsomodosito']) ? $x['utolsomodosito'] : $x['letrehozo'] ?></td>
+                                <td><?=($x['utolsomodositasideje']) ? $x['utolsomodositasideje'] : $eszkoz['letrehozasideje'] ?></td>
+                                <td><?=($x['utolsomodosito']) ? $x['utolsomodosito'] : $eszkoz['letrehozo'] ?></td>
                                 <td <?=($elozoverzio && $elozoverzio['gyarto'] != $x['gyarto'] && $elozoverzio['modell'] != $x['modell'] && $elozoverzio['varians'] != $x['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$x['gyarto']?> <?=$x['modell']?><?=$x['varians']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['sorozatszam'] != $x['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$x['sorozatszam']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['mac'] != $x['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$x['mac']?></td>

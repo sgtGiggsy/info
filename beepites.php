@@ -124,11 +124,8 @@ else
                     WHERE portok.id = switchportid
                     ORDER BY beepitesek.id DESC
          	        LIMIT 1) AS switchport,
-                beepitesek_history.letrehozo AS letrehozoid,
-                (SELECT nev FROM felhasznalok WHERE id = letrehozoid) AS letrehozo,
                 beepitesek_history.utolsomodosito AS utolsomodositoid,
                 (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
-                beepitesek_history.letrehozasideje AS letrehozasideje,
                 beepitesek_history.utolsomodositasideje AS utolsomodositasideje
             FROM beepitesek_history
                 LEFT JOIN ipcimek ON beepitesek_history.ipcim = ipcimek.id
@@ -191,8 +188,8 @@ else
                         foreach($elozmenyek as $x)
                         {
                             ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
-                                <td><?=($x['utolsomodositasideje']) ? $x['utolsomodositasideje'] : $x['letrehozasideje'] ?></td>
-                                <td><?=($x['utolsomodosito']) ? $x['utolsomodosito'] : $x['letrehozo'] ?></td>
+                                <td><?=($x['utolsomodositasideje']) ? $x['utolsomodositasideje'] : $beepitve['letrehozasideje'] ?></td>
+                                <td><?=($x['utolsomodosito']) ? $x['utolsomodosito'] : $beepitve['letrehozo'] ?></td>
                                 <td <?=($elozoverzio && $elozoverzio['eszkid'] != $x['eszkid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['eszkoz']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['nev'] != $x['nev']) ? "style='font-weight: bold;'" : "" ?>><?=$x['nev']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['ipcimid'] != $x['ipcimid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['ipcim']?></td>

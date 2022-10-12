@@ -90,7 +90,7 @@ else
             <li><b>></b></li>
             <li property="itemListElement" typeof="ListItem">
                 <span property="name"><?=$raktar['raktar']?></span>
-                <meta property="position" content="4">
+                <meta property="position" content="5">
             </li>
         </ol>
     </div>
@@ -120,12 +120,12 @@ else
                         <th class="tsorth" onclick="sortTable(2, 's', '<?=$tipus?>')">Gyártó</th>
                         <th class="tsorth" onclick="sortTable(3, 's', '<?=$tipus?>')">Modell</th>
                         <th class="tsorth" onclick="sortTable(4, 's', '<?=$tipus?>')">Sorozatszám</th>
-                        <th class="tsorth" onclick="sortTable(8, 's', '<?=$tipus?>')">Tulajdonos</th>
-                        <th class="tsorth" onclick="sortTable(9, 's', '<?=$tipus?>')">Beépítve</th>
-                        <th class="tsorth" onclick="sortTable(10, 's', '<?=$tipus?>')">Kiépítve</th><?php
+                        <th class="tsorth" onclick="sortTable(5, 's', '<?=$tipus?>')">Tulajdonos</th>
+                        <th class="tsorth" onclick="sortTable(6, 's', '<?=$tipus?>')">Beépítve</th>
+                        <th class="tsorth" onclick="sortTable(7, 's', '<?=$tipus?>')">Kiépítve</th><?php
                         if($csoportir)
                         {
-                            ?><th class="tsorth" onclick="sortTable(11, 's', '<?=$tipus?>')">Megjegyzés</th>
+                            ?><th class="tsorth" onclick="sortTable(8, 's', '<?=$tipus?>')">Megjegyzés</th>
                             <th class="dontprint"></th>
                             <th class="dontprint"></th>
                             <th class="dontprint"></th><?php
@@ -135,7 +135,6 @@ else
                 <tbody><?php
                 $zar = true;
             }
-            
 
             $eszkid = $eszkoz['id'];
             $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);

@@ -28,13 +28,13 @@ if(isset($mindir) && $mindir)
         }
         $iftulportchange = mySQLConnect("SELECT id FROM portok WHERE csatlakozas = $helyiportid;");
 
-        mySQLConnect("INSERT INTO switchportok_history (switchportid, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
-            SELECT id, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO switchportok_history (switchportid, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, utolsomodosito, utolsomodositasideje, modid)
+            SELECT id, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, utolsomodosito, utolsomodositasideje, $last_id
             FROM switchportok
             WHERE id = $switchportid");
 
-        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
-            SELECT id, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, modid)
+            SELECT id, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, $last_id
             FROM portok
             WHERE id = $helyiportid");
         
@@ -50,13 +50,13 @@ if(isset($mindir) && $mindir)
         {
             $last_id = modId($con);
 
-            mySQLConnect("INSERT INTO switchportok_history (switchportid, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
-                SELECT id, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
+            mySQLConnect("INSERT INTO switchportok_history (switchportid, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, utolsomodosito, utolsomodositasideje, modid)
+                SELECT id, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, utolsomodosito, utolsomodositasideje, $last_id
                 FROM switchportok
                 WHERE port = $tulportid");
 
-            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
-                SELECT id, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
+            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, modid)
+                SELECT id, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, $last_id
                 FROM portok
                 WHERE id = $tulportid");
             
@@ -75,8 +75,8 @@ if(isset($mindir) && $mindir)
 
             $last_id = modId($con);
             
-            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
-                SELECT id, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
+            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, modid)
+                SELECT id, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, $last_id
                 FROM portok
                 WHERE id = $oldportid");
             
@@ -137,13 +137,13 @@ if(isset($mindir) && $mindir)
 
         $last_id = modId($con);
 
-        mySQLConnect("INSERT INTO sohoportok_history (sohoportid, eszkoz, port, sebesseg, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
-            SELECT id, eszkoz, port, sebesseg, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO sohoportok_history (sohoportid, eszkoz, port, sebesseg, utolsomodosito, utolsomodositasideje, modid)
+            SELECT id, eszkoz, port, sebesseg, utolsomodosito, utolsomodositasideje, $last_id
             FROM sohoportok
             WHERE id = $sohid");
 
-        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, modid)
-            SELECT id, port, csatlakozo, csatlakozas, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, modid)
+            SELECT id, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, $last_id
             FROM portok
             WHERE id = $portid");        
 
@@ -326,8 +326,8 @@ if(isset($mindir) && $mindir)
     {
         for($i = $_POST['elsoport']; $i <= $_POST['utolsoport']; $i++)
         {
-            mySQLConnect("INSERT INTO vegpontiportok_history (vegpontiportid, epulet, port, helyiseg, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje)
-                SELECT id, epulet, port, helyiseg, letrehozo, utolsomodosito, letrehozasideje, utolsomodositasideje
+            mySQLConnect("INSERT INTO vegpontiportok_history (vegpontiportid, epulet, port, helyiseg, utolsomodosito, utolsomodositasideje)
+                SELECT id, epulet, port, helyiseg, utolsomodosito, utolsomodositasideje
                 FROM vegpontiportok
                 WHERE port = $i");
             

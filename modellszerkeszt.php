@@ -84,6 +84,11 @@ else
             $transzpsebesseg = @$mediakonverter['transzpsebesseg'];
         }
 
+        if (!isset($tipusnev))
+        {
+            $tipusnev = eszkozTipusValaszto($tipus)['tipus'];
+        }
+
         $button = "Szerkesztés";
 
         ?><form action="<?=$RootPath?>/modellszerkeszt?action=update&tipus=<?=$tipusnev?>" method="post" onsubmit="beKuld.disabled = true; return true;">

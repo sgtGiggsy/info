@@ -104,7 +104,7 @@ else
                     }
                     else
                     {
-                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?> <?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && !$eszkoz['online']) ? "offline" : "" ?>' style='<?=($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?> <?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && $eszkoz['online'] == 0 && $eszkoz['online'] != null) ? "offline" : "" ?>' style='<?=($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td><?=$eszkoz['beepitesinev']?></td>
                             <td><?=$eszkoz['gyarto']?></td>
