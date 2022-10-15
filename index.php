@@ -269,6 +269,13 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
     $jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $felhasznaloid;");
 }
 
+// Felhasználó személyes beállításainak lekérése
+if($_SESSION[getenv('SESSION_NAME').'id'])
+{
+    $szemelyesbeallitasok = mySQLConnect("SELECT * FROM szemelyesbeallitasok WHERE felhid = $felhasznaloid");
+    $szemelyes = mysqli_fetch_assoc($szemelyesbeallitasok);
+}
+
 // Menüterületeket tároló tömb elkészítése
 $menuk = array();
 
