@@ -498,7 +498,7 @@ function bugTypePicker($current)
 	</div><?php
 }
 
-function felhasznaloPicker($current, $selectnev, $alakulat)
+function felhasznaloPicker($current, $selectnev, $alakulat = null)
 {
 	$where = null;
 	if($alakulat)

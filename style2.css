@@ -379,6 +379,8 @@ table {
 
 thead {
     background-color: #666;
+    font-size: 1.1em;
+    font-weight: bold;
 }
 
 tr, td, th {
@@ -988,7 +990,6 @@ label {
     font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
     font-size: 1.2rem;
     font-variant: small-caps;
-    
     /*padding: 9px 10px 8px 10px;*/
 }
 
@@ -1006,7 +1007,7 @@ label {
     /*filter: sepia(100%) hue-rotate(240deg) brightness(90%);*/
 }
 
-.topmenuikonok a:hover {
+.topmenuikonok img:hover {
     filter: sepia(100%) hue-rotate(170deg) brightness(120%);
     transition: 0.5s;
 }

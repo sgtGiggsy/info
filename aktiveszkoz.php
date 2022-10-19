@@ -98,7 +98,7 @@ else
 
         if($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'])
         {
-            $allapotelozmenyek = mySQLConnect("SELECT * FROM aktiveszkoz_allapot WHERE eszkozid = $id");
+            $allapotelozmenyek = mySQLConnect("SELECT * FROM aktiveszkoz_allapot WHERE eszkozid = $id ORDER BY timestamp DESC");
         }
 
         if($epuletid)
