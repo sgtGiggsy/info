@@ -5,7 +5,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=0.85">
 	<meta name="description" content="<?=$ablakcim?>">
 	<script src="<?=$RootPath?>/includes/jquery.min.js"></script>
-	<script src="<?=$RootPath?>/includes/greedynav/greedynav.js"></script>
 	<script src="<?=$RootPath?>/includes/tinymce/tinymce.min.js"></script>
 	<link rel="shortcut icon" href="<?=$RootPath?>/favicon.ico">
 	<link rel="stylesheet" href="<?=$RootPath?>/style2.css" type="text/css">
@@ -13,37 +12,23 @@
 </head>
 
 <body>
-<div class="wrapper">
-<!-- Fejléc -->
-<div class="content">
-		<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$current?>">Hiba jelzése</a></div>
-		<?php include("./{$currentpage['url']}.php"); ?>
-	</div>
+	<div class="wrapper">
+		<!-- Tartalom -->
+		<div class="content">
+			<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$current?>">Hiba jelzése</a></div>
+			<?php include("./{$currentpage['url']}.php"); ?>
+		</div>
 
-	<div class="topmenubase"></div><?php include('./templates/header2.tpl.php'); ?>
-	<!--<div class="header">
-		
-	</div>-->
-<!-- Menürész -->
-	<!--<div class="menubar"></div>-->
-	<?php $menuterulet = 1; include('./includes/menu2.inc.php'); ?>
-		<!--<div class="menu">
-			
-		</div>-->
-	
-<!-- Oldaltörzs -->	
-<!-- Tartalom -->
-    
+		<!-- Fejléc -->
+		<div class="topmenubase"></div><?php include('./templates/header2.tpl.php'); ?>
 
-<!-- lábléc -->
-    <div class ="footer">
-		<?php
-			//include("./templates/footer.tpl.php");
-		?>
+		<!-- Menürész -->
+		<?php $menuterulet = 1; include('./includes/menu2.inc.php'); ?>		
+
+		<!-- Lábléc -->
+		<div class="bottom-line"><p><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p></div>
+		<div id="snackbar"></div>
 	</div>
-	<div class="bottom-line"><p><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p></div>
-</div>
-<div id="snackbar"></div>
 </body>
 <script>
 	function sortTable(n, t, tname) {
@@ -239,5 +224,12 @@
 	});
 	}
 
-</script>
+	<?php
+	if(isset($ujoldalcim))
+	{
+		?>
+		document.title = '<?=$ujoldalcim?>'
+		<?php
+	}
+?></script>
 </html>

@@ -1,6 +1,6 @@
 <?php
 ?><div class="headlogo" id="headlogo">
-    <img src="<?=$RootPath?>/images/headlogo.png">
+    <img src="<?=$RootPath?>/images/headlogo.png" height="45px">
 </div><?php
 
 if(isset($enablekeres) && $enablekeres)
@@ -34,7 +34,21 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
         </a>
         <div id="notifcount" onclick="showPopup('notifpopup')" style="display: <?=($ujertesites) ? 'block' : 'none' ?> "><?=$ujertesites?></div>
     </div>
-    <div id="notifpopup" onmouseleave="hidePopup('notifpopup')"><?php
+    
+    <a style="cursor: pointer" onclick="showPopup('profilpopup')"> 
+        <img src= <?=($_SESSION['profilkep']) ? "data:image/jpeg;base64," . base64_encode($_SESSION["profilkep"]) : "$RootPath/images/profil.png " ?> title="<?=$usernev?>" alt="<?=$usernev?>">
+    </a><?php
+}
+else
+{
+    ?><a href="<?=$RootPath?>/belepes" title="Belépés" alt="Belépés"><span>Belépés</span><!--<img src="<?=$RootPath?>/images/login.png">--></a><?php
+}
+?></div><?php
+
+// Előugró menük
+if($_SESSION[getenv('SESSION_NAME').'id'])
+{
+    ?><div id="notifpopup" onmouseleave="hidePopup('notifpopup')"><?php
         foreach($notifications as $notification)
         {
             ?><a onclick="seenNotif(<?=$notification['id']?>)" href="<?=$RootPath?><?=$notification['url']?>">
@@ -45,19 +59,11 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
                 </div>
             </a><?php
         }
-    ?><div id="seenallnotif"><p onclick="seenAllNotif();location.reload()">Mind megnézve</p></div>
+        ?><div id="seenallnotif"><p onclick="seenAllNotif();location.reload()">Mind megnézve</p></div>
     </div>
-    <a style="cursor: pointer" onclick="showPopup('profilpopup')"> 
-        <img src= <?=($_SESSION['profilkep']) ? "data:image/jpeg;base64," . base64_encode($_SESSION["profilkep"]) : "$RootPath/images/profil.png " ?> title="<?=$usernev?>" alt="<?=$usernev?>">
-    </a>
     <div id="profilpopup" onmouseleave="hidePopup('profilpopup')">
         <a href="<?=$RootPath?>/felhasznalo">Profil</a>
         <a href="<?=$RootPath?>/szemelyes">Beállítások</a>
         <a href="<?=$RootPath?>/kilep">Kilépés</a>
     </div><?php
 }
-else
-{
-    ?><a href="<?=$RootPath?>/belepes" title="Belépés" alt="Belépés"><span>Belépés</span><!--<img src="<?=$RootPath?>/images/login.png">--></a><?php
-}
-?></div>
