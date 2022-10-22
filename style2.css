@@ -989,14 +989,8 @@ label {
     text-decoration: none;
     font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
     font-size: 1.2rem;
-    font-variant: small-caps;
     /*padding: 9px 10px 8px 10px;*/
 }
-
-.topmenuikonok a :hover {
-    color: #663399;
-}
-
 
 .topmenuikonok img {
     width: 40px;
@@ -1138,21 +1132,58 @@ label {
     padding-right: 5px;
 }
 
-#profilpopup {
+#profilpopup, #notifpopup {
     display: flex;
     flex-direction: column;
-    text-align: right;
     visibility: hidden; /* Hidden by default. Visible on click */
     /*min-width: 200px; /* Set a default minimum width */
     /*background-color: #333;  Black background color */
     color: #fff; /* White text color */
-    border-radius: 2px; /* Rounded borders */
+    border-radius: 5px; /* Rounded borders */
     /*position: fixed; /* Sit on top of the screen */
     position: absolute;
     z-index: 1; /* Add a z-index if needed */
-    right: 0px; /* Center the snackbar */
     top: 50px; /* 30px from the bottom */
 }
+
+#profilpopup {
+    text-align: right;
+    right: 0px; /* Center the snackbar */
+}
+
+#notifpopup {
+    background-color: #1f282d;
+    right: 45px;
+    width: 400px;
+    max-height: 500px;
+    overflow-y: overlay;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+}
+
+#notifpopup::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+#notifpopup::-webkit-scrollbar-track {
+    background: #151c1f;
+    opacity: 10%;
+    border-radius: 100px;
+  }
+  
+  /* Handle */
+#notifpopup::-webkit-scrollbar-thumb {
+    background: #3d4d54;
+    opacity: 10%;
+    border-radius: 100px;
+  }
+  
+  /* Handle on hover */
+#notifpopup::-webkit-scrollbar-thumb:hover {
+    background: #2d373c;
+    border-radius: 100px;
+  }
 
 #profilpopup a {
     padding: 12px 20px 12px 20px;
@@ -1164,16 +1195,109 @@ label {
     font-size: 1.2rem;
 }
 
+#notifpopup a {
+    display: block;
+    margin: 10px;
+    padding: 5px 5px 15px 5px;
+    min-height: 100px;
+    max-height: fit-content;
+    width: 380px;
+    text-decoration: none;
+    color: rgb(212, 211, 211);
+    font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
+    font-size: 0.8rem;
+}
+
+#notifpopup a:hover {
+    display: block;
+    background-color: #2d373c;
+    border-radius: 10px;
+}
+
 #profilpopup a:hover {
     color: #663399;
     background-color: #1f282d;
 }
 
-#profilpopup.show {
-    visibility: visible; /* Show the snackbar 
-    background-color: #333;*/
-    /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
-    However, delay the fade out process for 2.5 seconds */
-    -webkit-animation: fadein 0.5s;
-    animation: fadein 0.5s;
+#profilpopup.show, #notifpopup.show {
+    visibility: visible;
+}
+
+#notifications {
+    position: relative;
+}
+
+#notifcount {
+    position: absolute;
+    padding-top: 3px;
+    right: 0;
+    top: 22px;
+    width: 20px;
+    height: 20px;
+    z-index: 99;
+    border-radius: 50%;
+    opacity: 0.8;
+    background-color: #990000;
+    color: #FFF;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+.notifitem-latta {
+    color: #43545e;
+}
+
+.notifitem {
+    display: block;
+}
+
+.notiftitle {
+    font-size: 1rem;
+}
+
+.notiftime {
+    text-align: right;
+    font-size: 0.5rem;
+}
+
+#seenallnotif {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+}
+
+#seenallnotif p {
+    cursor: pointer;
+    width: fit-content;
+    margin: auto;
+}
+
+#seenallnotif p:hover {
+    color: #663399;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 100px;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 100px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    border-radius: 100px;
   }

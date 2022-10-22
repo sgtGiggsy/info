@@ -192,23 +192,52 @@
         setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
 
-	function showProfile() {
+	function showPopup(id) {
         // Get the snackbar DIV
-        var x = document.getElementById("profilpopup");
+        var x = document.getElementById(id);
 
         // Add the "show" class to DIV
-        x.className = "show";
+		if(x.className == "show")
+		{
+			x.className = x.className.replace("show", "");
+		}
+		else
+		{
+			x.className = "show";
+		};
 
         // After 3 seconds, remove the show class from DIV
         //setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
 
-	function hideProfile() {
+	function hidePopup(id) {
         // Get the snackbar DIV
-        var x = document.getElementById("profilpopup");
+        var x = document.getElementById(id);
 
         // After 3 seconds, remove the show class from DIV
         x.className = x.className.replace("show", "");
     }
+
+	function updateNotif() {
+		$.ajax({
+        type: "POST",
+        url: "<?=$RootPath?>/notifseendb?action=checkednotif",
+	});
+	}
+
+	function seenAllNotif() {
+		$.ajax({
+        type: "POST",
+        url: "<?=$RootPath?>/notifseendb?action=seenallnotif",
+	});
+	}
+
+	function seenNotif(notifid) {
+		$.ajax({
+        type: "POST",
+        url: "<?=$RootPath?>/notifseendb?action=seennotif&notifid=" + notifid,
+	});
+	}
+
 </script>
 </html>

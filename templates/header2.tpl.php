@@ -18,10 +18,39 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
 {
     $usernev = $_SESSION[getenv('SESSION_NAME').'nev'];
     $menuterulet = 2; include('./includes/menu2.inc.php');
-    ?><a style="cursor: pointer" onclick="showProfile()"> 
+    $notifications = getNotifications();
+    $ujertesites = 0;
+    foreach($notifications as $notification)
+    {
+        if(!$notification['latta'])
+        {
+            $ujertesites++;
+        }
+    }
+
+    ?><div id="notifications">
+        <a style="cursor: pointer" onclick="showPopup('notifpopup');updateNotif()">
+            <img src="<?=$RootPath?>/images/notification.png" title="Értesítések" alt="Értesítések">
+        </a>
+        <div id="notifcount" onclick="showPopup('notifpopup')" style="display: <?=($ujertesites) ? 'block' : 'none' ?> "><?=$ujertesites?></div>
+    </div>
+    <div id="notifpopup" onmouseleave="hidePopup('notifpopup')"><?php
+        foreach($notifications as $notification)
+        {
+            ?><a onclick="seenNotif(<?=$notification['id']?>)" href="<?=$RootPath?><?=$notification['url']?>">
+                <div class="notifitem<?=($notification['latta']) ? '-latta' : '' ?>">
+                    <p class="notiftitle"><?=$notification['cim']?></p>
+                    <p class="notifbody"><?=$notification['szoveg']?></p>
+                    <p class="notiftime"><?=$notification['timestamp']?></p>
+                </div>
+            </a><?php
+        }
+    ?><div id="seenallnotif"><p onclick="seenAllNotif();location.reload()">Mind megnézve</p></div>
+    </div>
+    <a style="cursor: pointer" onclick="showPopup('profilpopup')"> 
         <img src= <?=($_SESSION['profilkep']) ? "data:image/jpeg;base64," . base64_encode($_SESSION["profilkep"]) : "$RootPath/images/profil.png " ?> title="<?=$usernev?>" alt="<?=$usernev?>">
     </a>
-    <div id="profilpopup" onmouseleave="hideProfile()">
+    <div id="profilpopup" onmouseleave="hidePopup('profilpopup')">
         <a href="<?=$RootPath?>/felhasznalo">Profil</a>
         <a href="<?=$RootPath?>/szemelyes">Beállítások</a>
         <a href="<?=$RootPath?>/kilep">Kilépés</a>

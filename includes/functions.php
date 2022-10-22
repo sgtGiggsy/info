@@ -710,3 +710,42 @@ function modId($con)
 
 	return $last_id;
 }
+
+function getNotifications()
+{
+	$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+	$notifications = array();
+	$switchcheck = mySQLConnect("SELECT ertek
+		FROM `beallitasok`
+		WHERE nev = 'last_switch_check'
+			AND ertek < date_sub(now(), INTERVAL 15 MINUTE)
+			AND ertek > (SELECT lastseennotif FROM felhasznalok WHERE id = $felhasznaloid)");
+
+	$ertesitesek = mySQLConnect("SELECT ertesitesek.id AS id, cim, szoveg, url, timestamp, latta
+		FROM ertesitesek
+			INNER JOIN ertesites_megjelenik ON ertesitesek.id = ertesites_megjelenik.ertesites
+		WHERE felhasznalo = $felhasznaloid
+			AND ertesitesek.id = (SELECT MAX(ic.id) FROM ertesitesek ic WHERE ic.cim = ertesitesek.cim)
+			AND ertesitesek.timestamp > date_sub(now(), INTERVAL 7 DAY)
+		ORDER BY timestamp DESC");
+	
+	if(mysqli_num_rows($switchcheck) > 0)
+	{
+		$switchutolso = mysqli_fetch_assoc($switchcheck)['ertek'];
+		$notification = array('cim' => 'Switch ellenőrző leállt', 'szoveg' => 'A switchek állapotát ellenőrző script utolsó futása: ' . $switchutolso, 'url' => null, 'timestamp' => $switchutolso, 'latta' => false);
+		$notifications[] = $notification;
+	}
+
+	foreach($ertesitesek as $ertesites)
+	{
+		$latta = false;
+		if($ertesites["latta"] > 0)
+			$latta = true;
+
+		$tempert = array('id' => $ertesites['id'], 'cim' => $ertesites["cim"], 'szoveg' => $ertesites["szoveg"], 'url' => $ertesites["url"], 'timestamp' => $ertesites["timestamp"], 'latta' => $latta);
+
+		$notifications[] = $tempert;
+	}
+
+	return $notifications;
+}
