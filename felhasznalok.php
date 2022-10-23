@@ -78,31 +78,24 @@ else
     <div>
 
     <table>
-        <thead style="font-size: 1.3em; font-weight: bold">
+        <thead>
             <tr>
-                <td>ID</td>
-                <td>Felhasználó</td>
-                <td>Usernév</td>
-                <td>Emailcím</td>
-                <td>Telefon</td>
-                <td>Alakulat</td>
-                <td>Részleg</td>
-                <td>Beosztás</td>
-                <td>Első bejelentkezés</td>
+                <th>ID</th>
+                <th>Felhasználó</th>
+                <th>Usernév</th>
+                <th>Emailcím</th>
+                <th>Telefon</th>
+                <th>Alakulat</th>
+                <th>Részleg</th>
+                <th>Beosztás</th>
+                <th>Első bejelentkezés</th>
             </tr>
         </thead>
         <tbody><?php
+        $szamoz = 1;
         foreach($lista as $x)
         {
-            if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] < 50)
-            {
-                echo "<tr>";
-            }
-            else
-            {
-                ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/felhasznalo/<?=$x['felhasznaloid']?>'><?php
-            }
-                ?>
+            ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/felhasznalo/<?=$x['felhasznaloid']?>'>
                 <td><?=$x['felhasznaloid']?></td>
                 <td><?=$x['nev']?></td>
                 <td><?=$x['felhasznalonev']?></td>
@@ -113,6 +106,7 @@ else
                 <td><?=$x['beosztas']?></td>
                 <td><?=$x['elsobelepes']?></td>
             </tr><?php
+            $szamoz++;
         }
         ?></tbody>
         </table>

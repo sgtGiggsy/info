@@ -138,10 +138,11 @@ else
                 </tr>
             </thead>
         <tbody><?php
+        $szamoz = 1;
         foreach($munkak as $munka)
         {
             $munkid = $munka['id'];
-            ?><tr>
+            ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' style='font-weight: normal'>
                 <td><?=$munkid?></td>
                 <td><?=$munka['igenylonev']?></td>
                 <td><?=$munka['igenylotelefon']?></td>
@@ -155,6 +156,7 @@ else
                 <td><a style="cursor: pointer;" onclick="window.open('<?=$RootPath?>/munkaprint/<?=$munka['id']?>')"><img src='<?=$RootPath?>/images/print.png' alt='Munkalap nyomtatása' title='Munkalap nyomtatása' /></a></td>
                 <td><?=($csoportir) ? "<a href='$RootPath/munkaszerkeszt/$munkid'><img src='$RootPath/images/edit.png' alt='Munka szerkesztése' title='Munka szerkesztése'/></a>" : "" ?></td>
             </tr><?php
+            $szamoz++;
         }
         ?></tbody>
         </table><?php

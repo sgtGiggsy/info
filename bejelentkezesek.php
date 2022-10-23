@@ -18,7 +18,7 @@ else
     ?><div class='oldalcim'>Bejelentkezések</div>
     <div>
     <table id='bejelentkezesek'>
-        <thead style="font-size: 1.3em; font-weight: bold">
+        <thead>
             <tr>
                 <th class="tsorth" onclick="sortTable(0, 'i', 'bejelentkezesek')">ID</th>
                 <?php if(!isset($felhid))
@@ -34,9 +34,10 @@ else
             </tr>
         </thead>
         <tbody><?php
+        $szamoz = 1;
         foreach($lista as $x)
         {
-            ?><tr>
+            ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' style='font-weight: normal'>
                 <td><?=$x['id']?></td>
                 <?php if(!isset($felhid))
                 {
@@ -49,6 +50,7 @@ else
                 <td><?=$x['bongeszoverzio']?></td>
                 <td><?=$x['timestamp']?></td>
             </tr><?php
+            $szamoz++;
         }
         ?></tbody>
         </table>

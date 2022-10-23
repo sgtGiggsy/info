@@ -9,7 +9,7 @@ else
     ?><div class='oldalcim'>Bejelentkezési hibák</div>
     <div>
     <table id='bejelentkezesihibak'>
-        <thead style="font-size: 1.3em; font-weight: bold">
+        <thead>
             <tr>
                 <th class="tsorth" onclick="sortTable(0, 'i', 'bejelentkezesihibak')">ID</th>
                 <th class="tsorth" onclick="sortTable(1, 's', 'bejelentkezesihibak')">Felhasználónév</th>
@@ -18,14 +18,16 @@ else
             </tr>
         </thead>
         <tbody><?php
+        $szamoz = 1;
         foreach($lista as $x)
         {
-            ?><tr>
+            ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' style='font-weight: normal'>
                 <td><?=$x['id']?></td>
                 <td><?=$x['felhasznalonev']?></td>
                 <td><?=$x['ipcim']?></td>
                 <td><?=$x['probalkozasideje']?></td>
             </tr><?php
+            $szamoz++;
         }
         ?></tbody>
         </table>
