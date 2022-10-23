@@ -8,7 +8,7 @@ else
 {
 // Adatbázis műveletek rész    
     $aktiveszkozok = mySQLConnect("SELECT
-            eszkozok.id AS id,
+            eszkozok.id AS eszkid,
             beepitesek.id AS beepid,
             sorozatszam,
             mac,
@@ -43,13 +43,15 @@ else
             raktarak.nev AS raktar,
             hibas,
             eszkozok.megjegyzes AS megjegyzes,
-            eszkozok.letrehozo AS letrehozoid,
+            beepitesek.megjegyzes AS beepmegjegyz,
+            (SELECT MIN(id) FROM modositasok WHERE eszkoz = eszkid) AS elsomodositas,
+            (SELECT felhasznalo FROM modositasok WHERE id = elsomodositas) AS letrehozoid,
             (SELECT nev FROM felhasznalok WHERE id = letrehozoid) AS letrehozo,
-            eszkozok.utolsomodosito AS utolsomodositoid,
+            (SELECT MAX(id) FROM modositasok WHERE eszkoz = eszkid) AS utolsomodositas,
+            (SELECT felhasznalo FROM modositasok WHERE id = utolsomodositas) AS utolsomodositoid,
             (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
-            eszkozok.utolsomodositasideje AS utolsomodositasideje,
-            eszkozok.letrehozasideje AS letrehozasideje,
-            beepitesek.megjegyzes AS beepmegjegyz
+            (SELECT timestamp FROM modositasok WHERE id = utolsomodositas) AS utolsomodositasideje,
+            (SELECT timestamp FROM modositasok WHERE id = elsomodositas) AS letrehozasideje
         FROM eszkozok
                 INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
                 INNER JOIN modellek ON eszkozok.modell = modellek.id
@@ -142,9 +144,10 @@ else
                 hibas,
                 raktar AS raktarid,
                 raktarak.nev AS raktar,
-                eszkozok_history.utolsomodosito AS utolsomodositoid,
-                (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
-                eszkozok_history.utolsomodositasideje AS utolsomodositasideje,
+                modositasok.felhasznalo AS modositoid,
+                (SELECT nev FROM felhasznalok WHERE id = modositoid) AS modosito,
+                modositasok.timestamp AS modositasideje,
+                muvelet,
                 mac,
                 web,
                 ssh,
@@ -153,11 +156,12 @@ else
                 uplinkportok,
                 szoftver
             FROM eszkozok_history
-            INNER JOIN aktiveszkozok_history ON eszkozok_history.modid = aktiveszkozok_history.modid
-            LEFT JOIN raktarak ON eszkozok_history.raktar = raktarak.id
-            LEFT JOIN modellek ON eszkozok_history.modell = modellek.id
-            LEFT JOIN gyartok ON modellek.gyarto = gyartok.id
-            LEFT JOIN alakulatok ON eszkozok_history.tulajdonos = alakulatok.id
+                INNER JOIN aktiveszkozok_history ON eszkozok_history.modid = aktiveszkozok_history.modid
+                INNER JOIN modositasok ON eszkozok_history.modid = modositasok.id
+                LEFT JOIN raktarak ON eszkozok_history.raktar = raktarak.id
+                LEFT JOIN modellek ON eszkozok_history.modell = modellek.id
+                LEFT JOIN gyartok ON modellek.gyarto = gyartok.id
+                LEFT JOIN alakulatok ON eszkozok_history.tulajdonos = alakulatok.id
             WHERE eszkozok_history.eszkozid = $id
             ORDER BY eszkozok_history.modid");
 
@@ -267,10 +271,23 @@ else
                         $elozoverzio = null;
                         foreach($elozmenyek as $x)
                         {
-                            ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
-                                <td><?=($x['utolsomodositasideje']) ? $x['utolsomodositasideje'] : $eszkoz['letrehozasideje'] ?></td>
-                                <td><?=($x['utolsomodosito']) ? $x['utolsomodosito'] : $eszkoz['letrehozo'] ?></td>
-                                <td <?=($elozoverzio && $elozoverzio['gyarto'] != $x['gyarto'] && $elozoverzio['modell'] != $x['modell'] && $elozoverzio['varians'] != $x['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$x['gyarto']?> <?=$x['modell']?><?=$x['varians']?></td>
+                            ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'><?php
+                                if($szamoz == 1 && $x['muvelet'] == 1)
+                                {
+                                    ?><td><?=$x['modositasideje']?></td>
+                                    <td><?=$x['modosito']?></td><?php
+                                }
+                                elseif ($szamoz != 1)
+                                {
+                                    ?><td><?=$x['modositasideje']?></td>
+                                    <td><?=$x['modosito']?></td><?php
+                                }
+                                else
+                                {
+                                    ?><td></td>
+                                    <td></td><?php
+                                }
+                                ?><td <?=($elozoverzio && $elozoverzio['gyarto'] != $x['gyarto'] && $elozoverzio['modell'] != $x['modell'] && $elozoverzio['varians'] != $x['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$x['gyarto']?> <?=$x['modell']?><?=$x['varians']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['sorozatszam'] != $x['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$x['sorozatszam']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['mac'] != $x['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$x['mac']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['szoftver'] != $x['szoftver']) ? "style='font-weight: bold;'" : "" ?>><?=$x['szoftver']?></td>
@@ -312,8 +329,10 @@ else
 // Infobox
         ?><div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
         <div class="infobox"><?php
+            $ujoldalcim = $ablakcim . " - " . $eszkoz['gyarto'] . " " . $eszkoz['modell'] . $eszkoz['varians'] . " (" . $eszkoz['sorozatszam'] . ")";
             if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
             {
+                $ujoldalcim = $ablakcim . " - " . $eszkoz['beepitesinev'] . " (" . $eszkoz['ipcim'] . ")";
                 ?><div>Állapot</div>
                 <div>Beépítve</div>
                 <div>IP cím</div><?php

@@ -598,59 +598,60 @@ function mysqliNaturalSort($mysqliresult, $sortcriteria)
 	return $returnarr;
 }
 
-function getWhere($eszktip)
+function getWhere($eszktip = false)
 {
 	if(isset($_GET['szures']) && $_GET['szures'] != "keszleten")
-    {
-        $filter = $_GET['szures'];
-        if($filter == "mind")
-        {
-            $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL)";
-            $szures = "- Mind";
-        }
-        elseif ($filter == "leadva")
-        {
-            $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NOT NULL";
-            $szures = "- Leadva";
-        }
-        elseif ($filter == "beepitve")
-        {
-            $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)";
-            $szures = "- Beépítve";
-        }
-        elseif ($filter == "raktaron")
-        {
-            $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL AND (beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL OR beepitesek.id IS NULL)";
-            $szures = "- Raktáron";
-        }
+	{
+		$filter = $_GET['szures'];
+		if($filter == "mind")
+		{
+			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL)";
+			$szures = "- Mind";
+		}
+		elseif ($filter == "leadva")
+		{
+			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NOT NULL";
+			$szures = "- Leadva";
+		}
+		elseif ($filter == "beepitve")
+		{
+			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)";
+			$szures = "- Beépítve";
+		}
+		elseif ($filter == "raktaron")
+		{
+			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL AND (beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL OR beepitesek.id IS NULL)";
+			$szures = "- Raktáron";
+		}
 		elseif ($filter == "hibatlan")
-        {
-            $where = "$eszktip AND eszkozok.hibas IS NULL";
-            $szures = "- Hibátlan eszközök";
-        }
+		{
+			$where = "$eszktip AND eszkozok.hibas IS NULL";
+			$szures = "- Hibátlan eszközök";
+		}
 		elseif ($filter == "reszleges")
-        {
-            $where = "$eszktip AND eszkozok.hibas = 1";
-            $szures = "- Részlegesen működőképes eszközök";
-        }
+		{
+			$where = "$eszktip AND eszkozok.hibas = 1";
+			$szures = "- Részlegesen működőképes eszközök";
+		}
 		elseif ($filter == "mukodeskeptelen")
-        {
-            $where = "$eszktip AND eszkozok.hibas = 2";
-            $szures = "- Működésképtelen eszközök";
-        }
-    }
-    elseif(!$_GET['page'] != "raktar")
-    {
-        $filter = false;
-        $where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL";
-        $szures = "- Készleten";
-    }
+		{
+			$where = "$eszktip AND eszkozok.hibas = 2";
+			$szures = "- Működésképtelen eszközök";
+		}
+	}
+	elseif($_GET['page'] == "raktar")
+	{
+		$filter = false;
+		$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL";
+		$szures = "- Készleten";
+	}
 	else
 	{
 		$filter = false;
-        $where = "$eszktip";
-        $szures = "- Teljes készlet";
+		$where = "$eszktip";
+		$szures = "- Teljes készlet";
 	}
+	
 
 	return array('filter' => $filter, 'where' => $where, 'szures' => $szures);
 }
@@ -700,12 +701,13 @@ function szerkSor($beepid, $eszkid, $eszktip)
 	<td class="dontprint"><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
 }
 
-function modId($con)
+function modId($muvelet, $tipus, $objid)
 {
-	$null = null;
-	$stmt = $con->prepare('INSERT INTO modositasok () VALUES (?)');
-	$stmt->bind_param('s', $null);
-	$stmt->execute();
+	$con = mySQLConnect();
+	$felhasznalo = $_SESSION[getenv('SESSION_NAME').'id'];
+	$string = "INSERT INTO modositasok (felhasznalo, muvelet, $tipus) VALUES ($felhasznalo, $muvelet, $objid)";
+	$modositas = mysqli_query($con, $string);
+
 	$last_id = mysqli_insert_id($con);
 
 	return $last_id;

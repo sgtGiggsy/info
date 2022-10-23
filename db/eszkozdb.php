@@ -14,26 +14,27 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO eszkozok (modell, sorozatszam, tulajdonos, varians, megjegyzes, raktar, letrehozo) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssssss', $_POST['modell'], $_POST['sorozatszam'], $_POST['tulajdonos'], $_POST['varians'], $_POST['megjegyzes'], $_POST['raktar'], $_SESSION[getenv('SESSION_NAME').'id']);
+        $stmt = $con->prepare('INSERT INTO eszkozok (modell, sorozatszam, tulajdonos, varians, megjegyzes, raktar) VALUES (?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('ssssss', $_POST['modell'], $_POST['sorozatszam'], $_POST['tulajdonos'], $_POST['varians'], $_POST['megjegyzes'], $_POST['raktar']);
         $stmt->execute();
 
         $last_id = mysqli_insert_id($con);
-
+        $modif_id = modId("1", "eszkoz", $last_id);
+        mySQLConnect("UPDATE eszkozok SET modid = $modif_id WHERE id = $last_id");
 
         if($eszkoztipus)
         {
             if($eszkoztipus == "aktiv")
             {
-                $stmt = $con->prepare('INSERT INTO aktiveszkozok (eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, letrehozo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->bind_param('sssssssss', $last_id, $_POST['mac'], $_POST['poe'], $_POST['ssh'], $_POST['web'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $_SESSION[getenv('SESSION_NAME').'id']);
+                $stmt = $con->prepare('INSERT INTO aktiveszkozok (eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, modid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->bind_param('sssssssss', $last_id, $_POST['mac'], $_POST['poe'], $_POST['ssh'], $_POST['web'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $modif_id);
                 $stmt->execute();
             }
 
             if($eszkoztipus == "soho")
             {
-                $stmt = $con->prepare('INSERT INTO sohoeszkozok (eszkoz, mac, lanportok, wanportok, szoftver, letrehozo) VALUES (?, ?, ?, ?, ?, ?)');
-                $stmt->bind_param('ssssss', $last_id, $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $_SESSION[getenv('SESSION_NAME').'id']);
+                $stmt = $con->prepare('INSERT INTO sohoeszkozok (eszkoz, mac, lanportok, wanportok, szoftver, modid) VALUES (?, ?, ?, ?, ?, ?)');
+                $stmt->bind_param('ssssss', $last_id, $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $modif_id);
                 $stmt->execute();
             }
 
@@ -49,6 +50,7 @@ if(isset($irhat) && $irhat)
                 $eszkoz = $last_id;
                 include("./db/portdb.php");
             }
+
         }
 
         if(mysqli_errno($con) != 0)
@@ -66,40 +68,40 @@ if(isset($irhat) && $irhat)
         $timestamp = date('Y-m-d H:i:s');
         $eszkoz = $_POST['id'];
 
-        $last_id = modId($con);
+        $modif_id = modId("2", "eszkoz", $eszkoz);
 
-        mySQLConnect("INSERT INTO eszkozok_history (eszkozid, modell, sorozatszam, tulajdonos, varians, megjegyzes, leadva, hibas, raktar, utolsomodosito, utolsomodositasideje, modid)
-            SELECT id, modell, sorozatszam, tulajdonos, varians, megjegyzes, leadva, hibas, raktar, utolsomodosito, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO eszkozok_history (eszkozid, modell, sorozatszam, tulajdonos, varians, megjegyzes, leadva, hibas, raktar, modid)
+            SELECT id, modell, sorozatszam, tulajdonos, varians, megjegyzes, leadva, hibas, raktar, modid
             FROM eszkozok
             WHERE id = $eszkoz");
         
-        $stmt = $con->prepare('UPDATE eszkozok SET modell=?, sorozatszam=?, tulajdonos=?, varians=?, megjegyzes=?, leadva=?, hibas=?, raktar=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
-        $stmt->bind_param('ssssssssssi', $_POST['modell'], $_POST['sorozatszam'], $_POST['tulajdonos'], $_POST['varians'], $_POST['megjegyzes'], $_POST['leadva'], $_POST['hibas'], $_POST['raktar'], $_SESSION[getenv('SESSION_NAME').'id'], $timestamp, $eszkoz);
+        $stmt = $con->prepare('UPDATE eszkozok SET modell=?, sorozatszam=?, tulajdonos=?, varians=?, megjegyzes=?, leadva=?, hibas=?, raktar=?, modid=? WHERE id=?');
+        $stmt->bind_param('sssssssssi', $_POST['modell'], $_POST['sorozatszam'], $_POST['tulajdonos'], $_POST['varians'], $_POST['megjegyzes'], $_POST['leadva'], $_POST['hibas'], $_POST['raktar'], $modif_id, $eszkoz);
         $stmt->execute();
 
         if($eszkoztipus)
         {
             if($eszkoztipus == "aktiv")
             {
-                mySQLConnect("INSERT INTO aktiveszkozok_history (akteszkid, eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, utolsomodosito, utolsomodositasideje, modid)
-                    SELECT id, eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, utolsomodosito, utolsomodositasideje, $last_id
+                mySQLConnect("INSERT INTO aktiveszkozok_history (akteszkid, eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, modid)
+                    SELECT id, eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, modid
                     FROM aktiveszkozok
                     WHERE eszkoz = $eszkoz");
 
-                $stmt = $con->prepare('UPDATE aktiveszkozok SET mac=?, poe=?, ssh=?, web=?, portszam=?, uplinkportok=?, szoftver=?, utolsomodosito=?, utolsomodositasideje=? WHERE eszkoz=?');
-                $stmt->bind_param('sssssssssi', $_POST['mac'], $_POST['poe'], $_POST['ssh'], $_POST['web'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $_SESSION[getenv('SESSION_NAME').'id'], $timestamp, $_POST['id']);
+                $stmt = $con->prepare('UPDATE aktiveszkozok SET mac=?, poe=?, ssh=?, web=?, portszam=?, uplinkportok=?, szoftver=?, modid=? WHERE eszkoz=?');
+                $stmt->bind_param('ssssssssi', $_POST['mac'], $_POST['poe'], $_POST['ssh'], $_POST['web'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $modif_id, $_POST['id']);
                 $stmt->execute();
             }
 
             elseif($eszkoztipus == "soho")
             {
-                mySQLConnect("INSERT INTO sohoeszkozok_history (sohoeszkozid, eszkoz, wanportok, lanportok, mac, szoftver, utolsomodosito, utolsomodositasideje, modid)
-                    SELECT id, eszkoz, wanportok, lanportok, mac, szoftver, utolsomodosito, utolsomodositasideje, $last_id
+                mySQLConnect("INSERT INTO sohoeszkozok_history (sohoeszkozid, eszkoz, wanportok, lanportok, mac, szoftver, modid)
+                    SELECT id, eszkoz, wanportok, lanportok, mac, szoftver, modid
                     FROM sohoeszkozok
                     WHERE eszkoz = $eszkoz");
                 
-                $stmt = $con->prepare('UPDATE sohoeszkozok SET mac=?, lanportok=?, wanportok=?, szoftver=?, utolsomodosito=?, utolsomodositasideje=? WHERE eszkoz=?');
-                $stmt->bind_param('ssssssi', $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $_SESSION[getenv('SESSION_NAME').'id'], $timestamp, $_POST['id']);
+                $stmt = $con->prepare('UPDATE sohoeszkozok SET mac=?, lanportok=?, wanportok=?, szoftver=?, modid=? WHERE eszkoz=?');
+                $stmt->bind_param('sssssi', $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $modif_id, $_POST['id']);
                 $stmt->execute();
             }
 
@@ -109,6 +111,7 @@ if(isset($irhat) && $irhat)
                 $stmt->bind_param('ss', $_POST['nev'], $_POST['id']);
                 $stmt->execute();
             }
+
         }
 
         if(mysqli_errno($con) != 0)
