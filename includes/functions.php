@@ -749,3 +749,20 @@ function getNotifications()
 
 	return $notifications;
 }
+
+function nevToLink($nev)
+{
+	setlocale(LC_CTYPE, 'hu_HU');
+	$charstoremove = array(":", ",", ".", "\"", "'", "(", ")");
+	$charstoreplace = array(" ", ".", "_");
+	$link = strtolower(str_replace($charstoremove, "", str_replace($charstoreplace, "-", iconv('utf-8', 'ascii//TRANSLIT', $nev))));
+	$link = str_replace("--", "-", $link);
+	$link = rtrim($link ,"-");
+	return $link;
+}
+
+function getCimkek($cimkek)
+{
+	$cimkelista = explode(',', $cimkek);
+	return $cimkelista;
+}
