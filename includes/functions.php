@@ -600,58 +600,79 @@ function mysqliNaturalSort($mysqliresult, $sortcriteria)
 
 function getWhere($eszktip = false)
 {
-	if(isset($_GET['szures']) && $_GET['szures'] != "keszleten")
+	if($eszktip)
 	{
-		$filter = $_GET['szures'];
-		if($filter == "mind")
+		if(isset($_GET['szures']) && $_GET['szures'] != "keszleten")
 		{
-			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL)";
-			$szures = "- Mind";
+			$filter = $_GET['szures'];
+			if($filter == "mind")
+			{
+				$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL)";
+				$szures = "- Mind";
+			}
+			elseif ($filter == "leadva")
+			{
+				$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NOT NULL";
+				$szures = "- Leadva";
+			}
+			elseif ($filter == "beepitve")
+			{
+				$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)";
+				$szures = "- Beépítve";
+			}
+			elseif ($filter == "raktaron")
+			{
+				$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL AND (beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL OR beepitesek.id IS NULL)";
+				$szures = "- Raktáron";
+			}
+			elseif ($filter == "hibatlan")
+			{
+				$where = "$eszktip AND eszkozok.hibas IS NULL";
+				$szures = "- Hibátlan eszközök";
+			}
+			elseif ($filter == "reszleges")
+			{
+				$where = "$eszktip AND eszkozok.hibas = 1";
+				$szures = "- Részlegesen működőképes eszközök";
+			}
+			elseif ($filter == "mukodeskeptelen")
+			{
+				$where = "$eszktip AND eszkozok.hibas = 2";
+				$szures = "- Működésképtelen eszközök";
+			}
 		}
-		elseif ($filter == "leadva")
+		elseif($_GET['page'] == "raktar")
 		{
-			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NOT NULL";
-			$szures = "- Leadva";
+			$filter = false;
+			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL";
+			$szures = "- Készleten";
 		}
-		elseif ($filter == "beepitve")
+		else
 		{
-			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)";
-			$szures = "- Beépítve";
+			$filter = false;
+			$where = "$eszktip";
+			$szures = "- Teljes készlet";
 		}
-		elseif ($filter == "raktaron")
-		{
-			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL AND (beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL OR beepitesek.id IS NULL)";
-			$szures = "- Raktáron";
-		}
-		elseif ($filter == "hibatlan")
-		{
-			$where = "$eszktip AND eszkozok.hibas IS NULL";
-			$szures = "- Hibátlan eszközök";
-		}
-		elseif ($filter == "reszleges")
-		{
-			$where = "$eszktip AND eszkozok.hibas = 1";
-			$szures = "- Részlegesen működőképes eszközök";
-		}
-		elseif ($filter == "mukodeskeptelen")
-		{
-			$where = "$eszktip AND eszkozok.hibas = 2";
-			$szures = "- Működésképtelen eszközök";
-		}
-	}
-	elseif($_GET['page'] == "raktar")
-	{
-		$filter = false;
-		$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL";
-		$szures = "- Készleten";
 	}
 	else
 	{
-		$filter = false;
-		$where = "$eszktip";
-		$szures = "- Teljes készlet";
+		$filter = @$_GET['szures'];
+		if ($filter == "raktarban")
+		{
+			$where = "$eszktip AND eszkozok.hibas = 2";
+			$szures = "- Raktárban";
+		}
+		elseif ($filter == "kiadva")
+		{
+			$where = "$eszktip AND eszkozok.hibas = 2";
+			$szures = "- Kiadva felhasználóknak";
+		}
+		else
+		{
+			$where = "$eszktip AND eszkozok.hibas = 2";
+			$szures = "- Minden SIM kártya";
+		}
 	}
-	
 
 	return array('filter' => $filter, 'where' => $where, 'szures' => $szures);
 }

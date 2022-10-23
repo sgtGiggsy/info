@@ -51,6 +51,12 @@ if(isset($irhat) && $irhat)
                 include("./db/portdb.php");
             }
 
+            elseif($eszkoztipus == "simkartya")
+            {
+                $stmt = $con->prepare('INSERT INTO simkartyak (eszkoz, telefonszam, pinkod, pukkod, tipus, felhasznaloszam, modid) VALUES (?, ?, ?, ?, ?, ?, ?)');
+                $stmt->bind_param('sssssss', $last_id, $_POST['telefonszam'], $_POST['pinkod'], $_POST['pukkod'], $_POST['tipus'], $_POST['felhasznaloszam'], $modif_id);
+                $stmt->execute();
+            }
         }
 
         if(mysqli_errno($con) != 0)
@@ -112,6 +118,17 @@ if(isset($irhat) && $irhat)
                 $stmt->execute();
             }
 
+            elseif($eszkoztipus == "simkartya")
+            {
+                mySQLConnect("INSERT INTO simkartyak_history (simid, eszkoz, telefonszam, pinkod, pukkod, tipus, felhasznaloszam, modid)
+                    SELECt id, eszkoz, telefonszam, pinkod, pukkod, tipus, felhasznaloszam, modid
+                    FROM simkartyak
+                    WHERE eszkoz = $eszkoz");
+
+                $stmt = $con->prepare('UPDATE simkartyak SET telefonszam=?, pinkod=?, pukkod=?, tipus=?, felhasznaloszam=?, modid=? WHERE eszkoz=?');
+                $stmt->bind_param('ssssssi', $_POST['telefonszam'], $_POST['pinkod'], $_POST['pukkod'], $_POST['tipus'], $_POST['felhasznaloszam'], $modif_id, $_POST['id']);
+                $stmt->execute();
+            }
         }
 
         if(mysqli_errno($con) != 0)

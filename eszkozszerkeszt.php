@@ -21,6 +21,7 @@ else
             case "bovitomodul": $wheretip = "WHERE modellek.tipus > 25 AND modellek.tipus < 31"; break;
             case "szerver": $wheretip = "WHERE modellek.tipus > 30 AND modellek.tipus < 40"; break;
             case "telefonkozpont": $wheretip = "WHERE modellek.tipus = 40"; break;
+            case "simkartya": $wheretip = "WHERE modellek.tipus = 45"; break;
         }
     }
     
@@ -39,9 +40,18 @@ else
 
     $raktarak = mySQLConnect("SELECT * FROM raktarak;");
     
-    $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = $uplinkportok = $szoftver = $nev = $leadva = $hibas = $raktar = $megjegyzes = $poe = $ssh = $web = null;
+    $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = 
+    $uplinkportok = $szoftver = $nev = $leadva = $hibas = $raktar =
+    $megjegyzes = $poe = $ssh = $web = $felhasznaloszam = $simtipus =
+    $telefonszam = $pinkod = $pukkod = null;
     $button = "Új eszköz";
     $oldalcim = "Új eszköz létrehozása";
+
+    if($eszkoztipus == "simkartya")
+    {
+        $felhasznaloszamok = mySQLConnect("SELECT * FROM simfelhasznaloszamok");
+        $simtipusok = mySQLConnect("SELECT * FROM simtipusok");
+    }
     
     if(isset($_GET['id']))
     {
@@ -181,6 +191,18 @@ else
             </div><?php
         }
 
+        if($eszkoztipus == "simkartya")
+        {
+            $simkartya = mySQLConnect("SELECT * FROM simkartyak WHERE eszkoz = $eszkid");
+            $simkartya = mysqli_fetch_assoc($simkartya);
+
+            $felhasznaloszam = @$simkartya['felhasznaloszam'];
+            $simtipus = @$simkartya['tipus'];
+            $telefonszam = @$simkartya['telefonszam'];
+            $pinkod = @$simkartya['pinkod'];
+            $pukkod = @$simkartya['pukkod'];
+        }
+
         $modell = $eszkoz['modell'];
         $sorozatszam = $eszkoz['sorozatszam'];
         $tulajdonos = $eszkoz['tulajdonos'];
@@ -201,47 +223,29 @@ else
     }
 
     ?><div class="oldalcim"><?=$oldalcim?></div>
-    <div class="contentcenter">
-
-        <div>
-            <label for="modell">Modell:</label><br>
-            <select id="modell" name="modell">
-                <option value="" selected></option><?php
-                foreach($modellek as $x)
-                {
-                    ?><option value="<?=$x["id"]?>" <?= ($modell == $x['id']) ? "selected" : "" ?>><?=$x['gyarto'] . " " . $x['modell'] . " (" . $x['tipus'] . ")"?></option><?php
-                }
-            ?></select>
-        </div>
-
-        <div>
-            <label for="varians">Modell variáns:</label><br>
-            <input type="text" accept-charset="utf-8" name="varians" id="varians" value="<?=$varians?>"></input>
-        </div>
-
-        <div>
-            <label for="sorozatszam">Sorozatszám:</label><br>
-            <input type="text" accept-charset="utf-8" name="sorozatszam" id="sorozatszam" value="<?=$sorozatszam?>"></input>
-        </div><?php
-
-        if(isset($_GET['id']))
+    <div class="contentcenter"><?php
+        if($eszkoztipus != "simkartya")
         {
             ?><div>
-                <label for="leadva">Leadva:</label><br>
-                <input type="checkbox" accept-charset="utf-8" name="leadva" id="leadva" value="1" <?= ($leadva) ? "checked" : "" ?>></input>
+                <label for="modell">Modell:</label><br>
+                <select id="modell" name="modell">
+                    <option value="" selected></option><?php
+                    foreach($modellek as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>" <?= ($modell == $x['id']) ? "selected" : "" ?>><?=$x['gyarto'] . " " . $x['modell'] . " (" . $x['tipus'] . ")"?></option><?php
+                    }
+                ?></select>
             </div>
 
             <div>
-                <label for="hibas">Hibás:</label><br>
-                <select name="hibas">
-                    <option value="" selected></option>
-                    <option value="1" <?= ($hibas == "1") ? "selected" : "" ?>>Részlegesen</option>
-                    <option value="2" <?= ($hibas == "2") ? "selected" : "" ?>>Működésképtelen</option>
-                </select>
+                <label for="varians">Modell variáns:</label><br>
+                <input type="text" accept-charset="utf-8" name="varians" id="varians" value="<?=$varians?>"></input>
             </div><?php
         }
-
-        alakulatPicker($tulajdonos, "tulajdonos");
+        ?><div>
+            <label for="sorozatszam"><?=($eszkoztipus != "simkartya") ? "Sorozatszám:" : "IMEI szám" ?></label><br>
+            <input type="text" accept-charset="utf-8" name="sorozatszam" id="sorozatszam" value="<?=$sorozatszam?>"></input>
+        </div><?php
 
         if($eszkoztipus == "telefonkozpont")
         {
@@ -289,6 +293,66 @@ else
             <div>
                 <label for="web">Webes felület:</label><br>
                 <input type="checkbox" accept-charset="utf-8" name="web" id="web" value="1" <?= ($web) ? "checked" : "" ?>></input>
+            </div><?php
+        }
+
+        if($eszkoztipus == "simkartya")
+        {
+            ?><div>
+                <label for="telefonszam">Telefonszám:</label><br>
+                <input type="text" accept-charset="utf-8" name="telefonszam" id="telefonszam" value="<?=$telefonszam?>"></input>
+            </div>
+            
+            <div>
+                <label for="pinkod">PIN kód:</label><br>
+                <input type="text" accept-charset="utf-8" name="pinkod" id="pinkod" value="<?=$pinkod?>"></input>
+            </div>
+
+            <div>
+                <label for="pukkod">PUK kód:</label><br>
+                <input type="text" accept-charset="utf-8" name="pukkod" id="pukkod" value="<?=$pukkod?>"></input>
+            </div>
+
+            <div>
+                <label for="tipus">Típus:</label><br>
+                <select id="tipus" name="tipus">
+                    <option value="" selected></option><?php
+                    foreach($simtipusok as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>" <?=($simtipus == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                    }
+                ?></select>
+            </div>
+
+            <div>
+                <label for="felhasznaloszam">Felhasználók száma:</label><br>
+                <select id="felhasznaloszam" name="felhasznaloszam">
+                    <option value="" selected></option><?php
+                    foreach($felhasznaloszamok as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>" <?= ($felhasznaloszam == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                    }
+                ?></select>
+            </div>
+            <?php
+        }
+
+        alakulatPicker($tulajdonos, "tulajdonos");
+
+        if(isset($_GET['id']))
+        {
+            ?><div>
+                <label for="leadva">Leadva:</label><br>
+                <input type="checkbox" accept-charset="utf-8" name="leadva" id="leadva" value="1" <?= ($leadva) ? "checked" : "" ?>></input>
+            </div>
+
+            <div>
+                <label for="hibas">Hibás:</label><br>
+                <select name="hibas">
+                    <option value="" selected></option>
+                    <option value="1" <?= ($hibas == "1") ? "selected" : "" ?>>Részlegesen</option>
+                    <option value="2" <?= ($hibas == "2") ? "selected" : "" ?>>Működésképtelen</option>
+                </select>
             </div><?php
         }
 
