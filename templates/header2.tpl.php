@@ -46,12 +46,13 @@ else
 ?></div><?php
 
 // Előugró menük
+//// Értesítések
 if($_SESSION[getenv('SESSION_NAME').'id'])
 {
     ?><div id="notifpopup" onmouseleave="hidePopup('notifpopup')"><?php
         foreach($notifications as $notification)
         {
-            ?><a onclick="seenNotif(<?=$notification['id']?>)" href="<?=$RootPath?><?=$notification['url']?>">
+            ?><a onclick="seenNotif(<?=$notification['id']?>)" href="<?=$RootPath?>/<?=$notification['url']?>">
                 <div class="notifitem<?=($notification['latta']) ? '-latta' : '' ?>">
                     <p class="notiftitle"><?=$notification['cim']?></p>
                     <p class="notifbody"><?=$notification['szoveg']?></p>
@@ -59,9 +60,11 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
                 </div>
             </a><?php
         }
-        ?><div id="seenallnotif"><p onclick="seenAllNotif();location.reload()">Mind megnézve</p></div>
-    </div>
-    <div id="profilpopup" onmouseleave="hidePopup('profilpopup')">
+        ?><div id="seenallnotif"><p onclick="seenAllNotif();reloadPageDelay(1000)">Mind megnézve</p></div>
+    </div><?php
+
+//// Profil
+    ?><div id="profilpopup" onmouseleave="hidePopup('profilpopup')">
         <a href="<?=$RootPath?>/felhasznalo">Profil</a>
         <a href="<?=$RootPath?>/szemelyes">Beállítások</a>
         <a href="<?=$RootPath?>/kilep">Kilépés</a>

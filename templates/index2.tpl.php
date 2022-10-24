@@ -219,9 +219,13 @@
 
 	function seenNotif(notifid) {
 		$.ajax({
-        type: "POST",
-        url: "<?=$RootPath?>/notifseendb?action=seennotif&notifid=" + notifid,
-	});
+        	type: "POST",
+        	url: "<?=$RootPath?>/notifseendb?action=seennotif&notifid=" + notifid,	
+		});
+	}
+
+	function reloadPageDelay(delaytime) {
+		setTimeout(() => { location.reload(); }, delaytime);
 	}
 
 	<?php

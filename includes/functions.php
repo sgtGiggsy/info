@@ -29,76 +29,6 @@ function mySQLConnect($querystring = null)
 	}
 }
 
-function showMenu($menuitems, $admin)
-{
-	$RootPath = getenv('APP_ROOT_PATH');
-	$jog = 0;
-	if (isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']))
-	{
-		$jog = $_SESSION[getenv('SESSION_NAME').'jogosultsag'];
-	}
-
-	?>
-	<nav class="greedy">
-		<ul class="links">
-			<?php 
-			$current = null;
-			if (!(isset($_GET['page'])))
-			{
-				$current = "fooldal";
-			}
-			else
-			{
-				$current = $_GET['page'];
-			}
-
-			foreach ($menuitems as $x => $menuitem)
-			{
-				if($menuitem['aktiv'] && $menuitem['jog'] <= $_SESSION[getenv('SESSION_NAME').'jogosultsag'] /*&& $menuitem['parent'] == 0*/)
-				{ ?>
-					<li <?= (($menuitem['url'] == $current) ? ' class="nav-active"' : '') ?>>  
-						<a href="<?= (($menuitem['url'] == '/') ? $RootPath : $RootPath."/".$menuitem['url']) ?>"><?=$menuitem['cimke']?></a>	
-					</li> <?php
-				}
-			} ?>
-		</ul>
-		<button aria-label="További oldalak"><img src="<?=$RootPath?>/images/hamburger.png" alt="További oldalak"></button>
-		<ul class='hidden-links hidden'></ul>
-	</nav><?php
-}
-
-function countVisitor($pagename)
-{
-	$oldal = $pagename;
-	$ipcim = $_SERVER['REMOTE_ADDR'];
-	$usernev = null;
-	$referrer = null;
-	if(isset($_SERVER['HTTP_REFERER']))
-	{
-		$referrer = $_SERVER['HTTP_REFERER'];
-		if(stristr($referrer, "exatlonhunstats.nhely.hu"))
-		{
-			$referrer = null;
-		}
-	}
-	if(isset($_SESSION[getenv('SESSION_NAME').'id']))
-	{
-		$usernev = $_SESSION[getenv('SESSION_NAME').'id'];
-	}
-
-	$datum = date("Y-m-d");
-	$con = mySQLConnect(false);
-	if ($stmt = $con->prepare('INSERT INTO latogatasok (oldal, felhasznalo, ipcim, datum, referrer) VALUES (?, ?, ?, ?, ?)'))
-    {
-        $stmt->bind_param('sssss', $oldal, $usernev, $ipcim, $datum, $referrer);
-		$stmt->execute();
-	}
-	else
-	{
-		echo "";
-	}
-}
-
 function checkLDAPConnection($host)
 {
 	include('config.inc.php');
@@ -641,7 +571,7 @@ function getWhere($eszktip = false)
 				$szures = "- Működésképtelen eszközök";
 			}
 		}
-		elseif($_GET['page'] == "raktar")
+		elseif(!$_GET['page'] != "raktar")
 		{
 			$filter = false;
 			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL";
@@ -727,7 +657,7 @@ function modId($muvelet, $tipus, $objid)
 	$con = mySQLConnect();
 	$felhasznalo = $_SESSION[getenv('SESSION_NAME').'id'];
 	$string = "INSERT INTO modositasok (felhasznalo, muvelet, $tipus) VALUES ($felhasznalo, $muvelet, $objid)";
-	$modositas = mysqli_query($con, $string);
+	mysqli_query($con, $string);
 
 	$last_id = mysqli_insert_id($con);
 
@@ -744,6 +674,18 @@ function getNotifications()
 			AND ertek < date_sub(now(), INTERVAL 15 MINUTE)
 			AND ertek > (SELECT lastseennotif FROM felhasznalok WHERE id = $felhasznaloid)");
 
+	if(mysqli_num_rows($switchcheck) > 0)
+	{
+		$switchutolso = mysqli_fetch_assoc($switchcheck)['ertek'];
+		$cim = 'Switch ellenőrző leállt';
+		$szoveg = 'A switchek állapotát ellenőrző script utolsó futása: ' . $switchutolso;
+		$ertesitette = mySQLConnect("SELECT id FROM ertesitesek WHERE timestamp = '$switchutolso' AND cim = 'Switch ellenőrző leállt'");
+		if(mysqli_num_rows($ertesitette) == 0)
+		{
+			mySQLConnect("INSERT INTO ertesitesek (cim, szoveg, timestamp, tipus) VALUES ('$cim', '$szoveg', '$switchutolso', '1')");
+		}
+	}
+
 	$ertesitesek = mySQLConnect("SELECT ertesitesek.id AS id, cim, szoveg, url, timestamp, latta
 		FROM ertesitesek
 			INNER JOIN ertesites_megjelenik ON ertesitesek.id = ertesites_megjelenik.ertesites
@@ -751,13 +693,6 @@ function getNotifications()
 			AND ertesitesek.id = (SELECT MAX(ic.id) FROM ertesitesek ic WHERE ic.cim = ertesitesek.cim)
 			AND ertesitesek.timestamp > date_sub(now(), INTERVAL 7 DAY)
 		ORDER BY timestamp DESC");
-	
-	if(mysqli_num_rows($switchcheck) > 0)
-	{
-		$switchutolso = mysqli_fetch_assoc($switchcheck)['ertek'];
-		$notification = array('cim' => 'Switch ellenőrző leállt', 'szoveg' => 'A switchek állapotát ellenőrző script utolsó futása: ' . $switchutolso, 'url' => null, 'timestamp' => $switchutolso, 'latta' => false);
-		$notifications[] = $notification;
-	}
 
 	foreach($ertesitesek as $ertesites)
 	{
