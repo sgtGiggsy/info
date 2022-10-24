@@ -84,7 +84,7 @@ else
                 </div>
 
                 <div>
-                    <label for="nullara">Nullára kiegészítés számjegye<br><small> (pl.: ha 001 legyen 1 helyett, akkor 2)</small>:</label><br>
+                    <label for="nullara">Nullára kiegészítés számjegye<br><small> (pl.: ha 001 legyen 1 helyett, akkor 3)</small>:</label><br>
                     <input type="text" accept-charset="utf-8" name="nullara" id="nullara"></input>
                 </div>
 

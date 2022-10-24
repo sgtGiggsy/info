@@ -129,7 +129,7 @@ else
         
         $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
         
-        ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/eszkozszerkeszt/$id?tipus=aktiv'\">Eszköz szerkesztése</button>" : "" ?>
+        ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/eszkozszerkeszt/$id?tipus=soho'\">Eszköz szerkesztése</button>" : "" ?>
         <div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
         <div class="infobox"><?php
             if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
