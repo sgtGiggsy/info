@@ -20,7 +20,7 @@ if(isset($mindir) && $mindir)
         $helyiportid = $_POST['portid'];
         $switchportid = $_POST['id'];
 
-        $last_id = modId($con);
+        $modif_id = modId("2", "port", $helyiportid);
 
         if($tulportid)
         {
@@ -28,35 +28,35 @@ if(isset($mindir) && $mindir)
         }
         $iftulportchange = mySQLConnect("SELECT id FROM portok WHERE csatlakozas = $helyiportid;");
 
-        mySQLConnect("INSERT INTO switchportok_history (switchportid, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, utolsomodosito, utolsomodositasideje, modid)
-            SELECT id, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, utolsomodosito, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO switchportok_history (switchportid, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, modid)
+            SELECT id, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, modid
             FROM switchportok
             WHERE id = $switchportid");
 
-        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, modid)
-            SELECT id, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
+            SELECT id, port, csatlakozo, csatlakozas, modid
             FROM portok
             WHERE id = $helyiportid");
         
-        $stmt = $con->prepare('UPDATE switchportok SET mode=?, vlan=?, sebesseg=?, nev=?, allapot=?, tipus=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
-        $stmt->bind_param('ssssssssi', $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $user, $timestamp, $_POST['id']);
+        $stmt = $con->prepare('UPDATE switchportok SET mode=?, vlan=?, sebesseg=?, nev=?, allapot=?, tipus=?, modid=? WHERE id=?');
+        $stmt->bind_param('sssssssi', $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $modif_id, $_POST['id']);
         $stmt->execute();
 
-        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=?, csatlakozas=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
-        $stmt->bind_param('sssssi', $_POST['port'], $_POST['csatlakozo'], $_POST['csatlakozas'], $user, $timestamp, $_POST['portid']);
+        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=?, csatlakozas=?, modid=? WHERE id=?');
+        $stmt->bind_param('ssssi', $_POST['port'], $_POST['csatlakozo'], $_POST['csatlakozas'], $modif_id, $_POST['portid']);
         $stmt->execute();
 
         if($tulportid && mysqli_num_rows($iftulportswitch) == 1)
         {
-            $last_id = modId($con);
+            $modif_id = modId("2", "port", $tulportid);
 
-            mySQLConnect("INSERT INTO switchportok_history (switchportid, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, utolsomodosito, utolsomodositasideje, modid)
-                SELECT id, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, utolsomodosito, utolsomodositasideje, $last_id
+            mySQLConnect("INSERT INTO switchportok_history (switchportid, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, modid)
+                SELECT id, eszkoz, port, mode, vlan, sebesseg, nev, allapot, tipus, modid
                 FROM switchportok
                 WHERE port = $tulportid");
 
-            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, modid)
-                SELECT id, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, $last_id
+            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
+                SELECT id, port, csatlakozo, csatlakozas, modid
                 FROM portok
                 WHERE id = $tulportid");
             
@@ -73,16 +73,16 @@ if(isset($mindir) && $mindir)
         {
             $oldportid = mysqli_fetch_assoc($iftulportchange)['id'];
 
-            $last_id = modId($con);
+            $modif_id = modId("2", "port", $oldportid);
             
-            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, modid)
-                SELECT id, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, $last_id
+            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
+                SELECT id, port, csatlakozo, csatlakozas, modid
                 FROM portok
                 WHERE id = $oldportid");
             
             $null = null;
-            $stmt = $con->prepare('UPDATE portok SET csatlakozas=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
-            $stmt->bind_param('sssi', $null, $user, $timestamp, $oldportid);
+            $stmt = $con->prepare('UPDATE portok SET csatlakozas=?, modid=? WHERE id=?');
+            $stmt->bind_param('ssi', $null, $modif_id, $oldportid);
             $stmt->execute();
         }
 
@@ -135,24 +135,24 @@ if(isset($mindir) && $mindir)
         $sohid = $_POST['id'];
         $portid = $_POST['portid'];
 
-        $last_id = modId($con);
+        $modif_id = modId("2", "port", $portid);
 
-        mySQLConnect("INSERT INTO sohoportok_history (sohoportid, eszkoz, port, sebesseg, utolsomodosito, utolsomodositasideje, modid)
-            SELECT id, eszkoz, port, sebesseg, utolsomodosito, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO sohoportok_history (sohoportid, eszkoz, port, sebesseg, modid)
+            SELECT id, eszkoz, port, sebesseg, modid
             FROM sohoportok
             WHERE id = $sohid");
 
-        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, modid)
-            SELECT id, port, csatlakozo, csatlakozas, utolsomodosito, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
+            SELECT id, port, csatlakozo, csatlakozas, modid
             FROM portok
             WHERE id = $portid");        
 
-        $stmt = $con->prepare('UPDATE sohoportok SET sebesseg=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
-        $stmt->bind_param('sssi', $_POST['sebesseg'], $user, $timestamp, $_POST['id']);
+        $stmt = $con->prepare('UPDATE sohoportok SET sebesseg=?, modid=? WHERE id=?');
+        $stmt->bind_param('ssi', $_POST['sebesseg'], $modif_id, $_POST['id']);
         $stmt->execute();
 
-        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=?, csatlakozas=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
-        $stmt->bind_param('sssssi', $_POST['port'], $_POST['csatlakozo'], $_POST['csatlakozas'], $user, $timestamp, $_POST['portid']);
+        $stmt = $con->prepare('UPDATE portok SET port=?, csatlakozo=?, csatlakozas=?, modid=? WHERE id=?');
+        $stmt->bind_param('ssssi', $_POST['port'], $_POST['csatlakozo'], $_POST['csatlakozas'], $modif_id, $_POST['portid']);
         $stmt->execute();
 
         if(mysqli_errno($con) != 0)
@@ -177,15 +177,18 @@ if(isset($mindir) && $mindir)
                 //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
                 $port = $_POST['accportpre'] . $i; //$portsorszam;
 
-                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
-                $stmt->bind_param('sss', $port, $csatlakozo, $user);
+                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+                $stmt->bind_param('ss', $port, $csatlakozo);
                 $stmt->execute();
 
                 $last_id = mysqli_insert_id($con);
+                $modif_id = modId("1", "port", $last_id);
+                mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $last_id");
 
-                $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg, letrehozo) VALUES (?, ?, ?, ?)');
-                $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['accportsebesseg'], $user);
+                $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg, modid) VALUES (?, ?, ?, ?)');
+                $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['accportsebesseg'], $modif_id);
                 $stmt->execute();
+                
             }
         }
 
@@ -196,14 +199,16 @@ if(isset($mindir) && $mindir)
                 //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
                 $port = $_POST['uplportpre'] . $i; //$portsorszam;
 
-                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
-                $stmt->bind_param('sss', $port, $csatlakozo, $user);
+                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+                $stmt->bind_param('ss', $port, $csatlakozo);
                 $stmt->execute();
 
                 $last_id = mysqli_insert_id($con);
+                $modif_id = modId("1", "port", $last_id);
+                mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $last_id");
 
-                $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg, tipus, letrehozo) VALUES (?, ?, ?, ?, ?)');
-                $stmt->bind_param('sssss', $_POST['eszkoz'], $last_id, $_POST['uplportsebesseg'], $tipus, $user);
+                $stmt = $con->prepare('INSERT INTO switchportok (eszkoz, port, sebesseg, tipus, modid) VALUES (?, ?, ?, ?, ?)');
+                $stmt->bind_param('sssss', $_POST['eszkoz'], $last_id, $_POST['uplportsebesseg'], $tipus, $modif_id);
                 $stmt->execute();
             }
         }
@@ -230,14 +235,16 @@ if(isset($mindir) && $mindir)
                 //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
                 $port = $_POST['accportpre'] . $i; //$portsorszam;
 
-                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
-                $stmt->bind_param('sss', $port, $csatlakozo, $user);
+                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+                $stmt->bind_param('ss', $port, $csatlakozo);
                 $stmt->execute();
 
                 $last_id = mysqli_insert_id($con);
+                $modif_id = modId("1", "port", $last_id);
+                mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $last_id");
 
-                $stmt = $con->prepare('INSERT INTO sohoportok (eszkoz, port, sebesseg, letrehozo) VALUES (?, ?, ?, ?)');
-                $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['accportsebesseg'], $user);
+                $stmt = $con->prepare('INSERT INTO sohoportok (eszkoz, port, sebesseg, modid) VALUES (?, ?, ?, ?)');
+                $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['accportsebesseg'], $modif_id);
                 $stmt->execute();
             }
         }
@@ -250,14 +257,16 @@ if(isset($mindir) && $mindir)
                 //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
                 $port = $_POST['uplportpre'] . $i; //$portsorszam;
 
-                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
-                $stmt->bind_param('sss', $port, $csatlakozo, $user);
+                $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+                $stmt->bind_param('ss', $port, $csatlakozo);
                 $stmt->execute();
 
                 $last_id = mysqli_insert_id($con);
+                $modif_id = modId("1", "port", $last_id);
+                mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $last_id");
 
-                $stmt = $con->prepare('INSERT INTO sohoportok (eszkoz, port, sebesseg, letrehozo) VALUES (?, ?, ?, ?)');
-                $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['uplportsebesseg'], $user);
+                $stmt = $con->prepare('INSERT INTO sohoportok (eszkoz, port, sebesseg, modid) VALUES (?, ?, ?, ?)');
+                $stmt->bind_param('ssss', $_POST['eszkoz'], $last_id, $_POST['uplportsebesseg'], $modif_id);
                 $stmt->execute();
             }
         }
@@ -280,14 +289,16 @@ if(isset($mindir) && $mindir)
             $portsorszam = str_pad($i, $_POST['nullara'], "0", STR_PAD_LEFT);
             $port = $_POST['portelotag'] . $portsorszam;
 
-            $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
-            $stmt->bind_param('sss', $port, $_POST['csatlakozo'], $user);
+            $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+            $stmt->bind_param('ss', $port, $_POST['csatlakozo']);
             $stmt->execute();
 
             $last_id = mysqli_insert_id($con);
+            $modif_id = modId("1", "port", $last_id);
+            mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $last_id");
 
-            $stmt = $con->prepare('INSERT INTO vegpontiportok (epulet, port, letrehozo) VALUES (?, ?, ?)');
-            $stmt->bind_param('sss', $_POST['epulet'], $last_id, $user);
+            $stmt = $con->prepare('INSERT INTO vegpontiportok (epulet, port, modid) VALUES (?, ?, ?)');
+            $stmt->bind_param('sss', $_POST['epulet'], $last_id, $modif_id);
             $stmt->execute();
         }
 
@@ -306,8 +317,11 @@ if(isset($mindir) && $mindir)
     {
         for($i = $_POST['elsoport']; $i <= $_POST['utolsoport']; $i++)
         {
-            $stmt = $con->prepare('INSERT INTO rackportok (rack, port, letrehozo) VALUES (?, ?, ?)');
-            $stmt->bind_param('sss', $_POST['rack'], $i, $user);
+            $modif_id = modId("2", "port", $i);
+            mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $i");
+            
+            $stmt = $con->prepare('INSERT INTO rackportok (rack, port, modid) VALUES (?, ?, ?)');
+            $stmt->bind_param('sss', $_POST['rack'], $i, $modif_id);
             $stmt->execute();
         }
 
@@ -326,13 +340,16 @@ if(isset($mindir) && $mindir)
     {
         for($i = $_POST['elsoport']; $i <= $_POST['utolsoport']; $i++)
         {
-            mySQLConnect("INSERT INTO vegpontiportok_history (vegpontiportid, epulet, port, helyiseg, utolsomodosito, utolsomodositasideje)
-                SELECT id, epulet, port, helyiseg, utolsomodosito, utolsomodositasideje
+            $modif_id = modId("2", "port", $i);
+            mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $i");
+            
+            mySQLConnect("INSERT INTO vegpontiportok_history (vegpontiportid, epulet, port, helyiseg, modid)
+                SELECT id, epulet, port, helyiseg, modid
                 FROM vegpontiportok
                 WHERE port = $i");
             
-            $stmt = $con->prepare('UPDATE vegpontiportok SET helyiseg=? utolsomodosito=?, utolsomodositasideje=? WHERE port=?');
-            $stmt->bind_param('sssi', $_POST['helyiseg'], $user, $timestamp, $i);
+            $stmt = $con->prepare('UPDATE vegpontiportok SET helyiseg=?, modid=? WHERE port=?');
+            $stmt->bind_param('ssi', $_POST['helyiseg'], $modif_id, $i);
             $stmt->execute();
         }
 
@@ -357,14 +374,16 @@ if(isset($mindir) && $mindir)
                 {
                     $port = $_POST['portpre'] . $i . "-" . $j; //$portsorszam;
                     //echo "$port <br>";
-                    $stmt = $con->prepare('INSERT INTO portok (port, letrehozo) VALUES (?, ?)');
-                    $stmt->bind_param('ss', $port, $user);
+                    $stmt = $con->prepare('INSERT INTO portok (port) VALUES (?)');
+                    $stmt->bind_param('s', $port);
                     $stmt->execute();
 
                     $last_id = mysqli_insert_id($con);
+                    $modif_id = modId("1", "port", $last_id);
+                    mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $last_id");
 
-                    $stmt = $con->prepare('INSERT INTO tkozpontportok (eszkoz, port, letrehozo) VALUES (?, ?, ?)');
-                    $stmt->bind_param('sss', $_POST['eszkoz'], $last_id, $user);
+                    $stmt = $con->prepare('INSERT INTO tkozpontportok (eszkoz, port, modid) VALUES (?, ?, ?)');
+                    $stmt->bind_param('sss', $_POST['eszkoz'], $last_id, $modif_id);
                     $stmt->execute();
                 }
             }
@@ -393,14 +412,16 @@ if(isset($mindir) && $mindir)
         $transzpszabvany = mySQLConnect("SELECT * FROM atviteliszabvanyok WHERE id = $transzpszabvany;");
         $transzpszabvany = mysqli_fetch_assoc($transzpszabvany)['nev'];
 
-        $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
-        $stmt->bind_param('sss', $transzpszabvany, $konvertermodell['transzpcsatlakozo'], $user);
+        $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+        $stmt->bind_param('ss', $transzpszabvany, $konvertermodell['transzpcsatlakozo']);
         $stmt->execute();
 
         $last_id = mysqli_insert_id($con);
+        $modif_id = modId("1", "port", $last_id);
+        mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $last_id");
 
-        $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany, letrehozo) VALUES (?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssss', $eszkoz, $last_id, $konvertermodell['transzpsebesseg'], $konvertermodell['transzpszabvany'], $user);
+        $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany, modid) VALUES (?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssss', $eszkoz, $last_id, $konvertermodell['transzpsebesseg'], $konvertermodell['transzpszabvany'], $modif_id);
         $stmt->execute();
 
         // LAN OLDALI PORT
@@ -408,14 +429,16 @@ if(isset($mindir) && $mindir)
         $lanszabvany = mySQLConnect("SELECT * FROM atviteliszabvanyok WHERE id = $lanszabvany;");
         $lanszabvany = mysqli_fetch_assoc($lanszabvany)['nev'];
 
-        $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo, letrehozo) VALUES (?, ?, ?)');
-        $stmt->bind_param('sss', $lanszabvany, $konvertermodell['lancsatlakozo'], $user);
+        $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+        $stmt->bind_param('ss', $lanszabvany, $konvertermodell['lancsatlakozo']);
         $stmt->execute();
 
         $last_id = mysqli_insert_id($con);
+        $modif_id = modId("1", "port", $last_id);
+        mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $last_id");
 
-        $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany, letrehozo) VALUES (?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssss', $eszkoz, $last_id, $konvertermodell['lansebesseg'], $konvertermodell['lanszabvany'], $user);
+        $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany, modid) VALUES (?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssss', $eszkoz, $last_id, $konvertermodell['lansebesseg'], $konvertermodell['lanszabvany'], $modif_id);
         $stmt->execute();
     }
 

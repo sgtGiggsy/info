@@ -41,7 +41,8 @@ else
     if(isset($_GET['id']))
     {
         $beepid = $_GET['id'];
-        $beepitve = mySQLConnect("SELECT beepitesek.nev AS nev,
+        $beepitve = mySQLConnect("SELECT beepitesek.id AS beepid,
+                beepitesek.nev AS nev,
                 beepitesek.eszkoz AS eszkid,
                 (SELECT CONCAT(gyartok.nev, ' ', modellek.modell, COALESCE(eszkozok.varians, ''), ' (', eszkozok.sorozatszam, ')')
                     FROM eszkozok
@@ -75,13 +76,13 @@ else
                     WHERE portok.id = switchportid
                     ORDER BY beepitesek.id DESC
          	        LIMIT 1) AS switchport,
-                beepitesek.letrehozo AS letrehozoid,
-                (SELECT nev FROM felhasznalok WHERE id = letrehozoid) AS letrehozo,
-                beepitesek.utolsomodosito AS utolsomodositoid,
+                muvelet,
+                (SELECT MAX(id) FROM modositasok WHERE beepites = beepid) AS utolsomodositas,
+                (SELECT felhasznalo FROM modositasok WHERE id = utolsomodositas) AS utolsomodositoid,
                 (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
-                beepitesek.letrehozasideje AS letrehozasideje,
-                beepitesek.utolsomodositasideje AS utolsomodositasideje
+                (SELECT timestamp FROM modositasok WHERE id = utolsomodositas) AS utolsomodositasideje
             FROM beepitesek
+                LEFT JOIN modositasok ON beepitesek.modid = modositasok.id
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                 LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
                 LEFT JOIN vlanok ON beepitesek.vlan = vlanok.id
@@ -90,7 +91,8 @@ else
         //$beepitve = mySQLConnect("SELECT * FROM beepitesek WHERE id = $beepid;");
         $beepitve = mysqli_fetch_assoc($beepitve);
 
-        $elozmenyek = mySQLConnect("SELECT beepitesek_history.nev AS nev,
+        $elozmenyek = mySQLConnect("SELECT beepitesek_history.id AS beepid,
+                beepitesek_history.nev AS nev,
                 beepitesek_history.eszkoz AS eszkid,
                 (SELECT CONCAT(gyartok.nev, ' ', modellek.modell, COALESCE(eszkozok.varians, ''), ' (', eszkozok.sorozatszam, ')')
                     FROM eszkozok
@@ -124,10 +126,12 @@ else
                     WHERE portok.id = switchportid
                     ORDER BY beepitesek.id DESC
          	        LIMIT 1) AS switchport,
-                beepitesek_history.utolsomodosito AS utolsomodositoid,
-                (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
-                beepitesek_history.utolsomodositasideje AS utolsomodositasideje
+                muvelet,
+                modositasok.felhasznalo AS modositoid,
+                (SELECT nev FROM felhasznalok WHERE id = modositoid) AS modosito,
+                modositasok.timestamp AS modositasideje
             FROM beepitesek_history
+                LEFT JOIN modositasok ON beepitesek_history.modid = modositasok.id
                 LEFT JOIN ipcimek ON beepitesek_history.ipcim = ipcimek.id
                 LEFT JOIN rackszekrenyek ON beepitesek_history.rack = rackszekrenyek.id
                 LEFT JOIN vlanok ON beepitesek_history.vlan = vlanok.id
@@ -165,8 +169,8 @@ else
                 <div class="oldalcim">Szerkesztési előzmények</div>
                 <table id="verzioelozmenyek">
                     <thead>
-                        <th>Létrehozás / Módosítás ideje</th>
-                        <th>Létrehozó / Módosító</th>
+                        <th>Létrehozás /<br>Módosítás ideje</th>
+                        <th>Létrehozó /<br>Módosító</th>
                         <th>Eszköz</th>
                         <th>Beépítési név</th>
                         <th>IP cím</th>
@@ -187,10 +191,23 @@ else
                         $elozoverzio = null;
                         foreach($elozmenyek as $x)
                         {
-                            ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
-                                <td><?=($x['utolsomodositasideje']) ? $x['utolsomodositasideje'] : $beepitve['letrehozasideje'] ?></td>
-                                <td><?=($x['utolsomodosito']) ? $x['utolsomodosito'] : $beepitve['letrehozo'] ?></td>
-                                <td <?=($elozoverzio && $elozoverzio['eszkid'] != $x['eszkid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['eszkoz']?></td>
+                            ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'><?php
+                                if($szamoz == 1 && $x['muvelet'] == 1)
+                                {
+                                    ?><td><?=$x['modositasideje']?></td>
+                                    <td><?=$x['modosito']?></td><?php
+                                }
+                                elseif ($szamoz != 1)
+                                {
+                                    ?><td><?=$x['modositasideje']?></td>
+                                    <td><?=$x['modosito']?></td><?php
+                                }
+                                else
+                                {
+                                    ?><td></td>
+                                    <td></td><?php
+                                }
+                                ?><td <?=($elozoverzio && $elozoverzio['eszkid'] != $x['eszkid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['eszkoz']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['nev'] != $x['nev']) ? "style='font-weight: bold;'" : "" ?>><?=$x['nev']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['ipcimid'] != $x['ipcimid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['ipcim']?></td>
                                 <td <?=($elozoverzio && $elozoverzio['vlanid'] != $x['vlanid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['vlan']?></td>

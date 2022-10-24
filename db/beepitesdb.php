@@ -17,9 +17,14 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO beepitesek (nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, admin, pass, megjegyzes, vlan, switchport, letrehozo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('ssssssssssssss', $_POST['nev'], $_POST['eszkoz'], $_POST['ipcim'], $_POST['rack'], $_POST['helyiseg'], $_POST['pozicio'], $beepido, $kiepido, $_POST['admin'], $_POST['pass'], $_POST['megjegyzes'], $_POST['vlan'], $_POST['switchport'], $_SESSION[getenv('SESSION_NAME').'id']);
+        $stmt = $con->prepare('INSERT INTO beepitesek (nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, admin, pass, megjegyzes, vlan, switchport) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssssssssssss', $_POST['nev'], $_POST['eszkoz'], $_POST['ipcim'], $_POST['rack'], $_POST['helyiseg'], $_POST['pozicio'], $beepido, $kiepido, $_POST['admin'], $_POST['pass'], $_POST['megjegyzes'], $_POST['vlan'], $_POST['switchport']);
         $stmt->execute();
+
+        $last_id = mysqli_insert_id($con);
+        $modif_id = modId("1", "beepites", $last_id);
+        mySQLConnect("UPDATE beepitesek SET modid = $modif_id WHERE id = $last_id");
+
         if(mysqli_errno($con) != 0)
         {
             echo "<h2>Eszköz beépítése sikertelen!<br></h2>";
@@ -35,15 +40,15 @@ if(isset($irhat) && $irhat)
         $timestamp = date('Y-m-d H:i:s');
         $beepid = $_POST['id'];
 
-        $last_id = modId($con);
+        $modif_id = modId("2", "beepites", $beepid);
         
-        mySQLConnect("INSERT INTO beepitesek_history (beepitesid, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, utolsomodosito, utolsomodositasideje, modid)
-            SELECT id, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, utolsomodosito, utolsomodositasideje, $last_id
+        mySQLConnect("INSERT INTO beepitesek_history (beepitesid, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, modid)
+            SELECT id, nev, eszkoz, ipcim, rack, helyiseg, pozicio, beepitesideje, kiepitesideje, megjegyzes, admin, pass, vlan, switchport, modid
             FROM beepitesek
             WHERE id = $beepid");
 
-        $stmt = $con->prepare('UPDATE beepitesek SET nev=?, eszkoz=?, ipcim=?, rack=?, helyiseg=?, pozicio=?, beepitesideje=?, kiepitesideje=?, admin=?, pass=?, megjegyzes=?, vlan=?, switchport=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
-        $stmt->bind_param('sssssssssssssssi', $_POST['nev'], $_POST['eszkoz'], $_POST['ipcim'], $_POST['rack'], $_POST['helyiseg'], $_POST['pozicio'], $beepido, $kiepido, $_POST['admin'], $_POST['pass'], $_POST['megjegyzes'], $_POST['vlan'], $_POST['switchport'], $_SESSION[getenv('SESSION_NAME').'id'], $timestamp, $beepid);
+        $stmt = $con->prepare('UPDATE beepitesek SET nev=?, eszkoz=?, ipcim=?, rack=?, helyiseg=?, pozicio=?, beepitesideje=?, kiepitesideje=?, admin=?, pass=?, megjegyzes=?, vlan=?, switchport=?, modid=? WHERE id=?');
+        $stmt->bind_param('ssssssssssssssi', $_POST['nev'], $_POST['eszkoz'], $_POST['ipcim'], $_POST['rack'], $_POST['helyiseg'], $_POST['pozicio'], $beepido, $kiepido, $_POST['admin'], $_POST['pass'], $_POST['megjegyzes'], $_POST['vlan'], $_POST['switchport'], $modif_id, $beepid);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

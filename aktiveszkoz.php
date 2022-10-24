@@ -157,7 +157,7 @@ else
                 szoftver
             FROM eszkozok_history
                 INNER JOIN aktiveszkozok_history ON eszkozok_history.modid = aktiveszkozok_history.modid
-                INNER JOIN modositasok ON eszkozok_history.modid = modositasok.id
+                LEFT JOIN modositasok ON eszkozok_history.modid = modositasok.id
                 LEFT JOIN raktarak ON eszkozok_history.raktar = raktarak.id
                 LEFT JOIN modellek ON eszkozok_history.modell = modellek.id
                 LEFT JOIN gyartok ON modellek.gyarto = gyartok.id
