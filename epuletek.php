@@ -31,6 +31,7 @@ else
     {
         if(@$telephely != $epulet['telephely'])
         {
+            $szamoz = 1;
             if($zar)
             {
                 ?></tbody>
@@ -52,12 +53,13 @@ else
             $zar = true;
         }
 
-        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/epulet/<?=$epulet['id']?>'>
+        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/epulet/<?=$epulet['id']?>'>
             <td><?=$epulet['szam']?></td>
             <td><?=$epulet['nev']?></td>
             <td><?=$epulet['tipus']?></td>
             <td><a href='<?=$RootPath?>/epuletszerkeszt/<?=$epulet['id']?>'><img src='<?=$RootPath?>/images/edit.png' alt='Épület szerkesztése' title='Épület szerkesztése'/></a></td>
         </tr><?php
+        $szamoz++;
     }
     ?></tbody>
     </table><?php

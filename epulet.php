@@ -50,6 +50,7 @@ else
 
     <?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/epuletszerkeszt/$epid'\">Épület szerkesztése</button>" : "" ?>
     <div class="oldalcim"><?=$epulet['telephely']?> - <?=$epulet['epuletszam']?>. <?=$epulet['tipus']?> (<?=$epulet['nev']?>)</div><?php
+    $ujoldalcim = $ablakcim . " - ". $epulet['telephely'] . " - " . $epulet['epuletszam'] . ". " . $epulet['tipus'] . " (" . $epulet['nev'] . ")";
 
     if(mysqli_num_rows($rackek) > 0)
     {
@@ -67,10 +68,11 @@ else
                     </tr>
                 </thead>
                 <tbody><?php
+                    $szamoz = 1;
                     foreach($rackek as $rack)
                     {
                         $rackid = $rack['id']
-                        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/rack/<?=$rack['id']?>'>
+                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/rack/<?=$rack['id']?>'>
                             <td><?=($rack['emelet'] == 0) ? "Földszint" : $rack['emelet'] . ". emelet" ?></td>
                             <td nowrap><?=$rack['helyisegszam']?> (<?=$rack['helyisegnev']?>)</td>
                             <td><?=$rack['nev']?></td>
@@ -78,6 +80,7 @@ else
                             <td><?=$rack['unitszam']?></td>
                             <td><?=($csoportir) ? "<a href='$RootPath/rackszerkeszt/$rackid'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td>
                         </tr><?php
+                        $szamoz++;
                     }
                 ?></tbody>
             </table>
@@ -90,6 +93,7 @@ else
     {
         if(@$emelet != $helyiseg['emelet'])
         {
+            $szamoz = 1;
             if($zar)
             {
                 ?></tbody>
@@ -110,11 +114,12 @@ else
             $zar = true;
         }
 
-        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>'>
+        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>'>
             <td><?=$helyiseg['helyisegszam']?></td>
             <td><?=$helyiseg['helyisegnev']?></td>
             <td><a href='<?=$RootPath?>/helyisegszerkeszt/<?=$helyiseg['id']?>'><img src='<?=$RootPath?>/images/edit.png' alt='Helyiség szerkesztése' title='Helyiség szerkesztése'/></a></td>
         </tr><?php
+        $szamoz++;
     }
     ?></tbody>
     </table><?php

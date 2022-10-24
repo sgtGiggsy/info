@@ -112,13 +112,14 @@ else
                     </tr>
                 </thead>
                 <tbody><?php
+                    $szamoz = 1;
                     foreach($eszkozok as $eszkoz)
                     {
                         $beepid = $eszkoz['beepid'];
                         $eszkid = $eszkoz['id'];
                         $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
 
-                        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip['teljes']?>/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/<?=$eszktip['teljes']?>/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td nowrap><?=$eszkoz['beepitesinev']?></td>
                             <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
@@ -133,6 +134,7 @@ else
                                 <td></td><?php
                             }
                         ?></tr><?php
+                        $szamoz++;
                     }
                 ?></tbody>
             </table>

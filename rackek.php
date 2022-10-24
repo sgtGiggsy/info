@@ -39,10 +39,11 @@ else
             </tr>
         </thead>
         <tbody><?php
+            $szamoz = 1;
             foreach($rackek as $rack)
             {
                 $rackid = $rack['id'];
-                ?><tr class='kattinthatotr' data-href='./rack/<?=$rack['id']?>'>
+                ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./rack/<?=$rack['id']?>'>
                     <td><?=$rack['id']?></td>
                     <td><?=$rack['rack']?></td>
                     <td><?=$rack['gyarto']?></td>
@@ -51,6 +52,7 @@ else
                     <td><?=$rack['epuletszam']?> (<?=$rack['epuletnev']?>)</td>
                     <td><?=($csoportir) ? "<a href='$RootPath/rackszerkeszt/$rackid'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td>
                 </tr><?php
+                $szamoz++;
             }
         ?></tbody>
     </table><?php

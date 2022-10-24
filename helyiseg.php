@@ -98,10 +98,11 @@ else
         </ol>
     </div>
 
-    <?=($mindir) ? "<a href='$RootPath/helyisegszerkeszt/$helyisegid'>Helyiség szerkesztése</a>" : "" ?>
+    <?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/helyisegszerkeszt/$helyisegid'\">Helyiség szerkesztése</button>" : "" ?>
     <div class="oldalcim"><?=$helyiseg['helyisegszam']?> (<?=$helyiseg['helyisegnev']?>)</div>
     
     <div class="oldalcim">Eszközök a helyiségben</div><?php
+    $ujoldalcim = $ablakcim . " - ". $helyiseg['epuletszam'] . ". " . $helyiseg['tipus'] . " " . $helyiseg['helyisegszam'] . ". helyiség (" . $helyiseg['helyisegnev'] . ")";
     if(mysqli_num_rows($eszkozok) > 0)
     {
         ?><div>
@@ -121,16 +122,18 @@ else
                         }
                         ?><th></th>
                         <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody><?php
+                    $szamoz = 1;
                     foreach($eszkozok as $eszkoz)
                     {
                         $beepid = $eszkoz['beepid'];
                         $eszkid = $eszkoz['id'];
                         $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
                         
-                        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip['teljes']?>/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/<?=$eszktip['teljes']?>/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td nowrap><?=$eszkoz['beepitesinev']?></td>
                             <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
@@ -145,10 +148,10 @@ else
                             if($csoportir)
                             {
                                 szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip['tipus']);
-                                ?><td></td>
-                                <td></td><?php
+                                ?><?php
                             }
                         ?></tr><?php
+                        $szamoz++;
                     }
                 ?></tbody>
             </table>
@@ -169,15 +172,17 @@ else
                     </tr>
                 </thead>
                 <tbody><?php
+                    $szamoz = 1;
                     foreach($rackek as $rack)
                     {
                         $rackid = $rack['id']
-                        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/rack/<?=$rack['id']?>'>
+                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/rack/<?=$rack['id']?>'>
                             <td><?=$rack['nev']?></td>
                             <td><?=$rack['gyarto']?></td>
                             <td><?=$rack['unitszam']?></td>
                             <td><?=($csoportir) ? "<a href='$RootPath/rackszerkeszt/$rackid'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td>
                         </tr><?php
+                        $szamoz++;
                     }
                 ?></tbody>
             </table>
