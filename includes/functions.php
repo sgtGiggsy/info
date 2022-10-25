@@ -446,7 +446,7 @@ function felhasznaloPicker($current, $selectnev, $alakulat = null)
 	?></select><?php
 }
 
-function alakulatPicker($current, $selectnev = 'alakulat')
+function alakulatPicker($current, $selectnev = 'alakulat', $hosszu = false)
 {
 	$alakulatok = mySQLConnect("SELECT * FROM alakulatok;");
 
@@ -456,7 +456,7 @@ function alakulatPicker($current, $selectnev = 'alakulat')
 			<option value="" selected></option><?php
 			foreach($alakulatok as $x)
 			{
-				?><option value="<?=$x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=$x['rovid']?></option><?php
+				?><option value="<?=$x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=(!$hosszu) ? $x['rovid'] : $x['nev']?></option><?php
 			}
 		?></select>
 	</div><?php
@@ -612,13 +612,13 @@ function keszletFilter($action, $filter)
 	?><div class="szuresvalaszto">
 		<form action="<?=$action?>" method="GET">
 			<label for="szures" style="font-size: 14px">Szűrés</label>
-				<select id="szures" name="szures" onchange="this.form.submit()">
-					<option value="keszleten" <?=($filter) ? "" : "selected" ?>>Teljes készlet</option>
-					<option value="beepitve" <?=($filter == "beepitve") ? "selected" : "" ?>>Beépítve</option>
-					<option value="raktaron" <?=($filter == "raktaron") ? "selected" : "" ?>>Raktáron</option>
-					<option value="leadva" <?=($filter == "leadva") ? "selected" : "" ?>>Leadva</option>
-					<option value="mind" <?=($filter == "mind") ? "selected" : "" ?>>Mind</option>
-				</select>
+			<select id="szures" name="szures" onchange="this.form.submit()">
+				<option value="keszleten" <?=($filter) ? "" : "selected" ?>>Teljes készlet</option>
+				<option value="beepitve" <?=($filter == "beepitve") ? "selected" : "" ?>>Beépítve</option>
+				<option value="raktaron" <?=($filter == "raktaron") ? "selected" : "" ?>>Raktáron</option>
+				<option value="leadva" <?=($filter == "leadva") ? "selected" : "" ?>>Leadva</option>
+				<option value="mind" <?=($filter == "mind") ? "selected" : "" ?>>Mind</option>
+			</select>
 		</form>
 	</div><?php
 }

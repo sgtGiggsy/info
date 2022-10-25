@@ -22,10 +22,6 @@ if(isset($irhat) && $irhat)
             echo "<h2>Rack hozzáadása sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
-        else
-        {
-            header("Location: $backtosender");
-        }
     }
     elseif($_GET["action"] == "update")
     {
@@ -36,10 +32,6 @@ if(isset($irhat) && $irhat)
         {
             echo "<h2>Rack szerkesztése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
-        }
-        else
-        {
-            header("Location: $backtosender");
         }
     }
     elseif($_GET["action"] == "delete")

@@ -267,5 +267,10 @@
 		document.title = '<?=$ujoldalcim?>'
 		<?php
 	}
+
+	if(isset($_GET['folyamat']) && $_GET['folyamat'] == "sikeres")
+	{
+		?>showToaster("<?=$succesmessage?>");<?php
+	}
 ?></script>
 </html>

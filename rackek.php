@@ -22,7 +22,7 @@ else
 
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/rackszerkeszt'">Új rackszekrény</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/rack?action=szerkeszt'">Új rackszekrény</button><?php
     }
     
     ?><div class="oldalcim">Rackszekrények</div>
