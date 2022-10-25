@@ -196,12 +196,44 @@
     }
 
 	function hidePopup(id) {
-        // Get the snackbar DIV
         var x = document.getElementById(id);
-
-        // After 3 seconds, remove the show class from DIV
         x.className = x.className.replace("show", "");
     }
+
+	function showSlideIn(id = null) {
+		var jelenlegi;
+
+		// Jelenleg statikusan maximum 4 beúszó elemet tud kezelni a függvény
+		for(var i = 1; i <= 4; i++)
+		{
+			var x = document.getElementById("slidein-" + i);
+
+			// Ha létezik, és jelenleg látszik: elrejt
+			if(x && x.className == "show")
+			{
+				x.className = x.className.replace("show", "hide");
+			}
+			// Ha létezik, nem látszik, és ez a megjeleníteni kívánt elem, megjelenítjük
+			else if(i == id)
+			{
+				jelenlegi = x;
+				x.className = "show";
+			};
+		}
+
+		// Ha az egér nem megy a megjelenített menü fölé 3 másodpercen belül: elrejt
+		if(jelenlegi && jelenlegi.className == "show")
+		{
+			setTimeout(
+				function(){
+					if($("#slidein-" + id + ":hover").length == 0)
+					{
+						jelenlegi.className = jelenlegi.className.replace("show", "hide");
+					}
+				}, 2500
+			);
+		}
+	}
 
 	function updateNotif() {
 		$.ajax({

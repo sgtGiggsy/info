@@ -12,8 +12,9 @@ else
         include("./db/rackdb.php");
     }
 
-    $racknev = $rackhely = $rackgyarto = $rackunitszam = null;
-    $button = "Beépítés";
+    $racknev = $rackhely = $rackgyarto = $rackunitszam = $magyarazat = null;
+    $button = "Új rack";
+    $oldalcim = "Új rack létrehozása";
 
     $ipcimek = mySQLConnect("SELECT * FROM ipcimek ORDER BY ipcim ASC");
 
@@ -44,64 +45,89 @@ else
                 LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
             WHERE epulet = $epulet;");
 
-        ?><div class="oldalcim"><p onclick="rejtMutat('portokrackbe')" style="cursor: pointer">Épület portok rackhez kötése</p></div>
-        <div class="contentcenter" id="portokrackbe" style='display: none'>
-            <form action="<?=$RootPath?>/portdb?action=generate&tipus=rack" method="post" onsubmit="beKuld.disabled = true; return true;">
-                <input type ="hidden" id="rack" name="rack" value=<?=$rackid?>>
-
-                <div>
-                    <label for="elsoport">Első port:</label><br>
-                    <select id="elsoport" name="elsoport"><?php
-                        foreach($epuletportok as $x)
-                        {
-                            ?><option value="<?=$x["id"]?>"><?=$x['port']?></option><?php
-                        }
-                    ?></select>
-                </div>
-
-                <div>
-                    <label for="utolsoport">Utolsó port:</label><br>
-                    <select id="utolsoport" name="utolsoport"><?php
-                        foreach($epuletportok as $x)
-                        {
-                            ?><option value="<?=$x["id"]?>" selected><?=$x['port']?></option><?php
-                        }
-                    ?></select>
-                </div>
-
-                <div class="submit"><input type="submit" name="beKuld" value="Portok rackhez kötése"></div>
-            </form>
-        </div><?php
-
         $button = "Szerkesztés";
-
-        ?><form action="<?=$RootPath?>/rackszerkeszt&action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
-        <input type ="hidden" id="id" name="id" value=<?=$rackid?>><?php
+        $oldalcim = "Rack szerkesztése";
     }
-    else
+
+    ?><div class="szerkcard">
+        <div class="szerkcardtitle"><?=$oldalcim?><a class="help" onclick="rejtMutat('magyarazat')">?</a></div><?php
+        if(isset($_GET['id']))
+        {
+            ?><div class="szerkcardoptions">
+                <div class="szerkcardoptionelement"><span onclick="showSlideIn('1')">Épületportok rackhez kötése</span></div>
+            </div><?php
+        }
+        ?><div class="szerkcardbody">
+            <div class="szerkeszt">
+                <div class="contentcenter">
+                    <form action="<?=$RootPath?>/rackszerkeszt&action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+                        if(isset($_GET['id']))
+                        {
+                            ?><input type ="hidden" id="id" name="id" value=<?=$rackid?>><?php
+                        }
+                        ?><div>
+                            <label for="nev">Rack neve:</label><br>
+                            <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$racknev?>"></input>
+                        </div>
+
+                        <div>
+                            <label for="unitszam">Rack unitszáma:</label><br>
+                            <input type="text" accept-charset="utf-8" name="unitszam" id="unitszam" value="<?=$rackunitszam?>"></input>
+                        </div>
+
+                        <?=helyisegPicker($rackhely, "helyiseg")?>
+
+                        <?=gyartoPicker($rackgyarto)?>
+
+                        <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
+                    </form><?php
+                    cancelForm();
+                ?></div>
+
+                <div id="magyarazat">
+                    <h2 style="text-align: center">Magyarázat</h2>
+                    <?=$magyarazat?>
+                </div>
+
+            </div>
+        </div>
+    </div><?php
+
+    if(isset($_GET['id']))
     {
-        ?><form action="<?=$RootPath?>/rackszerkeszt&action=new" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+        ?><div id="slidein-1" onmouseleave="showSlideIn('1')">
+            <div class="szerkcard">
+                <div class="szerkcardtitle">Épületportok rackhez kötése</div>
+                <div class="szerkcardbody">
+                    <div class="contentcenter">
+                        <form action="<?=$RootPath?>/portdb?action=generate&tipus=rack" method="post" onsubmit="beKuld.disabled = true; return true;">
+                            <input type ="hidden" id="rack" name="rack" value=<?=$rackid?>>
+
+                            <div>
+                                <label for="elsoport">Első port:</label><br>
+                                <select id="elsoport" name="elsoport"><?php
+                                    foreach($epuletportok as $x)
+                                    {
+                                        ?><option value="<?=$x["id"]?>"><?=$x['port']?></option><?php
+                                    }
+                                ?></select>
+                            </div>
+
+                            <div>
+                                <label for="utolsoport">Utolsó port:</label><br>
+                                <select id="utolsoport" name="utolsoport"><?php
+                                    foreach($epuletportok as $x)
+                                    {
+                                        ?><option value="<?=$x["id"]?>" selected><?=$x['port']?></option><?php
+                                    }
+                                ?></select>
+                            </div>
+
+                            <div class="submit"><input type="submit" name="beKuld" value="Portok rackhez kötése"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div><?php
     }
-
-    ?><div class="oldalcim">Rack szerkesztése</div>
-    <div class="contentcenter">
-
-        <div>
-            <label for="nev">Rack neve:</label><br>
-            <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$racknev?>"></input>
-        </div>
-
-        <div>
-            <label for="unitszam">Rack unitszáma:</label><br>
-            <input type="text" accept-charset="utf-8" name="unitszam" id="unitszam" value="<?=$rackunitszam?>"></input>
-        </div>
-
-        <?=helyisegPicker($rackhely, "helyiseg")?>
-
-        <?=gyartoPicker($rackgyarto)?>
-
-        <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
-    </form><?php
-    cancelForm();
-?></div><?php
 }

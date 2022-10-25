@@ -127,23 +127,14 @@ ol, ul {
     max-width: 70ch;
 }
 
-.contentcenter div, .column div {
+.contentcenter input, .contentcenter select {
+    width: 100%;
+    text-align: left;
+}
+
+.contentcenter div {
     padding: 1em 0 0 0;
     margin: 0 auto;
-    width: 70%;
-}
-
-.column {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-.column label {
-    float: left;
-}
-
-.szovegdoboz {
-    width: 900px;
 }
 
 .twocolgrid {
@@ -155,24 +146,126 @@ ol, ul {
     padding: 0.5em;
 }
 
-.ketharmad {
+.szerkeszt {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr auto;
+}
+
+.help {
+    cursor: pointer;
+    padding-right: 0.5ch;
+}
+
+#magyarazat {
+    display: none;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    text-align: justify;
+    padding: 0.5em;
+    margin-left: 0.5em;
+    background-color: #d5d8db;
+    border-left: 2px solid;
+    border-color: #858585;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    width: 300px;
+}
+
+#magyarazat p {
+    font-size: 0.8em;
+    padding-bottom: 0.5em;
+}
+
+#magyarazat h2 {
+    padding-bottom: 0.5em;
+}
+
+.ketharmad, .doublecolumn {
+    display: grid;
     grid-gap: 1em;
     margin: 10px;
     align-items: start;
     justify-content: center;
 }
 
-.ketharmad div {
+.doublecolumn h2 {
+    margin-bottom: 1em;
+}
+
+.ketharmad {
+    grid-template-columns: 2fr 1fr;
+}
+
+.doublecolumn {
+    grid-template-columns: 1fr 1fr;
+}
+
+.ketharmad div, .doublecolumn div {
     padding: 0 0 1em 0;
 }
 
-.ketharmad input[type="submit"], .ketharmad input[type="text"] {
+.ketharmad input[type="submit"], .ketharmad input[type="text"], .ketharmad textarea, .ketharmad select,
+.doublecolumn input[type="submit"], .doublecolumn input[type="text"], .doublecolumn textarea, .doublecolumn select {
     max-width: 100%;
     width: 100%;
 }
 
+/* Szerkesztő felületek megjelenése */
+.szerkcard {
+    border: 2px #82868f solid;
+    border-radius: 15px;
+}
+
+.szerkcardtitle {
+    background-color: #d5d8db;
+    border-top-left-radius: 13px;
+    border-top-right-radius: 13px;
+    border-bottom: 1px #bdc4c7 solid;
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 1em;
+}
+
+.szerkcardoptions {
+    display: flex;
+    flex-direction: row;
+    height: 3em;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.szerkcardoptionelement {
+    background-color: #dfe3e6;
+    font-size: 1em;
+    padding-top: 0.5em;
+    height: 2.2em;
+    transition: 0.5s;
+    border-bottom-right-radius: 0.7em;
+}
+
+.szerkcardoptionelement span {
+    padding: 1em 1em 0.5em 0.5em;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.szerkcardoptionelement span::before {
+    padding-right: 0.5em;
+    border-left: 1px #ccc solid;
+    content: "";
+}
+
+.szerkcardoptionelement:hover {
+    padding-top: 1em;
+    height: 2.7em;
+    transition: 0.5s;
+}
+
+.szerkcardbody {
+    padding: 0.7em 2em 1.5em 2em;
+}
+
+/* Általános szövegmegjelenítés */
 .szovegtartalom {
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -221,7 +314,6 @@ select, input {
 }
 
 textarea {
-    width: 60ch;
     height: 10ch;
     border: 1px solid lightgray;
     border-radius: 0.45em;
@@ -819,7 +911,7 @@ td img {
 }
 
 /* Lenyílók a címben */
-.szuresvalaszto {
+.szuresvalaszto, .help {
     position: relative;
     float: right;
     text-align: right;
@@ -926,6 +1018,41 @@ td img {
   @keyframes fadeout {
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
+  }
+
+/* Beúszó menü */
+#slidein-1, #slidein-2, #slidein-3, #slidein-4 {
+    visibility: hidden;
+    background-color: #dfe3e6;
+    z-index: 1;
+    width: 500px;
+    top: 8em;
+    right: -500px;
+    position: absolute;
+    margin: auto;
+    border-radius: 1em;
+}
+
+#slidein-1.show, #slidein-2.show, #slidein-3.show, #slidein-4.show {
+    visibility: visible;
+    top: 8em;
+    right: 0;
+    animation: 1s ease-in-out 0s 1 slideIn;
+}
+
+#slidein-1.hide, #slidein-2.hide, #slidein-3.hide, #slidein-4.hide {
+    visibility: visible;
+    animation: 1s ease-in-out 0s 1 slideOut;
+}
+  
+  @keyframes slideIn {
+    from {right: -500px}
+    to {right: 0}
+  }
+
+  @keyframes slideOut {
+    from {right: 0}
+    to {right: -500px}
   }
 
 /* Üzenetek */
