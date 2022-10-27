@@ -1,10 +1,10 @@
 <?php
 
-if(!@$mindolvas)
+if(!@$mindolvas || (isset($_GET['action']) && !$mindir))
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+	getPermissionError();
 }
-elseif(@$_GET['action'] == "szerkeszt")
+elseif(isset($_GET['action']) && ($_GET['action'] == "addnew" || $_GET['action'] == "edit") && $mindir)
 {
     $racknev = $rackhely = $rackgyarto = $rackunitszam = $magyarazat = $beuszok = null;
     $irhat = true;
@@ -42,7 +42,7 @@ elseif(@$_GET['action'] == "szerkeszt")
         $oldalcim = "Rack szerkesztése";
     }
 
-    $beuszok = array(array('cimszoveg' => 'Épületportok rackhez kötése', 'formnev' => 'portrackhezform'));
+    $beuszok = array(array('cimszoveg' => 'Helyiségek generálása', 'formnev' => 'portrackhezform'));
     $form = "rackform";
     include('./templates/edit.tpl.php');
 }
@@ -50,13 +50,9 @@ elseif(count($_POST) > 0 && $mindir && (@$_GET['action'] == "new" || @$_GET['act
 {
     $irhat = true;
     include("./db/rackdb.php");
-    if(!isset($id))
-    {
-        $id = mysqli_insert_id($con);
-    }
-    header("Location: ./rack/$id?folyamat=sikeres");
+    afterDBRedirect($con);
 }
-else
+elseif(!isset($_GET['action']))
 {
     $helyiseg = mySQLConnect("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
         FROM helyisegek
@@ -171,7 +167,7 @@ else
                         $eszkid = $eszkoz['id'];
                         $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
 
-                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/<?=$eszktip['teljes']?>/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td nowrap><?=$eszkoz['beepitesinev']?></td>
                             <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
@@ -181,7 +177,7 @@ else
                             <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td><?php
                             if($csoportir)
                             {
-                                szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip['tipus']);
+                                szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
                                 ?><td></td>
                                 <td></td><?php
                             }
@@ -213,9 +209,5 @@ else
                 ?></div><?php
             }
         ?></div><?php
-    }
-    if(@$_GET['folyamat'] == "sikeres")
-    {
-        $succesmessage = "A rack szerkesztése sikeresen megtörtént...";
     }
 }

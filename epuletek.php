@@ -22,7 +22,7 @@ else
 
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/epuletszerkeszt'">Új épület</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/epulet?action=addnew'">Új épület</button><?php
     }
 
     ?><div class="oldalcim">Épületek listája</div><?php
@@ -57,7 +57,7 @@ else
             <td><?=$epulet['szam']?></td>
             <td><?=$epulet['nev']?></td>
             <td><?=$epulet['tipus']?></td>
-            <td><a href='<?=$RootPath?>/epuletszerkeszt/<?=$epulet['id']?>'><img src='<?=$RootPath?>/images/edit.png' alt='Épület szerkesztése' title='Épület szerkesztése'/></a></td>
+            <td><a href='<?=$RootPath?>/epulet/<?=$epulet['id']?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Épület szerkesztése' title='Épület szerkesztése'/></a></td>
         </tr><?php
         $szamoz++;
     }
