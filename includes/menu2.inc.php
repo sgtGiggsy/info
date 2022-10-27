@@ -15,7 +15,7 @@ if($menuterulet == 1)
 					$fomenu = null;
 				}
 				
-				if($menupont['url'] == "#")
+				if($menupont['oldal'] == "#")
 				{
 					$fomenu = $menupont['id'];
 					?><li class="leftmenuitem"><a style="cursor: pointer" onclick="rejtMutat('<?=$menupont['id']?>')"><?=trim($menupont['menupont'])?><?php
@@ -26,26 +26,26 @@ if($menuterulet == 1)
 				}
 				elseif($fomenu && $fomenu == $menupont['szulo'])
 				{
-					?><li <?=(($menupont['url'] == $pagetofind || $menupont['id'] == $keresszulo) ? 'class="leftmenusub-active"' : 'class="leftmenusubitem"')?>>
-						<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=trim($menupont['menupont'])?><?php
+					?><li <?=(($menupont['oldal'] == $pagetofind || $menupont['gyujtooldal'] == $pagetofind || $menupont['szerkoldal'] == $pagetofind || $menupont['id'] == $keresszulo) ? 'class="leftmenusub-active"' : 'class="leftmenusubitem"')?>>
+						<a href="<?= (($menupont['oldal'] == '/') ? $RootPath : $RootPath."/".$menupont['gyujtooldal']) ?>"><?=trim($menupont['menupont'])?><?php
 							if($menupont['szerkoldal']) { ?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php }
 						?></a>
 					</li><?php
 				}
 				elseif($menupont['aktiv'] > 0)
 				{
-					?><li <?=(($menupont['url'] == $pagetofind) ? 'class="leftmenuitem-active"' : 'class="leftmenuitem"')?>>
-						<a href="<?= (($menupont['url'] == '/') ? $RootPath : $RootPath."/".$menupont['url']) ?>"><?=trim($menupont['menupont'])?><?php
+					?><li <?=(($menupont['oldal'] == $pagetofind || $menupont['gyujtooldal'] == $pagetofind) ? 'class="leftmenuitem-active"' : 'class="leftmenuitem"')?>>
+						<a href="<?= (($menupont['oldal'] == '/') ? $RootPath : $RootPath."/".$menupont['gyujtooldal']) ?>"><?=trim($menupont['menupont'])?><?php
 							if($menupont['szerkoldal']) { ?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php }
 						?></a>
 					</li><?php
 				}
 
-				if($menupont['url'] == $pagetofind && $menupont['aktiv'] > 0 || $menupont['id'] == $keresszulo)
+				if(($menupont['gyujtooldal'] == $pagetofind || $menupont['oldal'] == $pagetofind || $menupont['szerkoldal'] == $pagetofind) && ($menupont['aktiv'] > 0 || $menupont['id'] == $keresszulo))
 				{
 					$kinyit = $menupont['szulo'];
 				}
-				elseif($menupont['url'] == $pagetofind)
+				elseif($menupont['oldal'] == $pagetofind)
 				{
 					$keresszulo = $menupont['szulo'];
 				}

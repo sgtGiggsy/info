@@ -287,7 +287,7 @@ foreach($menu as $menupont)
     }
 
     // Ha megvan a jelenlegi oldal, a hozzá tartozó jogosultságok beállítása
-    if($menupont['oldal'] == $pagetofind)
+    if($menupont['oldal'] == $pagetofind || $menupont['gyujtooldal'] == $pagetofind || $menupont['dboldal'] == $pagetofind || $menupont['szerkoldal'] == $pagetofind)
     {
         if($_SESSION[getenv('SESSION_NAME').'id'])
 		{
@@ -340,6 +340,7 @@ foreach($menu as $menupont)
 if(!isset($currentpage))
 {
     $currentpage['url'] = $_GET['page'];
+    $currentpage['oldal'] = $_GET['page'];
     $currentpage['cimszoveg'] = "Oldal";
 }
 
@@ -356,6 +357,30 @@ catch(Exception $e)
     http_response_code(404);
     $currentpage['url'] = "404";
     $currentpage['cimszoveg'] = "Oldal nem található!";
+}
+
+// Folyamatértesítés
+if(@$_GET['sikeres'] == "uj")
+{
+    $succesmessage = "Új " . $currentpage['cimszoveg'] . " hozzáadása sikeres";
+}
+elseif(@$_GET['sikeres'] == "szerkesztes")
+{
+    $succesmessage = "A(z) " . $currentpage['cimszoveg'] . " szerkesztése sikerült";
+}
+
+// A jelenlegi oldal adatainak $_GET-hez történő előkészítése
+if(isset($_GET['page']) && isset($_GET['id']))
+{
+    $kuldooldal = "&kuldooldal=" . $_GET['page'] . "&kuldooldalid=" . $_GET['id'];
+}
+elseif(isset($_GET['page']))
+{
+    $kuldooldal = "&kuldooldal=" . $_GET['page'];
+}
+else
+{
+    $kuldooldal = null;
 }
 
 // Oldal megjelenítése

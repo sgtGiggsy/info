@@ -205,7 +205,8 @@ ol, ul {
 }
 
 .ketharmad input[type="submit"], .ketharmad input[type="text"], .ketharmad textarea, .ketharmad select,
-.doublecolumn input[type="submit"], .doublecolumn input[type="text"], .doublecolumn textarea, .doublecolumn select {
+.doublecolumn input[type="submit"], .doublecolumn input[type="text"], .doublecolumn textarea, .doublecolumn select,
+.fullsizebutton {
     max-width: 100%;
     width: 100%;
 }
@@ -334,6 +335,11 @@ label {
     display: flex;
     justify-content: center;
     padding-top: 1em;
+}
+
+.submit button {
+    max-width: 100%;
+    width: 100%;
 }
 
 .checkbox {
