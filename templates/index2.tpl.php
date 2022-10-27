@@ -230,9 +230,22 @@
 					{
 						jelenlegi.className = jelenlegi.className.replace("show", "hide");
 					}
-				}, 2500
+				}, 3000
 			);
 		}
+	}
+
+	function hideSlideIn(id)
+	{
+		var jelenlegi = document.getElementById("slidein-" + id);
+		setTimeout(
+				function(){
+					if($("#slidein-" + id + ":hover").length == 0)
+					{
+						jelenlegi.className = jelenlegi.className.replace("show", "hide");
+					}
+				}, 1000
+			);
 	}
 
 	function updateNotif() {
@@ -260,6 +273,30 @@
 		setTimeout(() => { location.reload(); }, delaytime);
 	}
 
+	function getMost(dateselect)
+    {
+        var most = new Date();
+        var dd = String(most.getDate()).padStart(2, '0');
+        var mm = String(most.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = most.getFullYear();
+        var hour = String(most.getHours()).padStart(2, '0');
+        var minute = String(most.getMinutes()).padStart(2, '0');
+
+        most = yyyy + '-' + mm + '-' + dd + ' ' + hour + ':' + minute;
+        document.getElementById(dateselect).value = most;
+    }
+
+	function getMa(dateselect)
+    {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        today = yyyy + '-' + mm + '-' + dd;
+        document.getElementById(dateselect).value = today;
+    }
+
 	<?php
 	if(isset($ujoldalcim))
 	{
@@ -268,9 +305,43 @@
 		<?php
 	}
 
-	if(isset($_GET['folyamat']) && $_GET['folyamat'] == "sikeres")
+	if(@$succesmessage)
 	{
 		?>showToaster("<?=$succesmessage?>");<?php
 	}
+
+	if(@$sorozatszamok)
+	{
+		?>
+		function checkSorozatszam()
+		{
+			let sorozatszamok = new Array(
+				<?php
+					$elso = true;
+					foreach($sorozatszamok as $x)
+					{
+						if($elso)
+						{
+							echo '"';
+							$elso = false;
+						}
+						else
+						{
+							echo ', "';
+						}
+						echo $x['sorozatszam'] . '"';
+					}
+				?>);
+			let sorozatszam = document.getElementById("sorozatszam");
+
+			if (sorozatszamok.includes(sorozatszam.value))
+			{
+				alert("A megadott sorozatszám már létezik az adatbázisban");
+			}
+		}
+		
+		<?php
+	}
+	
 ?></script>
 </html>

@@ -33,7 +33,7 @@ else
     $tipus = 'simkartyak';
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/eszkozszerkeszt?tipus=simkartya'">Új SIMkártya</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/simkartya?action=addnew'">Új SIMkártya</button><?php
     }
 
     ?><div class="PrintArea">

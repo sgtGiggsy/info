@@ -51,7 +51,7 @@ else
         ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/eszkozszerkeszt?tipus=nyomtato'">Új nyomtató</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/nyomtato?action=addnew'">Új nyomtató</button><?php
     }
     ?>
     <!-- DATALISTEK -->

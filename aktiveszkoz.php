@@ -1,8 +1,18 @@
 <?php
 
-if(!@$mindolvas)
+// Elsőként annak ellenőrzése, hogy a felhasználó olvashatja-e,
+// majd megvizsgálni, hogy ha olvashatja, de írni szeretné, ahhoz van-e joga
+if(!@$mindolvas || (isset($_GET['action']) && !$mindir))
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+    getPermissionError();
+}
+// Ha van valamilyen módosítási kísérlet, ellenőrizni, hogy van-e rá joga a felhasználónak
+elseif(isset($_GET['action']) && $mindir)
+{
+    $meghiv = true;
+    
+    // Az eszközszerkesztő oldal includeolása
+    include('./includes/eszkozszerkeszt.inc.php');
 }
 else
 {
@@ -234,8 +244,8 @@ else
         if($mindir)
         {
             ?><div style='display: inline-flex'>
-                <button type='button' onclick="location.href='<?=$RootPath?>/eszkozszerkeszt/<?=$id?>?tipus=aktiv'">Eszköz szerkesztése</button><?php
-                if(mysqli_num_rows($elozmenyek) > 0)
+                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Eszköz szerkesztése</button><?php
+                if(isset($elozmenyek) && mysqli_num_rows($elozmenyek) > 0)
                 {
                     ?><button type='button' onclick=rejtMutat("elozmenyek")>Szerkesztési előzmények</button><?php
                 }
@@ -572,45 +582,46 @@ else
                     }
                 ?></tbody>
             </table>
-        </div><?php
-    }
-}
-?><script>
-    $("form").on("submit", function (e) {
-        var dataString = $(this).serialize();
+        </div>
+        <script>
+        $("form").on("submit", function (e) {
+            var dataString = $(this).serialize();
 
-        $.ajax({
-        type: "POST",
-        data: dataString,
-        url: "<?=$RootPath?>/portdb?action=update&tipus=switch",
-        success: function () {
-            showToaster("Port szerkesztése sikeres...");
-        }
-    });
-    e.preventDefault();
-    });
+            $.ajax({
+            type: "POST",
+            data: dataString,
+            url: "<?=$RootPath?>/portdb?action=update&tipus=switch",
+            success: function () {
+                showToaster("Port szerkesztése sikeres...");
+            }
+        });
+        e.preventDefault();
+        });
 
-    <?php
-    if($eszkoz['web'])
-    {
-        ?>
-        var atfedes = document.getElementById("atfedes");
-        var btn = document.getElementById("manage");
-        var span = document.getElementsByClassName("close")[0];
+        <?php
+        if($eszkoz['web'])
+        {
+            ?>
+            var atfedes = document.getElementById("atfedes");
+            var btn = document.getElementById("manage");
+            var span = document.getElementsByClassName("close")[0];
 
-        btn.onclick = function() {
-            atfedes.style.display = "block";
-        }
+            btn.onclick = function() {
+                atfedes.style.display = "block";
+            }
 
-        span.onclick = function() {
-            atfedes.style.display = "none";
-        }
-
-        window.onclick = function(event) {
-            if (event.target == atfedes) {
+            span.onclick = function() {
                 atfedes.style.display = "none";
             }
+
+            window.onclick = function(event) {
+                if (event.target == atfedes) {
+                    atfedes.style.display = "none";
+                }
+            }
+            <?php
         }
-        <?php
+    ?></script><?php
     }
-?></script>
+}
+?>

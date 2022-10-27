@@ -490,9 +490,7 @@ function cancelForm()
 		$backtosender = $RootPath;
 	}
 	
-	?><form action='<?=$backtosender?>' method="post">
-        <div class='submit'><input type='submit' value='Mégsem'></div>
-    </form><?php
+	?><button type="button" onclick="location.href='<?=$backtosender?>'">Mégsem</button><?php
 }
 
 function mysqliNaturalSort($mysqliresult, $sortcriteria)
@@ -645,11 +643,11 @@ function szerkSor($beepid, $eszkid, $eszktip)
 	?><td class="dontprint"><?php
 	if($beepid)
 	{
-		?><a href='<?=$RootPath?>/beepites/<?=$beepid?>'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
+		?><a href='<?=$RootPath?>/beepites/<?=$beepid?>?action=edit'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
 	}
 	?></td>
-	<td class="dontprint"><a href='<?=$RootPath?>/beepites?eszkoz=<?=$eszkid?>&tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/newbeep.png' alt='Új beépítés' title='Új beépítés' /></a></td>
-	<td class="dontprint"><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$eszkid?>?tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
+	<td class="dontprint"><a href='<?=$RootPath?>/beepites?action=addnew&eszkoz=<?=$eszkid?>&tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/newbeep.png' alt='Új beépítés' title='Új beépítés' /></a></td>
+	<td class="dontprint"><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
 }
 
 function modId($muvelet, $tipus, $objid)
@@ -723,4 +721,41 @@ function getCimkek($cimkek)
 {
 	$cimkelista = explode(',', $cimkek);
 	return $cimkelista;
+}
+
+function afterDBRedirect($con, $last_id = null)
+{
+	$oldal = $_GET['page'];
+	// Ha új elemet vittünk fel, az átirányításhoz lekérjük az utolsó adatbázisművelet id-ját
+    if(!isset($_POST['id']))
+    {
+        if($last_id)
+		{
+			$id = $last_id;
+		}
+		else
+		{
+			$id = mysqli_insert_id($con);
+		}
+		$action = "uj";
+    }
+    // Ha szerkesztettük az eszközt, a szerkesztett eszközhöz való visszairányítás
+    else
+    {
+        $id = $_POST['id'];
+        $action = "szerkesztes";
+    }
+
+    // Ha nem volt hibaüzenet az adatbázisírás során, a felhasználó átirányítása, és eredményről való visszajelzés
+    if(mysqli_errno($con) == 0)
+    {
+        header("Location: ./$oldal/$id?sikeres=$action");
+    }
+}
+
+function getPermissionError()
+{
+    http_response_code(403);
+	?><h1>403</h1>
+	<strong>A kért művelet nem engedélyezett!</strong><?php
 }

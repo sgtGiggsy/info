@@ -63,12 +63,12 @@ else
 
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/eszkozszerkeszt?tipus=aktiv'">Új aktív eszköz</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/aktiveszkoz?action=addnew'">Új aktív eszköz</button><?php
     }
 
     $tipus = 'eszkozok';
     ?><div class="PrintArea">
-        <div class="oldalcim">Aktív eszközök <?=$szuresek['szures']?> <?=keszletFilter($_GET['page'], $szuresek['filter'])?></div>
+        <div class="oldalcim">Aktív eszközök <?=$szuresek['szures']?> <?=keszletFilter($page, $szuresek['filter'])?></div>
         <table id="<?=$tipus?>">
             <thead>
                 <tr>
@@ -118,7 +118,7 @@ else
                             <td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
                             if($csoportir)
                             {
-                                szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiv"); ?>
+                                szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiveszkoz"); ?>
                                 <td class="dontprint"><a href="telnet://<?=$eszkoz['ipcim']?>"><img src='<?=$RootPath?>/images/ssh.png' alt='Eszköz adminisztrálása' title='Eszköz adminisztrálása'/></a></td>
                                 <td class="dontprint"><?php
                                 if($eszkoz['web'])
@@ -147,7 +147,7 @@ else
                         <td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
                         if($csoportir)
                         {
-                            szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiv");
+                            szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiveszkoz");
                             ?><td class="dontprint"></td>
                             <td class="dontprint"></td><?php
                         }

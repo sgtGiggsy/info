@@ -1,8 +1,18 @@
 <?php
 
-if(!@$mindolvas)
+// Elsőként annak ellenőrzése, hogy a felhasználó olvashatja-e,
+// majd megvizsgálni, hogy ha olvashatja, de írni szeretné, ahhoz van-e joga
+if(!@$mindolvas || (isset($_GET['action']) && !$mindir))
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+    getPermissionError();
+}
+// Ha van valamilyen módosítási kísérlet, ellenőrizni, hogy van-e rá joga a felhasználónak
+elseif(isset($_GET['action']) && $mindir)
+{
+    $meghiv = true;
+    
+    // Az eszközszerkesztő oldal includeolása
+    include('./includes/eszkozszerkeszt.inc.php');
 }
 else
 {
@@ -105,11 +115,23 @@ else
                     <meta property="position" content="4">
                 </li>
             </ol>
-        </div>
+        </div><?php
+
+    // Szerkesztő gombok
+        if($mindir)
+        {
+            ?><div style='display: inline-flex'>
+                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Eszköz szerkesztése</button><?php
+                if(isset($elozmenyek) && mysqli_num_rows($elozmenyek) > 0)
+                {
+                    ?><button type='button' onclick=rejtMutat("elozmenyek")>Szerkesztési előzmények</button><?php
+                }
+            ?></div><?php
+        }
         
-        <div class="infobox">
+        ?><div class="infobox">
             <div>Tulajdonos</div>
-            <div><?=($eszkoz['tulajdonos']) ? $eszkoz['tulajdonos'] : "Nem ismert" ?></div>
+            <div><?=$eszkoz['tulajdonos']?></div>
             <div>Sorozatszám</div>
             <div><?=$eszkoz['sorozatszam']?></div>
             <div>Megjegyzés</div>

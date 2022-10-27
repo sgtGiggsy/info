@@ -1,8 +1,18 @@
 <?php
 
-if(!@$csoportir)
+// Elsőként annak ellenőrzése, hogy a felhasználó olvashatja-e,
+// majd megvizsgálni, hogy ha olvashatja, de írni szeretné, ahhoz van-e joga
+if(!@$mindolvas || (isset($_GET['action']) && !$mindir))
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+    getPermissionError();
+}
+// Ha van valamilyen módosítási kísérlet, ellenőrizni, hogy van-e rá joga a felhasználónak
+elseif(isset($_GET['action']) && $mindir)
+{
+    $meghiv = true;
+    
+    // Az eszközszerkesztő oldal includeolása
+    include('./includes/eszkozszerkeszt.inc.php');
 }
 else
 {
@@ -45,7 +55,7 @@ else
 
     if(mysqli_num_rows($bovitok) == 0)
     {
-        echo "Nincs ilyen sorszámú aktív eszköz";
+        echo "Nincs ilyen sorszámú bővítőmodul";
     }
     else
     {
@@ -113,8 +123,7 @@ else
                     
                     $aktiveszkoz = mysqli_fetch_assoc($aktiveszkozok);
 
-                    ?>
-                        <li property="itemListElement" typeof="ListItem">
+                        ?><li property="itemListElement" typeof="ListItem">
                             <a property="item" typeof="WebPage"
                                 href="<?=$RootPath?>/epuletek/<?=$aktiveszkoz['thelyid']?>">
                             <span property="name"><?=$aktiveszkoz['telephely']?></span></a>
@@ -170,8 +179,19 @@ else
             ?></ol>
         </div><?php
         
-        ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/eszkozszerkeszt/$id?tipus=bovito'\">Eszköz szerkesztése</button>" : "" ?>
-        <div class="oldalcim"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
+    // Szerkesztő gombok
+        if($mindir)
+        {
+            ?><div style='display: inline-flex'>
+                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Bővítőmodul szerkesztése</button><?php
+                if(isset($elozmenyek) && mysqli_num_rows($elozmenyek) > 0)
+                {
+                    ?><button type='button' onclick=rejtMutat("elozmenyek")>Szerkesztési előzmények</button><?php
+                }
+            ?></div><?php
+        }
+
+        ?><div class="oldalcim"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
         <div class="infobox"><?php
             if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
             {

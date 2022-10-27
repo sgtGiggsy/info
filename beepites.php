@@ -1,25 +1,56 @@
 <?php
 
-if(@!$sajatolvas)
+if(!@$mindolvas || !isset($_GET['action']) || !$mindir)
 {
-    echo "Nincs jogosultsága az oldal megtekintésére!";
+    getPermissionError();
 }
 else
 {
-    $tipus = null;
+    // Amíg nem tudjuk, hogy a folyamat jár-e tényleges írással, a változót false-ra állítjuk
+    $dbir = false;
+
+    // Amíg nem tudjuk, hogy a felhasználó valós műveletet akar végezni, a változót false-ra állítjuk
+    $irhat = false;
+
+    // Ha a kért művelet nem a szerkesztő oldal betöltése, az adatbázis változót true-ra állítjuk
+    if($_GET['action'] == "new" || $_GET['action'] == "update" || $_GET['action'] == "delete")
+    {
+        $irhat = true;
+        $dbir = true;
+    }
+
+    // Ha a kért művelet a szerkesztő oldal betöltése, az írás változót true-ra állítjuk
+    if($_GET['action'] == "addnew" || $_GET['action'] == "edit")
+    {
+        $irhat = true;
+    }
+
+    // Ha a felhasználó valótlan műveletet akart folytatni, letilt
+    if(!$irhat && !$dbir)
+    {
+        getPermissionError();
+    }
+    // Ha a kért művelet jár adatbázisművelettel, az adatbázis műveletekért felelős oldal meghívása
+    elseif($irhat && $dbir && count($_POST) > 0)
+    {
+        include("./db/beepitesdb.php");
+
+        // Az adatbázisműveleteket követő folyamatokat lebonyolító függvény meghívása
+        afterDBRedirect($con, $_POST['eszkoz']);
+    }
+
+    $beepid = $beepnev = $beepeszk = $beepip = $beeprack = $beephely = $beeppoz = $beepido = $beepkiep =
+    $admin = $pass = $megjegyzes = $vlan = $magyarazat = $beuszok = $tipus = null;
+
+    $switchport = 0;
+    $button = "Új beépítés";
+    $oldalcim = "Eszköz beépítése";
+    $form = "beepitesform";
+
     if(isset($_GET['tipus']))
     {
         $tipus = $_GET['tipus'];
     }
-
-    if(count($_POST) > 0)
-    {
-        $irhat = true;
-        include("./db/beepitesdb.php");
-    }
-
-    $beepid = $beepnev = $beepeszk = $beepip = $beeprack = $beephely = $beeppoz = $beepido = $beepkiep = $admin = $pass = $megjegyzes = $vlan = $switchport = null;
-    $button = "Beépítés";
 
     if(isset($_GET['eszkoz']))
     {
@@ -88,7 +119,6 @@ else
                 LEFT JOIN vlanok ON beepitesek.vlan = vlanok.id
             WHERE beepitesek.id = $beepid;");
 
-        //$beepitve = mySQLConnect("SELECT * FROM beepitesek WHERE id = $beepid;");
         $beepitve = mysqli_fetch_assoc($beepitve);
 
         $elozmenyek = mySQLConnect("SELECT beepitesek_history.id AS beepid,
@@ -153,9 +183,10 @@ else
 
         $eszkoztipus = mySQLConnect("SELECT tipus FROM eszkozok INNER JOIN modellek ON eszkozok.modell = modellek.id WHERE eszkozok.id = $beepeszk");
         $tip = mysqli_fetch_assoc($eszkoztipus);
-        $tipus = eszkozTipusValaszto($tip['tipus'])['tipus'];
+        $tipus = eszkozTipusValaszto($tip['tipus'])['teljes'];
 
-        $button = "Szerkesztés";
+        $button = "Új beépítés";
+        $oldalcim = "Beépítés szerkesztése";
 
 // Szerkesztési előzmények
         if(mysqli_num_rows($elozmenyek) > 0)
@@ -247,151 +278,22 @@ else
         }
 
 // Form
-        ?><form action="<?=$RootPath?>/beepites&action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
-        <input type ="hidden" id="id" name="id" value=<?=$beepid?>><?php
     }
-    else
+
+    if($switchport !== null)
     {
-        ?><form action="<?=$RootPath?>/beepites&action=new" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+        $switchportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
+        FROM portok
+            INNER JOIN switchportok ON portok.id = switchportok.port
+            INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
+            INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
+            LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+            LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+            LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+        WHERE switchportok.tipus = 1 AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL) AND ((SELECT count(id) FROM beepitesek WHERE switchport = portok.id) = 0 OR portok.id = $switchport)
+        ORDER BY telephely, epuletek.szam + 1, helyisegszam, pozicio, aktiveszkoz, id;");
     }
 
-    if(!$switchport)
-    {
-        $switchport = 0;
-    }
-
-    $switchportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
-    FROM portok
-        INNER JOIN switchportok ON portok.id = switchportok.port
-        INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
-        INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
-        LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
-        LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
-        LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
-    WHERE switchportok.tipus = 1 AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL) AND ((SELECT count(id) FROM beepitesek WHERE switchport = portok.id) = 0 OR portok.id = $switchport)
-    ORDER BY telephely, epuletek.szam + 1, helyisegszam, pozicio, aktiveszkoz, id;");
-
-    ?><div class="oldalcim">Eszköz beépítése</div>
-    <div class="contentcenter"><?php
-
-    eszkozPicker($beepeszk, ($beepid) ? true : false);
-
-    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "soho")
-    {
-        
-        ?><div>
-            <label for="nev">Beépítési név:</label><br>
-            <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$beepnev?>"></input>
-        </div><?php
-    }
-    
-    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "soho")
-    {
-        ?><div>
-            <label for="ipcim">IP cím:</label><br>
-            <select id="ipcim" name="ipcim">
-                <option value="" selected></option><?php
-                foreach($ipcimek as $x)
-                {
-                    ?><option value="<?php echo $x["id"] ?>" <?= ($beepip == $x['id']) ? "selected" : "" ?>><?=$x['ipcim']?></option><?php
-                }
-            ?></select>
-        </div><?php
-    }
-
-    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "mediakonverter" || $tipus == "soho")
-    {
-        
-        helyisegPicker($beephely, "helyiseg");
-    }
-
-    if(!$tipus || $tipus == "aktiv" || $tipus == "mediakonverter" || $tipus == "soho")
-    {
-        rackPicker($beeprack);
-    }
-
-    if(!$tipus || $tipus == "bovitomodul")
-    {
-        ?><div>
-            <label for="switchport">Switchport:</label><br>
-            <select name="switchport">
-                <option value=""></option><?php
-                foreach($switchportok as $x)
-                {
-                    ?><option value="<?=$x['id']?>" <?=($x['id'] == $switchport) ? "selected" : "" ?>><?=$x['aktiveszkoz']?> - <?=$x['port']?></option><?php
-                }
-            ?></select>
-        </div><?php
-    }
-
-    if(!$tipus || $tipus == "aktiv" || $tipus == "mediakonverter" || $tipus == "soho")
-    {
-        vlanPicker($vlan);
-    }
-
-    if(!$tipus || $tipus == "aktiv")
-    {
-        ?><div>
-            <label for="pozicio">Pozíció:</label><br>
-            <input type="text" id="pozicio" name="pozicio" value="<?=$beeppoz?>">
-        </div><?php
-    }
-
-    ?><div>
-        <label for="beepitesideje">Beépítés ideje</label><br>
-        <input type="datetime-local" id="beepitesideje" name="beepitesideje" value="<?=timeStampToDateTimeLocal($beepido)?>"><button style="margin-left: 10px;" onclick="getMost('beepitesideje'); return false;">Most</button>
-    </div>
-
-    <div>
-        <label for="kiepitesideje">Kiépítés ideje</label><br>
-        <input type="datetime-local" id="kiepitesideje" name="kiepitesideje" value="<?=timeStampToDateTimeLocal($beepkiep)?>"><button style="margin-left: 10px;" onclick="getMost('kiepitesideje'); return false;">Most</button>
-    </div><?php
-
-    if(!$tipus || $tipus == "aktiv" || $tipus == "nyomtato" || $tipus == "soho")
-    {
-        ?><div>
-            <label for="admin">Admin user:</label><br>
-            <input type="text" accept-charset="utf-8" name="admin" id="admin" value="<?=$admin?>"></input>
-        </div>
-
-        <div>
-            <label for="pass">Jelszó:</label><br>
-            <input type="text" accept-charset="utf-8" name="pass" id="pass" value="<?=$pass?>"></input>
-        </div><?php
-    }
-    
-    ?><div>
-        <label for="megjegyzes">Megjegyzés:</label><br>
-        <textarea accept-charset="utf-8" name="megjegyzes" id="megjegyzes"><?=$megjegyzes?></textarea>
-    </div>
-
-    <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
-    </form>
-    <?php
-    cancelForm();
-    if(isset($_GET['id']) && (!$tipus || $tipus == "aktiv" || $tipus == "soho"))
-    {
-        ?><br>
-        <form action="<?=$RootPath?>/portdb&action=clearportassign" method="post" onsubmit="return confirm('Figyelem!!!\nEzzel a switch ÖSSZES porthozzárendelését törlöd, nem csak a jelen beépítéshez tartozókat!\nBiztosan törölni szeretnéd a switch porthozzárendeléseit?');">
-            <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$beepeszk?>>
-            <div class="submit"><input type="submit" name="beKuld" value="Porthozzárendelések törlése"></div>
-        </form><?php
-    }
-?></div>
-<script>
-    function getMost(dateselect)
-    {
-        var most = new Date();
-        var dd = String(most.getDate()).padStart(2, '0');
-        var mm = String(most.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = most.getFullYear();
-        var hour = String(most.getHours()).padStart(2, '0');
-        var minute = String(most.getMinutes()).padStart(2, '0');
-
-        most = yyyy + '-' + mm + '-' + dd + ' ' + hour + ':' + minute;
-        document.getElementById(dateselect).value = most;
-    }
-</script>
-<?php
+    include('./templates/edit.tpl.php');
 }
 

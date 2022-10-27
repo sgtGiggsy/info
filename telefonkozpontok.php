@@ -41,7 +41,7 @@ else
         ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/eszkozszerkeszt?tipus=telefonkozpont'">Új telefonközpont</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkozpont?action=addnew'">Új telefonközpont</button><?php
     }
     ?><div class="oldalcim">Telefonközpontok</div>
 

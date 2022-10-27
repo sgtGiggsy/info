@@ -108,7 +108,7 @@ else
                     ?><td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
                     if($csoportir)
                     {
-                        szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip['tipus']);
+                        szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip['teljes']);
                     }
                 }
             ?></tr><?php

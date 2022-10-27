@@ -50,7 +50,7 @@ else
 
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/eszkozszerkeszt?tipus=soho'">Új SOHO eszköz</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/sohoeszkoz?action=addnew'">Új SOHO eszköz</button><?php
     }
 
     $tipus = 'sohoeszkozok';
@@ -105,7 +105,7 @@ else
                             <td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
                             if($csoportir)
                             {
-                                szerkSor($eszkoz['beepid'], $eszkoz['id'], "soho");
+                                szerkSor($eszkoz['beepid'], $eszkoz['id'], "sohoeszkoz");
                                 if($eszkoz['eszktip'] == 7)
                                 {
                                     ?><td class="dontprint"><a href="telnet://<?=$eszkoz['ipcim']?>"><img src='<?=$RootPath?>/images/ssh.png' alt='Eszköz adminisztrálása' title='Eszköz adminisztrálása'/></a></td>
@@ -132,7 +132,7 @@ else
                         <td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
                         if($csoportir)
                         {
-                            szerkSor($eszkoz['beepid'], $eszkoz['id'], "soho");
+                            szerkSor($eszkoz['beepid'], $eszkoz['id'], "sohoeszkoz");
                             ?><td></td>
                             <td></td><?php
                         }
