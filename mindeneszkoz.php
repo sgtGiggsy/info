@@ -91,7 +91,7 @@ else
             $eszkid = $eszkoz['id'];
             $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
 
-            ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal " . (($eszkoz['hibas']) ? "; text-decoration: line-through'" : "'" ) : "" ?> class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./<?=$eszktip['teljes']?>/<?=$eszkoz['id']?>'>
+            ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal " . (($eszkoz['hibas']) ? "; text-decoration: line-through'" : "'" ) : "" ?> class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./<?=$eszktip?>/<?=$eszkoz['id']?>'>
                 <td><?=$eszkoz['ipcim']?></td>
                 <td><?=$eszkoz['beepitesinev']?></td>
                 <td><?=$eszkoz['gyarto']?></td>
@@ -108,7 +108,7 @@ else
                     ?><td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
                     if($csoportir)
                     {
-                        szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip['teljes']);
+                        szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
                     }
                 }
             ?></tr><?php

@@ -14,8 +14,13 @@ elseif(isset($_GET['action']) && $mindir)
     // Az eszközszerkesztő oldal includeolása
     include('./includes/eszkozszerkeszt.inc.php');
 }
-else
+elseif($id)
 {
+    $beepszur = null;
+    if(isset($_GET['beepites']) && $_GET['beepites'])
+    {
+        $beepszur = "AND beepitesek.id = " . $_GET['beepites'];
+    }
 // Adatbázis műveletek rész    
     $aktiveszkozok = mySQLConnect("SELECT
             eszkozok.id AS eszkid,
@@ -76,7 +81,7 @@ else
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                 LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
-        WHERE eszkozok.id = $id AND modellek.tipus < 11
+        WHERE eszkozok.id = $id AND modellek.tipus < 11 $beepszur
         ORDER BY beepitesek.id DESC;");
 
     if(mysqli_num_rows($aktiveszkozok) == 0)
@@ -337,22 +342,36 @@ else
         }
 
 // Infobox
-        ?><div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div>
-        <div class="infobox"><?php
+        ?><div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div><?php
+        if(isset($_GET['beepites']))
+        {
+            ?><h1 style="text-align: center">Korábbi beépítés adatai</h1><?php
+        }
+        ?><div class="infobox"><?php
             $ujoldalcim = $ablakcim . " - " . $eszkoz['gyarto'] . " " . $eszkoz['modell'] . $eszkoz['varians'] . " (" . $eszkoz['sorozatszam'] . ")";
             if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
             {
                 $ujoldalcim = $ablakcim . " - " . $eszkoz['beepitesinev'] . " (" . $eszkoz['ipcim'] . ")";
                 ?><div>Állapot</div>
-                <div>Beépítve</div>
-                <div>IP cím</div><?php
-                if($eszkoz['web'])
+                <div>Beépítve</div><?php
+            }
+            if($eszkoz['beepitesideje'])
+            {
+                ?><div>IP cím</div><?php
+                if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
                 {
-                    ?><div><a style="cursor: pointer;" id="manage"><?=$eszkoz['ipcim']?></a></div><?php
+                    if($eszkoz['web'])
+                    {
+                        ?><div><a style="cursor: pointer;" id="manage"><?=$eszkoz['ipcim']?></a></div><?php
+                    }
+                    else
+                    {
+                        ?><div><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$eszkoz['ipcim']?></a></div><?php
+                    }
                 }
                 else
                 {
-                    ?><div><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$eszkoz['ipcim']?></a></div><?php
+                    ?><div><?=$eszkoz['ipcim']?></div><?php
                 }
                 ?><div>Beépítési név</div>
                 <div><?=$eszkoz['beepitesinev']?></div>
@@ -362,6 +381,8 @@ else
                 <div><?=$eszkoz['rack']?></div>
                 <div>Beépítés ideje</div>
                 <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
+                <div>Kiépítés ideje</div>
+                <div><?=timeStampToDate($eszkoz['kiepitesideje'])?></div>
                 <div>Beépítéshez tartozó megjegyzés</div>
                 <div><?=$eszkoz['beepmegjegyz']?></div>
                 <?php
@@ -448,11 +469,12 @@ else
                     </tr>
                 </thead>
                 <tbody><?php
+                $szamoz = 1;
                 foreach($aktiveszkozok as $x)
                 {
                     if($eszkoz['beepid'] != $x['beepid'] || mysqli_num_rows($aktiveszkozok) == 1)
                     {
-                        ?><tr>
+                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./<?=$id?>?beepites=<?=$x['beepid']?>'>
                             <td><?=$x['ipcim']?></td>
                             <td><?=$x['beepitesinev']?></td>
                             <td><?=$x['beepitesideje']?></td>
@@ -460,9 +482,10 @@ else
                             <td><?=$x['epuletszam']?> <?=($x['epuletnev']) ? "(" . $x['epuletnev'] . ")" : "" ?> <?=$x['helyisegszam']?> <?=($x['helyisegnev']) ? "(" . $x['helyisegnev'] . ")" : "" ?>
                             <td><?php if($csoportir)
                             {
-                                ?><a href='<?=$RootPath?>/beepites/<?=$x['beepid']?>'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
+                                ?><a href='<?=$RootPath?>/<?=$_GET['page']?>/<?=$id?>?beepites=<?=$x['beepid']?>&action=edit'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
                             } ?></td>
                         </tr><?php
+                        $szamoz++;
                     }
                 }
                 ?></tbody>

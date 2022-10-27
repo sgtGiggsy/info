@@ -220,7 +220,7 @@ if(isset($mindir) && $mindir)
         }
         else
         {
-            header("Location: $backtosender");
+            redirectToKuldo();
         }
     }
 
@@ -278,7 +278,7 @@ if(isset($mindir) && $mindir)
         }
         else
         {
-            header("Location: $backtosender");
+            redirectToKuldo();
         }
     }
 
@@ -309,7 +309,7 @@ if(isset($mindir) && $mindir)
         }
         else
         {
-            header("Location: $backtosender");
+            redirectToKuldo();
         }
     }
 
@@ -332,7 +332,7 @@ if(isset($mindir) && $mindir)
         }
         else
         {
-            header("Location: $backtosender");
+            redirectToKuldo();
         }
     }
 
@@ -360,7 +360,7 @@ if(isset($mindir) && $mindir)
         }
         else
         {
-            header("Location: $backtosender");
+            redirectToKuldo();
         }
     }
 
@@ -396,7 +396,7 @@ if(isset($mindir) && $mindir)
         }
         else
         {
-            header("Location: $backtosender");
+            redirectToKuldo();
         }
     }
 
@@ -440,6 +440,8 @@ if(isset($mindir) && $mindir)
         $stmt = $con->prepare('INSERT INTO mediakonverterportok (eszkoz, port, sebesseg, szabvany, modid) VALUES (?, ?, ?, ?, ?)');
         $stmt->bind_param('sssss', $eszkoz, $last_id, $konvertermodell['lansebesseg'], $konvertermodell['lanszabvany'], $modif_id);
         $stmt->execute();
+
+        redirectToKuldo();
     }
 
     elseif($_GET["action"] == "update" && $_GET["tipus"] == "mediakonverter")
@@ -510,7 +512,7 @@ if(isset($mindir) && $mindir)
 
         if(@$reload)
         {
-            header("Location: $backtosender");
+            redirectToKuldo();
         }
     }
 

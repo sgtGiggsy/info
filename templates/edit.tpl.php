@@ -2,11 +2,16 @@
 
 ?><div class="szerkcard">
     <div class="szerkcardtitle"><?=$oldalcim?><a class="help" onclick="rejtMutat('magyarazat')">?</a></div><?php
-    if($beuszok)
+    if(isset($beuszok) && $beuszok)
     {
-        ?><div class="szerkcardoptions">
-            <div class="szerkcardoptionelement"><span onclick="showSlideIn('1')">Épületportok rackhez kötése</span></div>
-        </div><?php
+        $i = 1;
+        ?><div class="szerkcardoptions"><?php
+            foreach($beuszok as $beuszo)
+            {
+                ?><div class="szerkcardoptionelement"><span onclick="showSlideIn('<?=$i?>')"><?=$beuszo['cimszoveg']?></span></div><?php
+                $i++;
+            }
+        ?></div><?php
     }
     ?>
     <div class="szerkcardbody">
@@ -15,20 +20,21 @@
             <?php include("./includes/forms/" . $form . ".php") ?>
 
             <div id="magyarazat">
-                <h2 style="text-align: center">Magyarázat</h2>
+                <h2 style="text-align: center">Súgó</h2>
                 <?=$magyarazat?>
             </div>
+
         </div>
     </div>
 </div><?php
-if($beuszok)
+if(isset($beuszok) && $beuszok)
 {
     $i = 1;
     foreach($beuszok as $beuszo)
     {
-        ?><div id="slidein-<?=$i?>" onmouseleave="showSlideIn('<?=$i?>')">
+        ?><div id="slidein-<?=$i?>">
             <div class="szerkcard">
-                <div class="szerkcardtitle"><?=$beuszo['cimszoveg']?></div>
+                <div class="szerkcardtitle"><?=$beuszo['cimszoveg']?><a class="help" onclick="showSlideIn('<?=$i?>')">X</a></div>
                 <div class="szerkcardbody">
                     <div class="contentcenter">
                         <?php include("./includes/forms/" . $beuszo['formnev'] . ".php") ?>

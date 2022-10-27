@@ -232,51 +232,42 @@ function eszkozTipusValaszto($tipusid)
 {
 	if($tipusid < 6)
 	{
-		$eszktip = "aktiv";
-		$teljesnev =  "aktiveszkoz";
+		$eszktip = "aktiveszkoz";
 	}
 	elseif($tipusid < 11)
 	{
-		$eszktip = "soho";
-		$teljesnev = "sohoeszkoz";
+		$eszktip = "sohoeszkoz";
 	}
 	elseif($tipusid == 11)
 	{
 		$eszktip = "szamitogep";
-		$teljesnev = "szamitogep";
 	}
 	elseif($tipusid == 12)
 	{
 		$eszktip = "nyomtato";
-		$teljesnev = "nyomtato";
 	}
 	elseif($tipusid < 20)
 	{
 		$eszktip = "vegponti";
-		$teljesnev = "vegponti";
 	}
 	elseif($tipusid < 26)
 	{
 		$eszktip = "mediakonverter";
-		$teljesnev = "mediakonverter";
 	}
 	elseif($tipusid < 31)
 	{
 		$eszktip = "bovitomodul";
-		$teljesnev = "bovitomodul";
 	}
 	elseif($tipusid < 40)
 	{
 		$eszktip = "szerver";
-		$teljesnev = "szerver";
 	}
 	elseif($tipusid == 40)
 	{
 		$eszktip = "telefonkozpont";
-		$teljesnev = "telefonkozpont";
 	}
 
-	return array("tipus" => $eszktip, "teljes" => $teljesnev);
+	return $eszktip;
 }
 
 function eszkozPicker($current = false, $beepitett)
@@ -643,10 +634,10 @@ function szerkSor($beepid, $eszkid, $eszktip)
 	?><td class="dontprint"><?php
 	if($beepid)
 	{
-		?><a href='<?=$RootPath?>/beepites/<?=$beepid?>?action=edit'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
+		?><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?beepites=<?=$beepid?>&action=edit'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
 	}
 	?></td>
-	<td class="dontprint"><a href='<?=$RootPath?>/beepites?action=addnew&eszkoz=<?=$eszkid?>&tipus=<?=$eszktip?>'><img src='<?=$RootPath?>/images/newbeep.png' alt='Új beépítés' title='Új beépítés' /></a></td>
+	<td class="dontprint"><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?beepites&action=addnew'><img src='<?=$RootPath?>/images/newbeep.png' alt='Új beépítés' title='Új beépítés' /></a></td>
 	<td class="dontprint"><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
 }
 
@@ -758,4 +749,21 @@ function getPermissionError()
     http_response_code(403);
 	?><h1>403</h1>
 	<strong>A kért művelet nem engedélyezett!</strong><?php
+}
+
+function redirectToKuldo($sikeres = null)
+{
+	$RootPath = getenv('APP_ROOT_PATH');
+	$targeturl = $RootPath . "/" . $_GET['kuldooldal'] . "/" . $_GET['kuldooldalid'];
+
+	if($sikeres == "uj")
+	{
+		$targeturl .= "&sikeres=uj";
+	}
+	elseif($sikeres == "&sikeres=szerkesztes")
+	{
+		$targeturl .= "&sikeres=szerkesztes";
+	}
+
+	header("Location: $targeturl");
 }
