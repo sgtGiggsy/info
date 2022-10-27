@@ -139,7 +139,7 @@ else
             $eszkid = $eszkoz['id'];
             $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
 
-            ?><tr style='font-weight: normal <?= ($eszkoz['hibas'] == 2) ? "; text-decoration: line-through; color: grey" : (($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "") ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/<?=$eszktip['teljes']?>/<?=$eszkoz['id']?>'>
+            ?><tr style='font-weight: normal <?= ($eszkoz['hibas'] == 2) ? "; text-decoration: line-through; color: grey" : (($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "") ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
                 <td><?=$eszkoz['ipcim']?></td>
                 <td><?=$eszkoz['beepitesinev']?></td>
                 <td><?=$eszkoz['gyarto']?></td>
@@ -153,7 +153,7 @@ else
                     ?><td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
                     if($csoportir)
                     {
-                        szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip['tipus']);
+                        szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
                     }
                 }
             ?></tr><?php

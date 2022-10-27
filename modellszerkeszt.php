@@ -86,7 +86,7 @@ else
 
         if (!isset($tipusnev))
         {
-            $tipusnev = eszkozTipusValaszto($tipus)['tipus'];
+            $tipusnev = eszkozTipusValaszto($tipus);
         }
 
         $button = "Szerkesztés";
