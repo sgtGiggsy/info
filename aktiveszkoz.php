@@ -243,270 +243,160 @@ elseif($id)
                     </li><?php
                 }
             ?></ol>
-        </div><?php
+        </div>
+        
+        <div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div><?php
 
-// Szerkesztő gombok
-        if($mindir)
-        {
-            ?><div style='display: inline-flex'>
-                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Eszköz szerkesztése</button><?php
-                if(isset($elozmenyek) && mysqli_num_rows($elozmenyek) > 0)
-                {
-                    ?><button type='button' onclick=rejtMutat("elozmenyek")>Szerkesztési előzmények</button><?php
-                }
-            ?></div><?php
-        }
-
-// Szerkesztési előzmények megjelenítése
-        if(mysqli_num_rows($elozmenyek) > 0)
-        {
-            ?><div id="elozmenyek" style="display: none">
-                <div class="oldalcim">Szerkesztési előzmények</div>
-                <table id="verzioelozmenyek">
-                    <thead>
-                        <th>Létrehozás / Módosítás ideje</th>
-                        <th>Létrehozó / Módosító</th>
-                        <th>Modell</th>
-                        <th>Sorozatszám</th>
-                        <th>MAC</th>
-                        <th>Szoftver</th>
-                        <th>Access portok</th>
-                        <th>Uplink portok</th>
-                        <th>PoE</th>
-                        <th>SSH</th>
-                        <th>Webes felület</th>
-                        <th>Tulajdonos</th>
-                        <th>Állapot</th>
-                        <th>Raktár</th>
-                        <th>Megjegyzés</th>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $szamoz = 1;
-                        $elozoverzio = null;
-                        foreach($elozmenyek as $x)
+        ?><div class="dyntripplecol">
+        <!-- Infóbox -->
+            <div class="infobox">
+                <div class="infoboxtitle"><?=(isset($_GET['beepites'])) ? "Korábbi beépítés adatai" : "Eszköz adatai" ?></div>
+                <div class="infoboxbody">
+                    <div class="infoboxbodytwocol"><?php
+                        $ujoldalcim = $ablakcim . " - " . $eszkoz['gyarto'] . " " . $eszkoz['modell'] . $eszkoz['varians'] . " (" . $eszkoz['sorozatszam'] . ")";
+                        if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
                         {
-                            ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'><?php
-                                if($szamoz == 1 && $x['muvelet'] == 1)
+                            $ujoldalcim = $ablakcim . " - " . $eszkoz['beepitesinev'] . " (" . $eszkoz['ipcim'] . ")";
+                            ?><div>Állapot</div>
+                            <div>Beépítve</div><?php
+                        }
+                        if($eszkoz['beepitesideje'])
+                        {
+                            ?><div>IP cím</div><?php
+                            if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
+                            {
+                                if($eszkoz['web'])
                                 {
-                                    ?><td><?=$x['modositasideje']?></td>
-                                    <td><?=$x['modosito']?></td><?php
-                                }
-                                elseif ($szamoz != 1)
-                                {
-                                    ?><td><?=$x['modositasideje']?></td>
-                                    <td><?=$x['modosito']?></td><?php
+                                    ?><div><a style="cursor: pointer;" id="manage"><?=$eszkoz['ipcim']?></a></div><?php
                                 }
                                 else
                                 {
-                                    ?><td></td>
-                                    <td></td><?php
+                                    ?><div><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$eszkoz['ipcim']?></a></div><?php
                                 }
-                                ?><td <?=($elozoverzio && $elozoverzio['gyarto'] != $x['gyarto'] && $elozoverzio['modell'] != $x['modell'] && $elozoverzio['varians'] != $x['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$x['gyarto']?> <?=$x['modell']?><?=$x['varians']?></td>
-                                <td <?=($elozoverzio && $elozoverzio['sorozatszam'] != $x['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$x['sorozatszam']?></td>
-                                <td <?=($elozoverzio && $elozoverzio['mac'] != $x['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$x['mac']?></td>
-                                <td <?=($elozoverzio && $elozoverzio['szoftver'] != $x['szoftver']) ? "style='font-weight: bold;'" : "" ?>><?=$x['szoftver']?></td>
-                                <td <?=($elozoverzio && $elozoverzio['portszam'] != $x['portszam']) ? "style='font-weight: bold;'" : "" ?>><?=$x['portszam']?></td>
-                                <td <?=($elozoverzio && $elozoverzio['uplinkportok'] != $x['uplinkportok']) ? "style='font-weight: bold;'" : "" ?>><?=$x['uplinkportok']?></td>
-                                <td <?=($elozoverzio && $elozoverzio['poe'] != $x['poe']) ? "style='font-weight: bold;'" : "" ?>><?=($x['poe']) ? "Képes" : "Nincs" ?></td>
-                                <td <?=($elozoverzio && $elozoverzio['ssh'] != $x['ssh']) ? "style='font-weight: bold;'" : "" ?>><?=($x['ssh']) ? "Elérhető" : "Nem elérhető" ?></td>
-                                <td <?=($elozoverzio && $elozoverzio['web'] != $x['web']) ? "style='font-weight: bold;'" : "" ?>><?=($x['web']) ? "Van" : "Nincs" ?></td>
-                                <td <?=($elozoverzio && $elozoverzio['tulajid'] != $x['tulajid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['tulajdonos']?></td>
-                                <td <?=($elozoverzio && $elozoverzio['hibas'] != $x['hibas']) ? "style='font-weight: bold;'" : "" ?>><?php switch($x['hibas']) { case 1: echo "Részlegesen működőképes"; Break; case 2: echo "Működésképtelen"; Break; default: echo "Működőképes"; } ?></td>
-                                <td <?=($elozoverzio && $elozoverzio['raktarid'] != $x['raktarid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['raktar']?></td>
-                                <td <?=($elozoverzio && $elozoverzio['megjegyzes'] != $x['megjegyzes']) ? "style='font-weight: bold;'" : "" ?>><?=$x['megjegyzes']?></td>
-                            </tr><?php
-                            $szamoz++;
-                            $elozoverzio = $x;
-                        }
-                        ?><tr style="font-weight: normal; font-style: italic;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
-                            <td><?=$eszkoz['utolsomodositasideje']?></td>
-                            <td><?=$eszkoz['utolsomodosito']?></td>
-                            <td <?=($elozoverzio['gyarto'] != $eszkoz['gyarto'] && $elozoverzio['modell'] != $eszkoz['modell'] && $elozoverzio['varians'] != $eszkoz['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
-                            <td <?=($elozoverzio['sorozatszam'] != $eszkoz['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['sorozatszam']?></td>
-                            <td <?=($elozoverzio['mac'] != $eszkoz['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['mac']?></td>
-                            <td <?=($elozoverzio['szoftver'] != $eszkoz['szoftver']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['szoftver']?></td>
-                            <td <?=($elozoverzio['portszam'] != $eszkoz['portszam']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['portszam']?></td>
-                            <td <?=($elozoverzio['uplinkportok'] != $eszkoz['uplinkportok']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['uplinkportok']?></td>
-                            <td <?=($elozoverzio['poe'] != $eszkoz['poe']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['poe']) ? "Képes" : "Nincs" ?></td>
-                            <td <?=($elozoverzio['ssh'] != $eszkoz['ssh']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['ssh']) ? "Elérhető" : "Nem elérhető" ?></td>
-                            <td <?=($elozoverzio['web'] != $eszkoz['web']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['web']) ? "Van" : "Nincs" ?></td>
-                            <td <?=($elozoverzio['tulajid'] != $eszkoz['tulajid']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['tulajdonos']?></td>
-                            <td <?=($elozoverzio['hibas'] != $eszkoz['hibas']) ? "style='font-weight: bold;'" : "" ?>><?php switch($eszkoz['hibas']) { case 1: echo "Részlegesen működőképes"; Break; case 2: echo "Működésképtelen"; Break; default: echo "Működőképes"; } ?></td>
-                            <td <?=($elozoverzio['raktarid'] != $eszkoz['raktarid']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['raktar']?></td>
-                            <td <?=($elozoverzio['megjegyzes'] != $eszkoz['megjegyzes']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['megjegyzes']?></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div><?php
-        }
-
-// Infobox
-        ?><div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div><?php
-        if(isset($_GET['beepites']))
-        {
-            ?><h1 style="text-align: center">Korábbi beépítés adatai</h1><?php
-        }
-        ?><div class="infobox"><?php
-            $ujoldalcim = $ablakcim . " - " . $eszkoz['gyarto'] . " " . $eszkoz['modell'] . $eszkoz['varians'] . " (" . $eszkoz['sorozatszam'] . ")";
-            if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
-            {
-                $ujoldalcim = $ablakcim . " - " . $eszkoz['beepitesinev'] . " (" . $eszkoz['ipcim'] . ")";
-                ?><div>Állapot</div>
-                <div>Beépítve</div><?php
-            }
-            if($eszkoz['beepitesideje'])
-            {
-                ?><div>IP cím</div><?php
-                if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
-                {
-                    if($eszkoz['web'])
-                    {
-                        ?><div><a style="cursor: pointer;" id="manage"><?=$eszkoz['ipcim']?></a></div><?php
-                    }
-                    else
-                    {
-                        ?><div><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$eszkoz['ipcim']?></a></div><?php
-                    }
-                }
-                else
-                {
-                    ?><div><?=$eszkoz['ipcim']?></div><?php
-                }
-                ?><div>Beépítési név</div>
-                <div><?=$eszkoz['beepitesinev']?></div>
-                <div>Beépítés helye</div>
-                <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
-                <div>Rackszekrény</div>
-                <div><?=$eszkoz['rack']?></div>
-                <div>Beépítés ideje</div>
-                <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
-                <div>Kiépítés ideje</div>
-                <div><?=timeStampToDate($eszkoz['kiepitesideje'])?></div>
-                <div>Beépítéshez tartozó megjegyzés</div>
-                <div><?=$eszkoz['beepmegjegyz']?></div>
-                <?php
-            }
-            elseif(!$eszkoz['beepid'])
-            {
-                ?><div>Állapot</div>
-                <div>Új, sosem beépített</div><?php
-            }
-            else
-            {
-                ?><div>Állapot</div>
-                <div>Kiépítve</div>
-                <div>Raktár</div>
-                <div><?=$eszkoz['raktar']?></div><?php
-            }
-            ?><div>Gyártó</div>
-            <div><?=$eszkoz['gyarto']?></div>
-            <div>Modell</div>
-            <div><?=$eszkoz['modell'] . $eszkoz['varians']?></div>
-            <div>Sorozatszám</div>
-            <div><?=$eszkoz['sorozatszam']?></div>
-            <div>MAC Address</div>
-            <div><?=$eszkoz['mac']?></div>
-            <div>POE</div>
-            <div><?=($eszkoz['poe']) ? "Képes" : "Nem képes" ?></div>
-            <div>SSH</div>
-            <div><?=($eszkoz['ssh']) ? "Igen" : "Nem" ?></div>
-            <div>Weben menedzselhető</div>
-            <div><?=($eszkoz['web']) ? "Igen" : "Nem" ?></div>
-            <div>Szoftver</div>
-            <div><?=$eszkoz['szoftver']?></div>
-            <div>Access portok</div>
-            <div><?=$eszkoz['portszam']?></div>
-            <div>Uplink portok</div>
-            <div><?=$eszkoz['uplinkportok']?></div>
-            <div>Tulajdonos</div>
-            <div><?=($eszkoz['tulajdonos']) ? $eszkoz['tulajdonos'] : "Nem ismert" ?></div><?php
-            if($eszkoz['hibas'])
-            {
-                ?><div>Hibás</div>
-                <div><?=($eszkoz['hibas'] == 1) ? "Részlegesen" : "Működésképtelen" ?></div><?php
-            }            
-            ?>
-            <div>Eszközhöz tartozó megjegyzés</div>
-            <div><?=$eszkoz['megjegyzes']?></div>
-            <div>Bővítők</div>
-            <div><?php
-            if(mysqli_num_rows($bovitok))
-            {
-                foreach($bovitok as $x)
-                {
-                    ?><a href="<?=$RootPath?>/bovitomodul/<?=$x['bovid']?>"><?=$x['port']?> - <?=$x['gyarto']?> <?=$x['modell']?> <?=$x['szabvany']?> (<?=$x['sorozatszam']?>)</a><br><?php
-                }
-            }
-            else
-            {
-                echo "Nincs csatlakoztatott bővítő";
-            }
-            ?></div>
-        </div>
-
-        <div id="atfedes" class="atfedes">
-            <div class="atfedes-content">
-                <span class="close">&times;</span>
-                <p><a href="telnet://<?=$eszkoz['ipcim']?>">Switch menedzselése Telneten keresztül</a></p>
-                <p><a href="http://<?=$eszkoz['ipcim']?>" target="_blank">Switch menedzselése a webes felülettel</a></p>
-            </div>
-        </div><?php
-
-// Korábbi beépítések
-        if(mysqli_num_rows($aktiveszkozok) > 1 || $eszkoz['kiepitesideje'])
-        {
-            ?><div class="oldalcim"><?=(mysqli_num_rows($aktiveszkozok) > 2) ? "Korábbi beépítések" : "Korábbi beépítés" ?></div>
-            <table id="eszkozok">
-                <thead>
-                    <tr>
-                        <th>IP cím</th>
-                        <th>Beépítési név</th>
-                        <th>Beépítés ideje</th>
-                        <th>Kiépítés ideje</th>
-                        <th>Beépítés helye</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody><?php
-                $szamoz = 1;
-                foreach($aktiveszkozok as $x)
-                {
-                    if($eszkoz['beepid'] != $x['beepid'] || mysqli_num_rows($aktiveszkozok) == 1)
-                    {
-                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./<?=$id?>?beepites=<?=$x['beepid']?>'>
-                            <td><?=$x['ipcim']?></td>
-                            <td><?=$x['beepitesinev']?></td>
-                            <td><?=$x['beepitesideje']?></td>
-                            <td><?=$x['kiepitesideje']?></td>
-                            <td><?=$x['epuletszam']?> <?=($x['epuletnev']) ? "(" . $x['epuletnev'] . ")" : "" ?> <?=$x['helyisegszam']?> <?=($x['helyisegnev']) ? "(" . $x['helyisegnev'] . ")" : "" ?>
-                            <td><?php if($csoportir)
+                            }
+                            else
                             {
-                                ?><a href='<?=$RootPath?>/<?=$_GET['page']?>/<?=$id?>?beepites=<?=$x['beepid']?>&action=edit'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
-                            } ?></td>
-                        </tr><?php
-                        $szamoz++;
-                    }
-                }
-                ?></tbody>
-            </table><?php
-        }
-// Állapot előzmények
-        if($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'])
-        {
-            ?><div class="oldalcim"><p onclick="rejtMutat('allapotelozmenyek')" style="cursor: pointer">Állapot előzmények</p></div>
-            <div id="allapotelozmenyek" style="display: none">
-                <div class="twocolgrid">
-                <div style="background-color: grey;"><strong>Időpont</strong></div>
-                <div style="background-color: grey;"><strong>Állapot</strong></div><?php
-                foreach($allapotelozmenyek as $x)
-                {
-                    ?><div class="<?=($x['online']) ? "online" : "offline" ?>"><?=$x['timestamp']?></div>
-                    <div class="<?=($x['online']) ? "online" : "offline" ?>"><?=($x['online']) ? "Online" : "Offline" ?></div><?php
-                }
-                ?></div>
+                                ?><div><?=$eszkoz['ipcim']?></div><?php
+                            }
+                            ?><div>Beépítési név</div>
+                            <div><?=$eszkoz['beepitesinev']?></div>
+                            <div>Beépítés helye</div>
+                            <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
+                            <div>Rackszekrény</div>
+                            <div><?=$eszkoz['rack']?></div>
+                            <div>Beépítés ideje</div>
+                            <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
+                            <div>Kiépítés ideje</div>
+                            <div><?=timeStampToDate($eszkoz['kiepitesideje'])?></div>
+                            <div>Beépítéshez tartozó megjegyzés</div>
+                            <div><?=$eszkoz['beepmegjegyz']?></div>
+                            <?php
+                        }
+                        elseif(!$eszkoz['beepid'])
+                        {
+                            ?><div>Állapot</div>
+                            <div>Új, sosem beépített</div><?php
+                        }
+                        else
+                        {
+                            ?><div>Állapot</div>
+                            <div>Kiépítve</div>
+                            <div>Raktár</div>
+                            <div><?=$eszkoz['raktar']?></div><?php
+                        }
+                        ?><div>Gyártó</div>
+                        <div><?=$eszkoz['gyarto']?></div>
+                        <div>Modell</div>
+                        <div><?=$eszkoz['modell'] . $eszkoz['varians']?></div>
+                        <div>Sorozatszám</div>
+                        <div><?=$eszkoz['sorozatszam']?></div>
+                        <div>MAC Address</div>
+                        <div><?=$eszkoz['mac']?></div>
+                        <div>POE</div>
+                        <div><?=($eszkoz['poe']) ? "Képes" : "Nem képes" ?></div>
+                        <div>SSH</div>
+                        <div><?=($eszkoz['ssh']) ? "Igen" : "Nem" ?></div>
+                        <div>Weben menedzselhető</div>
+                        <div><?=($eszkoz['web']) ? "Igen" : "Nem" ?></div>
+                        <div>Szoftver</div>
+                        <div><?=$eszkoz['szoftver']?></div>
+                        <div>Access portok</div>
+                        <div><?=$eszkoz['portszam']?></div>
+                        <div>Uplink portok</div>
+                        <div><?=$eszkoz['uplinkportok']?></div>
+                        <div>Tulajdonos</div>
+                        <div><?=($eszkoz['tulajdonos']) ? $eszkoz['tulajdonos'] : "Nem ismert" ?></div><?php
+                        if($eszkoz['hibas'])
+                        {
+                            ?><div>Hibás</div>
+                            <div><?=($eszkoz['hibas'] == 1) ? "Részlegesen" : "Működésképtelen" ?></div><?php
+                        }            
+                        ?>
+                        <div>Eszközhöz tartozó megjegyzés</div>
+                        <div><?=$eszkoz['megjegyzes']?></div>
+                        <div>Bővítők</div>
+                        <div><?php
+                        if(mysqli_num_rows($bovitok))
+                        {
+                            foreach($bovitok as $x)
+                            {
+                                ?><a href="<?=$RootPath?>/bovitomodul/<?=$x['bovid']?>"><?=$x['port']?> - <?=$x['gyarto']?> <?=$x['modell']?> <?=$x['szabvany']?> (<?=$x['sorozatszam']?>)</a><br><?php
+                            }
+                        }
+                        else
+                        {
+                            echo "Nincs csatlakoztatott bővítő";
+                        }
+                        ?></div>
+                    </div>
+                </div>
             </div><?php
+            
+        // Állapot előzmények
+            if($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && mysqli_num_rows($allapotelozmenyek) > 0)
+            {
+                ?>
+                <div class="infobox">
+                    <div class="infoboxtitle">Állapot előzmények</div>
+                    <div class="infoboxbody">
+                        <div class="infoboxbodytwocol">
+                            <div><h2>Időpont</h2></div>
+                            <div><h2>Állapot</h2></div><?php
+                            foreach($allapotelozmenyek as $x)
+                            {
+                                ?><div class='<?=($x["online"]) ? "online'" : "offline' style='font-weight: normal'" ?>><?=$x['timestamp']?></div>
+                                <div class="<?=($x['online']) ? "online" : "offline" ?>"><?=($x['online']) ? "Online" : "Offline" ?></div><?php
+                            }
+                        ?></div>
+                    </div>
+                </div><?php
+            }
+
+
+        ?></div><?php
+        
+        
+        
+        
+        // Szerkesztő gombok
+        if($mindir)
+        {
+            $slideup = 1;
+            ?><div class="szerkgombsor">
+                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Eszköz szerkesztése</button><?php
+                if(mysqli_num_rows($aktiveszkozok) > 1 || $eszkoz['kiepitesideje'])
+                {
+                    ?><button type='button' onclick='showSlideIn("<?=$slideup?>", "slideup-")'>Beépítési előzmények</button><?php
+                    $slideup++;
+                }
+                if(isset($elozmenyek) && mysqli_num_rows($elozmenyek) > 0)
+                {
+                    ?><button type='button' onclick='showSlideIn("<?=$slideup?>", "slideup-")'>Szerkesztési előzmények</button><?php
+                }
+            ?></div><?php
         }
+        
+
 
 // Port táblázat
         ?><div class="PrintArea">
@@ -605,8 +495,155 @@ elseif($id)
                     }
                 ?></tbody>
             </table>
-        </div>
-        <script>
+        </div><?php
+
+// Betöltésnél rejtett felületek
+    // Switch menedzselés felugró
+        ?><div id="atfedes" class="atfedes">
+            <div class="atfedes-content">
+                <span class="close">&times;</span>
+                <p><a href="telnet://<?=$eszkoz['ipcim']?>">Switch menedzselése Telneten keresztül</a></p>
+                <p><a href="http://<?=$eszkoz['ipcim']?>" target="_blank">Switch menedzselése a webes felülettel</a></p>
+            </div>
+        </div><?php
+
+    // Korábbi beépítések
+        $slideup = 1;
+        if(mysqli_num_rows($aktiveszkozok) > 1 || $eszkoz['kiepitesideje'])
+        {
+            ?><div id="slideup-<?=$slideup?>" onmouseleave='showSlideIn("<?=$slideup?>", "slideup-")'>
+                <div class="tablecard">
+                    <div class="tablecardtitle"><?=(mysqli_num_rows($aktiveszkozok) > 2) ? "Korábbi beépítések" : "Korábbi beépítés" ?></div>
+                    <div class="tablecardbody">
+                        <table id="eszkozok">
+                            <thead>
+                                <tr>
+                                    <th>IP cím</th>
+                                    <th>Beépítési név</th>
+                                    <th>Beépítés ideje</th>
+                                    <th>Kiépítés ideje</th>
+                                    <th>Beépítés helye</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody><?php
+                            $szamoz = 1;
+                            foreach($aktiveszkozok as $x)
+                            {
+                                if($eszkoz['beepid'] != $x['beepid'] || mysqli_num_rows($aktiveszkozok) == 1)
+                                {
+                                    ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./<?=$id?>?beepites=<?=$x['beepid']?>'>
+                                        <td><?=$x['ipcim']?></td>
+                                        <td><?=$x['beepitesinev']?></td>
+                                        <td><?=$x['beepitesideje']?></td>
+                                        <td><?=$x['kiepitesideje']?></td>
+                                        <td><?=$x['epuletszam']?> <?=($x['epuletnev']) ? "(" . $x['epuletnev'] . ")" : "" ?> <?=$x['helyisegszam']?> <?=($x['helyisegnev']) ? "(" . $x['helyisegnev'] . ")" : "" ?>
+                                        <td><?php if($csoportir)
+                                        {
+                                            ?><a href='<?=$RootPath?>/<?=$_GET['page']?>/<?=$id?>?beepites=<?=$x['beepid']?>&action=edit'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
+                                        } ?></td>
+                                    </tr><?php
+                                    $szamoz++;
+                                }
+                            }
+                            ?></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div><?php
+            $slideup++;
+        }
+
+    // Szerkesztési előzmények megjelenítése
+        if(mysqli_num_rows($elozmenyek) > 0)
+        {
+            ?><div id="slideup-<?=$slideup?>" onmouseleave='showSlideIn("<?=$slideup?>", "slideup-")'>
+                <div class="tablecard">
+                    <div class="tablecardtitle">Szerkesztési előzmények</div>
+                    <div class="tablecardbody">
+                        <table id="verzioelozmenyek">
+                            <thead>
+                                <th>Létrehozás / Módosítás ideje</th>
+                                <th>Létrehozó / Módosító</th>
+                                <th>Modell</th>
+                                <th>Sorozatszám</th>
+                                <th>MAC</th>
+                                <th>Szoftver</th>
+                                <th>Access portok</th>
+                                <th>Uplink portok</th>
+                                <th>PoE</th>
+                                <th>SSH</th>
+                                <th>Webes felület</th>
+                                <th>Tulajdonos</th>
+                                <th>Állapot</th>
+                                <th>Raktár</th>
+                                <th>Megjegyzés</th>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $szamoz = 1;
+                                $elozoverzio = null;
+                                foreach($elozmenyek as $x)
+                                {
+                                    ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'><?php
+                                        if($szamoz == 1 && $x['muvelet'] == 1)
+                                        {
+                                            ?><td><?=$x['modositasideje']?></td>
+                                            <td><?=$x['modosito']?></td><?php
+                                        }
+                                        elseif ($szamoz != 1)
+                                        {
+                                            ?><td><?=$x['modositasideje']?></td>
+                                            <td><?=$x['modosito']?></td><?php
+                                        }
+                                        else
+                                        {
+                                            ?><td></td>
+                                            <td></td><?php
+                                        }
+                                        ?><td <?=($elozoverzio && $elozoverzio['gyarto'] != $x['gyarto'] && $elozoverzio['modell'] != $x['modell'] && $elozoverzio['varians'] != $x['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$x['gyarto']?> <?=$x['modell']?><?=$x['varians']?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['sorozatszam'] != $x['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$x['sorozatszam']?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['mac'] != $x['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$x['mac']?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['szoftver'] != $x['szoftver']) ? "style='font-weight: bold;'" : "" ?>><?=$x['szoftver']?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['portszam'] != $x['portszam']) ? "style='font-weight: bold;'" : "" ?>><?=$x['portszam']?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['uplinkportok'] != $x['uplinkportok']) ? "style='font-weight: bold;'" : "" ?>><?=$x['uplinkportok']?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['poe'] != $x['poe']) ? "style='font-weight: bold;'" : "" ?>><?=($x['poe']) ? "Képes" : "Nincs" ?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['ssh'] != $x['ssh']) ? "style='font-weight: bold;'" : "" ?>><?=($x['ssh']) ? "Elérhető" : "Nem elérhető" ?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['web'] != $x['web']) ? "style='font-weight: bold;'" : "" ?>><?=($x['web']) ? "Van" : "Nincs" ?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['tulajid'] != $x['tulajid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['tulajdonos']?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['hibas'] != $x['hibas']) ? "style='font-weight: bold;'" : "" ?>><?php switch($x['hibas']) { case 1: echo "Részlegesen működőképes"; Break; case 2: echo "Működésképtelen"; Break; default: echo "Működőképes"; } ?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['raktarid'] != $x['raktarid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['raktar']?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['megjegyzes'] != $x['megjegyzes']) ? "style='font-weight: bold;'" : "" ?>><?=$x['megjegyzes']?></td>
+                                    </tr><?php
+                                    $szamoz++;
+                                    $elozoverzio = $x;
+                                }
+                                ?><tr style="font-weight: normal; font-style: italic;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
+                                    <td><?=$eszkoz['utolsomodositasideje']?></td>
+                                    <td><?=$eszkoz['utolsomodosito']?></td>
+                                    <td <?=($elozoverzio['gyarto'] != $eszkoz['gyarto'] && $elozoverzio['modell'] != $eszkoz['modell'] && $elozoverzio['varians'] != $eszkoz['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
+                                    <td <?=($elozoverzio['sorozatszam'] != $eszkoz['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['sorozatszam']?></td>
+                                    <td <?=($elozoverzio['mac'] != $eszkoz['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['mac']?></td>
+                                    <td <?=($elozoverzio['szoftver'] != $eszkoz['szoftver']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['szoftver']?></td>
+                                    <td <?=($elozoverzio['portszam'] != $eszkoz['portszam']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['portszam']?></td>
+                                    <td <?=($elozoverzio['uplinkportok'] != $eszkoz['uplinkportok']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['uplinkportok']?></td>
+                                    <td <?=($elozoverzio['poe'] != $eszkoz['poe']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['poe']) ? "Képes" : "Nincs" ?></td>
+                                    <td <?=($elozoverzio['ssh'] != $eszkoz['ssh']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['ssh']) ? "Elérhető" : "Nem elérhető" ?></td>
+                                    <td <?=($elozoverzio['web'] != $eszkoz['web']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['web']) ? "Van" : "Nincs" ?></td>
+                                    <td <?=($elozoverzio['tulajid'] != $eszkoz['tulajid']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['tulajdonos']?></td>
+                                    <td <?=($elozoverzio['hibas'] != $eszkoz['hibas']) ? "style='font-weight: bold;'" : "" ?>><?php switch($eszkoz['hibas']) { case 1: echo "Részlegesen működőképes"; Break; case 2: echo "Működésképtelen"; Break; default: echo "Működőképes"; } ?></td>
+                                    <td <?=($elozoverzio['raktarid'] != $eszkoz['raktarid']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['raktar']?></td>
+                                    <td <?=($elozoverzio['megjegyzes'] != $eszkoz['megjegyzes']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['megjegyzes']?></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div><?php
+        }
+            
+
+        ?><script>
         $("form").on("submit", function (e) {
             var dataString = $(this).serialize();
 

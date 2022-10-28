@@ -147,63 +147,68 @@ else
             default: $fax = "Nincs";
         }
 
-        ?><div class="infobox"><?php
-        if($eszkoz['beepitesideje'] && $eszkoz['raktar'])
-        {
-            ?><div>Állapot</div>
-            <div>Raktárban</div><?php
-        }
-        elseif($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
-        {
-            ?><div>Állapot</div>
-            <div>Beépítve</div>
-            <div>IP cím</div>
-            <div><?=$eszkoz['ipcim']?></div>
-            <div>Beépítési név</div>
-            <div><?=$eszkoz['beepitesinev']?></div>
-            <div>Beépítés helye</div>
-            <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
-            <div>Beépítés ideje</div>
-            <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
-            <?php
-        }
-        elseif(!$eszkoz['beepitesideje'])
-        {
-            ?><div>Állapot</div>
-            <div>Új, sosem beépített</div><?php
-        }
-        else
-        {
-            ?><div>Állapot</div>
-            <div>Kiépítve</div>
-            <div>Utolsó IP cím</div>
-            <div><?=$eszkoz['ipcim']?></div>
-            <div>Utolsó beépítési név</div>
-            <div><?=$eszkoz['beepitesinev']?></div>
-            <div>Utolsó beépítési helye</div>
-            <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
-            <div>Utolsó beépítés ideje</div>
-            <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
-            <div>Kiépítés ideje</div>
-            <div><?=timeStampToDate($eszkoz['kiepitesideje'])?></div>
-            <?php
-        }
-        ?><div>Gyártó</div>
-        <div><?=$eszkoz['gyarto']?></div>
-        <div>Modell</div>
-        <div><?=$eszkoz['modell'] . $eszkoz['varians']?></div>
-        <div>Sorozatszám</div>
-        <div><?=$eszkoz['sorozatszam']?></div>
-        <div>Színmód</div>
-        <div><?=$szines?></div>
-        <div>Max nyomtatási méret</div>
-        <div><?=$maxmeret?></div>
-        <div>Szkenner</div>
-        <div><?=$scanner?></div>
-        <div>Fax</div>
-        <div><?=$fax?></div>
-        <div>Tulajdonos</div>
-        <div><?=$eszkoz['tulajdonos']?></div>
+        ?><div class="infobox">
+            <div class="infoboxtitle"><?=(isset($_GET['beepites'])) ? "Korábbi beépítés adatai" : "Eszköz adatai" ?></div>
+            <div class="infoboxbody">
+                <div class="infoboxbodytwocol"><?php
+                    if($eszkoz['beepitesideje'] && $eszkoz['raktar'])
+                    {
+                        ?><div>Állapot</div>
+                        <div>Raktárban</div><?php
+                    }
+                    elseif($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
+                    {
+                        ?><div>Állapot</div>
+                        <div>Beépítve</div>
+                        <div>IP cím</div>
+                        <div><?=$eszkoz['ipcim']?></div>
+                        <div>Beépítési név</div>
+                        <div><?=$eszkoz['beepitesinev']?></div>
+                        <div>Beépítés helye</div>
+                        <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
+                        <div>Beépítés ideje</div>
+                        <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
+                        <?php
+                    }
+                    elseif(!$eszkoz['beepitesideje'])
+                    {
+                        ?><div>Állapot</div>
+                        <div>Új, sosem beépített</div><?php
+                    }
+                    else
+                    {
+                        ?><div>Állapot</div>
+                        <div>Kiépítve</div>
+                        <div>Utolsó IP cím</div>
+                        <div><?=$eszkoz['ipcim']?></div>
+                        <div>Utolsó beépítési név</div>
+                        <div><?=$eszkoz['beepitesinev']?></div>
+                        <div>Utolsó beépítési helye</div>
+                        <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
+                        <div>Utolsó beépítés ideje</div>
+                        <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
+                        <div>Kiépítés ideje</div>
+                        <div><?=timeStampToDate($eszkoz['kiepitesideje'])?></div>
+                        <?php
+                    }
+                    ?><div>Gyártó</div>
+                    <div><?=$eszkoz['gyarto']?></div>
+                    <div>Modell</div>
+                    <div><?=$eszkoz['modell'] . $eszkoz['varians']?></div>
+                    <div>Sorozatszám</div>
+                    <div><?=$eszkoz['sorozatszam']?></div>
+                    <div>Színmód</div>
+                    <div><?=$szines?></div>
+                    <div>Max nyomtatási méret</div>
+                    <div><?=$maxmeret?></div>
+                    <div>Szkenner</div>
+                    <div><?=$scanner?></div>
+                    <div>Fax</div>
+                    <div><?=$fax?></div>
+                    <div>Tulajdonos</div>
+                    <div><?=$eszkoz['tulajdonos']?></div>
+                </div>
+            </div>
         </div><?php
 	}
 }

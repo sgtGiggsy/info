@@ -118,32 +118,37 @@ else
 		</div>
 
 		<div class="oldalcim">A(z) <?=$port['epuletnev']?> <?=$port['port']?> portjának adatai</div>
-		<div class="infobox"><?php
-			?><div>Állapot</div>
-			<div><?=($port['szomszedport']) ? "Kirendezve" : "Használaton kívül" ?></div>
-			<div>Központi oldal</div>
-			<div><?=$port['rack']?> rack, <?=$port['rackhelyszam']?>. helyiség (<?=$port['rackhelynev']?>)</div><?php
-			if($port['szomszedport'])
-			{
-				?><div>Aktív eszköz</div>
-				<div><?=$port['switch']?> (<?=$port['switchip']?>)</div>
-				<div>Eszköz portja</div>
-				<div><?=$port['szomszedport']?></div><?php
-			}
-			if(isset($port2['rack']) && $port2['rack'])
-			{
-				?><div>Túlsó oldal</div>
-				<div><?=$port2['rack']?> rack, <?=$port2['rackhelyszam']?>. helyiség (<?=$port2['rackhelynev']?>)</div>
-				<div>Túlsó oldali aktív eszköz</div>
-				<div><?=$port2['switch2']?> (<?=$port2['switchip2']?>)</div>
-				<div>Túlsó oldali aktív eszköz portja</div>
-				<div><?=$port2['szomszedport2']?></div><?php
-			}
-			else
-			{
-				?><div>Végponti oldal</div>
-				<div><?=$port['helyisegszam']?>. helyiség <?=($port['helyisegnev']) ? "(" . $port['helyisegnev'] . ")" : "" ?></div><?php
-			}
-		?></div><?php
+		<div class="infobox">
+			<div class="infoboxtitle"><?=(isset($_GET['beepites'])) ? "Korábbi csatlakoztatás adatai" : "Csatlakozás adatai" ?></div>
+			<div class="infoboxbody">
+				<div class="infoboxbodytwocol"><?php
+					?><div>Állapot</div>
+					<div><?=($port['szomszedport']) ? "Kirendezve" : "Használaton kívül" ?></div>
+					<div>Központi oldal</div>
+					<div><?=$port['rack']?> rack, <?=$port['rackhelyszam']?>. helyiség (<?=$port['rackhelynev']?>)</div><?php
+					if($port['szomszedport'])
+					{
+						?><div>Aktív eszköz</div>
+						<div><?=$port['switch']?> (<?=$port['switchip']?>)</div>
+						<div>Eszköz portja</div>
+						<div><?=$port['szomszedport']?></div><?php
+					}
+					if(isset($port2['rack']) && $port2['rack'])
+					{
+						?><div>Túlsó oldal</div>
+						<div><?=$port2['rack']?> rack, <?=$port2['rackhelyszam']?>. helyiség (<?=$port2['rackhelynev']?>)</div>
+						<div>Túlsó oldali aktív eszköz</div>
+						<div><?=$port2['switch2']?> (<?=$port2['switchip2']?>)</div>
+						<div>Túlsó oldali aktív eszköz portja</div>
+						<div><?=$port2['szomszedport2']?></div><?php
+					}
+					else
+					{
+						?><div>Végponti oldal</div>
+						<div><?=$port['helyisegszam']?>. helyiség <?=($port['helyisegnev']) ? "(" . $port['helyisegnev'] . ")" : "" ?></div><?php
+					}
+				?></div>
+			</div>
+		</div><?php
 	}
 }

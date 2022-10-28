@@ -211,7 +211,85 @@ ol, ul {
     width: 100%;
 }
 
-/* Szerkesztő felületek megjelenése */
+.dyntripplecol {
+    display: grid;
+    grid-template-columns: minmax(0px, 1fr) minmax(0px, max-content) minmax(0px, 1fr);
+    grid-gap: 1em;
+}
+
+/* Információs doboz */
+.infobox {
+    max-width: max-content;
+    max-height: 55vh;
+    overflow: hidden;
+}
+
+.infobox a {
+    text-decoration: none;
+    color:#007acc;
+    font-weight: normal
+}
+
+.infoboxtitle {
+    /*background-color: #d5d8db;*/
+    background-color: #0f2c3a7c;
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 0.8em;
+    border: 1px solid #66747a;
+    height: 2.7em;
+}
+
+.infoboxbody {
+    background-color: #dfe3e6;;
+    font-size: 0.9em;
+    padding: 1em 1em 0 1em;
+    margin: 0 auto auto auto;
+    max-height: calc(55vh - 3.5em);
+    overflow-y: auto;
+    border-left: 1px solid #9aa3a7;
+    border-bottom: 1px solid #9aa3a7;
+    border-right: 1px solid #9aa3a7;
+}
+
+.infoboxbody::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.infoboxbody::-webkit-scrollbar-track {
+    background-color: #717a7f;
+    border-radius: 100px;
+    margin: 20px 0 20px 0;
+}
+
+.infoboxbody::-webkit-scrollbar-thumb {
+    background: #35454d;
+    border-radius: 100px;
+}
+
+.infoboxbody::-webkit-scrollbar-thumb:hover {
+    background: #212b30;
+    border-radius: 100px;
+}
+
+.infoboxbodytwocol {
+    display: grid;
+    display: -ms-grid;
+    -ms-grid-columns: 1fr 2fr;
+    grid-template-columns: 1fr 2fr;
+}
+
+.infoboxbodytwocol div {
+    padding: 0em 0.5em 0.6em 0.5em;
+}
+
+.infoboxbodytwocol div:nth-child(odd) {
+    font-weight: bold;
+}
+
+/* Felületek megjelenése */
+/* Szerkesztő felület */
 .szerkcard {
     border: 2px #82868f solid;
     border-radius: 15px;
@@ -264,6 +342,26 @@ ol, ul {
 
 .szerkcardbody {
     padding: 0.7em 2em 1.5em 2em;
+}
+
+/* Táblázat overlay */
+.tablecard {
+    display: block;
+    height: 100%;
+    background-color: #dfe3e6;
+}
+
+.tablecardtitle {
+    background-color: #d5d8db;
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: 0.8em;
+    border-bottom: 1px solid #bbbbbb;
+}
+
+.tablecardbody table {
+    width: calc(100% - 2em);
+    margin: 1em;
 }
 
 /* Általános szövegmegjelenítés */
@@ -480,12 +578,12 @@ td img {
 }
 
 .online {
-    background-color: rgb(0, 121, 26);
+    color: #018216;
     font-weight: bold;
 }
 
 .offline {
-    background-color: #990000;
+    color: #990000;
 }
 
 /* ------------------------------- Egyszerű igazításhoz használt típusok ------------------------------- */
@@ -874,32 +972,6 @@ td img {
 }
 
 /* ------------------------------- Tartalmi elemek ------------------------------- */
-/* Információs doboz */
-.infobox {
-    display: grid;
-    display: -ms-grid;
-    -ms-grid-columns: 1fr 2fr;
-    grid-template-columns: 1fr 2fr;
-    margin: 0 auto auto auto;
-    width: 70%;
-    background-color: #0f2c3a;
-    color: #e2e2e2;
-    opacity: 0.5;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    padding: 20px;
-    border-radius: 5px;
-}
-
-.infobox a {
-    text-decoration: none;
-    color:#007acc;
-    font-weight: normal
-}
-
-.infobox div {
-    padding: 0.5em 0.5em 0.1em 0.5em;
-}
-
 /* Oldal cím */
 .oldalcim {
     position: relative;
@@ -914,6 +986,15 @@ td img {
 
 .oldalcim p {
     margin: 0;
+}
+
+/* Szerkesztő gombok */
+.szerkgombsor {
+    display: inline-flex;
+}
+
+.szerkgombsor button {
+    margin: 0.5em 0.5em 0.5em 0;
 }
 
 /* Lenyílók a címben */
@@ -948,11 +1029,12 @@ td img {
 
 /* ------------------------------- Overlayek ------------------------------- */
 /* Egészképernyős átfedés */
-.atfedes {
+.atfedes, .formkuldatfedes {
     display: none;
     position: fixed;
-    z-index: 1;
     padding-top: 100px;
+    text-align: center;
+    z-index: 10;
     left: 0;
     top: 0;
     width: 100%;
@@ -983,6 +1065,30 @@ td img {
     text-decoration: none;
     cursor: pointer;
 }
+
+.formkuldmessage {
+    padding-top: 200px;
+    color: #f3f3f3;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.loader {
+    display: inline-block;
+    margin-top: 10px;
+    border: 10px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 10px solid #3498db;
+    width: 60px;
+    height: 60px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 
 /* Toaster üzenet */
 #snackbar {
@@ -1059,6 +1165,41 @@ td img {
   @keyframes slideOut {
     from {right: 0}
     to {right: -500px}
+  }
+
+/* Felúszó menü */
+#slideup-1, #slideup-2, #slideup-3, #slideup-4 {
+    box-shadow: 0px -2px 5px dimgrey;
+    visibility: hidden;
+    width: calc(100% - 260px);
+    z-index: 1;
+    left: 230px;
+    bottom: -250px;
+    height: 250px;
+    overflow: auto;
+    position: fixed;
+}
+
+#slideup-1.show, #slideup-2.show, #slideup-3.show, #slideup-4.show {
+    visibility: visible;
+    bottom: -5px;
+    left: 230px;
+    animation: 1s ease-in-out 0s 1 slideUp;
+}
+
+#slideup-1.hide, #slideup-2.hide, #slideup-3.hide, #slideup-4.hide {
+    visibility: visible;
+    animation: 1.5s ease-in-out 0s 1 slideDown;
+}
+  
+  @keyframes slideUp {
+    from {bottom: -250px}
+    to {bottom: -5px}
+  }
+
+  @keyframes slideDown {
+    from {bottom: -5px}
+    to {bottom: -250px}
   }
 
 /* Üzenetek */

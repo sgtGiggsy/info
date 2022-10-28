@@ -124,74 +124,79 @@ else
                 <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Eszköz szerkesztése</button><?php
                 if(isset($elozmenyek) && mysqli_num_rows($elozmenyek) > 0)
                 {
-                    ?><button type='button' onclick=rejtMutat("elozmenyek")>Szerkesztési előzmények</button><?php
+                    ?><button type='button' onclick='rejtMutat("elozmenyek")'>Szerkesztési előzmények</button><?php
                 }
             ?></div><?php
         }
         
         ?><div class="infobox">
-            <div>Tulajdonos</div>
-            <div><?=$eszkoz['tulajdonos']?></div>
-            <div>Sorozatszám</div>
-            <div><?=$eszkoz['sorozatszam']?></div>
-            <div>Megjegyzés</div>
-            <div><?=$eszkoz['megjegyzes']?></div><?php
-            if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
-            {
-                ?><div>Állapot</div>
-                <div>Beépítve</div>
-                <div>Beépítés helye</div>
-                <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
-                <div>Beépítés ideje</div>
-                <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
-                <div>Hálózat</div>
-                <div><?=$eszkoz['vlan']?></div>
-                <?php
-            }
-            elseif(!$eszkoz['beepitesideje'])
-            {
-                ?><div>Állapot</div>
-                <div>Új, sosem beépített</div>
-                <div>Raktár</div>
-                <div><?=$eszkoz['raktar']?></div><?php
-            }
-            else
-            {
-                ?><div>Állapot</div>
-                <div>Kiépítve</div>
-                <div>Utolsó beépítési helye</div>
-                <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
-                <div>Utolsó beépítés ideje</div>
-                <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
-                <div>Kiépítés ideje</div>
-                <div><?=timeStampToDate($eszkoz['kiepitesideje'])?></div>
-                <div>Raktár</div>
-                <div><?=$eszkoz['raktar']?></div>
-                <div>Hálózat</div>
-                <div><?=$eszkoz['vlan']?></div>
-                <?php
-            }
-            ?>
-            <div>Gyártó</div>
-            <div><?=$eszkoz['gyarto']?></div>
-            <div>Modell</div>
-            <div><?=$eszkoz['modell'] . $eszkoz['varians']?></div>
-            <div>Eszköz fajtája</div>
-            <div><?=$eszkoz['tipus']?></div>
-            <div>Fizikai adatátvitel módja</div>
-            <div><?=$eszkoz['fizikaireteg']?></div>
-            <div>Transzport port átviteli szabványa</div>
-            <div><?=$eszkoz['transzportszabvany']?></div>
-            <div>Transzport port csatlakozója</div>
-            <div><?=$eszkoz['transzportcsatlakozo']?></div>
-            <div>Transzport port sebessége</div>
-            <div><?=$eszkoz['transzportsebesseg']?> Mbit</div>
-            <div>LAN oldal átviteli szabványa</div>
-            <div><?=$eszkoz['lanportszabvany']?></div>
-            <div>LAN oldal csatlakozója</div>
-            <div><?=$eszkoz['lanportcsatlakozo']?></div>
-            <div>LAN oldali sebesség</div>
-            <div><?=$eszkoz['lanportsebesseg']?> Mbit</div>
+            <div class="infoboxtitle"><?=(isset($_GET['beepites'])) ? "Korábbi beépítés adatai" : "Eszköz adatai" ?></div>
+            <div class="infoboxbody">
+                <div class="infoboxbodytwocol">
+                    <div>Tulajdonos</div>
+                    <div><?=$eszkoz['tulajdonos']?></div>
+                    <div>Sorozatszám</div>
+                    <div><?=$eszkoz['sorozatszam']?></div>
+                    <div>Megjegyzés</div>
+                    <div><?=$eszkoz['megjegyzes']?></div><?php
+                    if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
+                    {
+                        ?><div>Állapot</div>
+                        <div>Beépítve</div>
+                        <div>Beépítés helye</div>
+                        <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
+                        <div>Beépítés ideje</div>
+                        <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
+                        <div>Hálózat</div>
+                        <div><?=$eszkoz['vlan']?></div>
+                        <?php
+                    }
+                    elseif(!$eszkoz['beepitesideje'])
+                    {
+                        ?><div>Állapot</div>
+                        <div>Új, sosem beépített</div>
+                        <div>Raktár</div>
+                        <div><?=$eszkoz['raktar']?></div><?php
+                    }
+                    else
+                    {
+                        ?><div>Állapot</div>
+                        <div>Kiépítve</div>
+                        <div>Utolsó beépítési helye</div>
+                        <div><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?> <?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></div>
+                        <div>Utolsó beépítés ideje</div>
+                        <div><?=timeStampToDate($eszkoz['beepitesideje'])?></div>
+                        <div>Kiépítés ideje</div>
+                        <div><?=timeStampToDate($eszkoz['kiepitesideje'])?></div>
+                        <div>Raktár</div>
+                        <div><?=$eszkoz['raktar']?></div>
+                        <div>Hálózat</div>
+                        <div><?=$eszkoz['vlan']?></div>
+                        <?php
+                    }
+                    ?>
+                    <div>Gyártó</div>
+                    <div><?=$eszkoz['gyarto']?></div>
+                    <div>Modell</div>
+                    <div><?=$eszkoz['modell'] . $eszkoz['varians']?></div>
+                    <div>Eszköz fajtája</div>
+                    <div><?=$eszkoz['tipus']?></div>
+                    <div>Fizikai adatátvitel módja</div>
+                    <div><?=$eszkoz['fizikaireteg']?></div>
+                    <div>Transzport port átviteli szabványa</div>
+                    <div><?=$eszkoz['transzportszabvany']?></div>
+                    <div>Transzport port csatlakozója</div>
+                    <div><?=$eszkoz['transzportcsatlakozo']?></div>
+                    <div>Transzport port sebessége</div>
+                    <div><?=$eszkoz['transzportsebesseg']?> Mbit</div>
+                    <div>LAN oldal átviteli szabványa</div>
+                    <div><?=$eszkoz['lanportszabvany']?></div>
+                    <div>LAN oldal csatlakozója</div>
+                    <div><?=$eszkoz['lanportcsatlakozo']?></div>
+                    <div>LAN oldali sebesség</div>
+                    <div><?=$eszkoz['lanportsebesseg']?> Mbit</div>
+                </div>
+            </div>
         </div><?php
 	}
 }
