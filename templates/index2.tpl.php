@@ -47,7 +47,10 @@
 
 		<!-- Lábléc -->
 		<div class="bottom-line"><p><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p></div>
+
+		<!-- Betöltés során látható területen kívül eső, illetve nem létező tartalmak -->
 		<div id="snackbar"></div>
+		<div id="formkuldatfedes" class="formkuldatfedes"><div class="formkuldmessage">Művelet folyamatban, kérlek várj...<br><div class="loader"></div></div></div>
 	</div>
 </body>
 <script>
@@ -187,21 +190,14 @@
 
 	function showToaster(message) {
 		$("#snackbar").html(message)
-        // Get the snackbar DIV
         var x = document.getElementById("snackbar");
-
-        // Add the "show" class to DIV
         x.className = "show";
-
-        // After 3 seconds, remove the show class from DIV
         setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
 
 	function showPopup(id) {
-        // Get the snackbar DIV
         var x = document.getElementById(id);
 
-        // Add the "show" class to DIV
 		if(x.className == "show")
 		{
 			x.className = x.className.replace("show", "");
@@ -210,23 +206,36 @@
 		{
 			x.className = "show";
 		};
-
-        // After 3 seconds, remove the show class from DIV
-        //setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
 
 	function hidePopup(id) {
         var x = document.getElementById(id);
-        x.className = x.className.replace("show", "");
+
+		setTimeout(
+				function(){
+					if($("#" + id + ":hover").length == 0)
+					{
+						x.className = x.className.replace("show", "");
+					}
+				}, 700
+			);
     }
 
-	function showSlideIn(id = null) {
+	function showSlideIn(id = null, irany = null) {
 		var jelenlegi;
+		if(irany)
+		{
+			var animnev = irany;
+		}
+		else
+		{
+			var animnev = "slidein-";
+		}
 
 		// Jelenleg statikusan maximum 4 beúszó elemet tud kezelni a függvény
 		for(var i = 1; i <= 4; i++)
 		{
-			var x = document.getElementById("slidein-" + i);
+			var x = document.getElementById(animnev + i);
 
 			// Ha létezik, és jelenleg látszik: elrejt
 			if(x && x.className == "show")
@@ -246,7 +255,7 @@
 		{
 			setTimeout(
 				function(){
-					if($("#slidein-" + id + ":hover").length == 0)
+					if($("#" + animnev + id + ":hover").length == 0)
 					{
 						jelenlegi.className = jelenlegi.className.replace("show", "hide");
 					}
@@ -255,8 +264,7 @@
 		}
 	}
 
-	function hideSlideIn(id)
-	{
+	function hideSlideIn(id) {
 		var jelenlegi = document.getElementById("slidein-" + id);
 		setTimeout(
 				function(){
@@ -277,9 +285,11 @@
 
 	function seenAllNotif() {
 		$.ajax({
-        type: "POST",
-        url: "<?=$RootPath?>/notifseendb?action=seenallnotif",
-	});
+        	type: "POST",
+        	url: "<?=$RootPath?>/notifseendb?action=seenallnotif",
+		});
+
+		document.getElementById("notifcount").style.display = "none"
 	}
 
 	function seenNotif(notifid) {
@@ -316,6 +326,17 @@
         today = yyyy + '-' + mm + '-' + dd;
         document.getElementById(dateselect).value = today;
     }
+
+	function showProgressOverlay() {
+		var formkuldatfedes = document.getElementById("formkuldatfedes");
+		formkuldatfedes.style.display = "block";
+	}
+
+
+	$("form").on("submit", function (e) {
+            hideSlideIn();
+			showProgressOverlay();
+        });
 
 	<?php
 	if(isset($ujoldalcim))

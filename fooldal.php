@@ -3,7 +3,7 @@
 /*foreach($_SESSION as $key => $value)
 {
 	echo "$key = $value";
-} */
+} 
 
 //echo "<div class='oldalcim'>Főoldal</div>";
 if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] == 0)
@@ -16,3 +16,5 @@ else
 }
 $udvszoveg = mysqli_fetch_assoc($udvszovegSQL);
 echo $udvszoveg['ertek'] ?>
+*/
+include("./kozlemenyek.php");

@@ -681,7 +681,7 @@ function getNotifications()
 		WHERE felhasznalo = $felhasznaloid
 			AND ertesitesek.id = (SELECT MAX(ic.id) FROM ertesitesek ic WHERE ic.cim = ertesitesek.cim)
 			AND ertesitesek.timestamp > date_sub(now(), INTERVAL 7 DAY)
-		ORDER BY timestamp DESC");
+		ORDER BY latta ASC, timestamp DESC");
 
 	foreach($ertesitesek as $ertesites)
 	{

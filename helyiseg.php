@@ -133,7 +133,7 @@ else
                         $eszkid = $eszkoz['id'];
                         $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
                         
-                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/<?=$eszktip['teljes']?>/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td nowrap><?=$eszkoz['beepitesinev']?></td>
                             <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
@@ -147,7 +147,7 @@ else
                             }
                             if($csoportir)
                             {
-                                szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip['tipus']);
+                                szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
                                 ?><?php
                             }
                         ?></tr><?php
@@ -180,7 +180,7 @@ else
                             <td><?=$rack['nev']?></td>
                             <td><?=$rack['gyarto']?></td>
                             <td><?=$rack['unitszam']?></td>
-                            <td><?=($csoportir) ? "<a href='$RootPath/rackszerkeszt/$rackid'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td>
+                            <td><?=($csoportir) ? "<a href='$RootPath/rack/$rackid?action=edit'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td>
                         </tr><?php
                         $szamoz++;
                     }

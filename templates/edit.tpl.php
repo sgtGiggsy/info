@@ -36,9 +36,7 @@ if(isset($beuszok) && $beuszok)
             <div class="szerkcard">
                 <div class="szerkcardtitle"><?=$beuszo['cimszoveg']?><a class="help" onclick="showSlideIn('<?=$i?>')">X</a></div>
                 <div class="szerkcardbody">
-                    <div class="contentcenter">
                         <?php include("./includes/forms/" . $beuszo['formnev'] . ".php") ?>
-                    </div>
                 </div>
             </div>
         </div><?php
