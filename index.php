@@ -250,6 +250,7 @@ else
 
 // Betöldendő oldal kiválasztása, menüterületek feltöltése, és felhasználói jogosultságok megállapítása
 $menu = mySQLConnect("SELECT * FROM menupontok ORDER BY menuterulet ASC, sorrend ASC, aktiv DESC, id ASC");
+$sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
 
 // Ha nincs betölteni kívánt oldal, a főoldal kiválasztása betöltésre
 if(!(isset($_GET['page'])))
@@ -259,7 +260,6 @@ if(!(isset($_GET['page'])))
 else
 {
     $pagetofind = $_GET['page'];
-    $sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
 }
 
 // Felhasználó jogosultságainak lekérése, a menüpontok is ezalapján jelennek meg
@@ -295,12 +295,19 @@ foreach($menu as $menupont)
 			{
 				if($menupont['id'] == $jogosultsag['menupont'])
 				{
-					($jogosultsag['sajatolvas']) ? $sajatolvas = true : $sajatolvas = false;
-					($jogosultsag['csoportolvas']) ? $csoportolvas = true : $csoportolvas = false;
-					($jogosultsag['mindolvas']) ? $mindolvas = true : $mindolvas = false;
-					($jogosultsag['sajatir']) ? $sajatir = true : $sajatir = false;
-					($jogosultsag['csoportir']) ? $csoportir = true : $csoportir = false;
-					($jogosultsag['mindir']) ? $mindir = true : $mindir = false;
+					switch($jogosultsag['olvasas'])
+                    {
+                        case 3: $mindolvas = true;
+                        case 2: $csoportolvas = true;
+                        case 1: $sajatolvas = true;
+                    }
+
+                    switch($jogosultsag['iras'])
+                    {
+                        case 3: $mindir = true;
+                        case 2: $csoportir = true;
+                        case 1: $sajatir = true;
+                    }
 					break;
 				}
 			}
@@ -326,7 +333,7 @@ foreach($menu as $menupont)
         {
             if($menupont['id'] == $jogosultsag['menupont'])
             {
-                if($jogosultsag['sajatolvas'] == 1)
+                if($jogosultsag['olvasas'] > 0)
                 {
                     array_push($menuk[$menupont['menuterulet']], $menupont);
                     break;

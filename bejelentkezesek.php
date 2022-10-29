@@ -10,13 +10,16 @@ else
     {
         $where = "WHERE felhasznalo = $felhid";
     }
+    else
+    {
+        ?><div class='oldalcim'>Bejelentkezések</div><div><?php
+    }
     $lista = mySQLConnect("SELECT bejelentkezesek.id AS id, nev, ipcim, bongeszo, bongeszoverzio, oprendszer, oprendszerverzio, oprendszerarch, timestamp
             FROM bejelentkezesek
                 INNER JOIN felhasznalok ON bejelentkezesek.felhasznalo = felhasznalok.id
             $where
             ORDER BY bejelentkezesek.id DESC");
-    ?><div class='oldalcim'>Bejelentkezések</div>
-    <div>
+    ?>
     <table id='bejelentkezesek'>
         <thead>
             <tr>
@@ -53,7 +56,10 @@ else
             $szamoz++;
         }
         ?></tbody>
-        </table>
-    </div><?php
+        </table><?php
+    if(!isset($felhid))
+    {
+        ?></div><?php
+    }
 }
 ?>

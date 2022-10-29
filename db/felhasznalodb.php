@@ -25,13 +25,23 @@ if(isset($irhat) && $irhat)
             echo "<h2>Felhasználó hozzáadása sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
-        else
-        {
-            header("Location: $backtosender");
-        }
     }
 
     elseif($_GET["action"] == "update")
+    {
+        $elsobelepes = null;
+        $stmt = $con->prepare('UPDATE felhasznalok SET felhasznalonev=?, nev=?, email=?, telefon=?, alakulat=? WHERE id=?');
+        $stmt->bind_param('ssssss', $_POST['felhasznalonev'], $_POST['nev'], $_POST['email'], $_POST['telefon'], $_POST['alakulat'], $_POST['id']);
+        $stmt->execute();
+
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>Felhasználó szerkesztése sikertelen!<br></h2>";
+            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+    }
+
+    elseif($_GET["action"] == "permissions")
     {
         $felhasznalo = $_POST['id'];
         foreach($menu as $x)
@@ -46,19 +56,15 @@ if(isset($irhat) && $irhat)
                 //echo "nincs $menuid<br>";
                 foreach($_POST as $key => $value)
                 {
-                    if("sajatolvas-$menuid" == $key)
+                    if("olvasas-$menuid" == $key && ($_POST["olvasas-$menuid"] != 0))
                     {
-                        $stmt = $con->prepare('INSERT INTO jogosultsagok (felhasznalo, menupont, sajatolvas, csoportolvas, mindolvas, sajatir, csoportir, mindir) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-                        $stmt->bind_param('ssssssss', $felhasznalo, $menuid, $_POST["sajatolvas-$menuid"], $_POST["csoportolvas-$menuid"], $_POST["mindolvas-$menuid"], $_POST["sajatir-$menuid"], $_POST["csoportir-$menuid"], $_POST["mindir-$menuid"]);
+                        $stmt = $con->prepare('INSERT INTO jogosultsagok (felhasznalo, menupont, olvasas, iras) VALUES (?, ?, ?, ?)');
+                        $stmt->bind_param('ssss', $felhasznalo, $menuid, $_POST["olvasas-$menuid"], $_POST["iras-$menuid"]);
                         $stmt->execute();
                         if(mysqli_errno($con) != 0)
                         {
                             echo "<h2>A jogosultsag hozzáadása sikertelen!<br></h2>";
                             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
-                        }
-                        else
-                        {
-                            header("Location: $backtosender");
                         }
                         break;
                     }
@@ -66,22 +72,14 @@ if(isset($irhat) && $irhat)
             }
             else
             {
-                // megoldani, hogy a sajatolvas jog elvétele is működjön
-                if(isset($_POST["sajatolvas-$menuid"]))
+                $jogid = mysqli_fetch_assoc($xjogosultsag)['id'];
+                $stmt = $con->prepare('UPDATE jogosultsagok SET olvasas=?, iras=? WHERE id=?');
+                $stmt->bind_param('ssi', $_POST["olvasas-$menuid"], $_POST["iras-$menuid"], $jogid);
+                $stmt->execute();
+                if(mysqli_errno($con) != 0)
                 {
-                    $jogid = mysqli_fetch_assoc($xjogosultsag)['id'];
-                    $stmt = $con->prepare('UPDATE jogosultsagok SET sajatolvas=?, csoportolvas=?, mindolvas=?, sajatir=?, csoportir=?, mindir=? WHERE id=?');
-                    $stmt->bind_param('ssssssi', $_POST["sajatolvas-$menuid"], $_POST["csoportolvas-$menuid"], $_POST["mindolvas-$menuid"], $_POST["sajatir-$menuid"], $_POST["csoportir-$menuid"], $_POST["mindir-$menuid"], $jogid);
-                    $stmt->execute();
-                    if(mysqli_errno($con) != 0)
-                    {
-                        echo "<h2>A jogosultsag hozzáadása sikertelen!<br></h2>";
-                        echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
-                    }
-                    else
-                    {
-                        header("Location: $backtosender");
-                    }
+                    echo "<h2>A jogosultsag hozzáadása sikertelen!<br></h2>";
+                    echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
                 }
             }
         }

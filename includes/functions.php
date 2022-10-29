@@ -481,7 +481,9 @@ function cancelForm()
 		$backtosender = $RootPath;
 	}
 	
-	?><button type="button" onclick="location.href='<?=$backtosender?>'">Mégsem</button><?php
+	?><div class="submit">
+		<button type="button" onclick="location.href='<?=$backtosender?>'">Mégsem</button>
+   </div><?php
 }
 
 function mysqliNaturalSort($mysqliresult, $sortcriteria)
@@ -760,7 +762,7 @@ function redirectToKuldo($sikeres = null)
 	{
 		$targeturl .= "&sikeres=uj";
 	}
-	elseif($sikeres == "&sikeres=szerkesztes")
+	elseif($sikeres == "szerkesztes")
 	{
 		$targeturl .= "&sikeres=szerkesztes";
 	}
