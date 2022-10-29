@@ -332,6 +332,24 @@
 		formkuldatfedes.style.display = "block";
 	}
 
+	function checkAll(sor, ertek)
+	{
+		var tr = document.getElementById(sor);
+		var ele = tr.querySelectorAll('select');
+		for(var i = 0; i < ele.length; i++){
+			if(ele[i].type == 'select-one')
+			{
+				if(ele[i].value == ertek)
+				{
+					ele[i].value = 0;
+				}
+				else
+				{
+					ele[i].value = ertek;
+				}
+			}
+		}
+	}
 
 	$("form").on("submit", function (e) {
             hideSlideIn();

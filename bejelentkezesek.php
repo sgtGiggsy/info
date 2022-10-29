@@ -23,7 +23,7 @@ else
     <table id='bejelentkezesek'>
         <thead>
             <tr>
-                <th class="tsorth" onclick="sortTable(0, 'i', 'bejelentkezesek')">ID</th>
+                <th class="tsorth" onclick="sortTable(0, 's', 'bejelentkezesek')">Idő</th>
                 <?php if(!isset($felhid))
                 {
                     ?><th class="tsorth" onclick="sortTable(1, 's', 'bejelentkezesek')">Felhasználó</th><?php
@@ -33,7 +33,6 @@ else
                 <th class="tsorth" onclick="sortTable(3, 's', 'bejelentkezesek')">Oprendszer</th>
                 <th class="tsorth" onclick="sortTable(4, 's', 'bejelentkezesek')">Böngésző</th>
                 <th class="tsorth" onclick="sortTable(5, 's', 'bejelentkezesek')">Böngésző verzió</th>
-                <th class="tsorth" onclick="sortTable(6, 's', 'bejelentkezesek')">Idő</th>
             </tr>
         </thead>
         <tbody><?php
@@ -41,7 +40,7 @@ else
         foreach($lista as $x)
         {
             ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' style='font-weight: normal'>
-                <td><?=$x['id']?></td>
+                <td><?=$x['timestamp']?></td>
                 <?php if(!isset($felhid))
                 {
                     ?><td><?=$x['nev']?></td><?php
@@ -51,7 +50,6 @@ else
                 <td><?=$x['oprendszer'] . " " . $x['oprendszerverzio'] . " " . $x['oprendszerarch']?></td>
                 <td><?=$x['bongeszo']?></td>
                 <td><?=$x['bongeszoverzio']?></td>
-                <td><?=$x['timestamp']?></td>
             </tr><?php
             $szamoz++;
         }

@@ -49,6 +49,7 @@
     --buttonhover: #1c4663;
     --checkswitchbg: #e0e0e0;
     --checkswitch: #2196F3;
+    --checkswitchtrack: #f7f7f7;
     --topbase: #f7f7f7;
     --topborder: #807d7d;
     --shadow: #252526;
@@ -176,10 +177,10 @@ ol, ul {
     margin: 0 auto;
     width: 100%;
     min-width: 20ch;
-    max-width: 70ch;
+    /*max-width: 70ch;*/
 }
 
-.contentcenter input, .contentcenter select {
+.contentcenter input {
     width: 100%;
     text-align: left;
 }
@@ -238,6 +239,10 @@ ol, ul {
     margin: 10px;
     align-items: start;
     justify-content: center;
+}
+
+.ketharmad .submit button, .doublecolumn .submit button {
+    max-width: 100%;
 }
 
 .doublecolumn h2 {
@@ -572,7 +577,7 @@ label {
     width: 26px;
     left: 4px;
     bottom: 4px;
-    background-color: var(--checkswitchbg);
+    background-color: var(--checkswitchtrack);
     -webkit-transition: .4s;
     transition: .4s;
 }

@@ -57,7 +57,7 @@ else
 
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/felhasznaloszerkeszt'">Új felhasználó</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=addnew'">Új felhasználó</button><?php
     }
     ?><div class='oldalcim'>Felhasználók listája
         <div class="right">

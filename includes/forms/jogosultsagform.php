@@ -10,6 +10,9 @@ if(@$irhat)
                             <th></th>
                             <th>Olvasás</th>
                             <th>Írás</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -31,7 +34,7 @@ if(@$irhat)
                             ?><tr id="<?='szerk' . $x['id']?>" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
                                 <td><label for="<?=$x['oldal']?>"><?=$x['menupont']?></label></td>
                                 <td>
-                                    <select id="olvasas" name="olvasas-<?=$x['id']?>">
+                                    <select id="olvasas-<?=$x['id']?>" name="olvasas-<?=$x['id']?>">
                                         <option value="0" <?=(!isset($jogosultsag['olvasas']) || $jogosultsag['olvasas'] == 0) ? "" : "selected" ?>></option>
                                         <option value="1" <?=(isset($jogosultsag['iras']) && $jogosultsag['olvasas'] == 1) ? "selected" : "" ?>>Saját</option>
                                         <option value="2" <?=(isset($jogosultsag['iras']) && $jogosultsag['olvasas'] == 2) ? "selected" : "" ?>>Csoport</option>
@@ -39,13 +42,16 @@ if(@$irhat)
                                     </select>
                                 </td>
                                 <td>
-                                    <select id="iras" name="iras-<?=$x['id']?>">
+                                    <select id="olvasas-<?=$x['id']?>" name="iras-<?=$x['id']?>">
                                         <option value="0" <?=(!isset($jogosultsag['iras']) || $jogosultsag['iras'] == 0) ? "" : "selected" ?>></option>
                                         <option value="1" <?=(isset($jogosultsag['iras']) && $jogosultsag['iras'] == 1) ? "selected" : "" ?>>Saját</option>
                                         <option value="2" <?=(isset($jogosultsag['iras']) && $jogosultsag['iras'] == 2) ? "selected" : "" ?>>Csoport</option>
                                         <option value="3" <?=(isset($jogosultsag['iras']) && $jogosultsag['iras'] == 3) ? "selected" : "" ?>>Minden</option>
                                     </select>
                                 </td>
+                                <td><button onclick="checkAll('<?='szerk' . $x['id']?>', '3'); return false;">Minden jog</button></td>
+                                <td><button onclick="checkAll('<?='szerk' . $x['id']?>', '2'); return false;">Csoport jogok</button></td>
+                                <td><button onclick="checkAll('<?='szerk' . $x['id']?>', '1'); return false;">Saját jogok</button></td>
                             </tr><?php
                             $szamoz++;
                         }
