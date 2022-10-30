@@ -17,7 +17,7 @@
     <div class="szerkcardbody">
         <div class="szerkeszt">
 
-            <?php include("./includes/forms/" . $form . ".php") ?>
+            <?php include("./" . $form . ".php") ?>
 
             <div id="magyarazat">
                 <h2 style="text-align: center">Súgó</h2>
@@ -36,7 +36,7 @@ if(isset($beuszok) && $beuszok)
             <div class="szerkcard">
                 <div class="szerkcardtitle"><?=$beuszo['cimszoveg']?><a class="help" onclick="showSlideIn('<?=$i?>')">X</a></div>
                 <div class="szerkcardbody">
-                        <?php include("./includes/forms/" . $beuszo['formnev'] . ".php") ?>
+                        <?php include("./" . $beuszo['formnev'] . ".php") ?>
                 </div>
             </div>
         </div><?php

@@ -279,6 +279,7 @@ ol, ul {
     max-width: max-content;
     max-height: 55vh;
     overflow: hidden;
+    /*margin: 0 auto;*/
 }
 
 .infobox a {

@@ -355,8 +355,17 @@ if(!isset($currentpage))
 try
 {
     $page = @fopen("./{$currentpage['url']}.php", "r");
-    if (!$page) {
-        throw new Exception();
+    if (!$page)
+    {
+        $page = @fopen("./{$currentpage['gyujtourl']}.php", "r");
+        if(!$page)
+        {
+            $page = @fopen("./{$currentpage['dburl']}.php", "r");
+            if(!$page)
+            {
+                throw new Exception();
+            }
+        }
     }
 }
 catch(Exception $e)

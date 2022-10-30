@@ -17,4 +17,4 @@ else
 $udvszoveg = mysqli_fetch_assoc($udvszovegSQL);
 echo $udvszoveg['ertek'] ?>
 */
-include("./kozlemenyek.php");
+include("./modules/kozlemenyek/kozlemenyek.php");

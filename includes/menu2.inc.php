@@ -59,7 +59,7 @@ if($menuterulet == 2)
 {
 	foreach($menuk[2] as $menupont)
 	{
-		?><a href="<?=$RootPath?>/<?=$menupont['url']?>"><img src="<?=$RootPath?>/images/<?=$menupont['url']?>.png" title="<?=$menupont['menupont']?>" alt="<?=$menupont['menupont']?>"></a><?php
+		?><a href="<?=$RootPath?>/<?=$menupont['gyujtooldal']?>"><img src="<?=$RootPath?>/images/<?=$menupont['oldal']?>.png" title="<?=$menupont['menupont']?>" alt="<?=$menupont['menupont']?>"></a><?php
 	}
 }
 
