@@ -153,7 +153,7 @@ else
                 <td><?=$munka['leiras']?></td>
                 <td><?=$munka['eszkoz']?></td>
                 <td><?=$munka['munkavegzo1nev']?></td>
-                <td><a style="cursor: pointer;" onclick="window.open('<?=$RootPath?>/munkaprint/<?=$munka['id']?>')"><img src='<?=$RootPath?>/images/print.png' alt='Munkalap nyomtatása' title='Munkalap nyomtatása' /></a></td>
+                <td><a style="cursor: pointer;" onclick="window.open('<?=$RootPath?>/munkaszerkeszt/<?=$munka['id']?>?action=print')"><img src='<?=$RootPath?>/images/print.png' alt='Munkalap nyomtatása' title='Munkalap nyomtatása' /></a></td>
                 <td><?=($csoportir) ? "<a href='$RootPath/munkaszerkeszt/$munkid'><img src='$RootPath/images/edit.png' alt='Munka szerkesztése' title='Munka szerkesztése'/></a>" : "" ?></td>
             </tr><?php
             $szamoz++;

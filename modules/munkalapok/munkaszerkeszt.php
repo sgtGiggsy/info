@@ -6,6 +6,11 @@ if(@!$sajatir)
 }
 else
 {
+    if($_GET['action'] == "print")
+    {
+        include("./modules/munkalapok/munkaprint.php");
+    }
+    
     if(count($_POST) > 0)
     {
         $irhat = true;
@@ -102,7 +107,7 @@ else
                         <input type="submit" name="beKuld" value="<?=$button?>">
                     </div>
                     <div class="submit" style="padding-top: 5px;">        
-                        <input type="submit" onclick="window.open('<?=$RootPath?>/munkaprint/<?=$munka['id']?>')" name="nyomtat" value="<?=$button2?>">
+                        <input type="submit" onclick="window.open('<?=$RootPath?>/munkaszerkeszt/<?=$munka['id']?>?action=print')" name="nyomtat" value="<?=$button2?>">
                     </div>
                 </form><?php
                 cancelForm();
