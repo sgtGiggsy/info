@@ -188,6 +188,16 @@
 		}
 	};
 
+	function upDownConversion(id) {
+		var elem = document.getElementById(id);
+		if(elem.textContent != "˄") {
+			elem.textContent = "˄";
+		}
+		else {
+			elem.textContent = "˅";
+		};
+	}
+
 	function showToaster(message) {
 		$("#snackbar").html(message)
         var x = document.getElementById("snackbar");

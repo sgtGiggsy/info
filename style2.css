@@ -190,6 +190,10 @@ ol, ul {
     margin: 0 auto;
 }
 
+.contentleft {
+    display: flex;
+}
+
 .twocolgrid {
     display: grid;
     grid-template-columns: 3fr 2fr;
@@ -367,12 +371,11 @@ ol, ul {
 .szerkcard {
     border: 2px var(--midborder) solid;
     border-radius: 15px;
+    overflow: hidden;
 }
 
 .szerkcardtitle {
     background-color: var(--cardtitle);
-    border-top-left-radius: 13px;
-    border-top-right-radius: 13px;
     border-bottom: 1px #bdc4c7 solid;
     font-size: 1.3em;
     font-weight: bold;
@@ -416,6 +419,49 @@ ol, ul {
 
 .szerkcardbody {
     padding: 0.7em 2em 1.5em 2em;
+}
+
+.menucard, .menucard-child {
+    padding: 0;
+    background-color: var(--cardbase);
+    border: 1px var(--midborder) solid;
+    border-radius: 0.5em;
+    margin-bottom: 0.3em;
+    overflow: hidden;
+}
+
+.menucard-child {
+    margin-left: 1em;
+}
+
+.menucardtitle {
+    background-color: var(--cardtitle);
+    border-bottom: 1px #bdc4c7 solid;
+    font-size: 1em;
+    font-weight: bold;
+    padding: 0.5em !important;
+}
+
+.menucardbody {
+    padding: 0.7em 1em 0.7em 1em !important;
+}
+
+.menuszerksor {
+    display: inline-flex;
+    padding-top: 0.3em;
+    padding-bottom: 0.5em;
+}
+
+.menuszerksor div {
+    padding-right: 0.5em;
+}
+
+.menucardbody input {
+    width: max-content;
+}
+
+.menucardbody input, .menucardbody label, .menucardbody select {
+    font-size: 0.8em;
 }
 
 /* Táblázat overlay */
