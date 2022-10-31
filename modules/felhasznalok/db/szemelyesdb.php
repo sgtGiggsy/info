@@ -16,8 +16,8 @@ if(isset($felhasznaloid))
 
     if(mysqli_num_rows($szemelyesdb) == 0)
     {
-        $stmt = $con->prepare('INSERT INTO szemelyesbeallitasok (felhid, switchstatemail, switchstateshow) VALUES (?, ?, ?)');
-        $stmt->bind_param('iss', $felhasznaloid, $_POST['switchstatemail'], $_POST['switchstateshow']);
+        $stmt = $con->prepare('INSERT INTO szemelyesbeallitasok (felhid, switchstatemail, switchstateshow, szinsema) VALUES (?, ?, ?, ?)');
+        $stmt->bind_param('isss', $felhasznaloid, $_POST['switchstatemail'], $_POST['switchstateshow'], $_POST['szinsema']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
@@ -27,8 +27,8 @@ if(isset($felhasznaloid))
     }
     elseif(mysqli_num_rows($szemelyesdb) == 1)
     {
-        $stmt = $con->prepare('UPDATE szemelyesbeallitasok SET switchstatemail=?, switchstateshow=? WHERE id=?');
-        $stmt->bind_param('ssi', $_POST['switchstatemail'], $_POST['switchstateshow'], $felhasznaloid);
+        $stmt = $con->prepare('UPDATE szemelyesbeallitasok SET switchstatemail=?, switchstateshow=?, szinsema=? WHERE id=?');
+        $stmt->bind_param('sssi', $_POST['switchstatemail'], $_POST['switchstateshow'], $_POST['szinsema'], $felhasznaloid);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

@@ -1,0 +1,63 @@
+/* Színmeghatározások */
+:root {
+    --body: #141414 !important;
+    --basefont: #c4cccc !important;
+    --fontlight: #c4cccc !important;
+    --fontlight2: #c4cccc !important;
+    --contentbg: #1f1f1f !important;
+    --menu: #333333 !important;
+    --menuhover: #252526 !important;
+    --submenu: #575757 !important;
+    --submenuhover: #393939 !important;
+    --link: #007acc !important;
+    --linkhover: #663399 !important;
+    --infoboxtitle: #212124 !important;
+    --infotitleborder: #171717 !important;
+    --infoboxthead: #171717 !important;
+    --infoboxsoro: #2d2d2d !important;
+    --infoboxsore: #333333 !important;
+    --cardbase: #323232 !important;
+    --cardtitle: #29292c !important;
+    --lightborder: #171717  !important;
+    --midborder: #252525 !important;
+    --button: #007acc !important;
+    --buttonborder: #004b7e !important;
+    --buttonhover: #1c4663 !important;
+    --checkswitchbg: #444444 !important;
+    --checkswitch: #2196F3 !important;
+    --checkswitchtrack: #3f3f3f !important;
+    --topbase: #252526 !important;
+    --topborder: #141414 !important;
+    --shadow: #151515 !important;
+    --selectbg: #575757 !important;
+    --thead: #171717 !important;
+    --tsoro: #2d2d2d !important;
+    --tsore: #333333 !important;
+    --online: #018216 !important;
+    --offline: #990000 !important;
+    --scrolltrack: #151c1f !important;
+    --scrollthumb: #4d4d4d !important;
+    --scrollthumbhover: #2d3132 !important;
+    --notifcount: #990000 !important;
+    --notifseen: #5f6263 !important;
+    --notifpopscrolltrack: #151c1f !important;
+    --notifpopscrollthumb: #3d4d54 !important;
+    --overlayclose: #aaaaaa !important;
+    --toasterbg: #333333 !important;
+    --commentbg: #666666 !important;
+    --footerbg: #141414 !important;
+    --loadercolor: #3498db !important;
+    --warning: #990000 !important;
+}
+
+.dontprint img {
+    filter: invert() brightness(80%);
+}
+
+.infoboxtitle img, td img {
+    filter: invert() brightness(80%);
+}
+
+.topmenuikonok img:hover {
+    filter: brightness(140%) !important;
+}

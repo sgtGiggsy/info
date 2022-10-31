@@ -127,6 +127,24 @@ elseif($mindir && isset($_GET['action']))
         include('././templates/edit.tpl.php');
     }
 }
+// A személyes beállítások meghívása
+elseif(isset($_SESSION[getenv('SESSION_NAME').'id']) && isset($_GET['beallitasok']))
+{
+    $magyarazat = null;
+    $irhat = true;
+    $form = "modules/felhasznalok/forms/szemelyesbeallitasokform";
+    $button = "Beállítások szerkesztése";
+    $oldalcim = "Személyes beállítások szerkesztése";
+
+    if(count($_POST) > 0)
+    {
+        $irhat = true;
+        include("./modules/felhasznalok/db/szemelyesdb.php");
+        header("Location: ./felhasznalo?beallitasok");
+    }
+
+    include('././templates/edit.tpl.php');
+}
 else
 {
     if(isset($_GET['id']))

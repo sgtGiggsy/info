@@ -66,7 +66,7 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
 //// Profil
     ?><div id="profilpopup" onmouseleave="hidePopup('profilpopup')">
         <a href="<?=$RootPath?>/felhasznalo">Profil</a>
-        <a href="<?=$RootPath?>/szemelyes">Beállítások</a>
+        <a href="<?=$RootPath?>/felhasznalo?beallitasok">Beállítások</a>
         <a href="<?=$RootPath?>/kilep">Kilépés</a>
     </div><?php
 }

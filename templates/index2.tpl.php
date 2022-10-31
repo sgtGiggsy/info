@@ -6,8 +6,12 @@
 	<meta name="description" content="<?=$ablakcim?>">
 	<script src="<?=$RootPath?>/includes/jquery.min.js"></script>
 	<script src="<?=$RootPath?>/includes/tinymce/tinymce.min.js"></script>
-	<link rel="shortcut icon" href="<?=$RootPath?>/favicon.ico">
-	<link rel="stylesheet" href="<?=$RootPath?>/style2.css" type="text/css">
+	<link rel="shortcut icon" href="<?=$RootPath?>/favicon.ico"><?php
+	if($szemelyes['szinsema'])
+	{
+		?><link rel="stylesheet" href="<?=$RootPath?>/<?=$szemelyes['szinsema']?>.css" type="text/css"><?php
+	}
+	?><link rel="stylesheet" href="<?=$RootPath?>/style2.css" type="text/css">
 	<title><?=$ablakcim . " - " . $currentpage['cimszoveg']?></title>
 </head>
 
