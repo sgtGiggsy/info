@@ -162,7 +162,7 @@ ol, ul {
     background-color: var(--contentbg);
     /*justify-content: center;*/
     overflow: auto;
-    box-shadow: 2px 2px 5px dimgrey;
+    box-shadow: 2px 2px 5px var(--shadow);
     grid-column-start: 2;
     grid-column-end: 4;
     grid-row-start: 2;
@@ -192,6 +192,10 @@ ol, ul {
 
 .contentleft {
     display: flex;
+}
+
+.contentleft div {
+    padding: 1em 0 0 0;
 }
 
 .twocolgrid {
@@ -370,13 +374,14 @@ ol, ul {
 /* Szerkesztő felület */
 .szerkcard {
     border: 2px var(--midborder) solid;
+    background-color: var(--cardbase);
     border-radius: 15px;
     overflow: hidden;
 }
 
 .szerkcardtitle {
     background-color: var(--cardtitle);
-    border-bottom: 1px #bdc4c7 solid;
+    border-bottom: 1px var(--lightborder) solid;
     font-size: 1.3em;
     font-weight: bold;
     padding: 1em;
@@ -391,7 +396,7 @@ ol, ul {
 }
 
 .szerkcardoptionelement {
-    background-color: var(--cardbase);
+    background-color: var(--tsoro);
     font-size: 1em;
     padding-top: 0.5em;
     height: 2.2em;
@@ -422,7 +427,7 @@ ol, ul {
 }
 
 .menucard, .menucard-child {
-    padding: 0;
+    padding: 0 !important;
     background-color: var(--cardbase);
     border: 1px var(--midborder) solid;
     border-radius: 0.5em;
@@ -431,12 +436,12 @@ ol, ul {
 }
 
 .menucard-child {
-    margin-left: 1em;
+    margin-left: 2em;
 }
 
 .menucardtitle {
     background-color: var(--cardtitle);
-    border-bottom: 1px #bdc4c7 solid;
+    border-bottom: 1px var(--midborder) solid;
     font-size: 1em;
     font-weight: bold;
     padding: 0.5em !important;
@@ -448,7 +453,7 @@ ol, ul {
 
 .menuszerksor {
     display: inline-flex;
-    padding-top: 0.3em;
+    padding-top: 0 !important;
     padding-bottom: 0.5em;
 }
 
@@ -478,7 +483,7 @@ ol, ul {
     font-weight: bold;
     font-size: 1.2em;
     padding: 0.8em;
-    border-bottom: 1px solid #bbbbbb;
+    border-bottom: 1px solid var(--lightborder);
 }
 
 .tablecardbody {
@@ -529,6 +534,7 @@ button:hover, .submit input:hover, input[type="submit"]:hover {
 
 select, input {
     /*width: 20ch;*/
+    color: var(--basefont);
     border: 1px solid var(--lightborder);
     border-radius: 0.25em;
     padding: 0.25em 0.5em;
@@ -542,11 +548,16 @@ select, input {
 textarea {
     height: 10ch;
     border: 1px solid var(--lightborder);
+    font-family: "roboto";
     border-radius: 0.45em;
     padding: 0.25em 0.5em;
     line-height: 1.1;
     background-color: var(--selectbg);
-    background-image: linear-gradient(to top, #f9f9f9, #fff 33%);
+    color: var(--basefont);
+}
+
+textarea:focus, input:focus, select:focus {
+    outline: 1px solid var(--shadow);
 }
 
 label {
@@ -707,6 +718,10 @@ td img {
     background: none;
 }
 
+.valtottsor-1 select option, .valtottsor-2 select option {
+    background-color: var(--selectbg);
+}
+
 .online {
     color: var(--online);
     font-weight: bold;
@@ -740,7 +755,7 @@ td img {
     width: 100%;
     padding: 5px;
     background-color: var(--topbase);
-    border: 1px solid var(--topborder);
+    border-bottom: 1px solid var(--topborder);
     grid-column-start: 1;
     grid-column-end: 4;
     grid-row-start: 1;
@@ -970,7 +985,7 @@ td img {
     font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
     font-size: 1rem;
     font-variant: small-caps;
-    border-right: 1px solid gray;
+    border-right: 1px solid var(--topborder);
     grid-column-start: 1;
     grid-column-end: 2;
     grid-row-start: 2;
@@ -978,7 +993,6 @@ td img {
 }
 
 .leftmenuarea {
-    padding-top: 12px;
     width: 200px;
     left: 0;
     right: 0;
@@ -992,7 +1006,7 @@ td img {
     flex-direction: column!important;
     padding-left: 0;
     list-style: none;
-    border-right: 1px solid gray;
+    border-right: 1px solid var(--topborder);
 }
 
 .leftmenuitem, .leftmenuitem a, .leftmenuitem-active, .leftmenuitem-active a {
@@ -1108,9 +1122,9 @@ td img {
     font-size: 1.5em;
     font-weight: bold;
     padding: 3px;
-    background: var(--fontlight);
+    background: var(--tsoro);
     margin: 5px 0px 10px 0px;
-    box-shadow: 2px 2px 5px dimgrey;
+    box-shadow: 2px 2px 5px var(--shadow);
 }
 
 .oldalcim p {

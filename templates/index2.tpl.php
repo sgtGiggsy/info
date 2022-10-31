@@ -190,11 +190,11 @@
 
 	function upDownConversion(id) {
 		var elem = document.getElementById(id);
-		if(elem.textContent != "˄") {
-			elem.textContent = "˄";
+		if(elem.textContent != "⮝") {
+			elem.textContent = "⮝";
 		}
 		else {
-			elem.textContent = "˅";
+			elem.textContent = "⮟";
 		};
 	}
 

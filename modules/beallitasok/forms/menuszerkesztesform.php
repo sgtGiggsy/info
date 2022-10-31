@@ -8,7 +8,7 @@ if(@$irhat)
                 foreach($menu as $menupont)
                 {
                     ?><div id="mid-<?=$menupont['id']?>" class="menucard<?=($menupont['szulo']) ? "-child" : "" ?>">
-                        <div class="menucardtitle"><?=$menupont['menupont']?><a class="help" id="nyil-<?=$menupont['id']?>" onclick="rejtMutat('menupontid-<?=$menupont['id']?>');upDownConversion('nyil-<?=$menupont['id']?>')">˅</a></div>
+                        <div class="menucardtitle"><?=$menupont['menupont']?><a class="help" id="nyil-<?=$menupont['id']?>" onclick="rejtMutat('menupontid-<?=$menupont['id']?>');upDownConversion('nyil-<?=$menupont['id']?>')"><strong>⮟</strong></a></div>
                         <div class="menucardbody" id="menupontid-<?=$menupont['id']?>" style="display: none">
                             <input type ="hidden" id="id-<?=$i?>" name="id-<?=$i?>" value="<?=$menupont['id']?>">
                             <div>
