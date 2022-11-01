@@ -6,6 +6,13 @@ if(!@$mindolvas)
 }
 else
 {
+    $where = null;
+    if(isset($_GET['kereses']))
+    {
+        $keres = $_GET['kereses'];
+        $where = "WHERE felhasznalok.nev LIKE '%$keres%' OR alakulatok.rovid LIKE '%$keres%' OR mv1.nev LIKE '%$keres%' OR mv2.nev LIKE '%$keres%' OR leiras LIKE '%$keres%' OR eszkoz LIKE '%$keres%'";
+    }
+    
     if(isset($_POST['oldalankent']))
     {
         $_SESSION['oldalankent'] = $_POST['oldalankent'];
@@ -43,21 +50,28 @@ else
         $nextid = $oldal + 1;
     }
     
-    $munkak = mySQLConnect("SELECT munkalapok.id AS id, hely, telephelyek.telephely AS telephely, epuletek.szam AS epulet, epulettipusok.tipus AS eptipus, helyisegek.helyisegszam AS helyiseg, igenylo, igenylesideje, vegrehajtasideje, munkavegzo1, munkavegzo2, leiras, eszkoz,
-            (SELECT nev FROM felhasznalok WHERE id = igenylo) AS igenylonev,
-            (SELECT telefon FROM felhasznalok WHERE id = igenylo) AS igenylotelefon,
-            (SELECT rovid FROM felhasznalok INNER JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id WHERE felhasznalok.id = igenylo) AS igenyloalakulat,
-            (SELECT nev FROM felhasznalok WHERE id = munkavegzo1) AS munkavegzo1nev,
-            (SELECT beosztas FROM felhasznalok WHERE id = munkavegzo1) AS munkavegzo1beosztas,
-            (SELECT telefon FROM felhasznalok WHERE id = munkavegzo1) AS munkavegzo1telefon,
-            (SELECT nev FROM felhasznalok WHERE id = munkavegzo2) AS munkavegzo2nev,
-            (SELECT beosztas FROM felhasznalok WHERE id = munkavegzo2) AS munkavegzo2beosztas,
-            (SELECT telefon FROM felhasznalok WHERE id = munkavegzo2) AS munkavegzo2telefon
+    $munkak = mySQLConnect("SELECT munkalapok.id AS id, hely, telephelyek.telephely AS telephely,
+            epuletek.szam AS epulet, epulettipusok.tipus AS eptipus, helyisegek.helyisegszam AS helyiseg,
+            igenylo, igenylesideje, vegrehajtasideje, munkavegzo1, munkavegzo2, leiras, eszkoz,
+            felhasznalok.nev AS igenylonev,
+            felhasznalok.telefon AS igenylotelefon,
+            alakulatok.rovid AS igenyloalakulat,
+            mv1.nev AS munkavegzo1nev,
+            mv1.telefon AS munkavegzo1telefon,
+            mv1.beosztas AS munkavegzo1beosztas,
+            mv2.nev AS munkavegzo2nev,
+            mv2.telefon AS munkavegzo2telefon,
+            mv2.beosztas AS munkavegzo2beosztas
         FROM munkalapok
             LEFT JOIN helyisegek ON munkalapok.hely = helyisegek.id
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
             LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
+            LEFT JOIN felhasznalok ON munkalapok.igenylo = felhasznalok.id
+            LEFT JOIN felhasznalok mv1 ON munkalapok.munkavegzo1 = mv1.id
+            LEFT JOIN felhasznalok mv2 ON munkalapok.munkavegzo2 = mv2.id
+            LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
+        $where    
         ORDER BY munkalapok.id DESC
         LIMIT $start, $megjelenit;");
 
@@ -171,4 +185,5 @@ else
         ?><div class='right'><a href="<?=$RootPath?>/munkalista/oldal/<?=$nextid?>">Következő oldal</a></div><?php
     }
     ?></div><?php
+    $enablekeres = true;
 }
