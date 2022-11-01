@@ -2,7 +2,7 @@
 
 // Ha nincs olvasási jog, vagy van írási kísérlet írási jog nélkül, letilt
 //if(!$mindir)
-if(1 > 2)
+if(@!$mindir)
 {
     getPermissionError();
 }
@@ -31,6 +31,10 @@ else
             $irhat = true;
         }
     }
+    elseif(isset($beallitasfelol) && $beallitasfelol)
+    {
+        $irhat = true;
+    }
 
     // Ha a felhasználó valótlan műveletet akart folytatni, letilt
     if(!$irhat && !$dbir)
@@ -43,13 +47,46 @@ else
     {
         include("./modules/beallitasok/db/menudb.php");
 
-        header("Location: ./menu?action=edit");
+        if(isset($_GET['kuldooldal']))
+        {
+            redirectToKuldo("szerkesztes");
+        }
+        else
+        {
+            header("Location: ./menu?action=edit");
+        }
     }
 
     // Ha a kért művelet nem jár adatbázisművelettel, a szerkesztési felület meghívása
     elseif($irhat && !$dbir)
     {
-        $magyarazat = null;
+        $magyarazat = "<strong>Menüpont neve</strong><p>Ez jelenik meg a menüben.</p>";
+        $magyarazat .= "<strong>Szülő menüpont</strong><p>Akkor kell megadni,
+            ha a menüpont egy másik menüpont almenüje.</p>";
+        $magyarazat .= "<strong>Megjelenik</strong><p>Itt választható, hogy kinek jelenjen meg a menüpont,
+            vagy, hogy megjelenjen-e egyáltalán.</p>";
+        $magyarazat .= "<strong>Menüterület</strong><p>A menüterület, ahol a menüpont megjelenik.
+            A jelen design mellett a főmenü az 1-es menüterület, a fejléc a 2-es menüterület,
+            más menüterület jelenleg nincs.</p>";
+        $magyarazat .= "<strong>Sorrend</strong><p>A menüpontok sorrendje fentről lefelé haladva.</p>";
+        $magyarazat .= "<strong>Új elem</strong><p>Ha ezt megadjuk, akkor a menüben megjelenik egy + gomb
+            a menüponton. Azt a linket kell itt megadni, amivel új elemet lehet felvinni az adatbázisba.
+            (Például új aktív eszközt az aktiveszköz?action=addnew cím meghívásával lehet hozzáadni.)</p>";
+        $magyarazat .= "<strong>Egyéni/Gyüjtő/Adatbázis oldal</strong>
+            <p>A menüpont mindig a <i>gyüjtő</i> oldalt hívja meg,
+            az <i>egyéni</i> oldalak a <i>gyüjtő</i> oldalról hívhatóak meg.
+            Ha olyan oldalt adnánk hozzá, ami csak <i>egyéni</i> oldalként funkcionál,
+            de menüből akarjuk meghívni, akkor azt is <i>gyüjtő</i> oldalként kell hozzáadni.
+            Az <i>adatbázis</i> oldal kitöltése csak speciális esetekben szügséges.
+            Lényegében, ha nem tudjuk, hogy ki kell-e tölteni, akkor biztosan nem kell.</p>";
+        $magyarazat .= "<strong>Fejléc címe</strong>
+            <p>A böngészőfülön, és az oldal tartalmi területének tetején megjelenő cím.</p>";
+        $magyarazat .= "<strong>Címsorban megjelenő oldal</strong>
+            <p>Az oldal rövid linkje. Az itt megadott cím jelenik meg közvetlenül
+            a website gyökerének címe után. Például: szervercim/oldal</p>";
+        $magyarazat .= "<strong>Tényleges elérési út</strong>
+            <p>Az oldal tényleges elérési útja a website gyökeréhez képest.</p>";
+        
         $form = $alapform . "menuszerkesztesform";
         $button = "Menük szerkesztése";
         $oldalcim = "Menük szerkesztése";
@@ -65,14 +102,30 @@ else
             return $a['menupont'] > $b['menupont'];
         });
 
-        if($_GET['action'] == "addnew")
+        if(@$_GET['action'] == "addnew")
         {
             $form = $alapform . "menuujform";
             $button = "Menü hozzáadása";
             $oldalcim = "Új menü hozzáadása";
         }
-
-        include('./templates/edit.tpl.php');
+        if(isset($beallitasfelol) && $beallitasfelol)
+        {
+            if(!$menuszerkmeghivva)
+            {
+                include('./modules/beallitasok/forms/menuszerkesztesform.php');
+                $menuszerkmeghivva = true;
+            }
+            else
+            {
+                $button = "Menü hozzáadása";
+                $oldalcim = "Új menü hozzáadása";
+                include('./modules/beallitasok/forms/menuujform.php');
+            }
+        }
+        else
+        {
+            include('./templates/edit.tpl.php');
+        }
     }
 
     

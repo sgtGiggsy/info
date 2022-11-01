@@ -203,7 +203,7 @@ elseif(isset($_GET['beepites']) && isset($_GET['action']))
         // Szerkesztési előzmények
             if(mysqli_num_rows($elozmenyek) > 0)
             {
-                ?><button type='button' onclick=rejtMutat("elozmenyek")>Szerkesztési előzmények</button><?php
+                ?><button type='button' onclick="rejtMutat('elozmenyek')">Szerkesztési előzmények</button><?php
             }
 
             if(mysqli_num_rows($elozmenyek) > 0)

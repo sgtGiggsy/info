@@ -37,7 +37,7 @@ if(@$irhat)
                                             <option value="3" <?=($menupont['aktiv'] == "3") ? "selected" : "" ?>>Mindenkinek</option>
                                             <option value="4" <?=($menupont['aktiv'] == "4") ? "selected" : "" ?>>Csak látogatóknak</option>
                                         </select>
-                                    </div>    
+                                    </div>
                                     <div>
                                         <label>Menüterület</label>
                                         <input type="text" style="width:6ch" name="menuterulet-<?=$i?>" value="<?=$menupont['menuterulet']?>">

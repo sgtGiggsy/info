@@ -1,20 +1,8 @@
 <?php
 
-if(!isset($_SESSION[getenv('SESSION_NAME').'id']))
+if(isset($irhat) && $irhat)
 {
-    echo "<h2>Nincs bejelentkezett felhasználó!</h2>" ?>
-    <head><meta http-equiv="refresh" content="1; URL='<?=$RootPath?>'" /></head><?php
-}
-else
-{
-    if(!(isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']) && $_SESSION[getenv('SESSION_NAME').'jogosultsag'] > 10))
-    {
-        echo "<h2>Nincs jogosultságod a beállítások szerkesztésére!</h2>" ?>
-        <head><meta http-equiv="refresh" content="1; URL='<?=$RootPath?>'" /></head><?php
-    }
-    else
-    {
-        $con = mySQLConnect(false);
+    $con = mySQLConnect(false);
         foreach($_POST as $key => $value)
         {
             if ($value == "NULL" || $value == "")
@@ -33,5 +21,4 @@ else
         }
         //header("Location: $backtosender");
     }
-}
 ?>

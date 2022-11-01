@@ -1,20 +1,34 @@
 <?php 
 
-/*foreach($_SESSION as $key => $value)
+/*
+foreach($_SESSION as $key => $value)
 {
 	echo "$key = $value";
 } 
+*/
 
-//echo "<div class='oldalcim'>Főoldal</div>";
+//
 if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] == 0)
 {
-	$udvszovegSQL = mySQLConnect("SELECT * FROM beallitasok WHERE nev = 'udvozloszoveg'");
+	if($_SESSION[getenv('SESSION_NAME').'fooldalkijelentkezve'])
+	{
+		header("Location: ./" . $_SESSION[getenv('SESSION_NAME').'fooldalkijelentkezve']);
+	}
+	else
+	{
+		echo "<div class='oldalcim'>Főoldal</div>";
+		echo $_SESSION[getenv('SESSION_NAME').'udvozloszoveg'];
+	}
 }
 else
 {
-	$udvszovegSQL = mySQLConnect("SELECT * FROM beallitasok WHERE nev = 'udvozloszovegbelepve'");
+	if($_SESSION[getenv('SESSION_NAME').'fooldalbejelentkezve'])
+	{
+		header("Location: ./" . $_SESSION[getenv('SESSION_NAME').'fooldalbejelentkezve']);
+	}
+	else
+	{
+		echo "<div class='oldalcim'>Főoldal</div>";
+		echo $_SESSION[getenv('SESSION_NAME').'udvozloszovegbelepve'];
+	}
 }
-$udvszoveg = mysqli_fetch_assoc($udvszovegSQL);
-echo $udvszoveg['ertek'] ?>
-*/
-include("./modules/kozlemenyek/kozlemenyek.php");

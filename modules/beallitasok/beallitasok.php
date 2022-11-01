@@ -1,145 +1,105 @@
 <?php
-if(!$sajatolvas)
+
+// Ha nincs olvasási jog, vagy van írási kísérlet írási jog nélkül, letilt
+if(@!$mindir)
 {
-    echo "<h2>Nincs jogosultsága az oldal megtekintésére!</h2>";
+    getPermissionError();
 }
 else
 {
-    if(count($_POST) > 0 && @$mindir)
+    // Amíg nem tudjuk, hogy a folyamat jár-e tényleges írással, a változót false-ra állítjuk
+    $dbir = false;
+
+    // Amíg nem tudjuk, hogy a felhasználó valós műveletet akar végezni, a változót false-ra állítjuk
+    $irhat = true;
+
+    // Ellenőrizzük, hogy volt-e műveletvégzésre irányuló kérdés
+    if(isset($_GET['action']))
     {
-        $irhat = true;
+        // Ha a kért művelet nem a szerkesztő oldal betöltése, az adatbázis változót true-ra állítjuk
+        if($_GET['action'] == "new" || $_GET['action'] == "update" || $_GET['action'] == "delete")
+        {
+            $dbir = true;
+        }
+    }
+
+    // Ha a kért művelet jár adatbázisművelettel, az adatbázis műveletekért felelős oldal meghívása
+    if($irhat && $dbir && count($_POST) > 0)
+    {
         include("./modules/beallitasok/db/beallitasdb.php");
+
+        header("Location: ./beallitasok?sikeres=szerkesztes");
     }
-    elseif(count($_POST) > 0)
+
+    // Ha a kért művelet nem jár adatbázisművelettel, a szerkesztési felület meghívása
+    elseif($irhat && !$dbir)
     {
-        echo "<h2>Nincs jogosultsága a beállítások elmentésére!</h2>";
+        $sugo = array();
+        $magyarazat = null;
+        $mindir = true;
+        $bbutton = "Beállítások mentése";
+        $oldalcim = "Főoldal beállítások";
+
+        $beallitassql = mySQLConnect("SELECT * FROM beallitasok");
+        $telephelyek = mySQLConnect("SELECT * FROM telephelyek;");
+        $beallitas = array();
+        foreach($beallitassql as $x)
+        {
+            $beallitas[$x['nev']] = $x['ertek'];
+        }
+
+        $beallitasfelol = true;
+        $beallitasfulek = array();
+        $beallitasfulek[] = array('cimszoveg' => 'Főoldal beállítások', 'formnev' => 'modules/beallitasok/forms/fooldalbeallitasform');
+        $beallitasfulek[] = array('cimszoveg' => 'Menü beállításai', 'formnev' => 'modules/beallitasok/menu');
+        $beallitasfulek[] = array('cimszoveg' => 'Új menüpont', 'formnev' => 'modules/beallitasok/menu');
+        $beallitasfulek[] = array('cimszoveg' => 'Mail beállítások', 'formnev' => 'modules/beallitasok/forms/mailbeallitasform');
+        $beallitasfulek[] = array('cimszoveg' => 'Munkalap beállítások', 'formnev' => 'modules/beallitasok/forms/munkalapbeallitasform');
+        $beallitasfulek[] = array('cimszoveg' => 'Switch ellenőrző beállítások', 'formnev' => 'modules/beallitasok/forms/switchcheckbeallitasform');
+
+        // A beállítások fő oldala
+        ?><div class="szerkcard">
+            <div class="szerkcardtitle"><span id="beallitastitle"><?=$oldalcim?></span><a class="help" onclick="rejtMutat('magyarazat')">?</a></div><?php
+                $i = 1;
+                ?><div class="szerkcardoptions"><?php
+                    foreach($beallitasfulek as $ful)
+                    {
+                        ?><div class="szerkcardoptionelement" id="szerkcard-<?=$i?>" <?=($i == 1) ? "style='background-color: var(--infoboxtitle)'" : "" ?>><span onclick="changeTitle('beallitastitle', '<?=$ful['cimszoveg']?>'); showOnlyOne('beallitas-', '<?=$i?>'); showOnlyOne('sugo-', '<?=$i?>')"><?=$ful['cimszoveg']?></span></div><?php
+                        $i++;
+                    }
+                ?></div>
+            <div class="szerkcardbody">
+                <div class="szerkeszt">
+                    <div><?php
+                        // A menüszerkesztés az első meghívás során a meglévő menüket szerkeszti,
+                        // a következő meghívásnál új menüpontot ad hozzá. Ez a változó adja meg,
+                        // hogy megvolt-e már hívva az oldal.
+                        $menuszerkmeghivva = false;
+                        $j = 1; // A menüszerkesztési oldal megnöveli az i értékét, így más változó kell
+                        foreach($beallitasfulek as $szerkform)
+                        {
+                            ?><div id="beallitas-<?=$j?>" <?=($j > 1) ? 'style="display: none"' : 'style="display: block"' ?>><?php
+                                include("./" . $szerkform['formnev'] . ".php");
+                                $sugo[] = $magyarazat;
+                            ?></div><?php
+                            $j++;
+                        }
+                    ?></div><div id="magyarazat">
+                        <h2 style="text-align: center">Súgó</h2><?php
+                        $s = 1;
+                        foreach($beallitasfulek as $ful)
+                        {
+                            ?><div id="sugo-<?=$s?>" <?=($s > 1) ? 'style="display: none"' : 'style="display: block"' ?>>
+                                <?php print_r($sugo[$s-1]);?>
+                            </div><?php
+                            $s++;
+                        }
+                        
+                    ?></div>
+
+                </div>
+            </div>
+        </div><?php
     }
-
-    $button = "Beállítások mentése";
-    $beallitassql = mySQLConnect("SELECT * FROM beallitasok");
-    $telephelyek = mySQLConnect("SELECT * FROM telephelyek;");
-    $beallitas = array();
-    foreach($beallitassql as $x)
-    {
-        $beallitas[$x['nev']] = $x['ertek'];
-    }    
-
-    ?><script type ="text/javascript">
-        tinymce.init({
-            selector: '#udvozloszoveg',
-            plugins : 'advlist autolink link image lists charmap print preview code'
-        });
-
-        tinymce.init({
-            selector: '#udvozloszovegbelepve',
-            plugins : 'advlist autolink link image lists charmap print preview code'
-        })
-
-        tinymce.init({
-            selector: '#lablecinfo',
-            plugins : 'advlist autolink link image lists charmap print preview code'
-        })
-    </script>
-
-    <?php include("./modules/beallitasok/menuszerkeszt.php"); ?>
-
-    <form action="<?=$RootPath?>/beallitasok?action=update" method="post">
-    <div class="oldalcim"><p onclick="rejtMutat('munkalapok')" style="cursor: pointer">Munkalapok</p></div>
-    <div class="contentcenter" id="munkalapok"style='display: none'>
-
-        <?=helyisegPicker($beallitas['defaultmunkahely'], "defaultmunkahely")?>
-
-        <div>
-        <label for="defaultugyintezo">Alapértelmezett ügyintéző:</label><br>
-            <?=felhasznaloPicker($beallitas['defaultugyintezo'], "defaultugyintezo", false)?>
-        </div>
-    </div>
-
-    <div class="oldalcim"><p onclick="rejtMutat('switchonline')" style="cursor: pointer">Switchek Online ellenőrzése</p></div>
-    <div class="contentcenter" id="switchonline"style='display: none'>
-        <div>
-            <label for="telephely">Telephely:</label><br>
-            <select id="telephely" name="telephely">
-                <option value="" selected>Mind</option><?php
-                foreach($telephelyek as $x)
-                {
-                    ?><option value="<?=$x["id"]?>" <?= ($beallitas['telephely'] == $x['id']) ? "selected" : "" ?>><?=$x['telephely']?></option><?php
-                }
-            ?></select>
-        </div>
-
-        <div>
-            <label for="onlinefigyeles">Switchek online állapotának mutatása:</label><br>
-            <label class="kapcsolo">
-                <input type="hidden" name="onlinefigyeles" id="onlinefigyeleshidden" value="">
-                <input type="checkbox" name="onlinefigyeles" id="onlinefigyeles" value="1" <?= ($beallitas['onlinefigyeles']) ? "checked" : "" ?>>
-                <span class="slider"></span>
-            </label>
-        </div>
-    </div>
-
-    <div class="oldalcim"><p onclick="rejtMutat('levelezes')" style="cursor: pointer">Mail beállítások</p></div>
-    <div class="contentcenter" id="levelezes"style='display: none'>
-        <div>
-            <label for="mailkuld">Automatikus mailküldés:</label><br>
-            <label class="kapcsolo">
-                <input type="hidden" name="mailkuld" id="mailkuldhidden" value="">
-                <input type="checkbox" name="mailkuld" id="mailkuld" value="1" <?= ($beallitas['mailkuld']) ? "checked" : "" ?>>
-                <span class="slider"></span>
-            </label>
-        </div>
-
-        <div>
-            <label for="mailserver">Mail szerver:</label><br>
-            <input type="text" accept-charset="utf-8" name="mailserver" id="mailserver" value="<?=$beallitas['mailserver']?>"></input>
-        </div>
-
-        <div>
-            <label for="mailport">Mail port:</label><br>
-            <input type="text" accept-charset="utf-8" name="mailport" id="mailport" value="<?=$beallitas['mailport']?>"></input>
-        </div>
-
-        <div>
-            <label for="mailuser">Mail felhasználó:</label><br>
-            <input type="text" accept-charset="utf-8" name="mailuser" id="mailuser" value="<?=$beallitas['mailuser']?>"></input>
-        </div>
-
-        <div>
-            <label for="mailpassword">Mail jelszó:</label><br>
-            <input type="text" accept-charset="utf-8" name="mailpassword" id="mailpassword" value="<?=$beallitas['mailpassword']?>"></input>
-        </div>
-
-        <div>
-            <label for="mailfrom">Mail küldő címe:</label><br>
-            <input type="text" accept-charset="utf-8" name="mailfrom" id="mailfrom" value="<?=$beallitas['mailfrom']?>"></input>
-        </div>
-
-        <div>
-            <label for="mailto">Mail címzett:</label><br>
-            <input type="text" accept-charset="utf-8" name="mailto" id="mailto" value="<?=$beallitas['mailto']?>"></input>
-        </div>
-    </div>
-
-    <div class="oldalcim"><p onclick="rejtMutat('fooldal')" style="cursor: pointer">Főoldal tartalma</p></div>
-    <div class="contentcenter" id="fooldal" style='display: none'>
-        <div>
-            <label for="udvozloszoveg">Üdvözlőszöveg:
-            <textarea name="udvozloszoveg" id="udvozloszoveg"><?php if(isset($beallitas['udvozloszoveg'])) { echo $beallitas['udvozloszoveg']; } ?></textarea></label>
-        </div>
-        <div>
-            <label for="udvozloszovegbelepve">Üdvözlőszöveg bejelentkezett felhasználóknak:
-            <textarea name="udvozloszovegbelepve" id="udvozloszovegbelepve"><?php if(isset($beallitas['udvozloszovegbelepve'])) { echo $beallitas['udvozloszovegbelepve']; } ?></textarea></label>
-        </div>
-    </div>
-    <div class="submit"><input type="submit" value='<?=$button?>'></div>
-    </form>
-<?php
-if(isset($_GET['menupontok']))
-{
-    ?><script>window.onload = function()
-	{
-        document.getElementById('menuk').style.display = "grid";
-    }
-    </script><?php
-}
+    
 }

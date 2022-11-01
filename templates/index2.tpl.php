@@ -184,13 +184,44 @@
 	function rejtMutat(id) {
 		if(document.getElementById(id).style.display == "block")
 		{
-			document.getElementById(id).style.display = "none"
+			document.getElementById(id).style.display = "none";
 		}
 		else
 		{
 			document.getElementById(id).style.display = "block";
 		}
 	};
+
+	function showOnlyOne(elotag, id, closecurrent = false) {
+		for(var i = 1; i <= 10; i++)
+		{
+			var x = document.getElementById(elotag + i);
+
+			// Ha létezik, és jelenleg látszik: elrejt
+			if((x && x.style.display == "block") && (i != id || (i == id && closecurrent)))
+			{
+				if(!(i == id && closecurrent))
+				{
+					x.style.display = "none";
+					if(elotag == "beallitas-")
+					{
+						var mp = document.getElementById("szerkcard-" + i);
+						mp.style.backgroundColor = "";
+					}
+				}
+			}
+			// Ha létezik, nem látszik, és ez a megjeleníteni kívánt elem, megjelenítjük
+			else if(i == id)
+			{
+				x.style.display = "block";
+				if(elotag == "beallitas-")
+				{
+					var mp = document.getElementById("szerkcard-" + i);
+					mp.style.backgroundColor = "var(--infoboxtitle)";
+				}
+			};
+		}
+	}
 
 	function upDownConversion(id) {
 		var elem = document.getElementById(id);
@@ -200,6 +231,11 @@
 		else {
 			elem.textContent = "⮟";
 		};
+	}
+
+	function changeTitle(id, szoveg) {
+		var elem = document.getElementById(id);
+		elem.textContent = szoveg;
 	}
 
 	function showToaster(message) {
