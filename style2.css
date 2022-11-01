@@ -63,6 +63,7 @@
     --scrolltrack: #717a7f;
     --scrollthumb: #35454d;
     --scrollthumbhover: #212b30;
+    --infoboxscrollthumb: #35454d;
     --notifcount: #990000;
     --notifseen: #43545e;
     --notifpopscrolltrack: #151c1f;
@@ -335,7 +336,7 @@ ol, ul {
 }
 
 .infoboxbody::-webkit-scrollbar-thumb {
-    background: var(--submenuhover);
+    background: var(--infoboxscrollthumb);
     border-radius: 100px;
 }
 
@@ -563,6 +564,10 @@ textarea:focus, input:focus, select:focus {
 
 .tox {
     padding: 0 !important;
+}
+
+.tox-promotion {
+    display: none !important;
 }
 
 label {

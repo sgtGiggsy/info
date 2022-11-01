@@ -6,7 +6,7 @@ if(@!$sajatir)
 }
 else
 {
-    if($_GET['action'] == "print")
+    if(isset($_GET['action']) && $_GET['action'] == "print")
     {
         include("./modules/munkalapok/munkaprint.php");
     }
