@@ -1,7 +1,7 @@
 <?php
 // Ha nincs bejelentkezett felhasználó,
 // vagy van, de írási művelettel próbálkozik írási jog nélkül
-if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] == 0 || (!$mindir && isset($_GET['action'])))
+if((isset($_GET['id']) && $_GET['id'] != @$_SESSION[getenv('SESSION_NAME').'id'] && !$mindolvas) || (!$mindir && isset($_GET['action'])))
 {
     getPermissionError();
 }

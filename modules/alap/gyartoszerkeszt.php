@@ -1,6 +1,6 @@
 <?php
 
-if(@!$sajatolvas)
+if(@!$mindir)
 {
     echo "Nincs jogosultsága az oldal megtekintésére!";
 }
@@ -10,10 +10,15 @@ else
     {
         $irhat = true;
         include("./modules/alap/db/gyartodb.php");
+        
+        redirectToGyujto("gyartoklistaja");
     }
 
-    $nev = null;
+    $nev = $magyarazat = null;
     $button = "Új gyártó";
+    $irhat = true;
+    $form = "modules/alap/forms/gyartoszerkesztform";
+    $oldalcim = "Új gyártó hozzáadása";
 
     if(isset($_GET['id']))
     {
@@ -24,31 +29,8 @@ else
         $nev = $gyarto['nev'];
 
         $button = "Szerkesztés";
-
-        ?><form action="<?=$RootPath?>/gyartoszerkeszt&action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
-        <input type ="hidden" id="id" name="id" value=<?=$gyartoid?>><?php
-    }
-    else
-    {
-        ?><form action="<?=$RootPath?>/gyartoszerkeszt&action=new" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+        $oldalcim = "Gyártó szerkesztése";
     }
 
-    ?><div class="oldalcim">Gyártó szerkesztése</div>
-    <div class="contentcenter">
-
-        <div>
-            <label for="nev">Modellnév:</label><br>
-            <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$nev?>"></input>
-        </div>
-
-        <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
-    </form><?php
-
-    if(isset($_GET['id']))
-    {
-        ?><form action='<?=$RootPath?>/gyartoklistaja' method="post">
-        <div class='submit'><input type='submit' value='Mégsem'></div>
-        </form><?php
-    }
-    ?></div><?php
+    include('././templates/edit.tpl.php');
 }

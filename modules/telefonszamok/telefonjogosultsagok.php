@@ -21,13 +21,15 @@ else
         </tr>
     </thead>
     <tbody><?php
+    $szamoz = 1;
     foreach($telefonjogosultsagok as $telefonjogosultsag)
     {
         $telefonjogosultsagid = $telefonjogosultsag['id'];
-        ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/telefonjogszerk/$telefonjogosultsagid'" : "" ?>>
+        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' <?=($mindir) ? "data-href='$RootPath/telefonjogszerk/$telefonjogosultsagid'" : "" ?>>
             <td><?=$telefonjogosultsag['id']?></td>
             <td><?=$telefonjogosultsag['nev']?></td>
         </tr><?php
+        $szamoz++;
     }
     ?></tbody>
     </table><?php

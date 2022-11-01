@@ -30,7 +30,7 @@ if(isset($irhat) && $irhat)
     elseif($_GET["action"] == "update")
     {
         $stmt = $con->prepare('UPDATE vlanok SET nev=?, leiras=?, kceh=? WHERE id=?');
-        $stmt->bind_param('sssi', $_POST['nev'], $_POST['leiras'], $_POST['kceh'], $_POST['origid']);
+        $stmt->bind_param('sssi', $_POST['nev'], $_POST['leiras'], $_POST['kceh'], $_POST['id']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

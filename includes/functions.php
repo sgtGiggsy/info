@@ -769,3 +769,17 @@ function redirectToKuldo($sikeres = null)
 
 	header("Location: $targeturl");
 }
+
+function redirectToGyujto($gyujtonev)
+{
+	$eredmeny = null;
+	if($_GET['action'] == "new")
+	{
+		$eredmeny = "?sikeres=uj";
+	}
+	elseif($_GET['action'] == "update")
+	{
+		$eredmeny = "?sikeres=szerkesztes";
+	}
+	header("Location: ./" . $gyujtonev . $eredmeny);
+}

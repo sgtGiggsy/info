@@ -29,8 +29,8 @@ if(isset($irhat) && $irhat)
     }
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE telefonjogosultsagok SET id=?, nev=? WHERE id=?');
-        $stmt->bind_param('ssi', $_POST['id'], $_POST['nev'], $_POST['origid']);
+        $stmt = $con->prepare('UPDATE telefonjogosultsagok SET nev=? WHERE id=?');
+        $stmt->bind_param('si', $_POST['nev'], $_POST['id']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
