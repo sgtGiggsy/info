@@ -42,6 +42,7 @@
     --infoboxsore: #abb0bc;
     --cardbase: #dfe3e6;
     --cardtitle: #d5d8db;
+    --cardoptions: #ced4da;
     --lightborder: #9aa3a7;
     --midborder: #858585;
     --button: #007acc;
@@ -396,7 +397,7 @@ ol, ul {
 }
 
 .szerkcardoptionelement {
-    background-color: var(--tsoro);
+    background-color: var(--cardoptions);
     font-size: 1em;
     padding-top: 0.5em;
     height: 2.2em;
@@ -412,7 +413,7 @@ ol, ul {
 
 .szerkcardoptionelement span::before {
     padding-right: 0.5em;
-    border-left: 1px #ccc solid;
+    border-left: 1px var(--basefont) solid;
     content: "";
 }
 
@@ -558,6 +559,10 @@ textarea {
 
 textarea:focus, input:focus, select:focus {
     outline: 1px solid var(--shadow);
+}
+
+.tox {
+    padding: 0 !important;
 }
 
 label {
@@ -1409,10 +1414,15 @@ td img {
     }
 
     .PrintArea {
-        background: white;
+        color: #0b0b0b !important;
+        background: white !important;
         position: absolute;
         left: 0;
         top: 0;
+    }
+
+    .oldalcim {
+        background-color: #aaaaaa !important;
     }
 
     .dontprint, .dontprint td, .dontprint th, .szuresvalaszto {
@@ -1422,14 +1432,15 @@ td img {
 
     th {
         color-adjust: exact;
-        background-color: #888;
+        background-color: #888 !important;
     }
 
     .portnev th, .portnev td, .portnev input {
         width: 25ch !important;
     }
 
-    .kattinthatotr-1 {
+    .kattinthatotr-1, .valtottsor-1 {
+        background-color: #ccc !important;
         color-adjust: exact;
     }
 
@@ -1437,7 +1448,7 @@ td img {
         background-color: transparent !important;
     }
     
-    .kattinthatotr-2 {
+    .kattinthatotr-2, .valtottsor-2 {
         background-color: #ddd !important;
         color-adjust: exact;
     }
@@ -1449,6 +1460,7 @@ td img {
     input, select {
         font-size: 0.6rem !important;
         border: none !important;
+        color: #0b0b0b !important;
         -webkit-appearance: none;
         -moz-appearance: none;
         text-indent: 1px;
