@@ -11,7 +11,7 @@
 	{
 		?><link rel="stylesheet" href="<?=$RootPath?>/<?=$szemelyes['szinsema']?>.css" type="text/css"><?php
 	}
-	?><link rel="stylesheet" href="<?=$RootPath?>/style2.css" type="text/css">
+	?><link rel="stylesheet" href="<?=$RootPath?>/style.css" type="text/css">
 	<title><?=$ablakcim . " - " . $currentpage['cimszoveg']?></title>
 </head>
 
@@ -44,10 +44,10 @@
 		?></div>
 
 		<!-- Fejléc -->
-		<div class="topmenubase"></div><?php include('./templates/header2.tpl.php'); ?>
+		<div class="topmenubase"></div><?php include('./templates/header.tpl.php'); ?>
 
 		<!-- Menürész -->
-		<?php $menuterulet = 1; include('./includes/menu2.inc.php'); ?>		
+		<?php $menuterulet = 1; include('./includes/menu.inc.php'); ?>		
 
 		<!-- Lábléc -->
 		<div class="bottom-line"><p><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p></div>

@@ -60,8 +60,7 @@ if(isset($_GET['id']))
 	$id = $_GET['id'];
 }
 
-// Felhasználó beléptetése/jogosultsági szintjének ellenőrzése
-$admin = false;
+// Felhasználó beléptetése
 if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION_NAME').'id']) && isset($_POST['felhasznalonev']) && !(isset($_GET['page']) && $_GET['page'] == "kilep"))
 {
 	$con = mySQLConnect();
@@ -212,7 +211,6 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
         $_SESSION[getenv('SESSION_NAME').'id'] = $row['id'];
         $_SESSION[getenv('SESSION_NAME').'felhasznalonev'] = $row['felhasznalonev'];
         $_SESSION[getenv('SESSION_NAME').'nev'] =  $row['nev'];
-        $_SESSION[getenv('SESSION_NAME').'jogosultsag'] =  $row['jogosultsag'];
         $_SESSION['profilkep'] =  $row['profilkep'];
     }
     else
@@ -224,11 +222,6 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
 else
 {
 	$_SESSION[getenv('SESSION_NAME').'id'] = false;
-}
-
-if(!isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']))
-{
-    $_SESSION[getenv('SESSION_NAME').'jogosultsag'] = 0;
 }
 
 // Oldal működéséhez használt alapbeállítások betöltése
@@ -400,13 +393,6 @@ else
 }
 
 // Oldal megjelenítése
-if($_SESSION[getenv('SESSION_NAME').'id'] == 1)
-{
-    include('./templates/index2.tpl.php');
-}
-else
-{
-    include('./templates/index2.tpl.php');
-}
+include('./templates/index.tpl.php');
 
 ?>

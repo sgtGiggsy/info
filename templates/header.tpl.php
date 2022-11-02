@@ -17,7 +17,7 @@ if(isset($enablekeres) && $enablekeres)
 if($_SESSION[getenv('SESSION_NAME').'id'])
 {
     $usernev = $_SESSION[getenv('SESSION_NAME').'nev'];
-    $menuterulet = 2; include('./includes/menu2.inc.php');
+    $menuterulet = 2; include('./includes/menu.inc.php');
     $notifications = getNotifications();
     $ujertesites = 0;
     foreach($notifications as $notification)
