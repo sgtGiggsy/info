@@ -23,14 +23,12 @@ else
             </tr>
         </thead>
         <tbody><?php
-        $szamoz = 1;
         foreach($gyartok as $gyarto)
         {
-            ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/gyartoszerkeszt/<?=$gyarto['id']?>'>
+            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/gyartoszerkeszt/<?=$gyarto['id']?>'>
                 <td><?=$gyarto['id']?></td>
                 <td><?=$gyarto['nev']?></td>
             </tr><?php
-            $szamoz++;
         }
         ?></tbody>
     </table><?php

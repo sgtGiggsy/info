@@ -7,7 +7,7 @@
 	<script src="<?=$RootPath?>/includes/jquery.min.js"></script>
 	<script src="<?=$RootPath?>/includes/tinymce/tinymce.min.js"></script>
 	<link rel="shortcut icon" href="<?=$RootPath?>/favicon.ico"><?php
-	if($szemelyes['szinsema'])
+	if(isset($szemelyes['szinsema']) && $szemelyes['szinsema'])
 	{
 		?><link rel="stylesheet" href="<?=$RootPath?>/<?=$szemelyes['szinsema']?>.css" type="text/css"><?php
 	}
@@ -401,12 +401,17 @@
 		}
 	}
 
-	$("form").on("submit", function (e) {
-            hideSlideIn();
-			showProgressOverlay();
-        });
-
 	<?php
+	if(isset($_GET['page']) && $_GET['page'] != "aktiveszkoz")
+	{
+		?>
+		$("form").on("submit", function (e) {
+				hideSlideIn();
+				showProgressOverlay();
+			});
+		<?php
+	}
+
 	if(isset($ujoldalcim))
 	{
 		?>

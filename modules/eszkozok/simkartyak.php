@@ -59,10 +59,9 @@ else
             </thead>
             <tbody><?php
                 $nembeepitett = array();
-                $szamoz = 1;
                 foreach($mindeneszkoz as $sim)
                 {
-                    ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./eszkozszerkeszt/<?=$sim['id']?>?tipus=simkartya'>
+                    ?><tr class='kattinthatotr' data-href='./eszkozszerkeszt/<?=$sim['id']?>?tipus=simkartya'>
                         <td><?=$sim['sorozatszam']?></td>
                         <td><?=$sim['telefonszam']?></td>
                         <td><?=$sim['tipus']?></td>
@@ -78,7 +77,6 @@ else
                             <td><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$sim['id']?>?tipus=simkartya'><img src='<?=$RootPath?>/images/edit.png' alt='SIM kártya szerkesztése' title='SIM kártya szerkesztése'/></a></td><?php
                         }
                     ?></tr><?php
-                    $szamoz++;
                 }
             ?></tbody>
         </table>

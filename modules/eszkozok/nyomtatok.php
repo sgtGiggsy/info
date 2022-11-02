@@ -110,7 +110,6 @@ else
         </thead>
         <tbody><?php
             $nembeepitett = array();
-            $szamoz = 1;
             foreach($mindeneszkoz as $eszkoz)
             {            
                 if(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
@@ -144,7 +143,7 @@ else
                         case 2: $fax = "Alkalmas, modullal"; break;
                         default: $fax = "Nincs";
                     }
-                    ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./nyomtato/<?=$eszkoz['id']?>'>
+                    ?><tr class='kattinthatotr' data-href='./nyomtato/<?=$eszkoz['id']?>'>
                         <td><?=$eszkoz['ipcim']?></td>
                         <td><?=$eszkoz['beepitesinev']?></td>
                         <td nowrap><?=$eszkoz['gyarto']?></td>
@@ -165,7 +164,6 @@ else
                             <td class="dontprint"><a href="" onclick='window.open("http://<?=$eszkoz['ipcim']?>");'><img src='<?=$RootPath?>/images/webmanage.png' alt='Webes adminisztráció' title='Webes adminisztráció'/></a></td><?php
                         }
                     ?></tr><?php
-                    $szamoz++;
                 }
             }
 
@@ -197,7 +195,7 @@ else
                     default: $fax = "Nincs";
                 }
 
-                ?><tr style='font-weight: normal <?=($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./nyomtato/<?=$eszkoz['id']?>'>
+                ?><tr style='font-weight: normal <?=($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr' data-href='./nyomtato/<?=$eszkoz['id']?>'>
                     <td><?=$eszkoz['ipcim']?></td>
                     <td><?=$eszkoz['beepitesinev']?></td>
                     <td nowrap><?=$eszkoz['gyarto']?></td>
@@ -218,7 +216,6 @@ else
                         <td class="dontprint"></td><?php
                     }
                 ?></tr><?php
-                $szamoz++;
             }
             ?></tbody>
         </table>

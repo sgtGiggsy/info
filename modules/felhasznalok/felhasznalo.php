@@ -222,15 +222,13 @@ else
                         </tr>
                     </thead>
                     <tbody><?php
-                        $szamoz = 1;
                         foreach($jogok as $x)
                         {
-                            ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
+                            ?><tr>
                                 <td><?=$x['menupont']?></td>
                                 <td><?=($x['olvasas'] == 3) ? "Mind" : (($x['olvasas'] == 2) ? "Csoport" : (($x['olvasas'] == 1) ? "Saját" : "Semmi")) ?></td>
                                 <td><?=($x['iras'] == 3) ? "Mind" : (($x['iras'] == 2) ? "Csoport" : (($x['iras'] == 1) ? "Saját" : "Semmi")) ?></td>
                             </tr><?php
-                            $szamoz++;
                         }
                     ?></tbody>
                 </table>

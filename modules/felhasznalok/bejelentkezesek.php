@@ -36,10 +36,9 @@ else
             </tr>
         </thead>
         <tbody><?php
-        $szamoz = 1;
         foreach($lista as $x)
         {
-            ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' style='font-weight: normal'>
+            ?><tr>
                 <td><?=$x['timestamp']?></td>
                 <?php if(!isset($felhid))
                 {
@@ -51,7 +50,6 @@ else
                 <td><?=$x['bongeszo']?></td>
                 <td><?=$x['bongeszoverzio']?></td>
             </tr><?php
-            $szamoz++;
         }
         ?></tbody>
         </table><?php

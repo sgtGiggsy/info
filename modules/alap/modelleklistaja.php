@@ -27,7 +27,6 @@ else
 
     ?><div class="oldalcim">Modellek listája</div><?php
     $zar = false;
-    $szamoz = 1;
     foreach($modellek as $modell)
     {
         if(@$tipus != $modell['tipus'])
@@ -52,11 +51,10 @@ else
             $zar = true;
         }
 
-        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/modellszerkeszt/<?=$modell['id']?>'>
+        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/modellszerkeszt/<?=$modell['id']?>'>
             <td><?=$modell['gyarto']?></td>
             <td><?=$modell['modell']?></td>
         </tr><?php
-        $szamoz++;
     }
     ?></tbody>
     </table><?php

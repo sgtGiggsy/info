@@ -176,7 +176,6 @@ else
         <div class="PrintArea">
             <div class="oldalcim"><?=$raktar['raktar']?> raktár <?=$szuresek['szures']?> <?=raktarKeszlet(null, $szuresek['filter'])?></div><?php
             $zar = false;
-            $szamoz = 1;
             foreach($mindeneszkoz as $eszkoz)
             {
                 if(@$tipus != $eszkoz['tipus'])
@@ -216,7 +215,7 @@ else
                 $eszkid = $eszkoz['id'];
                 $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
 
-                ?><tr style='font-weight: normal <?= ($eszkoz['hibas'] == 2) ? "; text-decoration: line-through; color: grey" : (($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "") ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
+                ?><tr style='font-weight: normal <?= ($eszkoz['hibas'] == 2) ? "; text-decoration: line-through; color: grey" : (($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "") ?>' class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
                     <td><?=$eszkoz['ipcim']?></td>
                     <td><?=$eszkoz['beepitesinev']?></td>
                     <td><?=$eszkoz['gyarto']?></td>
@@ -234,7 +233,6 @@ else
                         }
                     }
                 ?></tr><?php
-                $szamoz++;
             }
             ?></tbody>
             </table>

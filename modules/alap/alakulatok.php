@@ -22,17 +22,15 @@ else
         </tr>
     </thead>
     <tbody><?php
-    $szamoz = 1;
     foreach($alakulatok as $alakulat)
     {
         $alakulatid = $alakulat['id'];
         
-        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' <?=($mindir) ? "data-href='$RootPath/alakulatszerkeszt/$alakulatid'" : "" ?>>
+        ?><tr class='kattinthatotr' <?=($mindir) ? "data-href='$RootPath/alakulatszerkeszt/$alakulatid'" : "" ?>>
             <td><?=$alakulat['id']?></td>
             <td><?=$alakulat['nev']?></td>
             <td><?=$alakulat['rovid']?></td>
         </tr><?php
-        $szamoz++;
     }
     ?></tbody>
     </table><?php

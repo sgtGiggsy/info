@@ -2,7 +2,7 @@
 if(@$irhat)
 {
     ?><script type ="text/javascript"><?php
-        if($szemelyes['szinsema'] == "dark")
+        if(@$szemelyes['szinsema'] == "dark")
 	    {
             ?>
             tinymce.init({

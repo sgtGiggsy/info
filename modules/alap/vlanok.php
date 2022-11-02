@@ -30,17 +30,15 @@ else
         </tr>
     </thead>
     <tbody><?php
-    $szamoz = 1;
     foreach($vlanok as $vlan)
     {
         $vlanid = $vlan['id'];
-        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' <?=($mindir) ? "data-href='$RootPath/vlanszerkeszt/$vlanid'" : "" ?>>
+        ?><tr class='kattinthatotr' <?=($mindir) ? "data-href='$RootPath/vlanszerkeszt/$vlanid'" : "" ?>>
             <td><?=$vlan['id']?></td>
             <td><?=$vlan['nev']?></td>
             <td><?=$vlan['leiras']?></td>
             <td><?=($vlan['kceh']) ? "Igen" : "Nem" ?></td>
         </tr><?php
-        $szamoz++;
     }
     ?></tbody>
     </table><?php

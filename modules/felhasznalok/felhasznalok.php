@@ -92,10 +92,9 @@ else
             </tr>
         </thead>
         <tbody><?php
-        $szamoz = 1;
         foreach($lista as $x)
         {
-            ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/felhasznalo/<?=$x['felhasznaloid']?>'>
+            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/felhasznalo/<?=$x['felhasznaloid']?>'>
                 <td><?=$x['felhasznaloid']?></td>
                 <td><?=$x['nev']?></td>
                 <td><?=$x['felhasznalonev']?></td>
@@ -106,7 +105,6 @@ else
                 <td><?=$x['beosztas']?></td>
                 <td><?=$x['elsobelepes']?></td>
             </tr><?php
-            $szamoz++;
         }
         ?></tbody>
         </table>

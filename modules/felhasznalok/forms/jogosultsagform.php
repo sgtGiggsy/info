@@ -17,7 +17,6 @@ if(@$irhat)
                     </thead>
                     <tbody>
                         <input type ="hidden" id="id" name="id" value=<?=$id?> /><?php
-                        $szamoz = 1;
                         //uasort($menu, function ($a, $b) { return $a->menupont > $b->menupont; });
                         foreach($menu as $x)
                         {
@@ -31,7 +30,7 @@ if(@$irhat)
                                 }
                             }
                             
-                            ?><tr id="<?='szerk' . $x['id']?>" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
+                            ?><tr id="<?='szerk' . $x['id']?>" class='valtottsor'>
                                 <td><label for="<?=$x['oldal']?>"><?=$x['menupont']?></label></td>
                                 <td>
                                     <select id="olvasas-<?=$x['id']?>" name="olvasas-<?=$x['id']?>">
@@ -53,7 +52,6 @@ if(@$irhat)
                                 <td><button onclick="checkAll('<?='szerk' . $x['id']?>', '2'); return false;">Csoport jogok</button></td>
                                 <td><button onclick="checkAll('<?='szerk' . $x['id']?>', '1'); return false;">Saját jogok</button></td>
                             </tr><?php
-                            $szamoz++;
                         }
                         ?>
                     </tbody>

@@ -82,7 +82,6 @@ else
             </thead>
             <tbody><?php
                 $nembeepitett = array();
-                $szamoz = 1;
                 foreach($mindeneszkoz as $eszkoz)
                 {
                     if(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
@@ -91,7 +90,7 @@ else
                     }
                     else
                     {
-                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./sohoeszkoz/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr' data-href='./sohoeszkoz/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td><?=$eszkoz['beepitesinev']?></td>
                             <td><?=$eszkoz['gyarto']?></td>
@@ -113,12 +112,11 @@ else
                                 }
                             }
                         ?></tr><?php
-                        $szamoz++;
                     }
                 }
                 foreach($nembeepitett as $eszkoz)
                 {
-                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./sohoeszkoz/<?=$eszkoz['id']?>'>
+                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr' data-href='./sohoeszkoz/<?=$eszkoz['id']?>'>
                         <td><?=$eszkoz['ipcim']?></td>
                         <td><?=$eszkoz['beepitesinev']?></td>
                         <td><?=$eszkoz['gyarto']?></td>
@@ -137,7 +135,6 @@ else
                             <td></td><?php
                         }
                     ?></tr><?php
-                    $szamoz++;
                 }
             ?></tbody>
         </table>

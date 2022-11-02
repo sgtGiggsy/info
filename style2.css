@@ -364,11 +364,11 @@ ol, ul {
     background-color: var(--infoboxthead);
 }
 
-.infoboxbody .kattinthatotr-1, .infoboxbody .valtottsor-1 {
+.infoboxbody tr:nth-child(odd) {
     background-color: var(--infoboxsoro);
 }
 
-.infoboxbody .kattinthatotr-2, .infoboxbody .valtottsor-2 {
+.infoboxbody tr:nth-child(even) {
     background-color: var(--infoboxsore);
 }
 
@@ -684,10 +684,20 @@ thead {
     font-weight: bold;
 }
 
+thead tr:nth-child(1) {background: none !important }
+
 tr, td, th {
     border: 0px;
     padding: 0.4em 0.3em 0.4em 0.3em;
     text-align: left;
+}
+
+tr:nth-child(even) {
+    background-color: var(--tsore)
+}
+
+tr:nth-child(odd) {
+    background-color: var(--tsoro)
 }
 
 tr a, td a, th a {
@@ -711,28 +721,16 @@ td img {
     margin-bottom: 5px;
 }
 
-.valtottsor-1, .valtottsor-2, .kattinthatotr, .kattinthatotr-1, .kattinthatotr-2  {
-    
+.kattinthatotr {
+    cursor:pointer;
     font-weight: bold;
 }
 
-.kattinthatotr, .kattinthatotr-1, .kattinthatotr-2{
-    cursor:pointer;
-}
-
-.valtottsor-1, .kattinthatotr-1 {
-    background-color: var(--tsoro);
-}
-
-.valtottsor-2, .kattinthatotr-2 {
-    background-color: var(--tsore);
-}
-
-.valtottsor-1 select, .valtottsor-1 input[type="text"], .valtottsor-2 select, .valtottsor-2 input[type="text"] {
+.transpinput select, .transpinput input[type="text"] {
     background: none;
 }
 
-.valtottsor-1 select option, .valtottsor-2 select option {
+.transpinput select option {
     background-color: var(--selectbg);
 }
 
@@ -1414,6 +1412,14 @@ td img {
         visibility: hidden;
     }
 
+    .szerkgombsor * {
+        display: none;
+    }
+
+    .topmenuikonok * {
+        display: none;
+    }
+
     *:before, *:after {
         display: none;
     }
@@ -1444,26 +1450,18 @@ td img {
         background-color: #888 !important;
     }
 
-    .portnev th, .portnev td, .portnev input {
-        width: 25ch !important;
+    tr, td {
+        padding: 0 !important;
     }
 
-    .kattinthatotr-1, .valtottsor-1 {
+    tr:nth-child(odd) {
         background-color: #ccc !important;
         color-adjust: exact;
     }
 
-    .offline {
-        background-color: transparent !important;
-    }
-    
-    .kattinthatotr-2, .valtottsor-2 {
+    tr:nth-child(even) {
         background-color: #ddd !important;
         color-adjust: exact;
-    }
-
-    .valtottsor-1, .valtottsor-2, .valtottsor-1 tr, .valtottsor-2 tr, .valtottsor-1 td, .valtottsor-2 td {
-        padding: 0 !important;
     }
 
     input, select {
@@ -1475,6 +1473,14 @@ td img {
         text-indent: 1px;
         text-overflow: '';
         padding: 0;
+    }
+
+    .portnev th, .portnev td, .portnev input {
+        width: 25ch !important;
+    }
+
+    .offline {
+        background-color: transparent !important;
     }
 
     @page {

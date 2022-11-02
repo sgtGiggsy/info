@@ -18,16 +18,14 @@ else
             </tr>
         </thead>
         <tbody><?php
-        $szamoz = 1;
         foreach($lista as $x)
         {
-            ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' style='font-weight: normal'>
+            ?><tr>
                 <td><?=$x['id']?></td>
                 <td><?=$x['felhasznalonev']?></td>
                 <td><?=$x['ipcim']?></td>
                 <td><?=$x['probalkozasideje']?></td>
             </tr><?php
-            $szamoz++;
         }
         ?></tbody>
         </table>

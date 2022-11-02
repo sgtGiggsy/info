@@ -220,14 +220,13 @@ else
                         </tr>
                     </thead>
                     <tbody><?php
-                        $szamoz = 1;
                         foreach($eszkozok as $eszkoz)
                         {
                             $beepid = $eszkoz['beepid'];
                             $eszkid = $eszkoz['id'];
                             $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
                             
-                            ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
+                            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
                                 <td><?=$eszkoz['ipcim']?></td>
                                 <td nowrap><?=$eszkoz['beepitesinev']?></td>
                                 <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
@@ -245,7 +244,6 @@ else
                                     ?><?php
                                 }
                             ?></tr><?php
-                            $szamoz++;
                         }
                     ?></tbody>
                 </table>
@@ -266,17 +264,15 @@ else
                         </tr>
                     </thead>
                     <tbody><?php
-                        $szamoz = 1;
                         foreach($rackek as $rack)
                         {
                             $rackid = $rack['id']
-                            ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/rack/<?=$rack['id']?>'>
+                            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/rack/<?=$rack['id']?>'>
                                 <td><?=$rack['nev']?></td>
                                 <td><?=$rack['gyarto']?></td>
                                 <td><?=$rack['unitszam']?></td>
                                 <td><?=($csoportir) ? "<a href='$RootPath/rack/$rackid?action=edit'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td>
                             </tr><?php
-                            $szamoz++;
                         }
                     ?></tbody>
                 </table>

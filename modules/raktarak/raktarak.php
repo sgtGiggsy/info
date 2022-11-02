@@ -43,18 +43,16 @@ else
             </tr>
         </thead>
         <tbody><?php
-            $szamoz = 1;
             foreach($raktarak as $raktar)
             {
                 $raktarid = $raktar['id'];
-                ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./raktar/<?=$raktar['id']?>'>
+                ?><tr class='kattinthatotr' data-href='./raktar/<?=$raktar['id']?>'>
                     <td><?=$raktar['raktarnev']?></td>
                     <td><?=$raktar['epuletszam']?>. <?=$raktar['epulettipus']?> - <?=$raktar['helyisegszam']?> (<?=$raktar['helyisegnev']?>)</td>
                     <td><?=$raktar['telephely']?></td>
                     <td><?=$raktar['alakulat']?></td>
                     <td><?=($csoportir) ? "<a href='$RootPath/raktar/$raktarid?action=edit'><img src='$RootPath/images/edit.png' alt='Raktár szerkesztése' title='Raktár szerkesztése'/></a>" : "" ?></td>
                 </tr><?php
-                $szamoz++;
             }
         ?></tbody>
     </table><?php

@@ -87,15 +87,13 @@ elseif(isset($_GET['action']))
 								</tr>
 							</thead>
 							<tbody><?php
-							$szamoz = 1;
 							foreach($kozlemenyek as $x)
 							{
-								?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/kozlemeny/<?=$x['id']?>?action=edit'>
+								?><tr class='kattinthatotr' data-href='<?=$RootPath?>/kozlemeny/<?=$x['id']?>?action=edit'>
 									<td><?=$x['id']?></td>
 									<td><?=$x['cim']?></td>
 									<td><img src='<?=$RootPath?>/images/edit.png' /></td>
 								</tr><?php
-								$szamoz++;
 							}
 							?></tbody>
 						</table>

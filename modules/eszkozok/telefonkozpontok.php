@@ -47,7 +47,6 @@ else
 
     <?php
     $tipus = "telefonkozpontok";
-    $szamoz = 1;
     ?><div class="PrintArea">
         <table id="<?=$tipus?>">
         <thead>
@@ -70,7 +69,7 @@ else
         <tbody><?php
             foreach($telefonkozpontok as $kozpont)
             {
-                ?><tr <?=(!($kozpont['beepitesideje'] && !$kozpont['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./telefonkozpont/<?=$kozpont['id']?>'>
+                ?><tr <?=(!($kozpont['beepitesideje'] && !$kozpont['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./telefonkozpont/<?=$kozpont['id']?>'>
                     <td><?=$kozpont['beepitesinev']?></td>
                     <td nowrap><?=$kozpont['gyarto']?></td>
                     <td nowrap><?=$kozpont['modell']?><?=$kozpont['varians']?></td>
@@ -83,7 +82,6 @@ else
                         szerkSor($kozpont['beepid'], $kozpont['id'], "telefonkozpont");
                     }
                 ?></tr><?php
-                $szamoz++;
             }
             ?></tbody>
         </table>

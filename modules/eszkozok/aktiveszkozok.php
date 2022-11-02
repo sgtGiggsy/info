@@ -95,7 +95,6 @@ else
             </thead>
             <tbody><?php
                 $nembeepitett = array();
-                $szamoz = 1;
                 foreach($mindeneszkoz as $eszkoz)
                 {
                     if(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
@@ -104,7 +103,7 @@ else
                     }
                     else
                     {
-                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?> <?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && $eszkoz['online'] == 0 && $eszkoz['online'] != null && $szemelyes['switchstateshow'] == 1) ? "offline" : "" ?>' style='<?=($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr <?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && $eszkoz['online'] == 0 && $eszkoz['online'] != null && $szemelyes['switchstateshow'] == 1) ? "offline" : "" ?>' style='<?=($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td><?=$eszkoz['beepitesinev']?></td>
                             <td><?=$eszkoz['gyarto']?></td>
@@ -128,12 +127,11 @@ else
                                 ?></td><?php
                             }
                         ?></tr><?php
-                        $szamoz++;
                     }
                 }
                 foreach($nembeepitett as $eszkoz)
                 {
-                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas'] == 2) ? "; text-decoration: line-through; color: grey" : (($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "") ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
+                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas'] == 2) ? "; text-decoration: line-through; color: grey" : (($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "") ?>' class='kattinthatotr' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                         <td><?=$eszkoz['ipcim']?></td>
                         <td><?=$eszkoz['beepitesinev']?></td>
                         <td><?=$eszkoz['gyarto']?></td>
@@ -152,7 +150,6 @@ else
                             <td class="dontprint"></td><?php
                         }
                     ?></tr><?php
-                    $szamoz++;
                 }
             ?></tbody>
         </table>

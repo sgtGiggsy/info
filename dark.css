@@ -4,8 +4,8 @@
     --basefont: #c4cccc !important;
     --fontlight: #c4cccc !important;
     --fontlight2: #c4cccc !important;
-    --contentbg: #1f1f1f !important;
-    --menu: #333333 !important;
+    --contentbg: #252525 !important;
+    --menu: #2b2b2b !important;
     --menuhover: #252526 !important;
     --submenu: #575757 !important;
     --submenuhover: #282829 !important;
@@ -16,7 +16,7 @@
     --infoboxthead: #201f1f !important;
     --infoboxsoro: #2d2d2d !important;
     --infoboxsore: #333333 !important;
-    --cardbase: #323232 !important;
+    --cardbase: #313131 !important;
     --cardtitle: #29292c !important;
     --cardoptions: #444647 !important;
     --lightborder: #171717  !important;
@@ -32,10 +32,10 @@
     --shadow: #151515 !important;
     --selectbg: #575757 !important;
     --thead: #191919 !important;
-    --tsoro: #2d2d2d !important;
-    --tsore: #333333 !important;
+    --tsoro: #282828 !important;
+    --tsore: #2d2d2d !important;
     --online: #018216 !important;
-    --offline: #990000 !important;
+    --offline: #b10101 !important;
     --scrolltrack: #292828  !important;
     --scrollthumb: #414141 !important;
     --scrollthumbhover: #4d4d4d !important;

@@ -34,7 +34,6 @@ else
     {
         if(@$tableid != $ipcim['vlan'])
         {
-            $szamoz = 1;
             if($zar)
             {
                 ?></tbody>
@@ -80,14 +79,13 @@ else
                 }
             }
 
-            ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' <?=($hasznalatban) ? "" : "style='font-weight: normal'" ?> >
+            ?><tr <?=($hasznalatban) ? "" : "style='font-weight: normal'" ?> >
                 <td><?=$ipcim['ipcim']?></td>
                 <td><?=$ipcim['vlan']?></td>
                 <td><?=$eszkoz?></td>
                 <td><?=$ipcim['megjegyzes']?></td>
                 <td><?=($csoportir) ? "<a href='$RootPath/ipszerkeszt/$ipid'><img src='$RootPath/images/edit.png' alt='IP cím szerkesztése' title='IP cím szerkesztése'/></a>" : "" ?></td>
             </tr><?php
-            $szamoz++;
             $eszkoz = null;
             $elozoip = $ipcim['ipcim'];
         }

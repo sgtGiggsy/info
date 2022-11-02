@@ -78,7 +78,6 @@ else
             </thead>
             <tbody><?php
                 $nembeepitett = array();
-                $szamoz = 1;
                 foreach($mindeneszkoz as $eszkoz)
                 {
                     if(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
@@ -87,7 +86,7 @@ else
                     }
                     else
                     {
-                        ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./bovitomodul/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr' data-href='./bovitomodul/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['gyarto']?></td>
                             <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
                             <td><?=$eszkoz['sorozatszam']?></td>
@@ -102,12 +101,11 @@ else
                                 <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], "bovitomodul");
                             }
                         ?></tr><?php
-                        $szamoz++;
                     }
                 }
                 foreach($nembeepitett as $eszkoz)
                 {
-                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./bovitomodul/<?=$eszkoz['id']?>'>
+                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas']) ? "; text-decoration: line-through" : "" ?>' class='kattinthatotr' data-href='./bovitomodul/<?=$eszkoz['id']?>'>
                         <td><?=$eszkoz['gyarto']?></td>
                             <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
                             <td><?=$eszkoz['sorozatszam']?></td>
@@ -122,7 +120,6 @@ else
                             <?php szerkSor($eszkoz['beepid'], $eszkoz['id'], "bovitomodul");
                         }
                     ?></tr><?php
-                    $szamoz++;
                 }
             ?></tbody>
         </table>

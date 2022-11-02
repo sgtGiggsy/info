@@ -26,16 +26,14 @@ else
                 </tr>
             </thead>
             <tbody><?php
-            $szamoz = 1;
             foreach($lista as $x)
             {
-                ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='<?=$RootPath?>/hkrszerkeszt/<?=$x['id']?>'>
+                ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/hkrszerkeszt/<?=$x['id']?>'>
                     <td><?=$x['gepnev']?></td>
                     <td><?=$x['nev']?></td>
                     <td><?=($x['utolsoeredmeny'] == 1) ? "Sikeres" : "Sikertelen" ?></td>
                     <td><?=$x['utolsofrissites']?></td>
                 </tr><?php
-                $szamoz++;
             }
             ?></tbody>
         </table>

@@ -234,7 +234,7 @@ elseif(isset($_GET['beepites']) && isset($_GET['action']))
                             $elozoverzio = null;
                             foreach($elozmenyek as $x)
                             {
-                                ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'><?php
+                                ?><tr><?php
                                     if($szamoz == 1 && $x['muvelet'] == 1)
                                     {
                                         ?><td><?=$x['modositasideje']?></td>
@@ -267,7 +267,7 @@ elseif(isset($_GET['beepites']) && isset($_GET['action']))
                                 $szamoz++;
                                 $elozoverzio = $x;
                             }
-                            ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
+                            ?><tr>
                                 <td><?=$beepitve['utolsomodositasideje']?></td>
                                 <td><?=$beepitve['utolsomodosito']?></td>
                                 <td <?=($elozoverzio['eszkid'] != $beepitve['eszkid']) ? "style='font-weight: bold;'" : "" ?>><?=$beepitve['eszkoz']?></td>

@@ -47,7 +47,6 @@ else
     ?><div class="PrintArea">
         <div class="oldalcim">Minden eszköz <?=$szuresek['szures']?> <?=keszletFilter($_GET['page'], $szuresek['filter'])?></div><?php
         $zar = false;
-        $szamoz = 1;
         foreach($mindeneszkoz as $eszkoz)
         {
             if(@$tipus != $eszkoz['tipus'])
@@ -91,7 +90,7 @@ else
             $eszkid = $eszkoz['id'];
             $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
 
-            ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal " . (($eszkoz['hibas']) ? "; text-decoration: line-through'" : "'" ) : "" ?> class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./<?=$eszktip?>/<?=$eszkoz['id']?>'>
+            ?><tr <?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "style='font-weight: normal " . (($eszkoz['hibas']) ? "; text-decoration: line-through'" : "'" ) : "" ?> class='kattinthatotr' data-href='./<?=$eszktip?>/<?=$eszkoz['id']?>'>
                 <td><?=$eszkoz['ipcim']?></td>
                 <td><?=$eszkoz['beepitesinev']?></td>
                 <td><?=$eszkoz['gyarto']?></td>
@@ -112,7 +111,6 @@ else
                     }
                 }
             ?></tr><?php
-            $szamoz++;
         }
         ?></tbody>
         </table>

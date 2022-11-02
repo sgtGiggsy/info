@@ -413,14 +413,13 @@ elseif($id)
                         <th class="tsorth dontprint" onclick="sortTable(6, 's', 'switchportok')">Tipus</th>
                         <th class="tsorth dontprint" onclick="sortTable(7, 's', 'switchportok')">Csatlakozó</th>
                         <th class="tsorth" onclick="sortTable(8, 's', 'switchportok')">Végpont</th>
-                        <th></th>
+                        <th class="dontprint"></th>
                     </tr>
                 </thead>
                 <tbody><?php
-                    $szamoz = 1;
                     foreach($switchportok as $port)
                     {
-                        ?><tr class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
+                        ?><tr class='transpinput'>
                             <!--<form action="">-->
                             <form action="?page=portdb&action=update&tipus=switch" method="post">
                                 <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
@@ -491,7 +490,6 @@ elseif($id)
                                 <td style="width: 6.5em" class="dontprint"><input type="submit" value="Módosítás"></td>
                             </form>
                         </tr><?php
-                        $szamoz++;
                     }
                 ?></tbody>
             </table>
@@ -528,12 +526,11 @@ elseif($id)
                                 </tr>
                             </thead>
                             <tbody><?php
-                            $szamoz = 1;
                             foreach($aktiveszkozok as $x)
                             {
                                 if($eszkoz['beepid'] != $x['beepid'] || mysqli_num_rows($aktiveszkozok) == 1)
                                 {
-                                    ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>' data-href='./<?=$id?>?beepites=<?=$x['beepid']?>'>
+                                    ?><tr class='kattinthatotr' data-href='./<?=$id?>?beepites=<?=$x['beepid']?>'>
                                         <td><?=$x['ipcim']?></td>
                                         <td><?=$x['beepitesinev']?></td>
                                         <td><?=$x['beepitesideje']?></td>
@@ -544,7 +541,6 @@ elseif($id)
                                             ?><a href='<?=$RootPath?>/<?=$_GET['page']?>/<?=$id?>?beepites=<?=$x['beepid']?>&action=edit'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
                                         } ?></td>
                                     </tr><?php
-                                    $szamoz++;
                                 }
                             }
                             ?></tbody>
@@ -580,13 +576,12 @@ elseif($id)
                                 <th>Raktár</th>
                                 <th>Megjegyzés</th>
                             </thead>
-                            <tbody>
-                                <?php
-                                $szamoz = 1;
+                            <tbody><?php
                                 $elozoverzio = null;
+                                $szamoz = 1;
                                 foreach($elozmenyek as $x)
                                 {
-                                    ?><tr style="font-weight: normal;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'><?php
+                                    ?><tr><?php
                                         if($szamoz == 1 && $x['muvelet'] == 1)
                                         {
                                             ?><td><?=$x['modositasideje']?></td>
@@ -619,7 +614,7 @@ elseif($id)
                                     $szamoz++;
                                     $elozoverzio = $x;
                                 }
-                                ?><tr style="font-weight: normal; font-style: italic;" class='valtottsor-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'>
+                                ?><tr style="font-style: italic;">
                                     <td><?=$eszkoz['utolsomodositasideje']?></td>
                                     <td><?=$eszkoz['utolsomodosito']?></td>
                                     <td <?=($elozoverzio['gyarto'] != $eszkoz['gyarto'] && $elozoverzio['modell'] != $eszkoz['modell'] && $elozoverzio['varians'] != $eszkoz['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>

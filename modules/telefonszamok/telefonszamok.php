@@ -89,11 +89,10 @@ else
             </tr>
         </thead>
         <tbody><?php
-        $szamoz = 1;
         foreach($telefonszamok as $telefonszam)
         {
             $telszamid = $telefonszam['id'];
-            ?><tr class='kattinthatotr-<?=($szamoz % 2 == 0) ? "2" : "1" ?>'<?=($telefonszam['manualis']) ? 'style="font-style: italic"' : "" ?> data-href='./telefonszam/<?=$telefonszam['id']?>'>
+            ?><tr class='kattinthatotr' <?=($telefonszam['manualis']) ? 'style="font-style: italic"' : "" ?> data-href='./telefonszam/<?=$telefonszam['id']?>'>
                 <td><?=($telefonszam['manualis']) ? '!' : "" ?></td>
                 <td><?=$telefonszam['szam']?></td>
                 <td><?=$telefonszam['cimke']?></td>
@@ -106,7 +105,6 @@ else
                 <td><?=$telefonszam['tipus']?></td>
                 <td><?=($csoportir) ? "<a href='$RootPath/telefonszam/$telszamid?action=edit'><img src='$RootPath/images/edit.png' alt='Telefonszám szerkesztése' title='Telefonszám szerkesztése'/></a>" : "" ?></td>
             </tr><?php
-            $szamoz++;
         }
         ?></tbody>
     </table><?php
