@@ -1,7 +1,7 @@
 <?php
-if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] <= 10)
+if(isset($mindolvas) && $mindolvas)
 {
-    echo "<h2>Az oldal kizárólag adminisztrátorok számára érhető el!</h2>";
+    getPermissionError();
 }
 else
 {

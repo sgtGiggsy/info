@@ -8,7 +8,7 @@ foreach($_SESSION as $key => $value)
 */
 
 //
-if($_SESSION[getenv('SESSION_NAME').'jogosultsag'] == 0)
+if($_SESSION[getenv('SESSION_NAME').'id'] == 0)
 {
 	if($_SESSION[getenv('SESSION_NAME').'fooldalkijelentkezve'])
 	{

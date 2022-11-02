@@ -1,7 +1,7 @@
 <?php
 if(!$csoportolvas)
 {
-    echo "<h2>Az oldal kizárólag adminisztrátorok számára érhető el!</h2>";
+    getPermissionError();
 }
 else
 {
@@ -49,7 +49,7 @@ else
         $where = "WHERE felhasznalok.nev LIKE '%$keres%' OR felhasznalonev LIKE '%$keres%' OR osztaly LIKE '%$keres%'";
     }
 
-    $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev AS nev, felhasznalonev, jogosultsag, email, elsobelepes, osztaly, telefon, beosztas, alakulatok.nev AS alakulat
+    $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, alakulatok.nev AS alakulat
         FROM felhasznalok
             LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
         $where

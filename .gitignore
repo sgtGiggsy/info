@@ -5,6 +5,7 @@ eibszteszt
 rebifteszt
 *.ttf
 *.eot
+*.csv
 jquery.min.js
 jquery.min.map
 xlsxwriter.class.php
