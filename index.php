@@ -17,7 +17,7 @@ header('Pragma: no-cache');
 //header("Content-Security-Policy-Report-Only: script-src 'nonce-{RANDOM}' 'strict-dynamic';");
 
 // Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
-$page = null; $id = null; $current = null;
+$page = null; $id = null; $current = null; $loginsuccess = false;
 if(isset($_GET['page']))
 {
     $page = $_GET['page'];
@@ -164,11 +164,11 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
             session_regenerate_id();
             if(mysqli_num_rows($result) == 1) // Ez az egyedüli "Sikeres bejelentkezés" ág. Bármely más ágra fut ki a modul, a bejelentkezés sikertelen
             {
-                echo "<h2>Sikeres bejelentkezés!</h2>";
                 $userdbid = mysqli_fetch_assoc($result)['id'];
                 $_SESSION[getenv('SESSION_NAME').'id'] = true;
                 logLogin($userdbid);
-                ?><head><meta http-equiv="refresh" content="0; URL='./'" /></head><?php
+                print_r($_GET['kuldooldal']);
+                $loginsuccess = true;
             }
             else
             {
@@ -212,6 +212,21 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
         $_SESSION[getenv('SESSION_NAME').'felhasznalonev'] = $row['felhasznalonev'];
         $_SESSION[getenv('SESSION_NAME').'nev'] =  $row['nev'];
         $_SESSION['profilkep'] =  $row['profilkep'];
+
+        // Ez a rész gondoskodik róla, hogy ha egy adott oldalt próbált a felhasználó felkeresni,
+        // a sikeres bejelentkezés után vissza legyen oda irányítva
+        if($loginsuccess && isset($_GET['kuldooldal']) && $_GET['kuldooldal'] != "belepes")
+        {
+            if(isset($_GET['kuldooldalid']))
+            {
+                header("Location: $RootPath/" . $_GET['kuldooldal'] . "/" . $_GET['kuldooldalid'] . "?sikeres=bejelentkezes");
+            }
+            else
+            {
+                header("Location: $RootPath/" . $_GET['kuldooldal'] . "?sikeres=bejelentkezes");
+            }
+            die;
+        }
     }
     else
     {
@@ -376,6 +391,10 @@ if(@$_GET['sikeres'] == "uj")
 elseif(@$_GET['sikeres'] == "szerkesztes")
 {
     $succesmessage = "A(z) " . $currentpage['cimszoveg'] . " szerkesztése sikerült";
+}
+elseif(@$_GET['sikeres'] == "bejelentkezes")
+{
+    $succesmessage = "Sikeres bejelentkezés";
 }
 
 // A jelenlegi oldal adatainak $_GET-hez történő előkészítése

@@ -20,27 +20,7 @@
 		<!-- Tartalom -->
 		<div class="content">
 			<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$current?>">Hiba jelzése</a></div><?php
-			// Alkalomadtán szépíteni rajta, mert így most elég hányaveti
-				if($currentpage['oldal'] == "fooldal")
-				{
-					include("./{$currentpage['url']}.php");
-				}
-				elseif($_GET['page'] == $currentpage['oldal'])
-				{
-					include("./{$currentpage['url']}.php");
-				}
-				elseif($_GET['page'] == $currentpage['gyujtooldal'])
-				{
-					include("./{$currentpage['gyujtourl']}.php");
-				}
-				elseif($_GET['page'] == $currentpage['dboldal'])
-				{
-					include("./{$currentpage['dburl']}.php");
-				}
-				elseif($_GET['page'] == $currentpage['szerkoldal'])
-				{
-					include("./{$currentpage['szerkoldal']}.php");
-				}
+			include('./includes/contentpage.inc.php')
 		?></div>
 
 		<!-- Fejléc -->
