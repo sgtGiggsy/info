@@ -3,7 +3,7 @@ if(@$irhat)
 {
     ?><div class="contentcenter">
         <div>
-            <form action="<?=$RootPath?>/modellszerkeszt?action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+            <form action="<?=$RootPath?>/modellszerkeszt?action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?>&tipus=<?=$tipusnev?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
                 if(isset($_GET['id']))
                 {
                     ?><input type ="hidden" id="id" name="id" value=<?=$_GET['id']?>><?php

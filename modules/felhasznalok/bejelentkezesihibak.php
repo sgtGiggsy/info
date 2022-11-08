@@ -1,5 +1,5 @@
 <?php
-if(isset($mindolvas) && $mindolvas)
+if(isset($mindolvas) && !$mindolvas)
 {
     getPermissionError();
 }

@@ -27,7 +27,7 @@ if(isset($felhasznaloid))
     }
     elseif(mysqli_num_rows($szemelyesdb) == 1)
     {
-        $stmt = $con->prepare('UPDATE szemelyesbeallitasok SET switchstatemail=?, switchstateshow=?, szinsema=? WHERE id=?');
+        $stmt = $con->prepare('UPDATE szemelyesbeallitasok SET switchstatemail=?, switchstateshow=?, szinsema=? WHERE felhid=?');
         $stmt->bind_param('sssi', $_POST['switchstatemail'], $_POST['switchstateshow'], $_POST['szinsema'], $felhasznaloid);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
