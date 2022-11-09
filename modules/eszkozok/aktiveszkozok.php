@@ -103,7 +103,7 @@ else
                     }
                     else
                     {
-                        ?><tr class='kattinthatotr <?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && $eszkoz['online'] == 0 && $eszkoz['online'] != null && $szemelyes['switchstateshow'] == 1) ? "offline" : "" ?>' style='<?=($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
+                        ?><tr class='kattinthatotr<?=($eszkoz['hibas'] == 1) ? " reszhibas" : "" ?><?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && $eszkoz['online'] == 0 && $eszkoz['online'] != null && $szemelyes['switchstateshow'] == 1) ? " offline" : "" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                             <td><?=$eszkoz['ipcim']?></td>
                             <td><?=$eszkoz['beepitesinev']?></td>
                             <td><?=$eszkoz['gyarto']?></td>
@@ -131,7 +131,7 @@ else
                 }
                 foreach($nembeepitett as $eszkoz)
                 {
-                    ?><tr style='font-weight: normal <?= ($eszkoz['hibas'] == 2) ? "; text-decoration: line-through; color: grey" : (($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "") ?>' class='kattinthatotr' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
+                    ?><tr class='kattinthatotr kiepitett<?=($eszkoz['hibas'] == 2) ? " mukodeskeptelen" : (($eszkoz['hibas'] == 1) ? " reszhibas" : "") ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
                         <td><?=$eszkoz['ipcim']?></td>
                         <td><?=$eszkoz['beepitesinev']?></td>
                         <td><?=$eszkoz['gyarto']?></td>

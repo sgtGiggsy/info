@@ -72,7 +72,8 @@ elseif(!isset($_GET['action']))
     $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban
         FROM rackportok
             INNER JOIN portok ON rackportok.port = portok.id
-        WHERE rackportok.rack = $id;");
+        WHERE rackportok.rack = $id
+        ORDER BY port;");
 
     $eszkozok = mySQLConnect("SELECT
             eszkozok.id AS id,

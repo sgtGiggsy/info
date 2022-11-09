@@ -141,7 +141,7 @@ elseif($id)
                     INNER JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
                     INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
                 WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
-                ORDER BY aktiveszkoz, id;");
+                ORDER BY aktiveszkoz, port;");
         }
 
         $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");

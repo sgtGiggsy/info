@@ -24,28 +24,45 @@ if($mindir)
 ?><div class="oldalcim">Közlemények</div><?php
 if(mysqli_num_rows($result) > 0)
 {
-	?><div class="ketharmad">
-		<div class='kozlemeny'>
-			<div class='kozlemenyfej'>
-				<h2><a href='<?=$RootPath?>/kozlemeny/<?=$legfrissebb['link']?>'><?=$legfrissebb['cim']?></a></h2>
-			</div>
-			<div class='szovegtartalom'>
-				<small><b>Szerző: <?=$legfrissebb['nev']?></b><br><i><?=$legfrissebb['ido']?></i></small><br><br>
-				<?=$legfrissebb['bevezetes']?>
-				<?=$legfrissebb['szovegtorzs']?><?php
-				if($csoportir || ($sajatir && $legfrissebb['szerzo'] == $felhasznaloid))
-				{
-					?><a href='<?=$RootPath?>/kozlemeny/<?=$legfrissebb['id']?>?action=edit'>Szerkesztés</a><?php
-				}
-			?></div>
-		</div>
-		<div class="kozlemenyside"><?php
-			$darab = $result->num_rows;
-			$i = 1;
-			foreach ($result as $x)
+	?><div class="ketharmad"><?php
+		$fo = 2;
+		$darab = $result->num_rows;
+		$i = 1;
+		foreach ($result as $x)
+		{
+			if($i < $fo + 1)
 			{
-				if($i != 1)
+				if($i == 1)
 				{
+					?><div class='kozlemeny'><?php
+				}
+					?><div class='kozlemenyfej'>
+						<h2><a href='<?=$RootPath?>/kozlemeny/<?=$x['link']?>'><?=$x['cim']?></a></h2>
+					</div>
+					<div class='szovegtartalom'>
+						<small><b>Szerző: <?=$x['nev']?></b><br><i><?=$x['ido']?></i></small><br><br>
+						<?=$x['bevezetes']?>
+						<?=$x['szovegtorzs']?><?php
+						if($csoportir || ($sajatir && $x['szerzo'] == $felhasznaloid))
+						{
+							?><a href='<?=$RootPath?>/kozlemeny/<?=$x['id']?>?action=edit'>Szerkesztés</a><?php
+						}
+					?></div><?php
+				if ($i != $fo)
+				{
+					?><div class='elvalaszto'></div><?php
+				}
+				if($i == $fo)
+				{
+					?></div><?php
+				}
+			}
+			else
+			{
+				if($i == $fo + 1)
+				{
+					?><div class="kozlemenyside"><?php
+				}
 					?><div class='kozlemeny'>
 						<div class='kozlemenyfej'>
 							<h2><a href='<?=$RootPath?>/kozlemeny/<?=$x['link']?>'><?=$x['cim']?></a></h2>
@@ -61,16 +78,19 @@ if(mysqli_num_rows($result) > 0)
 							{
 								?><a class="right" href='<?=$RootPath?>/kozlemeny/<?=$x['id']?>?action=edit'>Szerkesztés</a><?php
 							}
-						?></div><?php
-						if ($i != $darab)
-						{
-							echo "<div class='elvalaszto'></div>"; 
-						}
-						
-					?></div><?php
+						?></div>
+					</div><?php
+				if ($i != $darab)
+				{
+					?><div class='elvalaszto'></div><?php
 				}
-				$i++;
+				if($i == $darab)
+				{
+					?></div><?php	
+				}
 			}
-		?></div>
-	</div><?php
+			
+			$i++;
+		}
+	?></div><?php
 }

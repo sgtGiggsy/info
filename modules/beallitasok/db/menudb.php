@@ -34,7 +34,6 @@ if(isset($irhat) && $irhat)
         {
             if(isset($_POST['id-'.$postid]))
             {
-                echo 'id-'.$postid;
                 $stmt = $con->prepare('UPDATE menupontok SET menupont=?, szulo=?, url=?, oldal=?, cimszoveg=?, szerkoldal=?, aktiv=?, menuterulet=?, sorrend=?, gyujtourl=?, gyujtocimszoveg=?, gyujtooldal=?, dburl=?, dboldal=? WHERE id=?');
                 $stmt->bind_param('ssssssssssssssi', $_POST['menupont-'.$postid], $_POST['szulo-'.$postid], $_POST['url-'.$postid], $_POST['oldal-'.$postid], $_POST['cimszoveg-'.$postid], $_POST['szerkoldal-'.$postid], $_POST['aktiv-'.$postid], $_POST['menuterulet-'.$postid], $_POST['sorrend-'.$postid], $_POST['gyujtourl-'.$postid], $_POST['gyujtocimszoveg-'.$postid], $_POST['gyujtooldal-'.$postid], $_POST['dburl-'.$postid], $_POST['dboldal-'.$postid], $_POST['id-'.$postid]);
                 $stmt->execute();
