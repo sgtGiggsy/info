@@ -309,7 +309,8 @@ if(isset($mindir) && $mindir)
         }
         else
         {
-            redirectToKuldo();
+            $targeturl = $RootPath . "/" . $_GET['kuldooldal'] . "/" . $_GET['kuldooldalid'] . "?action=edit";
+            header("Location: $targeturl");
         }
     }
 

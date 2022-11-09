@@ -25,7 +25,7 @@ else
         }
 
         // Ha a kért művelet a szerkesztő oldal betöltése, az írás változót true-ra állítjuk
-        if($_GET['action'] == "addnew" || $_GET['action'] == "edit")
+        if($_GET['action'] == "addnew" || $_GET['action'] == "edit" || $_GET['action'] == "szamtarsitas")
         {
             $irhat = true;
         }
@@ -38,16 +38,23 @@ else
     }
 
     // Ha a kért művelet jár adatbázisművelettel, az adatbázis műveletekért felelős oldal meghívása
-    elseif($irhat && $dbir && count($_POST) > 0)
+    elseif($irhat && $dbir && count($_POST) > 0 || (@$_GET['action'] == "szamtarsitas" && count($_POST) > 0))
     {
-        include("./modules/epuletek/db/epuletdb.php");
+        if($_GET['action'] == "szamtarsitas")
+        {
+            include("./modules/epuletek/db/telefonszamokdb.php");
+        }
+        else
+        {
+            include("./modules/epuletek/db/epuletdb.php");
 
-        // Az adatbázisműveleteket követő folyamatokat lebonyolító függvény meghívása
-        afterDBRedirect($con);
+            // Az adatbázisműveleteket követő folyamatokat lebonyolító függvény meghívása
+            afterDBRedirect($con);
+        }
     }
 
-    // Ha a kért művelet nem jár adatbázisművelettel, a szerkesztési felület meghívása
-    elseif($irhat && !$dbir)
+    // Ha a kért művelet nem jár adatbázisművelettel és nem a telefonszámok társítását elvégző felület, a szerkesztési felület meghívása
+    elseif($irhat && !$dbir && $_GET['action'] != "szamtarsitas")
     {
         $szam = $telephely = $nev = $tipus = $emelet = $magyarazat = null;
         $beuszok = array();
@@ -86,10 +93,41 @@ else
         include('./templates/edit.tpl.php');
     }
 
-    // Ha írási művelet nem lesz, ellenőrizni kell, hogy van-e kiválasztott épület. Ha nincs, hiba dobása
+    // A folytatáshoz llenőrizni kell, hogy van-e kiválasztott épület. Ha nincs, hiba dobása
     elseif(!isset($id))
     {
         getPermissionError();
+    }
+
+    // A számok végpontokkal társítását elvégző felület meghívása
+    elseif($irhat && $_GET['action'] == "szamtarsitas")
+    {
+        $where = $magyarazat = null;
+
+        $eptkpquery = mySQLConnect("SELECT telefonkozpont FROM epuletek WHERE id = $id");
+        $epuletkozpont = mysqli_fetch_assoc($eptkpquery)['telefonkozpont'];
+
+        if($epuletkozpont < 0) // Debug okokból, élesben a < 0-t KIVENNI!!!
+        {
+            $where = "WHERE tkozpontportok.eszkoz = $epuletkozpont";
+        }
+        
+        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port
+                FROM portok
+                    INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
+                WHERE epulet = $id
+                ORDER BY portok.port;");
+        $telefonszamok = mySQLConnect("SELECT telefonszamok.id AS id, szam, cimke, telefonszamok.port AS port
+                FROM telefonszamok
+                    INNER JOIN tkozpontportok ON telefonszamok.tkozpontport = tkozpontportok.port
+                $where
+                ORDER BY szam;");
+
+        $button = "Portok számmal társítása";
+        $oldalcim = "Az épület portjainak telefonszámmal társítása";
+        $form = $alapform . "portszamtarsitasform";
+
+        include('./templates/edit.tpl.php');
     }
 
     // Akkor futunk ki erre az ágra, ha van olvasási jog, és kiválasztott épület, de más nincs. Ez a sima megjelenítő felület
@@ -140,10 +178,11 @@ else
         if($mindir)
         {
             ?><div style='display: inline-flex'>
-                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Épület szerkesztése</button><?php
+                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Épület szerkesztése</button>&nbsp;
+                <button type='button' onclick="location.href='./<?=$id?>?action=szamtarsitas'">Épület portjainak telefonszámmal társítása</button><?php
                 if(isset($elozmenyek) && mysqli_num_rows($elozmenyek) > 0)
                 {
-                    ?><button type='button' onclick=rejtMutat("elozmenyek")>Szerkesztési előzmények</button><?php
+                    ?><button type='button' onclick='rejtMutat("elozmenyek")'>Szerkesztési előzmények</button><?php
                 }
             ?></div><?php
         }
