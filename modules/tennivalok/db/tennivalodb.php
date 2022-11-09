@@ -18,8 +18,8 @@ else
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO tennivalok (cim, leiras, felhasznalo, prioritas) VALUES (?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $_POST['cim'], $_POST['leiras'], $_SESSION[getenv('SESSION_NAME').'id'], $_POST['prioritas']);
+        $stmt = $con->prepare('INSERT INTO tennivalok (cim, leiras, felhasznalo, prioritas, bovitett) VALUES (?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssss', $_POST['cim'], $_POST['leiras'], $_SESSION[getenv('SESSION_NAME').'id'], $_POST['prioritas'], $_POST['bovitett']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

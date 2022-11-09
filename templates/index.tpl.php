@@ -251,6 +251,38 @@
 			);
     }
 
+	function openToDo(id) {
+		var jelenlegi;
+
+		// Jelenleg statikusan maximum 4 beúszó elemet tud kezelni a függvény
+		for(var i = 1; i <= 100; i++)
+		{
+			var x = document.getElementById("tennivaloopenclose-" + i);
+			var y = document.getElementById("tennivalobody-" + i);
+			var z = document.getElementById("prioritas-" + i);
+
+			// Ha létezik, és jelenleg látszik: elrejt
+			if(x && x.className == "open")
+			{
+				x.className = x.className.replace("open", "close");
+				y.className = y.className.replace("open", "close");
+				z.className = z.className.replace("open", "close");
+			}
+			// Ha létezik, nem látszik, és ez a megjeleníteni kívánt elem, megjelenítjük
+			else if(i == id)
+			{
+				jelenlegi = x;
+				x.className = "open";
+				y.className = "open";
+				z.className = "open";
+			}
+			else if(!x)
+			{
+				break;
+			}
+		}
+	}
+
 	function showSlideIn(id = null, irany = null) {
 		var jelenlegi;
 		if(irany)

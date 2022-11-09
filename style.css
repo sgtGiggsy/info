@@ -51,19 +51,24 @@
     --checkswitchbg: #c2c5cc;
     --checkswitch: #2196F3;
     --checkswitchtrack: #f7f7f7;
+    --cbchecked: #007acc;
     --topbase: #f7f7f7;
+    --topbase2nd: #edebeb;
     --topborder: #807d7d;
     --shadow: #252526;
     --selectbg: #f7f7f7;
     --thead: #969494;
     --tsoro: #e0e0e0;
     --tsore: #bbbbbb;
+    --hibas: #666666;
+    --hibasoffline: #990000ac;
     --online: #018216;
     --offline: #990000;
     --scrolltrack: #717a7f;
     --scrollthumb: #35454d;
     --scrollthumbhover: #212b30;
     --infoboxscrollthumb: #35454d;
+    --headpopupbg: #1f282d;
     --notifcount: #990000;
     --notifseen: #43545e;
     --notifpopscrolltrack: #151c1f;
@@ -303,7 +308,7 @@ ol, ul {
     background-color: var(--infoboxtitle);
     font-weight: bold;
     font-size: 1.1em;
-    padding: 0.8em;
+    padding: 0.8em !important;
     border: 1px solid var(--infotitleborder);
     height: 2.7em;
 }
@@ -312,16 +317,28 @@ ol, ul {
     margin-top: -3px;
 }
 
-.infoboxbody {
+.infoboxbody, .infoboxbodybp {
     background-color: var(--cardbase);
     font-size: 0.9em;
-    padding: 1em 1em 0 1em;
-    margin: 0 auto auto auto;
+    
+    margin: 0 auto auto auto !important;
     max-height: calc(55vh - 3.5em);
     overflow-y: auto;
     border-left: 1px solid var(--lightborder);
     border-bottom: 1px solid var(--lightborder);
     border-right: 1px solid var(--lightborder);
+}
+
+.infoboxbody {
+    padding: 1em 1em 0 1em !important;
+}
+
+.infoboxbodybp {
+    padding: 1em !important;
+}
+
+.infoboxbodybp select {
+    margin: 0.2em;
 }
 
 .infoboxbody::-webkit-scrollbar {
@@ -652,6 +669,7 @@ label {
     background-color: var(--checkswitchtrack);
     -webkit-transition: .4s;
     transition: .4s;
+    /*box-shadow: 0px 0px 10px 4px var(--shadow);*/
 }
   
 input:checked + .slider {
@@ -767,6 +785,7 @@ td img {
     width: 100%;
     padding: 5px;
     background-color: var(--topbase);
+    background-image: linear-gradient(to bottom right, var(--topbase), var(--topbase2nd));
     border-bottom: 1px solid var(--topborder);
     grid-column-start: 1;
     grid-column-end: 4;
@@ -833,6 +852,8 @@ td img {
 
 /* Fejléc lenyíló elemei */
 #profilpopup, #notifpopup {
+    background-color: var(--headpopupbg);
+    box-shadow: -3px 3px 5px var(--shadow);
     display: flex;
     flex-direction: column;
     visibility: hidden;
@@ -850,9 +871,8 @@ td img {
 }
 
 #notifpopup {
-    background-color: var(--menuhover);
     right: 45px;
-    width: 400px;
+    width: 420px;
     max-height: 500px;
     overflow-y: overlay;
     overflow-x: hidden;
@@ -881,7 +901,7 @@ td img {
 
 #profilpopup a {
     padding: 12px 20px 12px 20px;
-    background-color: var(--menu);
+    background-color: var(--headpopupbg);
     text-decoration: none;
     color: var(--fontlight);
     font-variant: small-caps;
@@ -902,7 +922,7 @@ td img {
 
 #notifpopup a:hover {
     display: block;
-    background-color: var(--menu);
+    background-color: var(--menuhover);
     border-radius: 10px;
 }
 
@@ -1178,8 +1198,259 @@ td img {
 .elvalaszto {
     margin: 5px 40px 0px 40px;
     height: 3px;
-    border-bottom: 1px solid var(--midborder);
+    border-top: 1px solid var(--midborder);
     position: relative;
+}
+
+/* ------------------------------- Speciális oldalak ------------------------------- */
+/* -- Tennivalók -- */
+.tennivalokwrap {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 40em);
+    grid-gap: 1em;
+}
+
+.tennivaloformwrap {
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+.tennivaloform {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1em;
+    background-color: var(--cardbase);
+    border-radius: 1.5em;
+    width: 80%;
+    margin: 0 auto;
+    padding: 1em;
+}
+
+div[id^=tennivalo-] {
+    display: grid;
+    grid-template-columns: minmax(0.6em, 2.6em) 1fr 2.5em;
+    grid-template-rows: minmax(0, 1fr) minmax(0, max-content);
+    background-color: var(--cardbase);
+    width: 40em;
+    border-radius: 1.5em;
+    padding: 0;
+    overflow: hidden;
+    height: max-content;
+}
+
+div[id^=prioritas-] {
+    margin: 1.1em 0 1.1em 2em;
+    width: 0.6em;
+    grid-row-start: 1;
+    grid-row-end: 3;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    border-left: 0.7em solid;
+    border-radius: 0.3em;
+    box-shadow: 3px 3px 3px var(--shadow);
+}
+
+div[id^=prioritas-].open {
+    margin: 0;
+    transition: margin 1s;
+}
+
+div[id^=prioritas-].close {
+    margin: 1.3em 0 1.3em 2em;
+    transition: margin 1s;
+}
+
+.tennivalotitle {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    font-size: 1.2em;
+    font-weight: bold;
+    word-wrap: break-word;
+    padding: 1em 2em 1em 0;
+}
+
+.tennivalotitle, div[id^=tennivalobody-] {
+    padding-left: 1em;
+}
+
+.tennivalofelhasznalo {
+    font-weight: bold;
+    padding-top: 1em;
+}
+
+.tennivaloido {
+    font-size: 0.8em;
+    font-style: italic;
+    padding-top: 0.4em;
+    padding-bottom: 0.5em;
+}
+
+.openclosewrapper {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 3;
+    grid-column-end: 4;
+    padding-top: 1.2em;
+    padding-left: 0.3em;
+}
+
+div[id^=tennivaloopenclose-] {
+    border: solid var(--basefont);
+    border-width: 0 5px 5px 0;
+    width: 1em;
+    height: 1em;
+    transform: rotate(45deg);
+    cursor: pointer;
+}
+
+div[id^=tennivaloopenclose-].open {
+    transform: rotate(225deg);
+    animation: opentodo 0.5s linear;
+}
+
+div[id^=tennivaloopenclose-].close {
+    transform: rotate(45deg);
+    animation: closetodo 0.5s linear;
+}
+
+@keyframes opentodo {
+    0% { transform: rotate(45deg); }
+    100% { transform: rotate(225deg); }
+}
+
+@keyframes closetodo {
+    0% { transform: rotate(225deg); }
+    100% { transform: rotate(45deg); }
+}
+
+div[id^=tennivalobody-] {
+    grid-row-start: 2;
+    grid-row-end: 3;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    max-height: 0em;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+div[id^=tennivalobody-].open {
+    max-height: 600px;
+    overflow: hidden;
+    transition: max-height 2s;
+}
+
+div[id^=tennivalobody-].close {
+    max-height: 0px;
+    overflow: hidden;
+    transition: max-height 1s;
+}
+
+@keyframes enlarge {
+    0% { transform: height 0.2s ease-out }
+    100% { transform: rotate(225deg); }
+}
+
+.tennivalocbdiv {
+    font-size: 0.7em;
+}
+
+/* A tennivalók checkboxa */
+/* Customize the label (the container) */
+.tennivalokcb {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+  
+/* Hide the browser's default checkbox */
+.tennivalokcb input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+  
+/* Create a custom checkbox */
+.tenivalokjelolo {
+    position: absolute;
+    top: 0;
+    right: -1.8em;
+    height: 1.5em;
+    width: 1.5em;
+    border-radius: 25%;
+    border: 4px solid var(--cbchecked);
+}
+  
+/* On mouse-over, add a grey background color */
+.tennivalokcb:hover input ~ .tenivalokjelolo {
+    
+}
+  
+/* When the checkbox is checked, add a blue background */
+.tennivalokcb input:checked ~ .tenivalokjelolo {
+    background-color: var(--cbchecked);
+}
+  
+/* Create the checkmark/indicator (hidden when not checked) */
+.tenivalokjelolo:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+ 
+/* Show the checkmark when checked */
+.tennivalokcb input:checked ~ .tenivalokjelolo:after {
+    display: block;
+}
+  
+/* Style the checkmark/indicator */
+.tenivalokjelolo:after {
+    left: 0.2em;
+    top: -0.1em;
+    width: 0.6em;
+    height: 1em;
+    border: solid var(--fontlight);
+    border-width: 0 6px 6px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    box-shadow: 3px 3px 3px var(--shadow);
+}
+
+/* --- Aktív eszköz --- */
+.reszhibas, .mukodeskeptelen {
+    font-style: italic;
+    color: var(--hibas);
+}
+
+.reszhibas.offline {
+    color: var(--hibasoffline);
+}
+
+.mukodeskeptelen {
+    text-decoration: line-through;
+}
+
+.kiepitett {
+    font-weight: normal;
+}
+
+/* --- Telefonszám <-> épületport párosítás --- */
+.portparositas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 15em);
+    grid-gap: 1em;
 }
 
 /* ------------------------------- Overlayek ------------------------------- */
@@ -1207,7 +1478,7 @@ td img {
     width: 40em;
 }
   
-.close {
+.closeol {
     color: var(--overlayclose);
     float: right;
     margin-top: -15px;
@@ -1215,7 +1486,7 @@ td img {
     font-weight: bold;
 }
   
-.close:hover, .close:focus {
+.closeol:hover, .closeol:focus {
     color: var(--basefont);
     text-decoration: none;
     cursor: pointer;
