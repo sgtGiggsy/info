@@ -143,6 +143,20 @@
 		}
 	}
 
+	<?php
+	if(isset($_GET['ertesites']))
+	{
+		?>
+		$(document).ready(function($) {
+			seenNotif(<?=$_GET['ertesites']?>);
+			var notifcount = document.getElementById("notifcount").textContent;
+			notifcount = notifcount - 1;
+			document.getElementById("notifcount").textContent = notifcount;
+		});
+		<?php
+	}
+	?>
+
 	$(document).ready(function($) {
 		$(".kattinthatotr").click(function() {
 		window.document.location = $(this).data("href");

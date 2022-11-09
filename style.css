@@ -68,7 +68,7 @@
     --scrollthumb: #35454d;
     --scrollthumbhover: #212b30;
     --infoboxscrollthumb: #35454d;
-    --headpopupbg: #1f282d;
+    --headpopupbg: #2c3539;
     --notifcount: #990000;
     --notifseen: #43545e;
     --notifpopscrolltrack: #151c1f;
@@ -872,7 +872,7 @@ td img {
 
 #notifpopup {
     right: 45px;
-    width: 420px;
+    width: 410px;
     max-height: 500px;
     overflow-y: overlay;
     overflow-x: hidden;

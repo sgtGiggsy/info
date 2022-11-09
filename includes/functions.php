@@ -663,7 +663,7 @@ function getNotifications()
 		FROM `beallitasok`
 		WHERE nev = 'last_switch_check'
 			AND ertek < date_sub(now(), INTERVAL 15 MINUTE)
-			AND ertek > (SELECT lastseennotif FROM felhasznalok WHERE id = $felhasznaloid)");
+			AND ertek > date_sub((SELECT lastseennotif FROM felhasznalok WHERE id = $felhasznaloid), INTERVAL 15 MINUTE)");
 
 	if(mysqli_num_rows($switchcheck) > 0)
 	{
