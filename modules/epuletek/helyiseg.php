@@ -114,12 +114,16 @@ else
                 LEFT JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
             WHERE helyiseg = $helyisegid;");
         
-        $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban
+        $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban, szam, vlanok.nev AS vlan
             FROM portok
                 LEFT JOIN rackportok ON rackportok.port = portok.id
                 LEFT JOIN vegpontiportok ON vegpontiportok.port = portok.id
+                LEFT JOIN portok csatlakoz ON portok.id = csatlakoz.csatlakozas
+                LEFT JOIN switchportok ON switchportok.port = csatlakoz.id
                 LEFT JOIN rackszekrenyek ON rackportok.rack = rackszekrenyek.id
                 LEFT JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id OR vegpontiportok.helyiseg = helyisegek.id
+                LEFT JOIN telefonszamok ON telefonszamok.port = portok.id
+                LEFT JOIN vlanok ON switchportok.vlan = vlanok.id
             WHERE helyisegek.id = $helyisegid
             ORDER BY rackportok.rack ASC, portok.id ASC;");
 
@@ -278,15 +282,7 @@ else
                 </table>
             </div><?php
         }
-        ?><div class="oldalcim">Végpontok a helyiségben</div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;"><?php
-            foreach($portok as $port)
-            {
-                $portid = $port['portid'];
-                ?><div>
-                    <a href='<?=$RootPath?>/port/<?=$portid?>'><?=($port['hasznalatban']) ? "<p style='font-weight: bold'>" : "<p style='font-weight: normal'>" ?><?=$port['port']?></p></a>
-                </div><?php
-            }
-        ?></div><?php
+        ?><div class="oldalcim">Végpontok a helyiségben</div><?php
+            vegpontLista($portok);
     }
 }

@@ -783,3 +783,47 @@ function redirectToGyujto($gyujtonev)
 	}
 	header("Location: ./" . $gyujtonev . $eredmeny);
 }
+
+function vegpontLista($portok)
+{
+	$RootPath = getenv('APP_ROOT_PATH');
+	$portok = mysqliNaturalSort($portok, "port");
+	if(count($portok) > 0)
+	{
+		?><div class="vegpontlist"><?php
+			$elozoport = null;
+			foreach($portok as $port)
+			{
+				// Ha nem a ciklus első körében vagyunk, és egy új port adatait írjuk ki, az előző port divjeinek és hivatkozásának lezárása
+				if($elozoport && $elozoport != $port['portid'])
+				{
+					?></div></div></a><?php
+				}
+
+				// Ha egy új port adatait írjuk ki, új div nyitása
+				if($elozoport != $port['portid'])
+				{
+					?><a class="<?=($port['hasznalatban'] || $port['szam']) ? "foglalt" : "ures" ?>" href='<?=$RootPath?>/port/<?=$port['portid']?>'>
+						<div class="vegpont">
+							<div><?=$port['port']?></div>
+							<div>
+								<?=($port['szam']) ? "<div>" . $port['szam'] . "</div>" : "" ?>
+								<?=($port['vlan']) ? "<div>" . $port['vlan'] . "</div>" : "" ?><?php
+				}
+
+				// Ha egy már megjelenített port további kapcsolatait írjuk ki, csak a további adatok kiírása, új div nyitása nélkül
+				else
+				{
+					?><?=($port['szam']) ? "<div>" . $port['szam'] . "</div>" : "" ?>
+					<?=($port['vlan']) ? "<div>" . $port['vlan'] . "</div>" : "" ?><?php
+				}
+
+				// A jelenlegi port azonosítása a ciklus következő iterációja részére
+				$elozoport = $port['portid'];
+			}
+
+			// A legutolsó port div-jeinek lezárása. FONTOS!!! Az utolsó iterációt követően MINDEN ESETBEN NYITVA MARAD KÉT DIV ÉS EGY HIVATKOZÁS.
+			?></div></div></a>
+		</div><?php
+	}
+}

@@ -69,11 +69,16 @@ elseif(!isset($_GET['action']))
         WHERE rackszekrenyek.id = $id;");
     $rack = mysqli_fetch_assoc($rackek);
 
-    $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban
-        FROM rackportok
-            INNER JOIN portok ON rackportok.port = portok.id
+    $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban, szam, vlanok.nev AS vlan
+        FROM portok
+            LEFT JOIN rackportok ON rackportok.port = portok.id
+            LEFT JOIN portok csatlakoz ON portok.id = csatlakoz.csatlakozas
+            LEFT JOIN switchportok ON switchportok.port = csatlakoz.id
+            LEFT JOIN rackszekrenyek ON rackportok.rack = rackszekrenyek.id
+            LEFT JOIN telefonszamok ON telefonszamok.port = portok.id
+            LEFT JOIN vlanok ON switchportok.vlan = vlanok.id
         WHERE rackportok.rack = $id
-        ORDER BY port;");
+        ORDER BY portok.port ASC;");
 
     $eszkozok = mySQLConnect("SELECT
             eszkozok.id AS id,
@@ -195,23 +200,7 @@ elseif(!isset($_GET['action']))
 
     if(mysqli_num_rows($portok) > 0)
     {
-        ?><div class="oldalcim">Patch portok a szekrényben</div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;"><?php
-            foreach($portok as $port)
-            {
-                $portid = $port['portid'];
-                ?><div ><?php
-                    if($mindir)
-                    {
-                        ?><a href='<?=$RootPath?>/port/<?=$portid?>'><?php
-                    }
-                    ?><?=($port['hasznalatban']) ? "<p style='font-weight: bold'>" : "<p style='font-weight: normal'>" ?><?php echo $port['port'] . "</p>";
-                    if($mindir)
-                    {
-                        echo "</a>";
-                    }
-                ?></div><?php
-            }
-        ?></div><?php
+        ?><div class="oldalcim">Patch portok a szekrényben</div><?php
+        vegpontLista($portok);
     }
 }

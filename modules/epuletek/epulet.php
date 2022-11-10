@@ -123,6 +123,8 @@ else
                 $where
                 ORDER BY szam;");
 
+        $epuletportok = mysqliNaturalSort($epuletportok, 'port');
+
         $button = "Portok számmal társítása";
         $oldalcim = "Az épület portjainak telefonszámmal társítása";
         $form = $alapform . "portszamtarsitasform";
@@ -149,6 +151,17 @@ else
                 LEFT JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
             WHERE epulet = $epid
             ORDER BY emelet, helyisegszam + 0;");
+
+        $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban, telefonszamok.szam AS szam, vlanok.nev AS vlan
+            FROM portok
+                LEFT JOIN vegpontiportok ON vegpontiportok.port = portok.id
+                LEFT JOIN portok csatlakoz ON portok.id = csatlakoz.csatlakozas
+                LEFT JOIN switchportok ON switchportok.port = csatlakoz.id
+                LEFT JOIN epuletek ON vegpontiportok.epulet = epuletek.id
+                LEFT JOIN telefonszamok ON telefonszamok.port = portok.id
+                LEFT JOIN vlanok ON switchportok.vlan = vlanok.id
+            WHERE epuletek.id = $epid
+            ORDER BY portok.port ASC;");
         
         $epulet = mysqli_fetch_assoc($epuletek);
 
@@ -223,39 +236,49 @@ else
             </div><?php
         }
 
-        ?><div class="oldalcim">Helyiségek</div><?php
-        $zar = false;
-        foreach($helyisegek as $helyiseg)
-        {
-            if(@$emelet != $helyiseg['emelet'])
+        ?><div class="oldalcim">Helyiségek</div>
+        <div class="szintlist"><?php
+            if(mysqli_num_rows($helyisegek) > 0)
             {
-                if($zar)
+                $zar = false;
+                foreach($helyisegek as $helyiseg)
                 {
-                    ?></tbody>
-                    </table><?php
+                    if(@$emelet != $helyiseg['emelet'])
+                    {
+                        if($zar)
+                        {
+                            ?></tbody>
+                            </table>
+                            </div><?php
+                        }
+
+                        $emelet = $helyiseg['emelet'];
+                        ?><div>
+                            <h1><?=($helyiseg['emelet'] == 0) ? "Földszint" : $helyiseg['emelet'] . ". emelet" ?></h1>
+                            <table id="<?=$emelet?>">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%" class="tsorth" onclick="sortTable(0, 'i', '<?=$emelet?>')">Szám</th>
+                                    <th style="width: 70%" class="tsorth" onclick="sortTable(1, 's', '<?=$emelet?>')">Helyiségnév</th>
+                                    <th style="width: 10%"></th>
+                                </tr>
+                            </thead>
+                            <tbody><?php
+                            $zar = true;
+                    }
+
+                    ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>'>
+                        <td><?=$helyiseg['helyisegszam']?></td>
+                        <td><?=$helyiseg['helyisegnev']?></td>
+                        <td><a href='<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Helyiség szerkesztése' title='Helyiség szerkesztése'/></a></td>
+                    </tr><?php
                 }
-
-                $emelet = $helyiseg['emelet'];
-                ?><h1><?=($helyiseg['emelet'] == 0) ? "Földszint" : $helyiseg['emelet'] . ". emelet" ?></h1>
-                <table id="<?=$emelet?>">
-                <thead>
-                    <tr>
-                        <th class="tsorth" onclick="sortTable(0, 'i', '<?=$emelet?>')">Helyiség száma</th>
-                        <th class="tsorth" onclick="sortTable(1, 's', '<?=$emelet?>')">Helyiség megnevezése</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody><?php
-                $zar = true;
+                ?></tbody>
+                </table>
+                </div><?php
             }
-
-            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>'>
-                <td><?=$helyiseg['helyisegszam']?></td>
-                <td><?=$helyiseg['helyisegnev']?></td>
-                <td><a href='<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Helyiség szerkesztése' title='Helyiség szerkesztése'/></a></td>
-            </tr><?php
-        }
-        ?></tbody>
-        </table><?php
+        ?></div>
+        <div class="oldalcim">Végpontok az épületben</div><?php
+            vegpontLista($portok);
     }
 }

@@ -691,15 +691,22 @@ input:checked + .slider:before {
 table {
     font-family: "roboto", "bench";
     font-size: 0.9em;
-    display: block;
+    display: table;
+    table-layout: fixed;
     border: 0px;
     border-collapse: collapse;
+    width: auto;
+    max-width: fit-content;
 }
 
 thead {
     background-color: var(--thead);
     font-size: 1.1em;
     font-weight: bold;
+}
+
+thead, tbody {
+    width: 100%;
 }
 
 thead tr:nth-child(1) {background: none !important }
@@ -1451,6 +1458,48 @@ div[id^=tennivalobody-].close {
     display: grid;
     grid-template-columns: repeat(auto-fill, 15em);
     grid-gap: 1em;
+}
+
+/* --- Emeletek listája --- */
+.szintlist {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10em, 23em));
+    grid-gap: 2em;
+}
+
+.szintlist div, .szintlist table {
+    width: 100%;
+}
+
+/* --- Végpontok listája --- */
+
+.vegpontlist {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 10em);
+    grid-gap: 0.5em;
+}
+
+.vegpontlist a {
+    text-decoration: none;
+}
+
+.vegpont {
+    display: grid;
+    grid-template-columns: max-content minmax(0, max-content);
+    grid-gap: 0.8em;
+    padding: 0.5em;
+    background-color: var(--cardbase);
+    border: 1px solid var(--infotitleborder);
+    overflow: auto;
+}
+
+.foglalt {
+    font-weight: bold;
+}
+
+.ures {
+    font-weight: normal;
+    color: var(--hibas);
 }
 
 /* ------------------------------- Overlayek ------------------------------- */
