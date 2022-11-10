@@ -142,6 +142,8 @@ elseif($id)
                     INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
                 WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
                 ORDER BY aktiveszkoz, port;");
+
+            $epuletportok = mysqliNaturalSort($epuletportok, 'port');
         }
 
         $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
@@ -263,7 +265,7 @@ elseif($id)
                         if($eszkoz['beepitesideje'])
                         {
                             ?><div>IP cím</div><?php
-                            if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
+                            if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'] && $mindir)
                             {
                                 if($eszkoz['web'])
                                 {
@@ -412,84 +414,129 @@ elseif($id)
                         <th class="tsorth" onclick="sortTable(5, 's', 'switchportok')">Port Mód</th>
                         <th class="tsorth dontprint" onclick="sortTable(6, 's', 'switchportok')">Tipus</th>
                         <th class="tsorth dontprint" onclick="sortTable(7, 's', 'switchportok')">Csatlakozó</th>
-                        <th class="tsorth" onclick="sortTable(8, 's', 'switchportok')">Végpont</th>
-                        <th class="dontprint"></th>
-                    </tr>
+                        <th class="tsorth" onclick="sortTable(8, 's', 'switchportok')">Végpont</th><?php
+                        if($mindir)
+                        {
+                            ?><th class="dontprint"></th><?php
+                        }
+                    ?></tr>
                 </thead>
                 <tbody><?php
                     foreach($switchportok as $port)
                     {
-                        ?><tr class='transpinput'>
-                            <!--<form action="">-->
-                            <form action="?page=portdb&action=update&tipus=switch" method="post">
-                                <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
-                                <input type ="hidden" id="portid" name="portid" value=<?=$port['portid']?>>
-                                <td><input style="width: 10ch;" type="text" name="port" value="<?=$port['port']?>"></td>
-                                <td class="portnev"><input style="width: 16ch;" type="text" name="nev" value="<?=$port['nev']?>"></td>
-                                <td>
-                                    <select name="vlan">
-                                        <option value=""></option><?php
-                                        foreach($vlanok as $x)
-                                        {
-                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['vlan']) ? "selected" : "" ?>><?=$x['id'] . " " . $x['nev']?></option><?php
-                                        }
-                                    ?></select>
-                                </td>
-                                <td>
-                                    <select name="allapot">
-                                        <option value="0" <?=($port['allapot'] == "0") ? "selected" : "" ?>>Letiltva</option>
-                                        <option value="1" <?=($port['allapot'] == "1") ? "selected" : "" ?>>Engedélyezve</option>
-                                    </select>
-                                </td>
-                                <td class="dontprint">
-                                    <select name="sebesseg">
-                                        <option value=""></option><?php
-                                        foreach($sebessegek as $x)
-                                        {
-                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['sebesseg']) ? "selected" : "" ?>><?=$x['sebesseg']?></option><?php
-                                        }
-                                    ?></select>
-                                </td>
-                                <td>
-                                    <select name="mode">
-                                        <option value="1" <?=($port['mode'] == "1") ? "selected" : "" ?>>Trunk</option>
-                                        <option value="2" <?=($port['mode'] == "2") ? "selected" : "" ?>>Access</option>
-                                    </select>
-                                </td>
-                                <td class="dontprint">
-                                    <select name="tipus">
-                                        <option value="1" <?=($port['tipus'] == "1") ? "selected" : "" ?>>Uplink</option>
-                                        <option value="2" <?=($port['tipus'] == "2") ? "selected" : "" ?>>Access</option>
-                                    </select>
-                                </td>
-                                <td class="dontprint">
-                                    <select name="csatlakozo">
-                                        <option value=""></option><?php
-                                        foreach($csatlakozotipusok as $x)
-                                        {
-                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozo']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
-                                        }
-                                    ?></select>
-                                </td>
-                                <td>
-                                    <select name="csatlakozas">
-                                        <option value="" selected></option><?php
-                                        $elozo = null;
-                                        foreach($epuletportok as $x)
-                                        {
-                                            // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
-                                            // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
-                                            if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                        if($mindir)
+                        {
+                            ?><tr class='transpinput'>
+                                <!--<form action="">-->
+                                <form action="?page=portdb&action=update&tipus=switch" method="post">
+                                    <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
+                                    <input type ="hidden" id="portid" name="portid" value=<?=$port['portid']?>>
+                                    <td><input style="width: 10ch;" type="text" name="port" value="<?=$port['port']?>"></td>
+                                    <td class="portnev"><input style="width: max-content;" type="text" name="nev" value="<?=$port['nev']?>"></td>
+                                    <td>
+                                        <select name="vlan">
+                                            <option value=""></option><?php
+                                            foreach($vlanok as $x)
                                             {
-                                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['vlan']) ? "selected" : "" ?>><?=$x['id'] . " " . $x['nev']?></option><?php
                                             }
-                                            $elozo = $x['id'];
+                                        ?></select>
+                                    </td>
+                                    <td>
+                                        <select name="allapot">
+                                            <option value="0" <?=($port['allapot'] == "0") ? "selected" : "" ?>>Letiltva</option>
+                                            <option value="1" <?=($port['allapot'] == "1") ? "selected" : "" ?>>Engedélyezve</option>
+                                        </select>
+                                    </td>
+                                    <td class="dontprint">
+                                        <select name="sebesseg">
+                                            <option value=""></option><?php
+                                            foreach($sebessegek as $x)
+                                            {
+                                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['sebesseg']) ? "selected" : "" ?>><?=$x['sebesseg']?></option><?php
+                                            }
+                                        ?></select>
+                                    </td>
+                                    <td>
+                                        <select name="mode">
+                                            <option value="1" <?=($port['mode'] == "1") ? "selected" : "" ?>>Trunk</option>
+                                            <option value="2" <?=($port['mode'] == "2") ? "selected" : "" ?>>Access</option>
+                                        </select>
+                                    </td>
+                                    <td class="dontprint">
+                                        <select name="tipus">
+                                            <option value="1" <?=($port['tipus'] == "1") ? "selected" : "" ?>>Uplink</option>
+                                            <option value="2" <?=($port['tipus'] == "2") ? "selected" : "" ?>>Access</option>
+                                        </select>
+                                    </td>
+                                    <td class="dontprint">
+                                        <select name="csatlakozo">
+                                            <option value=""></option><?php
+                                            foreach($csatlakozotipusok as $x)
+                                            {
+                                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozo']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                            }
+                                        ?></select>
+                                    </td>
+                                    <td>
+                                        <select name="csatlakozas">
+                                            <option value="" selected></option><?php
+                                            $elozo = null;
+                                            foreach($epuletportok as $x)
+                                            {
+                                                // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
+                                                // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
+                                                if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                                                {
+                                                    ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                                }
+                                                $elozo = $x['id'];
+                                            }
+                                        ?></select>
+                                    </td>
+                                    <td style="width: 6.5em" class="dontprint"><input type="submit" value="Módosítás"></td>
+                                </form>
+                            </tr><?php
+                        }
+                        else
+                        {
+                            ?><tr>
+                                <td><?=$port['port']?></td>
+                                <td><?=$port['nev']?></td>
+                                <td><?php
+                                    foreach($vlanok as $x)
+                                    {
+                                        ?><?=($x['id'] == $port['vlan']) ? $x['id'] . " " . $x['nev'] : "" ?><?php
+                                    }
+                                ?></td>
+                                <td><?=($port['allapot'] == "0") ? "Letiltva" : "Engedélyezve" ?></td>
+                                <td class="dontprint"><?php
+                                    foreach($sebessegek as $x)
+                                    {
+                                        ?><?=($x['id'] == $port['sebesseg']) ? $x['sebesseg'] . " Mbit" : "" ?><?php
+                                    }
+                                ?></td>
+                                <td><?=($port['mode'] == "1") ? "Trunk" : "Access" ?></td>
+                                <td class="dontprint"><?=($port['tipus'] == "1") ? "Uplink" : "Access" ?></td>
+                                <td class="dontprint"><?php
+                                    foreach($csatlakozotipusok as $x)
+                                    {
+                                        ?><?=($x['id'] == $port['csatlakozo']) ? $x['nev'] : "" ?><?php
+                                    }
+                                ?></td>
+                                <td><?php
+                                    $elozo = null;
+                                    foreach($epuletportok as $x)
+                                    {
+                                        if($x['id'] != $elozo)
+                                        {
+                                            ?><?=($x['id'] == $port['csatlakozas']) ? $x['aktiveszkoz'] . " " . $x['port'] : "" ?><?php
                                         }
-                                    ?></select>
-                                </td>
-                                <td style="width: 6.5em" class="dontprint"><input type="submit" value="Módosítás"></td>
-                            </form>
-                        </tr><?php
+                                        $elozo = $x['id'];
+                                    }
+                                ?></td>
+                            </tr><?php
+                        }
                     }
                 ?></tbody>
             </table>
@@ -498,13 +545,16 @@ elseif($id)
 
 // Betöltésnél rejtett felületek
     // Switch menedzselés felugró
-        ?><div id="atfedes" class="atfedes">
-            <div class="atfedes-content">
-                <span class="close">&times;</span>
-                <p><a href="telnet://<?=$eszkoz['ipcim']?>">Switch menedzselése Telneten keresztül</a></p>
-                <p><a href="http://<?=$eszkoz['ipcim']?>" target="_blank">Switch menedzselése a webes felülettel</a></p>
-            </div>
-        </div><?php
+        if($mindir)
+        {
+            ?><div id="atfedes" class="atfedes">
+                <div class="atfedes-content">
+                    <span class="close">&times;</span>
+                    <p><a href="telnet://<?=$eszkoz['ipcim']?>">Switch menedzselése Telneten keresztül</a></p>
+                    <p><a href="http://<?=$eszkoz['ipcim']?>" target="_blank">Switch menedzselése a webes felülettel</a></p>
+                </div>
+            </div><?php
+        }
 
     // Korábbi beépítések
         $slideup = 1;

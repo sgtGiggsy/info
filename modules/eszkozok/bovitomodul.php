@@ -203,7 +203,17 @@ else
                         <div>Port</div>
                         <div><?=$eszkoz['portnev']?></div>
                         <div>Beépítési eszköz IP címe</div>
-                        <div><a href="telnet://<?=$aktiveszkoz['ipcim']?>"><?=$aktiveszkoz['ipcim']?></a></div>
+                        <div><?php
+                            if($mindir)
+                            {
+                                ?><a href="telnet://<?=$aktiveszkoz['ipcim']?>"><?php
+                            } ?>
+                            <?=$aktiveszkoz['ipcim']?><?php
+                            if($mindir)
+                            {
+                                ?></a><?php
+                            }
+                        ?></div>
                         <div>Beépítési eszköz neve</div>
                         <div><?=$aktiveszkoz['beepitesinev']?></div>
                         <div>Beépítési eszköz  helye</div>

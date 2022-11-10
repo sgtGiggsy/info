@@ -2,7 +2,7 @@
 
 if(!@$mindolvas)
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+	getPermissionError();
 }
 else
 {
@@ -24,7 +24,7 @@ else
     foreach($telefonjogosultsagok as $telefonjogosultsag)
     {
         $telefonjogosultsagid = $telefonjogosultsag['id'];
-        ?><tr class='kattinthatotr' <?=($mindir) ? "data-href='$RootPath/telefonjogszerk/$telefonjogosultsagid'" : "" ?>>
+        ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/telefonjogszerk/$telefonjogosultsagid'" : "" ?>>
             <td><?=$telefonjogosultsag['id']?></td>
             <td><?=$telefonjogosultsag['nev']?></td>
         </tr><?php

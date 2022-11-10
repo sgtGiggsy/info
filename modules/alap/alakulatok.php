@@ -2,7 +2,7 @@
 
 if(!@$mindolvas)
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+	getPermissionError();
 }
 else
 {
@@ -26,7 +26,7 @@ else
     {
         $alakulatid = $alakulat['id'];
         
-        ?><tr class='kattinthatotr' <?=($mindir) ? "data-href='$RootPath/alakulatszerkeszt/$alakulatid'" : "" ?>>
+        ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/alakulatszerkeszt/$alakulatid'" : "" ?>>
             <td><?=$alakulat['id']?></td>
             <td><?=$alakulat['nev']?></td>
             <td><?=$alakulat['rovid']?></td>

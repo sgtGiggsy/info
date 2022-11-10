@@ -2,7 +2,7 @@
 
 if(!@$mindolvas)
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+	getPermissionError();
 }
 else
 {
@@ -33,7 +33,7 @@ else
     foreach($vlanok as $vlan)
     {
         $vlanid = $vlan['id'];
-        ?><tr class='kattinthatotr' <?=($mindir) ? "data-href='$RootPath/vlanszerkeszt/$vlanid'" : "" ?>>
+        ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/vlanszerkeszt/$vlanid'" : "" ?>>
             <td><?=$vlan['id']?></td>
             <td><?=$vlan['nev']?></td>
             <td><?=$vlan['leiras']?></td>

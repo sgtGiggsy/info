@@ -2,7 +2,7 @@
 
 if(!@$mindolvas)
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+	getPermissionError();
 }
 else
 {
@@ -19,13 +19,13 @@ else
             <tr>
                 <th class="tsorth" onclick="sortTable(0, 'i', '<?=$tipus?>?>')">ID</th>
                 <th class="tsorth" onclick="sortTable(1, 's', '<?=$tipus?>?>')">Gyártó</th>
-                <th></th>
             </tr>
         </thead>
         <tbody><?php
         foreach($gyartok as $gyarto)
         {
-            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/gyartoszerkeszt/<?=$gyarto['id']?>'>
+            $gyartoid = $gyarto['id'];
+            ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/gyartoszerkeszt/$gyartoid'" : "" ?>>
                 <td><?=$gyarto['id']?></td>
                 <td><?=$gyarto['nev']?></td>
             </tr><?php

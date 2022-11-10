@@ -2,7 +2,7 @@
 
 if(@!$mindir)
 {
-    echo "Nincs jogosultsága az oldal megtekintésére!";
+    getPermissionError();
 }
 else
 {

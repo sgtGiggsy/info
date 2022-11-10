@@ -1,7 +1,7 @@
 <?php
-if(!$csoportolvas)
+if(!$mindolvas)
 {
-    echo "<h2>Az oldal kizárólag adminisztrátorok számára érhető el!</h2>";
+    getPermissionError();
 }
 else
 {
@@ -28,7 +28,8 @@ else
             <tbody><?php
             foreach($lista as $x)
             {
-                ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/hkrszerkeszt/<?=$x['id']?>'>
+                $hkrid = $x['id'];
+                ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/hkrszerkeszt/$$hkrid'" : "" ?>>
                     <td><?=$x['gepnev']?></td>
                     <td><?=$x['nev']?></td>
                     <td><?=($x['utolsoeredmeny'] == 1) ? "Sikeres" : "Sikertelen" ?></td>

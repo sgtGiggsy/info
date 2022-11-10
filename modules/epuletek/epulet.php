@@ -259,9 +259,12 @@ else
                             <thead>
                                 <tr>
                                     <th style="width: 20%" class="tsorth" onclick="sortTable(0, 'i', '<?=$emelet?>')">Szám</th>
-                                    <th style="width: 70%" class="tsorth" onclick="sortTable(1, 's', '<?=$emelet?>')">Helyiségnév</th>
-                                    <th style="width: 10%"></th>
-                                </tr>
+                                    <th style="width: 70%" class="tsorth" onclick="sortTable(1, 's', '<?=$emelet?>')">Helyiségnév</th><?php
+                                    if($mindir)
+                                    {
+                                        ?><th style="width: 10%"></th><?php
+                                    }
+                                ?></tr>
                             </thead>
                             <tbody><?php
                             $zar = true;
@@ -269,9 +272,12 @@ else
 
                     ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>'>
                         <td><?=$helyiseg['helyisegszam']?></td>
-                        <td><?=$helyiseg['helyisegnev']?></td>
-                        <td><a href='<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Helyiség szerkesztése' title='Helyiség szerkesztése'/></a></td>
-                    </tr><?php
+                        <td><?=$helyiseg['helyisegnev']?></td><?php
+                        if($mindir)
+                        {
+                            ?><td><a href='<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Helyiség szerkesztése' title='Helyiség szerkesztése'/></a></td><?php
+                        }
+                    ?></tr><?php
                 }
                 ?></tbody>
                 </table>

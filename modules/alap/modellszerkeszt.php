@@ -1,8 +1,8 @@
 <?php
 
-if(@!$sajatolvas)
+if(@!$midir)
 {
-    echo "Nincs jogosultsága az oldal megtekintésére!";
+    getPermissionError();
 }
 else
 {

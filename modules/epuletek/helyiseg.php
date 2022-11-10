@@ -218,10 +218,13 @@ else
                                 ?><th class="tsorth" onclick="sortTable(6, 's', 'eszkozok')">Rackszekrény</th>
                                 <th class="tsorth" onclick="sortTable(7, 'i', 'eszkozok')">Pozíció</th><?php
                             }
-                            ?><th></th>
-                            <th></th>
-                            <th></th>
-                        </tr>
+                            if($csoportir)
+                            {
+                                ?><th></th>
+                                <th></th>
+                                <th></th><?php
+                            }
+                        ?></tr>
                     </thead>
                     <tbody><?php
                         foreach($eszkozok as $eszkoz)
@@ -263,9 +266,12 @@ else
                         <tr>
                             <th class="tsorth" onclick="sortTable(0, 's', 'rackek')">Azonosító</th>
                             <th class="tsorth" onclick="sortTable(1, 's', 'rackek')">Gyártó</th>
-                            <th class="tsorth" onclick="sortTable(2, 'i', 'rackek')">Unitszám</th>
-                            <th></th>
-                        </tr>
+                            <th class="tsorth" onclick="sortTable(2, 'i', 'rackek')">Unitszám</th><?php
+                            if($mindir)
+                            {
+                                ?><th></th><?php
+                            }
+                        ?></tr>
                     </thead>
                     <tbody><?php
                         foreach($rackek as $rack)
@@ -274,9 +280,12 @@ else
                             ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/rack/<?=$rack['id']?>'>
                                 <td><?=$rack['nev']?></td>
                                 <td><?=$rack['gyarto']?></td>
-                                <td><?=$rack['unitszam']?></td>
-                                <td><?=($csoportir) ? "<a href='$RootPath/rack/$rackid?action=edit'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td>
-                            </tr><?php
+                                <td><?=$rack['unitszam']?></td><?php
+                                if($mindir)
+                                {
+                                    ?><td><?=($csoportir) ? "<a href='$RootPath/rack/$rackid?action=edit'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td><?php
+                                }
+                            ?></tr><?php
                         }
                     ?></tbody>
                 </table>

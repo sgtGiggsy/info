@@ -2,7 +2,7 @@
 
 if(!@$mindolvas)
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+	getPermissionError();
 }
 else
 {
@@ -44,14 +44,14 @@ else
                 <tr>
                     <th class="tsorth" onclick="sortTable(0, 's', '<?=$tipus?>?>')">Gyártó</th>
                     <th class="tsorth" onclick="sortTable(1, 's', '<?=$tipus?>?>')">Modell</th>
-                    <th></th>
                 </tr>
             </thead>
             <tbody><?php
             $zar = true;
         }
 
-        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/modellszerkeszt/<?=$modell['id']?>'>
+        $modellid = $modell['id'];
+        ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/modellszerkeszt/$modellid'" : "" ?>>
             <td><?=$modell['gyarto']?></td>
             <td><?=$modell['modell']?></td>
         </tr><?php

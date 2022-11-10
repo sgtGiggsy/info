@@ -2,7 +2,7 @@
 
 if(!@$mindolvas)
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+	getPermissionError();
 }
 else
 {
@@ -44,9 +44,12 @@ else
                 <tr>
                     <th class="tsorth" onclick="sortTable(0, 'i', '<?=$telephely?>')">Épületszám</th>
                     <th class="tsorth" onclick="sortTable(1, 's', '<?=$telephely?>')">Épület megnevezése</th>
-                    <th class="tsorth" onclick="sortTable(2, 's', '<?=$telephely?>')">Típus</th>
-                    <th></th>
-                </tr>
+                    <th class="tsorth" onclick="sortTable(2, 's', '<?=$telephely?>')">Típus</th><?php
+                    if($mindir)
+                    {
+                        ?><th></th><?php
+                    }
+                ?></tr>
             </thead>
             <tbody><?php
             $zar = true;
@@ -55,9 +58,12 @@ else
         ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/epulet/<?=$epulet['id']?>'>
             <td><?=$epulet['szam']?></td>
             <td><?=$epulet['nev']?></td>
-            <td><?=$epulet['tipus']?></td>
-            <td><a href='<?=$RootPath?>/epulet/<?=$epulet['id']?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Épület szerkesztése' title='Épület szerkesztése'/></a></td>
-        </tr><?php
+            <td><?=$epulet['tipus']?></td><?php
+            if($mindir)
+            {
+                ?><td><a href='<?=$RootPath?>/epulet/<?=$epulet['id']?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Épület szerkesztése' title='Épület szerkesztése'/></a></td><?php
+            }
+        ?></tr><?php
     }
     ?></tbody>
     </table><?php

@@ -81,11 +81,11 @@ else
                     <th class="tsorth"><p><span class="dontprint"><input type="text" id="f6" onkeyup="filterTable('f6', '<?=$tipus?>', 6)" placeholder="Eszköztípus" title="Eszköztípus"><br></span><span onclick="sortTable(6, 's', '<?=$tipus?>')">Eszköztípus</span></p></th>
                     <th class="tsorth"><p><span class="dontprint"><input type="text" id="f7" onkeyup="filterTable('f7', '<?=$tipus?>', 7)" placeholder="Épület" title="Épület"><br></span><span onclick="sortTable(7, 's', '<?=$tipus?>')">Épület</span></p></th>
                     <th class="tsorth"><p><span class="dontprint"><input type="text" id="f8" onkeyup="filterTable('f8', '<?=$tipus?>', 8)" placeholder="Helyiség" title="Helyiség"><br></span><span onclick="sortTable(8, 's', '<?=$tipus?>')">Helyiség</span></p></th>
-                    <th class="tsorth"><p><span class="dontprint"><input type="text" id="f9" onkeyup="filterTable('f9', '<?=$tipus?>', 9)" placeholder="Rack" title="Rack"><br></span><span onclick="sortTable(9, 's', '<?=$tipus?>')">Rack</span></p></th><?php
+                    <th class="tsorth"><p><span class="dontprint"><input type="text" id="f9" onkeyup="filterTable('f9', '<?=$tipus?>', 9)" placeholder="Rack" title="Rack"><br></span><span onclick="sortTable(9, 's', '<?=$tipus?>')">Rack</span></p></th>
+                    <th class="tsorth"><p><span class="dontprint"><input type="text" id="f10" onkeyup="filterTable('f10', '<?=$tipus?>', 10)" placeholder="Megjegyzés" title="Megjegyzés"><br></span><span onclick="sortTable(10, 's', '<?=$tipus?>')">Megjegyzés</span></p></th><?php
                     if($csoportir)
                     {
-                        ?><th class="tsorth"><p><span class="dontprint"><input type="text" id="f10" onkeyup="filterTable('f10', '<?=$tipus?>', 10)" placeholder="Megjegyzés" title="Megjegyzés"><br></span><span onclick="sortTable(10, 's', '<?=$tipus?>')">Megjegyzés</span></p></th>
-                        <th class="dontprint"></th>
+                        ?><th class="dontprint"></th>
                         <th class="dontprint"></th>
                         <th class="dontprint"></th>
                         <th class="dontprint"></th>

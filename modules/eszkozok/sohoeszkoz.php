@@ -160,7 +160,17 @@ else
                         ?><div>Állapot</div>
                         <div>Beépítve</div>
                         <div>IP cím</div>
-                        <div><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$eszkoz['ipcim']?></a></div>
+                        <div><?php
+                            if($mindir)
+                            {
+                                ?><a href="telnet://<?=$eszkoz['ipcim']?>"><?php
+                            } ?>
+                            <?=$eszkoz['ipcim']?><?php
+                            if($mindir)
+                            {
+                                ?></a><?php
+                            }
+                        ?></div>
                         <div>VLAN</div>
                         <div><?=$eszkoz['vlan']?></div>
                         <div>Beépítési név</div>
