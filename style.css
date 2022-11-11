@@ -320,10 +320,10 @@ ol, ul {
 .infoboxbody, .infoboxbodybp {
     background-color: var(--cardbase);
     font-size: 0.9em;
-    
     margin: 0 auto auto auto !important;
     max-height: calc(55vh - 3.5em);
     overflow-y: auto;
+    overflow-x: hidden;
     border-left: 1px solid var(--lightborder);
     border-bottom: 1px solid var(--lightborder);
     border-right: 1px solid var(--lightborder);
@@ -1520,7 +1520,7 @@ div[id^=tennivalobody-].close {
 }
   
 .atfedes-content {
-    background-color: var(--fontlight);
+    background-color: var(--submenuhover);
     margin: auto;
     padding: 15px 15px 10px 15px;
     border: 1px solid var(--midborder);

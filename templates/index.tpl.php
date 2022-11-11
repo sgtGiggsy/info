@@ -152,6 +152,7 @@
 			var notifcount = document.getElementById("notifcount").textContent;
 			notifcount = notifcount - 1;
 			document.getElementById("notifcount").textContent = notifcount;
+			document.getElementById("notif-<?=$_GET['ertesites']?>").className.replace("notifitem", "notifitem-latta");
 		});
 		<?php
 	}

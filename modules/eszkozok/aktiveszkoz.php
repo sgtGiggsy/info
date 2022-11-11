@@ -549,7 +549,7 @@ elseif($id)
         {
             ?><div id="atfedes" class="atfedes">
                 <div class="atfedes-content">
-                    <span class="close">&times;</span>
+                    <span class="closeol">&times;</span>
                     <p><a href="telnet://<?=$eszkoz['ipcim']?>">Switch menedzselése Telneten keresztül</a></p>
                     <p><a href="http://<?=$eszkoz['ipcim']?>" target="_blank">Switch menedzselése a webes felülettel</a></p>
                 </div>

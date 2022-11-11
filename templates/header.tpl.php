@@ -53,7 +53,7 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
         foreach($notifications as $notification)
         {
             ?><a href="<?=$RootPath?>/<?=$notification['url']?>?ertesites=<?=$notification['id']?>">
-                <div class="notifitem<?=($notification['latta']) ? '-latta' : '' ?>">
+                <div id="notif-<?=$notification['id']?>" class="notifitem<?=($notification['latta']) ? '-latta' : '' ?>">
                     <p class="notiftitle"><?=$notification['cim']?></p>
                     <p class="notifbody"><?=$notification['szoveg']?></p>
                     <p class="notiftime"><?=$notification['timestamp']?></p>

@@ -673,7 +673,7 @@ function getNotifications()
 		$ertesitette = mySQLConnect("SELECT id FROM ertesitesek WHERE timestamp = '$switchutolso' AND cim = 'Switch ellenőrző leállt'");
 		if(mysqli_num_rows($ertesitette) == 0)
 		{
-			mySQLConnect("INSERT INTO ertesitesek (cim, szoveg, timestamp, tipus) VALUES ('$cim', '$szoveg', '$switchutolso', '1')");
+			mySQLConnect("INSERT INTO ertesitesek (cim, szoveg, timestamp, url, tipus) VALUES ('$cim', '$szoveg', '$switchutolso', 'aktiveszkozok', '1')");
 		}
 	}
 
