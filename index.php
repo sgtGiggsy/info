@@ -295,7 +295,12 @@ foreach($menu as $menupont)
     }
 
     // Ha megvan a jelenlegi oldal, a hozzá tartozó jogosultságok beállítása
-    if($menupont['oldal'] == $pagetofind || $menupont['gyujtooldal'] == $pagetofind || $menupont['dboldal'] == $pagetofind || $menupont['szerkoldal'] == $pagetofind)
+    $gyujtotemp = $menupont['gyujtooldal'];
+    if($gyujtotemp)
+    {
+        $gyujtotemp = explode('?', $gyujtotemp)[0];
+    }
+    if($menupont['oldal'] == $pagetofind || $gyujtotemp == $pagetofind || $menupont['dboldal'] == $pagetofind || $menupont['szerkoldal'] == $pagetofind)
     {
         if($_SESSION[getenv('SESSION_NAME').'id'])
 		{
@@ -303,7 +308,7 @@ foreach($menu as $menupont)
 			{
 				if($menupont['id'] == $jogosultsag['menupont'])
 				{
-					switch($jogosultsag['olvasas'])
+                    switch($jogosultsag['olvasas'])
                     {
                         case 3: $mindolvas = true;
                         case 2: $csoportolvas = true;
@@ -321,6 +326,7 @@ foreach($menu as $menupont)
 			}
 		}
         $currentpage = $menupont;
+        $gyujtooldal = $gyujtotemp;
     }
 
     // Ha egy menüpont megjelenése nincs kifejezett joghoz kötve, menüterülethez adása
