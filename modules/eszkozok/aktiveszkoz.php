@@ -1,27 +1,13 @@
 <?php
 
-// Elsőként annak ellenőrzése, hogy a felhasználó olvashatja-e,
-// majd megvizsgálni, hogy ha olvashatja, de írni szeretné, ahhoz van-e joga
-if(!@$csoportolvas || (isset($_GET['action']) && !$csoportir))
-{
-    getPermissionError();
-}
-// Ha van valamilyen módosítási kísérlet, ellenőrizni, hogy van-e rá joga a felhasználónak
-elseif(isset($_GET['action']) && $csoportir)
-{
-    $meghiv = true;
-    
-    // Az eszközszerkesztő oldal includeolása
-    include('./modules/eszkozok/includes/eszkozszerkeszt.inc.php');
-}
-elseif($id)
+if($id)
 {
     $beepszur = null;
     if(isset($_GET['beepites']) && $_GET['beepites'])
     {
         $beepszur = "AND beepitesek.id = " . $_GET['beepites'];
     }
-// Adatbázis műveletek rész    
+    // Adatbázis műveletek rész    
     $aktiveszkozok = mySQLConnect("SELECT
             eszkozok.id AS eszkid,
             beepitesek.id AS beepid,
@@ -83,15 +69,99 @@ elseif($id)
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
         WHERE eszkozok.id = $id AND modellek.tipus < 11 $beepszur
         ORDER BY beepitesek.id DESC;");
+        $eszkoz = mysqli_fetch_assoc($aktiveszkozok);
+}
 
-    if(mysqli_num_rows($aktiveszkozok) == 0)
+if((!$id || mysqli_num_rows($aktiveszkozok) == 0 || !@$csoportolvas) && (isset($_POST) && !@$csoportir))
+{
+    echo "<h2>Nincs ilyen sorszámú aktív eszköz, vagy nincs jogosultsága a megtekintéséhez!</h2>";
+}
+
+else
+{
+    // A többi megjelenítési és adatbázis részt megelőzően először a breadcumbok betöltése történik meg,
+    // mivel arra a betöltés formájától függetlenül mindenképp szükség lesz
+    ?><div class="breadcumblist">
+        <ol vocab="https://schema.org/" typeof="BreadcrumbList">
+            <li property="itemListElement" typeof="ListItem">
+                <a property="item" typeof="WebPage"
+                    href="<?=$RootPath?>/">
+                <span property="name">Kecskemét Informatika</span></a>
+                <meta property="position" content="1">
+            </li>
+            <li><b>></b></li><?php
+            if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
+            {
+                ?><li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
+                    <span property="name"><?=$eszkoz['telephely']?></span></a>
+                    <meta property="position" content="2">
+                </li>
+                <li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
+                    <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
+                    <meta property="position" content="3">
+                </li>
+                <li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
+                    <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
+                    <meta property="position" content="4">
+                </li>
+                <?php if($eszkoz['rackid'])
+                {
+                    ?><li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
+                        <span property="name"><?=$eszkoz['rack']?></span></a>
+                        <meta property="position" content="5">
+                    </li><?php
+                }
+                ?><li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <span property="name"><?=$eszkoz['beepitesinev']?> (<?=$eszkoz['ipcim']?>)</span>
+                    <meta property="position" content="6">
+                </li><?php
+            }
+            else
+            {
+                ?><li property="itemListElement" typeof="ListItem">
+                    <a property="item" typeof="WebPage"
+                        href="<?=$RootPath?>/aktiveszkozok">
+                    <span property="name">Aktív eszközök</span></a>
+                    <meta property="position" content="2">
+                </li>
+                <li><b>></b></li>
+                <li property="itemListElement" typeof="ListItem">
+                    <span property="name"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</span>
+                    <meta property="position" content="3">
+                </li><?php
+            }
+        ?></ol>
+    </div><?php
+    
+    // Első műveletként annak ellenőrzése, hogy ha a felhasználó írni szeretné az eszközt,
+    // akkor rendelkezik-e a szükséges jogosultságokkal
+    if(isset($_GET['action']) && !$csoportir)
     {
-        echo "Nincs ilyen sorszámú aktív eszköz";
+        getPermissionError();
+    }
+    // Ha van valamilyen módosítási kísérlet, ellenőrizni, hogy van-e rá joga a felhasználónak
+    elseif(isset($_GET['action']) && $csoportir)
+    {
+        // Ez jelzi a szerkesztő oldalnak, hogy van jogosultsága a felhasználónak írni
+        $meghiv = true;
+        
+        // Az eszközszerkesztő oldal includeolása
+        include('./modules/eszkozok/includes/eszkozszerkeszt.inc.php');
     }
     else
     {
-        $eszkoz = mysqli_fetch_assoc($aktiveszkozok);
-
         $epuletid = $eszkoz['epuletid'];
         $helyisegid = $eszkoz['helyisegid'];
         $vlanok = mySQLConnect("SELECT * FROM vlanok;");
@@ -182,72 +252,8 @@ elseif($id)
             WHERE eszkozok_history.eszkozid = $id
             ORDER BY eszkozok_history.modid");
 
-// Megjelenés rész
-        ?><div class="breadcumblist">
-            <ol vocab="https://schema.org/" typeof="BreadcrumbList">
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/">
-                    <span property="name">Kecskemét Informatika</span></a>
-                    <meta property="position" content="1">
-                </li>
-                <li><b>></b></li><?php
-                if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
-                {
-                    ?><li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage"
-                            href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
-                        <span property="name"><?=$eszkoz['telephely']?></span></a>
-                        <meta property="position" content="2">
-                    </li>
-                    <li><b>></b></li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage"
-                            href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
-                        <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
-                        <meta property="position" content="3">
-                    </li>
-                    <li><b>></b></li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage"
-                            href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
-                        <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
-                        <meta property="position" content="4">
-                    </li>
-                    <?php if($eszkoz['rackid'])
-                    {
-                        ?><li><b>></b></li>
-                        <li property="itemListElement" typeof="ListItem">
-                            <a property="item" typeof="WebPage"
-                                href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
-                            <span property="name"><?=$eszkoz['rack']?></span></a>
-                            <meta property="position" content="5">
-                        </li><?php
-                    }
-                    ?><li><b>></b></li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <span property="name"><?=$eszkoz['beepitesinev']?> (<?=$eszkoz['ipcim']?>)</span>
-                        <meta property="position" content="6">
-                    </li><?php
-                }
-                else
-                {
-                    ?><li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage"
-                            href="<?=$RootPath?>/aktiveszkozok">
-                        <span property="name">Aktív eszközök</span></a>
-                        <meta property="position" content="2">
-                    </li>
-                    <li><b>></b></li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <span property="name"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</span>
-                        <meta property="position" content="3">
-                    </li><?php
-                }
-            ?></ol>
-        </div>
-        
-        <div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div><?php
+        // Megjelenés rész
+        ?><div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div><?php
 
         ?><div class="dyntripplecol">
         <!-- Infóbox -->
@@ -366,7 +372,7 @@ elseif($id)
                             <div><h2>Állapot</h2></div><?php
                             foreach($allapotelozmenyek as $x)
                             {
-                                ?><div class='<?=($x["online"]) ? "online'" : "offline' style='font-weight: normal'" ?>><?=$x['timestamp']?></div>
+                                ?><div class='<?=($x["online"]) ? "online" : "offline" ?>' <?=($x["online"]) ? "" : "style='font-weight: normal'" ?>><?=$x['timestamp']?></div>
                                 <div class="<?=($x['online']) ? "online" : "offline" ?>"><?=($x['online']) ? "Online" : "Offline" ?></div><?php
                             }
                         ?></div>
@@ -381,11 +387,14 @@ elseif($id)
         
         
         // Szerkesztő gombok
-        if($csoportir)
+        if($mindir)
         {
             $slideup = 1;
             ?><div class="szerkgombsor">
-                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Eszköz szerkesztése</button><?php
+                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Eszköz szerkesztése</button>
+                <button type='button' onclick="location.href='./<?=$id?>?beepites<?=($eszkoz['beepid'] && !$eszkoz['kiepitesideje']) ? '=' . $eszkoz['beepid'] . '&action=edit' : '&action=addnew' ?>'">
+                    <?=($eszkoz['beepid'] && !$eszkoz['kiepitesideje']) ? "Beépítés szerkesztése" : "Új beépítés" ?>
+                </button><?php
                 if(mysqli_num_rows($aktiveszkozok) > 1 || $eszkoz['kiepitesideje'])
                 {
                     ?><button type='button' onclick='showSlideIn("<?=$slideup?>", "slideup-")'>Beépítési előzmények</button><?php
@@ -397,10 +406,8 @@ elseif($id)
                 }
             ?></div><?php
         }
-        
 
-
-// Port táblázat
+        // Port táblázat
         ?><div class="PrintArea">
             <div class="oldalcim">Portok</div>
             <table id="switchportok">
@@ -422,6 +429,7 @@ elseif($id)
                     ?></tr>
                 </thead>
                 <tbody><?php
+                    $i = 1;
                     foreach($switchportok as $port)
                     {
                         if($mindir)
@@ -434,7 +442,7 @@ elseif($id)
                                     <td><input style="width: 10ch;" type="text" name="port" value="<?=$port['port']?>"></td>
                                     <td class="portnev"><input style="width: max-content;" type="text" name="nev" value="<?=$port['nev']?>"></td>
                                     <td>
-                                        <select name="vlan">
+                                        <select name="vlan" id="vlan-<?=$i?>">
                                             <option value=""></option><?php
                                             foreach($vlanok as $x)
                                             {
@@ -479,24 +487,28 @@ elseif($id)
                                         ?></select>
                                     </td>
                                     <td>
-                                        <select name="csatlakozas">
-                                            <option value="" selected></option><?php
-                                            $elozo = null;
-                                            foreach($epuletportok as $x)
-                                            {
-                                                // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
-                                                // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
-                                                if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                                        <div class="custom-select">
+                                            <select name="csatlakozas">
+                                                <option value="" selected>&nbsp;</option>
+                                                <option value="" selected>&nbsp;</option><?php
+                                                $elozo = null;
+                                                foreach($epuletportok as $x)
                                                 {
-                                                    ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                                    // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
+                                                    // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
+                                                    if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                                                    {
+                                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                                    }
+                                                    $elozo = $x['id'];
                                                 }
-                                                $elozo = $x['id'];
-                                            }
-                                        ?></select>
+                                            ?></select>
+                                        </div>
                                     </td>
                                     <td style="width: 6.5em" class="dontprint"><input type="submit" value="Módosítás"></td>
                                 </form>
                             </tr><?php
+                            $i++;
                         }
                         else
                         {
@@ -541,22 +553,39 @@ elseif($id)
                 ?></tbody>
             </table>
         </div><?php
+        $cselect = true;
+        if($mindir)
+        {
+            ?><div class="contentcenter">
+                <div class="largebutton">
+                    <button onclick="showPopup('largebutton-popup')">Minden port egy VLAN-ra állítása</button>
+                    <button onclick="sendAllForms()">Az összes módosítás mentése egyszerre</button>
+                        
+                    <div id="largebutton-popup">
+                        <div><button onclick="setVlan('')">&nbsp;</button></div><?php
+                        foreach($vlanok as $x)
+                        {
+                            ?><div><button onclick="setVlan(<?=$x['id']?>)"><?=$x['id'] . " " . $x['nev']?></button></div><?php
+                        }
+                    ?></div>
+                </div>
+            </div><?php
+        }
 
-
-// Betöltésnél rejtett felületek
-    // Switch menedzselés felugró
+        // Betöltésnél rejtett felületek
+        // Switch menedzselés felugró
         if($mindir)
         {
             ?><div id="atfedes" class="atfedes">
                 <div class="atfedes-content">
-                    <span class="closeol">&times;</span>
+                    <span class="close">&times;</span>
                     <p><a href="telnet://<?=$eszkoz['ipcim']?>">Switch menedzselése Telneten keresztül</a></p>
                     <p><a href="http://<?=$eszkoz['ipcim']?>" target="_blank">Switch menedzselése a webes felülettel</a></p>
                 </div>
             </div><?php
         }
 
-    // Korábbi beépítések
+        // Korábbi beépítések
         $slideup = 1;
         if(mysqli_num_rows($aktiveszkozok) > 1 || $eszkoz['kiepitesideje'])
         {
@@ -601,7 +630,7 @@ elseif($id)
             $slideup++;
         }
 
-    // Szerkesztési előzmények megjelenítése
+        // Szerkesztési előzmények megjelenítése
         if(mysqli_num_rows($elozmenyek) > 0)
         {
             ?><div id="slideup-<?=$slideup?>" onmouseleave='showSlideIn("<?=$slideup?>", "slideup-")'>
@@ -694,15 +723,51 @@ elseif($id)
             var dataString = $(this).serialize();
 
             $.ajax({
-            type: "POST",
-            data: dataString,
-            url: "<?=$RootPath?>/portdb?action=update&tipus=switch",
-            success: function () {
-                showToaster("Port szerkesztése sikeres...");
+                type: "POST",
+                data: dataString,
+                url: "<?=$RootPath?>/portdb?action=update&tipus=switch",
+                success: function () {
+                    showToaster("Port szerkesztése sikeres...");
+                }
+            });
+            e.preventDefault();
+        });
+
+        function sendAllForms()
+        {
+            var forms = document.getElementsByTagName("FORM");
+            var elemszam = forms.length;
+            showProgressOverlay();
+            for (var i = 0; i < elemszam; i++) {
+                var dataString = $(forms[i]).serialize();
+                $.ajax({
+                    type: "POST",
+                    data: dataString,
+                    url: "<?=$RootPath?>/portdb?action=update&tipus=switch",
+                    success: function () {
+                        if(i == elemszam)
+                        {
+                            hideProgressOverlay();
+                        }
+                    }
+                });
             }
-        });
-        e.preventDefault();
-        });
+        }
+
+        function setVlan(id) {
+
+            for(var i = 1; i < 1000; i++) {
+                if(document.getElementById("vlan-" + i)) {
+                    select = document.getElementById("vlan-" + i);
+                    console.log(select);
+                    select.value = id;
+                }
+                else {
+                    break;
+                }
+            }
+            showPopup('largebutton-popup');
+        }
 
         <?php
         if($eszkoz['web'])

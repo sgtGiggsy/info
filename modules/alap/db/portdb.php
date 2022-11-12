@@ -60,12 +60,12 @@ if(isset($mindir) && $mindir)
                 FROM portok
                 WHERE id = $tulportid");
             
-            $stmt = $con->prepare('UPDATE portok SET csatlakozo=?, csatlakozas=?, utolsomodosito=?, utolsomodositasideje=? WHERE id=?');
-            $stmt->bind_param('ssssi', $_POST['csatlakozo'], $_POST['portid'], $user, $timestamp, $tulportid);
+            $stmt = $con->prepare('UPDATE portok SET csatlakozo=?, csatlakozas=? WHERE id=?');
+            $stmt->bind_param('ssi', $_POST['csatlakozo'], $_POST['portid'], $tulportid);
             $stmt->execute();
 
-            $stmt = $con->prepare('UPDATE switchportok SET mode=?, vlan=?, sebesseg=?, nev=?, allapot=?, tipus=?, utolsomodosito=?, utolsomodositasideje=? WHERE port=?');
-            $stmt->bind_param('ssssssssi', $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $user, $timestamp, $tulportid);
+            $stmt = $con->prepare('UPDATE switchportok SET mode=?, vlan=?, sebesseg=?, nev=?, allapot=?, tipus=? WHERE port=?');
+            $stmt->bind_param('ssssssi', $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $tulportid);
             $stmt->execute();
         }
 

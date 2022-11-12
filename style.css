@@ -511,7 +511,7 @@ ol, ul {
 }
 
 .tablecardbody table {
-    width: calc(100% - 2em);
+    /*width: calc(100% - 2em);*/
     margin: 1em;
 }
 
@@ -597,6 +597,50 @@ label {
     font-weight: bold;
 }
 
+.largebutton {
+    position: relative;
+}
+
+.largebutton button {
+    margin-top: 1em;
+    padding: 0.3em 0.8em;
+    font-size: 1.2em;
+}
+
+#largebutton-popup {
+    display: none;
+    position: absolute;
+    bottom: 2.28em;
+    left: 0.4em;
+    background-color: var(--buttonborder);
+    padding-top: 0;
+}
+
+#largebutton-popup div {
+    padding: 0;
+    margin: 0;
+}
+
+#largebutton-popup.show {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1px;
+}
+
+#largebutton-popup.hide {
+    display: none;
+}
+
+#largebutton-popup button {
+    margin: 0;
+    font-size: 0.8em;
+    border: 0;
+    border-radius: 0;
+    text-align: left;
+    width: 100%;
+    max-width: 100%;
+}
+
 .submit {
     width: 100%;
     display: flex;
@@ -628,7 +672,7 @@ label {
     height: 1.1em;
 }
 
-/* On-Off kapcsoló formokhoz */
+/* -- On-Off kapcsoló formokhoz -- */
 /* A container div */
 .kapcsolo {
     position: relative;
@@ -686,6 +730,86 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
+/* -- Egyedi select -- */
+.custom-select {
+    position: relative;
+    /*font-family: Arial;*/
+}
+  
+.custom-select select {
+    display: none; /*hide original SELECT element:*/
+}
+  
+.select-selected {
+    background-color: var(--selectbg);
+    border: 1px solid var(--lightborder);
+    border-radius: 0.25em;
+    padding: 0.37em 2em 0.37em 0.5em;
+    min-width: max-content;
+    cursor: pointer;
+    user-select: none;
+    line-height: 1.1;
+    
+}
+
+.select-selected.transpinput {
+    background-color: transparent;
+}
+  
+/* A select elem nyilának megjelenése */
+.select-selected:after {
+    position: absolute;
+    content: "";
+    top: 12px;
+    right: 10px;
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+    border-color: var(--basefont) transparent transparent transparent;
+    z-index: 0;
+}
+  
+/* A nyíl felfelé irányítása ha a menü nyitva */
+.select-selected.select-arrow-active:after {
+    border-color: transparent transparent var(--basefont) transparent;
+    top: 6px;
+}
+
+/* Az elemek stílusának meghatározása, beleértve a kiválasztott elemet is */
+.select-items div {
+    color: var(--basefont);
+    padding: 0.5em 1em;
+    border: 1px solid transparent;
+    border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+    cursor: pointer;
+    user-select: none;
+}
+  
+/* Az elemek container-e */
+.select-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 10ch);
+    min-width: 10ch;
+    max-width: 500px;
+    min-height: 1em;
+    max-height: 300px;
+    overflow-y: auto;
+    position: absolute;
+    background-color: var(--selectbg);
+    bottom: 2em;
+    right: 0;
+    z-index: 99;
+}
+  
+/* Az elemek elrejtése, mikor a select be van zárva */
+.select-hide {
+    display: none;
+}
+  
+.select-items div:hover, .same-as-selected {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
 /* ------------------------------- Táblázatok ------------------------------- */
 /* Táblázat alapbeállítások */
 table {
@@ -711,7 +835,7 @@ thead, tbody {
 
 thead tr:nth-child(1) {background: none !important }
 
-tr, td, th {
+td, th {
     border: 0px;
     padding: 0.4em 0.3em 0.4em 0.3em;
     text-align: left;
@@ -1754,6 +1878,12 @@ div[id^=tennivalobody-].close {
         position: absolute;
         left: 0;
         top: 0;
+    }
+
+    .select-selected {
+        color: #0b0b0b !important;
+        font-size: 0.7em;
+        border: 0px;
     }
 
     .oldalcim {
