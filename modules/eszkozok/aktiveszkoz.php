@@ -81,69 +81,72 @@ else
 {
     // A többi megjelenítési és adatbázis részt megelőzően először a breadcumbok betöltése történik meg,
     // mivel arra a betöltés formájától függetlenül mindenképp szükség lesz
-    ?><div class="breadcumblist">
-        <ol vocab="https://schema.org/" typeof="BreadcrumbList">
-            <li property="itemListElement" typeof="ListItem">
-                <a property="item" typeof="WebPage"
-                    href="<?=$RootPath?>/">
-                <span property="name">Kecskemét Informatika</span></a>
-                <meta property="position" content="1">
-            </li>
-            <li><b>></b></li><?php
-            if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
-            {
-                ?><li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
-                    <span property="name"><?=$eszkoz['telephely']?></span></a>
-                    <meta property="position" content="2">
-                </li>
-                <li><b>></b></li>
+    if(isset($_GET['action']) && $_GET['action'] != 'addnew')
+    {
+        ?><div class="breadcumblist">
+            <ol vocab="https://schema.org/" typeof="BreadcrumbList">
                 <li property="itemListElement" typeof="ListItem">
                     <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
-                    <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
-                    <meta property="position" content="3">
+                        href="<?=$RootPath?>/">
+                    <span property="name">Kecskemét Informatika</span></a>
+                    <meta property="position" content="1">
                 </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
-                    <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
-                    <meta property="position" content="4">
-                </li>
-                <?php if($eszkoz['rackid'])
+                <li><b>></b></li><?php
+                if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
                 {
-                    ?><li><b>></b></li>
+                    ?><li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
+                        <span property="name"><?=$eszkoz['telephely']?></span></a>
+                        <meta property="position" content="2">
+                    </li>
+                    <li><b>></b></li>
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage"
-                            href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
-                        <span property="name"><?=$eszkoz['rack']?></span></a>
-                        <meta property="position" content="5">
+                            href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
+                        <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
+                        <meta property="position" content="3">
+                    </li>
+                    <li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
+                        <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
+                        <meta property="position" content="4">
+                    </li>
+                    <?php if($eszkoz['rackid'])
+                    {
+                        ?><li><b>></b></li>
+                        <li property="itemListElement" typeof="ListItem">
+                            <a property="item" typeof="WebPage"
+                                href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
+                            <span property="name"><?=$eszkoz['rack']?></span></a>
+                            <meta property="position" content="5">
+                        </li><?php
+                    }
+                    ?><li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name"><?=$eszkoz['beepitesinev']?> (<?=$eszkoz['ipcim']?>)</span>
+                        <meta property="position" content="6">
                     </li><?php
                 }
-                ?><li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <span property="name"><?=$eszkoz['beepitesinev']?> (<?=$eszkoz['ipcim']?>)</span>
-                    <meta property="position" content="6">
-                </li><?php
-            }
-            else
-            {
-                ?><li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/aktiveszkozok">
-                    <span property="name">Aktív eszközök</span></a>
-                    <meta property="position" content="2">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <span property="name"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</span>
-                    <meta property="position" content="3">
-                </li><?php
-            }
-        ?></ol>
-    </div><?php
+                else
+                {
+                    ?><li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/aktiveszkozok">
+                        <span property="name">Aktív eszközök</span></a>
+                        <meta property="position" content="2">
+                    </li>
+                    <li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</span>
+                        <meta property="position" content="3">
+                    </li><?php
+                }
+            ?></ol>
+        </div><?php
+    }
     
     // Első műveletként annak ellenőrzése, hogy ha a felhasználó írni szeretné az eszközt,
     // akkor rendelkezik-e a szükséges jogosultságokkal
@@ -379,13 +382,8 @@ else
                     </div>
                 </div><?php
             }
-
-
         ?></div><?php
-        
-        
-        
-        
+
         // Szerkesztő gombok
         if($mindir)
         {

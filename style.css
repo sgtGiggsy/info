@@ -285,7 +285,7 @@ ol, ul {
 
 .dyntripplecol {
     display: grid;
-    grid-template-columns: minmax(0px, 1fr) minmax(0px, 1fr) minmax(0px, max-content);
+    grid-template-columns: minmax(0px, 1fr) minmax(0px, max-content) minmax(max-content, 0.5fr);
     grid-gap: 1em;
 }
 
@@ -366,7 +366,7 @@ ol, ul {
     display: grid;
     display: -ms-grid;
     -ms-grid-columns: 1fr 2fr;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: max-content minmax(min-content, max-content);
 }
 
 .infoboxbodytwocol div {
@@ -379,6 +379,10 @@ ol, ul {
 
 .infobox thead {
     background-color: var(--infoboxthead);
+}
+
+.infobox table {
+    max-width: unset;
 }
 
 .infoboxbody tr:nth-child(odd) {
@@ -540,7 +544,7 @@ button, .submit input, input[type="submit"] {
     color: var(--fontlight2);
     background-color: var(--button);
     border: 1px solid;
-    border-radius: 6px;
+    border-radius: 0.25em;
     border-color: var(--buttonborder);
     transition: 0.3s;
     background-image: none;
