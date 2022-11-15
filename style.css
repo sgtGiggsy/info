@@ -79,6 +79,11 @@
     --footerbg: #000000;
     --loadercolor: #3498db;
     --warning: #990000;
+    --addnewborder: #33343a;
+    --alacsony: #3fbb01;
+    --halaszthato: #b4fc00;
+    --urgent: #c04d00;
+    --important: #e1bc00;
 }
 
 /* ------------------------------- Az oldal "alapbeállításai" ------------------------------- */
@@ -294,7 +299,7 @@ ol, ul {
     max-width: max-content;
     max-height: 55vh;
     overflow: hidden;
-    /*margin: 0 auto;*/
+    margin: 0 auto;
 }
 
 .infobox a {
@@ -306,6 +311,8 @@ ol, ul {
 .infoboxtitle {
     /*background-color: var(--cardtitle);*/
     background-color: var(--infoboxtitle);
+    position: relative;
+    display: flex;
     font-weight: bold;
     font-size: 1.1em;
     padding: 0.8em !important;
@@ -393,6 +400,45 @@ ol, ul {
     background-color: var(--infoboxsore);
 }
 
+.infoboxkepek {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 200px));
+    padding: 0 !important;
+}
+
+.infoboxkepek img {
+    max-width: 200px;
+    max-height: 200px;
+}
+
+.fullheight {
+    max-height: unset;
+}
+
+.clickimage a img:hover {
+    cursor: pointer;
+}
+
+div[id^=kep-].enlarge {
+    position: absolute;
+    top: 50%;
+    left: calc(50% + 150px);
+    transform: translate(-50%, -50%);
+    max-width: 80vw;
+    max-height: 80vh;
+    z-index: 99;
+}
+
+div[id^=kep-].enlarge img {
+    max-width: 80%;;
+    max-height: 80%;
+}
+
+div[id^=kep-].shrink img {
+    max-width: 200px;
+    max-height: 200px;
+}
+
 /* Felületek megjelenése */
 /* Szerkesztő felület */
 .szerkcard {
@@ -408,6 +454,7 @@ ol, ul {
     font-size: 1.3em;
     font-weight: bold;
     padding: 1em;
+    position: relative;
 }
 
 .szerkcardoptions {
@@ -792,9 +839,9 @@ input:checked + .slider:before {
 /* Az elemek container-e */
 .select-items {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 10ch);
-    min-width: 10ch;
+    min-width: 10em;
     max-width: 500px;
+    grid-template-columns: repeat(5, minmax(0, min-content));
     min-height: 1em;
     max-height: 300px;
     overflow-y: auto;
@@ -803,6 +850,8 @@ input:checked + .slider:before {
     bottom: 2em;
     right: 0;
     z-index: 99;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
 }
   
 /* Az elemek elrejtése, mikor a select be van zárva */
@@ -870,6 +919,7 @@ td img {
 .tsorth input {
     width: 100%;
     font-size: 0.7em;
+    display: block;
     padding: 5px;
     margin-bottom: 5px;
 }
@@ -894,6 +944,10 @@ td img {
 
 .offline {
     color: var(--offline);
+}
+
+.warning {
+    color: var(--warning);
 }
 
 /* ------------------------------- Egyszerű igazításhoz használt típusok ------------------------------- */
@@ -1190,6 +1244,10 @@ td img {
     background-color: var(--menu);
 }
 
+.leftmenuitem, .leftmenuitem-active, .leftmenusubitem, .leftmenusub-active {
+    position: relative;
+}
+
  .leftmenuitem a:hover, .leftmenuitem a, .leftmenuitem-active a {
     padding: 12px 0px 12px 0px;
 }
@@ -1246,8 +1304,12 @@ td img {
 }
 
 .addnew {
-    float: right;
-    padding-right: 5px;
+    position: absolute;
+    padding: 7px 5px;
+    margin: 5px 0;
+    right: 0;
+    top: 0;
+    border-left: 1px solid var(--addnewborder);
 }
 
 /* ------------------------------- Breadcumbok ------------------------------- */
@@ -1309,10 +1371,13 @@ td img {
 
 /* Lenyílók a címben */
 .szuresvalaszto, .help {
-    position: relative;
-    float: right;
+    position: absolute;
+    right: 6px;
     text-align: right;
-    padding-top: 0px;
+}
+
+.szuresvalaszto {
+    top: 3px;
 }
 
 /* Közlemények */
@@ -1628,6 +1693,81 @@ div[id^=tennivalobody-].close {
 .ures {
     font-weight: normal;
     color: var(--hibas);
+}
+
+#hibajegyek {
+    max-width: unset;
+}
+
+.hibajegyallapotupdate {
+    display: flex;
+    flex-direction: row;
+}
+
+.pickpriority {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    margin-right: 1em;
+}
+
+#prioritas {
+    background-color: var(--cardtitle);
+    position: absolute;
+    visibility: hidden;
+    top: 2em;
+}
+
+#prioritas.show {
+    visibility: visible;
+}
+
+.prioritas th, .prioritas td {
+    width: 10px;
+}
+
+.kesz {
+    background-color: var(--toasterbg);
+}
+
+.alacsony {
+    background-color: var(--alacsony);
+}
+
+.halaszthato {
+    background-color: var(--halaszthato);
+}
+
+.fontos {
+    background-color: var(--important);
+}
+
+.surgos {
+    background-color: var(--urgent);
+}
+
+.kritikus {
+    background-color: var(--warning);
+}
+
+.alacsony-font, .alacsony-font a {
+    color: var(--alacsony);
+}
+
+.halaszthato-font, .halaszthato-font a {
+    color: var(--halaszthato);
+}
+
+.fontos-font, .fontos-font a {
+    color: var(--important);
+}
+
+.surgos-font, .surgos-font a {
+    color: var(--urgent);
+}
+
+.kritikus-font, .kritikus-font a {
+    color: var(--warning);
 }
 
 /* ------------------------------- Overlayek ------------------------------- */

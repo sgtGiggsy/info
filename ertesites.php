@@ -25,5 +25,4 @@ if(isset($felhasznaloid))
         $stmt->bind_param('ii', $latta, $felhasznaloid);
         $stmt->execute();
     }
-
 }

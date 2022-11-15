@@ -318,6 +318,28 @@ function eszkozPicker($current = false, $beepitett)
 	}
 }
 
+function epuletPicker($current)
+{
+	$epuletek = mySQLConnect("SELECT epuletek.id AS id,
+			szam AS epuletszam,
+			epuletek.nev AS epuletnev,
+			epulettipusok.tipus AS tipus
+        FROM epuletek
+            LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
+		ORDER BY epuletek.szam;");
+
+	?><div>
+	<label for="epulet">Épület:</label><br>
+	<select id="epulet" name="epulet">
+		<option value="" selected></option><?php
+		foreach($epuletek as $x)
+		{
+			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?= $x['epuletszam'] . ". " . $x['tipus'] . ($x['epuletnev']) ? " (" . $x['epuletnev'] . ")" : "" ?></option><?php
+		}
+	?></select>
+	</div><?php
+}
+
 function helyisegPicker($current, $selectnev)
 {
 	$helyisegek = mySQLConnect("SELECT
@@ -327,9 +349,8 @@ function helyisegPicker($current, $selectnev)
             helyisegnev,
             epulet AS epuletid,
             epuletek.nev AS epuletnev
-        FROM
-            helyisegek LEFT JOIN
-                epuletek ON helyisegek.epulet = epuletek.id
+        FROM helyisegek
+			LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
         ORDER BY epuletszam + 0, helyisegszam;");
 
 	?><div>
@@ -826,4 +847,20 @@ function vegpontLista($portok)
 			?></div></div></a>
 		</div><?php
 	}
+}
+
+function quickXSSfilter($string)
+{
+	$string = str_replace("<", "&lt;", $string);
+	$string = str_replace(">", "&gt;", $string);
+	$string = str_replace("{", "&#123;", $string);
+	$string = str_replace("}", "&#125;", $string);
+	$string = str_replace("$", "&#36;", $string);
+	$string = str_replace("(", "&#40;", $string);
+	$string = str_replace(")", "&#41;", $string);
+	return $string;
+}
+
+function hashId($n) {
+    return (((0x0000FFFF & $n) << 16) + ((0xFFFF0000 & $n) >> 16));
 }

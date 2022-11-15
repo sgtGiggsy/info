@@ -4,7 +4,7 @@
     --basefont: #c4cccc !important;
     --fontlight: #c4cccc !important;
     --fontlight2: #c4cccc !important;
-    --contentbg: #222228 !important;
+    --contentbg: #222328 !important;
     --menu: #1e1f23 !important;
     --menuhover: #16171a !important;
     --submenu: #40454d !important;
@@ -55,6 +55,11 @@
     --footerbg: #141414 !important;
     --loadercolor: #3498db !important;
     --warning: #990000 !important;
+    --addnewborder: #33343a !important;
+    --alacsony: #3fbb01;
+    --halaszthato: #b4fc00;
+    --urgent: #c04d00;
+    --important: #e1bc00;
 }
 
 .dontprint img, .infoboxtitle img, td img{

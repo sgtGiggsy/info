@@ -12,7 +12,7 @@
 		?><link rel="stylesheet" href="<?=$RootPath?>/<?=$szemelyes['szinsema']?>.css" type="text/css"><?php
 	}
 	?><link rel="stylesheet" href="<?=$RootPath?>/style.css" type="text/css">
-	<title><?=$ablakcim . " - " . $currentpage['cimszoveg']?></title>
+	<title><?=$ablakcim . " - " . $currentpage['gyujtocimszoveg']?></title>
 </head>
 
 <body>
@@ -353,17 +353,30 @@
 			);
 	}
 
+	function enlargeImage(id) {
+		var x = document.getElementById(id);
+
+		if(x.className == "enlarge")
+		{
+			x.className = x.className.replace("enlarge", "shrink");
+		}
+		else
+		{
+			x.className = "enlarge";
+		};
+	}
+
 	function updateNotif() {
 		$.ajax({
         type: "POST",
-        url: "<?=$RootPath?>/notifseendb?action=checkednotif",
+        url: "<?=$RootPath?>/ertesites?action=checkednotif",
 	});
 	}
 
 	function seenAllNotif() {
 		$.ajax({
         	type: "POST",
-        	url: "<?=$RootPath?>/notifseendb?action=seenallnotif",
+        	url: "<?=$RootPath?>/ertesites?action=seenallnotif",
 		});
 
 		document.getElementById("notifcount").style.display = "none"
@@ -372,7 +385,7 @@
 	function seenNotif(notifid) {
 		$.ajax({
         	type: "POST",
-        	url: "<?=$RootPath?>/notifseendb?action=seennotif&notifid=" + notifid,	
+        	url: "<?=$RootPath?>/ertesites?action=seennotif&notifid=" + notifid,	
 		});
 	}
 
@@ -454,6 +467,11 @@
 	if(@$succesmessage)
 	{
 		?>showToaster("<?=$succesmessage?>");<?php
+	}
+
+	if(@$nyithelp)
+	{
+		?>rejtMutat('magyarazat');<?php
 	}
 
 	if(@$sorozatszamok)

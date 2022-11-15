@@ -164,9 +164,9 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
             session_regenerate_id();
             if(mysqli_num_rows($result) == 1) // Ez az egyedüli "Sikeres bejelentkezés" ág. Bármely más ágra fut ki a modul, a bejelentkezés sikertelen
             {
-                $userdbid = mysqli_fetch_assoc($result)['id'];
+                $userid = mysqli_fetch_assoc($result)['id'];
                 $_SESSION[getenv('SESSION_NAME').'id'] = true;
-                logLogin($userdbid);
+                logLogin($userid);
                 print_r($_GET['kuldooldal']);
                 $loginsuccess = true;
             }
@@ -212,6 +212,7 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
         $_SESSION[getenv('SESSION_NAME').'felhasznalonev'] = $row['felhasznalonev'];
         $_SESSION[getenv('SESSION_NAME').'nev'] =  $row['nev'];
         $_SESSION['profilkep'] =  $row['profilkep'];
+        $alakulat = $row['alakulat'];
 
         // Ez a rész gondoskodik róla, hogy ha egy adott oldalt próbált a felhasználó felkeresni,
         // a sikeres bejelentkezés után vissza legyen oda irányítva
@@ -270,7 +271,8 @@ else
     $pagetofind = $_GET['page'];
 }
 
-// Felhasználó jogosultságainak lekérése, a menüpontok is ezalapján jelennek meg
+// Felhasználó jogosultságainak lekérése, a menüpontok is ezalapján jelennek meg,
+// innentől kezdve a $felhasznaloid változónak bejelentkezett felhasználó esetén léteznie KELL
 if($_SESSION[getenv('SESSION_NAME').'id'])
 {
     $felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
