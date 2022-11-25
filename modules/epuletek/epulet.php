@@ -103,6 +103,7 @@ else
     elseif($irhat && $_GET['action'] == "szamtarsitas")
     {
         $where = $magyarazat = null;
+        $maxhidra = 4;
 
         $eptkpquery = mySQLConnect("SELECT telefonkozpont FROM epuletek WHERE id = $id");
         $epuletkozpont = mysqli_fetch_assoc($eptkpquery)['telefonkozpont'];
@@ -119,9 +120,14 @@ else
                 ORDER BY portok.port;");
         $telefonszamok = mySQLConnect("SELECT telefonszamok.id AS id, szam, cimke, telefonszamok.port AS port
                 FROM telefonszamok
-                    INNER JOIN tkozpontportok ON telefonszamok.tkozpontport = tkozpontportok.port
+                    LEFT JOIN tkozpontportok ON telefonszamok.tkozpontport = tkozpontportok.port
                 $where
                 ORDER BY szam;");
+
+        if(mysqli_num_rows($epuletportok) > 150)
+        {
+            $maxhidra = 2;
+        }
 
         $epuletportok = mysqliNaturalSort($epuletportok, 'port');
 

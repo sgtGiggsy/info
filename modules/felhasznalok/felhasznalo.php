@@ -1,7 +1,7 @@
 <?php
 // Ha nincs bejelentkezett felhasználó,
 // vagy van, de írási művelettel próbálkozik írási jog nélkül
-if((isset($_GET['id']) && $_GET['id'] != @$_SESSION[getenv('SESSION_NAME').'id'] && !$mindolvas) || (!$mindir && isset($_GET['action'])))
+if((isset($_GET['id']) && $_GET['id'] != @$felhasznaloid && !$mindolvas) || (!$mindir && isset($_GET['action'])))
 {
     getPermissionError();
 }
@@ -153,7 +153,7 @@ else
     }
     else
     {
-        $felhid = $_SESSION[getenv('SESSION_NAME').'id'];
+        $felhid = $felhasznaloid;
     }
     
     $query = mySQLConnect("SELECT felhasznalok.id as felhid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, alakulatok.nev AS alakulat

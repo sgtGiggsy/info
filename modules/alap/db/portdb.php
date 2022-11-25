@@ -3,7 +3,6 @@
 if(isset($mindir) && $mindir)
 {
     $con = mySQLConnect(false);
-    $user = $_SESSION[getenv('SESSION_NAME').'id'];
     $timestamp = date('Y-m-d H:i:s');
 
     foreach($_POST as $key => $value)

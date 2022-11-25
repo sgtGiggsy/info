@@ -1,6 +1,6 @@
 <?php
 
-if(@!$midir)
+if(@!$mindir)
 {
     getPermissionError();
 }

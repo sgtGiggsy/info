@@ -2,10 +2,15 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-
             <form action="<?=$RootPath?>/epulet?action=szamtarsitas<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
                 <div class="portparositas"><?php
 
+                    $magyarazat = "<h2>Portok telefonszámmal társítása</h2>";
+                    $magyarazat .= "<strong>Előzetes tudnivaló</strong><p>A telefonszámok és épületportok igen jelentős száma miatt
+                        ha egy épületben 150-nél több végpont van, úgy erről az oldalról egy porthoz legfeljebb két számot lehet csatlakoztatni.
+                        Erre a rendszer limitációi miatt van szükség (A 150. port után a számtársítások nem mentődnének el,
+                        és 200 port felett a szerkesztő oldal be sem töltődne be rendesen, ha a rendszer engedné, hogy mindig 4 szám társítódhasson egy végponthoz.
+                        Amennyiben 150 portosnál nagyobb épületben kellene egy portra kettőnél több számot kirendezni, úgy a fennmaradó számokat a telefonszámok menüpontban kell hozzáadni.</p>";
                     $i = 1;
                     // Tömb a már megtalált számok részére. Erre azért van szükség, mert egy porton
                     // akár négy szám is futhat, de egy szám nem futhat több porton.
@@ -22,7 +27,7 @@ if(@$irhat)
 
                                 // Mivel egy nyolceres végponton négy szám lehet,
                                 // négy formot hozunk létre hozzá
-                                for($j = 1; $j < 5; $j++)
+                                for($j = 1; $j < $maxhidra+1; $j++)
                                 {
                                     $hozzaadott = false;
                                     ?><select id="telefonszam-<?=$i?>-<?=$j?>" name="telefonszam-<?=$i?>-<?=$j?>">
@@ -57,6 +62,10 @@ if(@$irhat)
                                     if($hozzaadott)
                                     {
                                         ?><input type ="hidden" id="nullid-<?=$i?>-<?=$j?>" name="nullid-<?=$i?>-<?=$j?>" value="<?=$hozzaadott?>"><?php
+                                    }
+                                    else
+                                    {
+                                        break;
                                     }
                                 }
                             ?></div>

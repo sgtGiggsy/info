@@ -19,7 +19,7 @@ else
     if($_GET["action"] == "new")
     {
         $stmt = $con->prepare('INSERT INTO bugok (cim, leiras, felhasznalo, oldal, tipus, prioritas) VALUES (?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('ssssss', $_POST['cim'], $_POST['leiras'], $_SESSION[getenv('SESSION_NAME').'id'], $_POST['oldal'], $_POST['tipus'],  $_POST['prioritas']);
+        $stmt->bind_param('ssssss', $_POST['cim'], $_POST['leiras'], $felhasznaloid, $_POST['oldal'], $_POST['tipus'],  $_POST['prioritas']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
