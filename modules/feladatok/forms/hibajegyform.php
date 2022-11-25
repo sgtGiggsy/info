@@ -53,11 +53,11 @@ if(@$irhat)
                     <b>Rendszer</b> utána <b>Eszköz megnevezése</b></i></p>"; ?>
 
                 <div>
-                    <label for="tipus">A meghibásodott eszköz típusa:</label><br>
-                    <select name="tipus" id="tipus">
+                    <label for="szakid">A meghibásodott eszköz típusa:</label><br>
+                    <select name="szakid" id="szakid">
                         <option value="" selected></option>
-                        <option value="1" <?=($tipus == 1) ? "selected" : "" ?>>Híradó</option>
-                        <option value="2" <?=($tipus == 2) ? "selected" : "" ?>>Informatika</option>
+                        <option value="1" <?=($szakid == 1) ? "selected" : "" ?>>Híradó</option>
+                        <option value="2" <?=($szakid == 2) ? "selected" : "" ?>>Informatika</option>
                     </select>
                 </div>
 

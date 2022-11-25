@@ -12,7 +12,7 @@ else
 
     // Először kiválasztjuk a megjelenítendő hibajegyek listáját.
     // Plusz jogosultság nélkül mindenki csak a sajátját látja.
-    $where = "WHERE (szerepkor IS NULL OR szerepkor > 2) AND (hibajegyallapotok.id = (SELECT MAX(hjstate.id) FROM hibajegyallapotok hjstate WHERE hjstate.hibajegy = hibajegyallapotok.hibajegy) OR hibajegyallapotok.id IS NULL)";
+    $where = "WHERE feladattipus = 1 AND (feladatallapotok.id = (SELECT MAX(hjstate.id) FROM feladatallapotok hjstate WHERE hjstate.feladat = feladatallapotok.feladat) OR feladatallapotok.id IS NULL)";
     if($mindolvas)
     {}
     elseif($csoportolvas)
@@ -21,29 +21,29 @@ else
     }
     elseif($sajatolvas)
     {
-        $where .= " AND hibajegyek.felhasznalo = $felhasznaloid";
+        $where .= " AND feladatok.felhasznalo = $felhasznaloid";
     }
 
-    $hibajegyek = mySQLConnect("SELECT hibajegyek.id AS hibid,
+    $hibajegyek = mySQLConnect("SELECT feladatok.id AS hibid,
             felhasznalok.alakulat AS alakulat, alakulatok.rovid AS alakulatnev,
-            felhasznalok.nev AS bejelento, hibajegyek.allapot AS allapot,
-            hibajegyek.rovid AS rovid, bejelentesideje, eszkozneve,
+            felhasznalok.nev AS bejelento, feladatok.allapot AS allapot,
+            feladatok.rovid AS rovid, feladatok.timestamp AS bejelentesideje, eszkozneve,
             epuletek.nev AS epuletnev, epuletek.szam AS epuletszam,
             helyisegnev, helyisegszam,
-            hibajegyvaltozastipusok.nev AS valtozastipus, modositok.nev AS modosito,
-            szakok.nev AS tipus, megjegyzes, timestamp, prioritas,
-            (SELECT count(id) FROM hibajegyfajlok WHERE hibajegy = hibid) AS csatolmanyok
-        FROM hibajegyek
-            INNER JOIN felhasznalok ON hibajegyek.felhasznalo = felhasznalok.id
-            LEFT JOIN hibajegyallapotok ON hibajegyallapotok.hibajegy = hibajegyek.id
-            LEFT JOIN hibajegyvaltozastipusok ON hibajegyallapotok.valtozastipus = hibajegyvaltozastipusok.id
+            allapottipusok.folyamat AS allapottipus, modositok.nev AS modosito,
+            szakok.nev AS tipus, megjegyzes, feladatallapotok.timestamp AS timestamp, feladatok.prioritas AS prioritas,
+            (SELECT count(id) FROM feladatfajlok WHERE feladat = hibid) AS csatolmanyok
+        FROM feladatok
+            INNER JOIN felhasznalok ON feladatok.felhasznalo = felhasznalok.id
+            LEFT JOIN feladatallapotok ON feladatallapotok.feladat = feladatok.id
+            LEFT JOIN allapottipusok ON feladatallapotok.allapottipus = allapottipusok.id
             LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
-            LEFT JOIN felhasznalok modositok ON hibajegyallapotok.felhasznalo = modositok.id
-            LEFT JOIN helyisegek ON hibajegyek.helyiseg = helyisegek.id
-            LEFT JOIN epuletek ON hibajegyek.epulet = epuletek.id
-            LEFT JOIN szakok ON hibajegyek.tipus = szakok.id
+            LEFT JOIN felhasznalok modositok ON feladatallapotok.felhasznalo = modositok.id
+            LEFT JOIN helyisegek ON feladatok.helyiseg = helyisegek.id
+            LEFT JOIN epuletek ON feladatok.epulet = epuletek.id
+            LEFT JOIN szakok ON feladatok.szakid = szakok.id
         $where
-        ORDER BY bejelentesideje DESC");
+        ORDER BY feladatok.timestamp DESC");
 
     if($sajatir) 
     {
@@ -62,8 +62,8 @@ else
         array('nev' => 'Csatolmány', 'tipus' => 's'),
         array('nev' => 'Épület', 'tipus' => 's'),
         array('nev' => 'Helyiség', 'tipus' => 's'),
-        array('nev' => 'Ügyintéző', 'tipus' => 's'),
-        array('nev' => 'Ügyintéző megjegyzése', 'tipus' => 's'),
+        array('nev' => 'Utolsó módosítás', 'tipus' => 's'),
+        array('nev' => 'Legutóbbi megjegyzés', 'tipus' => 's'),
         array('nev' => 'Módosítás ideje', 'tipus' => 's')
     );
     ?><div class='oldalcim'>Bejelentett hibák listája</div>
@@ -73,8 +73,13 @@ else
                 if($mindir)
                 {
                     ?><th class="prioritas"></th><?php
+                    $i = 1;
                 }
-                $i = 0;
+                else
+                {
+                    $i = 0;
+                }
+                
                 foreach($oszlopok as $oszlop)
                 {
                     ?><th class="tsorth"><p><span class="dontprint"><input size="1" type="text" id="f<?=$i?>" onkeyup="filterTable('f<?=$i?>', '<?=$tipus?>', <?=$i?>)" placeholder="<?=$oszlop['nev']?>" title="<?=$oszlop['nev']?>"><br></span><span onclick="sortTable(<?=$i?>, '<?=$oszlop['tipus']?>', '<?=$tipus?>')"><?=$oszlop['nev']?></span></p></th><?php
@@ -100,9 +105,9 @@ else
 
                 if($hibajegy['allapot'] == 1)
                 {
-                    if($hibajegy['valtozastipus'])
+                    if($hibajegy['allapottipus'])
                     {
-                        $allapot = $hibajegy['valtozastipus'];
+                        $allapot = $hibajegy['allapottipus'];
                     }
                     else
                     {
@@ -115,7 +120,7 @@ else
                     $szint = "kesz";
                 }
 
-                $hibid = hashId($hibajegy['hibid'])
+                $hibid = cryptId($hibajegy['hibid'])
 
                 ?><tr class='kattinthatotr' data-href='./hibajegy/<?=$hibid?>'><?php
                     if($mindir)

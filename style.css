@@ -510,6 +510,7 @@ div[id^=kep-].shrink img {
 }
 
 .menucardtitle {
+    position: relative;
     background-color: var(--cardtitle);
     border-bottom: 1px var(--midborder) solid;
     font-size: 1em;
@@ -1701,21 +1702,41 @@ div[id^=tennivalobody-].close {
 
 .hibajegyallapotupdate {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hibajegyallapotupdate div {
+    padding: 0.5em;
 }
 
 .pickpriority {
     position: relative;
     display: block;
-    cursor: pointer;
     margin-right: 1em;
 }
 
+.pickpriority a {
+    cursor: pointer;
+}
+
 #prioritas {
-    background-color: var(--cardtitle);
+    background-color: var(--menu);
+    box-shadow: 2px 5px 5px var(--shadow);
     position: absolute;
     visibility: hidden;
-    top: 2em;
+    top: 1.85em;
+}
+
+#prioritas a {
+    color: var(--basefont);
+    display: block;
+    padding: 0.4em 1em 0.4em 1em;
+}
+
+#prioritas a:hover {
+    color: var(--linkhover);
+    background-color: var(--menuhover);
 }
 
 #prioritas.show {
@@ -1768,6 +1789,38 @@ div[id^=tennivalobody-].close {
 
 .kritikus-font, .kritikus-font a {
     color: var(--warning);
+}
+
+.felelos {
+    display: inline-flex;
+    justify-content: flex-end;
+}
+
+.bejelento {
+    display: inline-flex;
+    justify-content: flex-start;
+    text-align: right;
+}
+
+.allapotvaltozas {
+    width: 50%;
+    margin: 0.3em;
+    padding: 0.5em;
+}
+
+.allapotvaltozasfej {
+    font-size: 1.5em;
+    font-variant: small-caps;
+    font-weight: bold;
+}
+
+.allapotvaltozasbody {
+    padding: 0.3em 1em;
+}
+
+.allapotvaltozasmeta {
+    padding: 0 1em;
+    font-size: 0.7em;
 }
 
 /* ------------------------------- Overlayek ------------------------------- */

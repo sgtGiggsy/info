@@ -861,6 +861,13 @@ function quickXSSfilter($string)
 	return $string;
 }
 
-function hashId($n) {
-    return (((0x0000FFFF & $n) << 16) + ((0xFFFF0000 & $n) >> 16));
+function cryptId($n) {
+	$n = ($n + 3) * 7;
+	$val = (((0x0000FFFF & $n) << 16) + ((0xFFFF0000 & $n) >> 16)) / 7;
+    return $val;
+}
+
+function encryptId($n) {
+    $val = (((0x0000FFFF & $n) << 16) + ((0xFFFF0000 & $n) >> 16)) * 7;
+	return $val / 7 - 3;
 }
