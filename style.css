@@ -1629,6 +1629,36 @@ div[id^=tennivalobody-].close {
     box-shadow: 3px 3px 3px var(--shadow);
 }
 
+/* -- Csoportok -- */
+.csoportokwrap {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 25em);
+    grid-gap: 1em;
+}
+
+.csoport {
+    max-width: unset;
+    max-height: unset;
+    width: 25em;
+}
+
+.csoportbody {
+    padding-bottom: 1em !important;
+    max-height: unset;
+}
+
+.csoportbody div {
+    margin: 0.4em 0;
+}
+
+.csoportbody div a {
+    color: var(--basefont);
+}
+
+.csoportlink a {
+    color: var(--link) !important;
+}
+
 /* --- Aktív eszköz --- */
 .reszhibas, .mukodeskeptelen {
     font-style: italic;
