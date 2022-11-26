@@ -31,29 +31,34 @@ if(isset($irhat) && $irhat)
     {
         if(isset($_POST['id']))
         {
-            $hibid = decryptid($_POST['id']);
+            $hibid = $_POST['id'];
         }
         else
         {
-            $hibid = decryptid($_POST['feladat']);
+            $hibid = $_POST['feladat'];
         }
-        $felhasznaloquery = mySQLConnect("SELECT felhasznalok.id AS id, felhasznalok.nev AS nev, felhasznalok.alakulat AS alakulat, feladatok.szakid AS szak
+        
+        $felhasznaloquery = mySQLConnect("SELECT felhasznalok.id AS id, felhasznalok.nev AS nev,
+                    felhasznalok.alakulat AS alakulat, feladatok.szakid AS szak,
+                    feladatok.id AS feladatid
                 FROM felhasznalok
                     LEFT JOIN feladatok ON feladatok.felhasznalo = felhasznalok.id
-                WHERE feladatok.id = $hibid");
+                WHERE feladatok.pubid = $hibid");
         $felhasznalo = mysqli_fetch_assoc($felhasznaloquery);
         
         $origfelhasznaloneve = $felhasznalo['nev'];
         $origfelhasznaloid = $felhasznalo['id'];
         $origalakulat = $felhasznalo['alakulat'];
         $origszak = $felhasznalo['szak'];
+        $origid = $felhasznalo['feladatid'];
     }
 
     if($_GET["action"] == "new")
     {
         $feladattipus = "1";
-        $stmt = $con->prepare('INSERT INTO feladatok (felhasznalo, rovid, bovitett, fajl, eszkozneve, szakid, epulet, helyiseg, feladattipus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssssssss', $felhid, $_POST['rovid'], $_POST['bovitett'], $_POST['fajl'], $_POST['eszkozneve'], $_POST['szakid'], $_POST['epulet'], $_POST['helyiseg'], $feladattipus);
+        $pubid = rand(2000000, 15000000); // Kell egy induló pubid, mert ha van null érték a pubid oszlopban, akkor a random generálás nem tud mihez hasonlítani, és ezért nem is generál számot
+        $stmt = $con->prepare('INSERT INTO feladatok (felhasznalo, rovid, bovitett, fajl, eszkozneve, szakid, epulet, helyiseg, feladattipus, pubid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('ssssssssss', $felhid, $_POST['rovid'], $_POST['bovitett'], $_POST['fajl'], $_POST['eszkozneve'], $_POST['szakid'], $_POST['epulet'], $_POST['helyiseg'], $feladattipus, $pubid);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
@@ -62,7 +67,15 @@ if(isset($irhat) && $irhat)
         }
 
         $origid = mysqli_insert_id($con);
-        $last_id = encryptid($origid);
+
+        mySQLConnect("UPDATE feladatok SET pubid = (
+                SELECT FLOOR(1 + RAND() * 999999) AS random_num 
+                FROM feladatok
+                WHERE 'random_num' NOT IN (SELECT pubid FROM feladatok) LIMIT 1)
+            WHERE id = $origid");
+
+        $lastrow = mySQLConnect("SELECT pubid FROM feladatok WHERE id = $origid");
+        $last_id = mysqli_fetch_assoc($lastrow)['pubid'];
 
         $felhasznaloquery = mySQLConnect("SELECT nev FROM felhasznalok WHERE id = $felhid");
         $felhasznaloneve = mysqli_fetch_assoc($felhasznaloquery)['nev'];
@@ -72,7 +85,6 @@ if(isset($irhat) && $irhat)
 
     elseif($_GET["action"] == "update")
     {
-        $origid = decryptid($_POST['id']);
         $sorszam = $_POST['id'];
         $stmt = $con->prepare('UPDATE feladatok SET felhasznalo=?, rovid=?, bovitett=?, fajl=?, eszkozneve=?, szakid=?, epulet=?, helyiseg=? WHERE id=?');
         $stmt->bind_param('ssssssssi', $_POST['felhasznalo'], $_POST['rovid'], $_POST['bovitett'], $_POST['fajl'], $_POST['eszkozneve'], $_POST['szakid'], $_POST['epulet'], $_POST['helyiseg'], $origid);
@@ -88,7 +100,6 @@ if(isset($irhat) && $irhat)
 
     elseif($_GET["action"] == "stateupdate")
     {
-        $origid = decryptid($_POST['feladat']);
         $sorszam = $_POST['feladat'];
         if($csoportir)
         {

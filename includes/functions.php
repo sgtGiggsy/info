@@ -876,8 +876,8 @@ function hibajegyErtesites($ertesites, $szoveg, $hibajegyid, $felhasznalo, $alak
 					INNER JOIN csoportjogok ON csoporttagsagok.csoport = csoportjogok.csoport
 					INNER JOIN jogosultsagok ON jogosultsagok.felhasznalo = csoporttagsagok.felhasznalo
     			WHERE menupont = 11 AND iras > 1 AND csoportjogok.alakulat = $alakulat $szak
-				UNION
-				SELECT id AS felhasznalo, '$ertesitesid' FROM felhasznalok WHERE id = $felhasznalo;");
+			UNION
+			SELECT id AS felhasznalo, '$ertesitesid' FROM felhasznalok WHERE id = $felhasznalo;");
 }
 
 function quickXSSfilter($string)
@@ -890,15 +890,4 @@ function quickXSSfilter($string)
 	$string = str_replace("(", "&#40;", $string);
 	$string = str_replace(")", "&#41;", $string);
 	return $string;
-}
-
-function encryptid($n) {
-	$n = ($n + 3) * 7;
-	$val = (((0x0000FFFF & $n) << 16) + ((0xFFFF0000 & $n) >> 16)) / 7;
-    return $val;
-}
-
-function decryptid($n) {
-    $val = (((0x0000FFFF & $n) << 16) + ((0xFFFF0000 & $n) >> 16)) * 7;
-	return $val / 7 - 3;
 }

@@ -24,7 +24,7 @@ else
         $where .= " AND feladatok.felhasznalo = $felhasznaloid";
     }
 
-    $hibajegyek = mySQLConnect("SELECT feladatok.id AS hibid,
+    $hibajegyek = mySQLConnect("SELECT feladatok.id AS hibid, pubid,
             felhasznalok.alakulat AS alakulat, alakulatok.rovid AS alakulatnev,
             felhasznalok.nev AS bejelento, feladatok.allapot AS allapot,
             feladatok.rovid AS rovid, feladatok.timestamp AS bejelentesideje, eszkozneve,
@@ -120,7 +120,7 @@ else
                     $szint = "kesz";
                 }
 
-                $hibid = encryptid($hibajegy['hibid'])
+                $hibid = $hibajegy['pubid']
 
                 ?><tr class='kattinthatotr' data-href='./hibajegy/<?=$hibid?>'><?php
                     if($mindir)

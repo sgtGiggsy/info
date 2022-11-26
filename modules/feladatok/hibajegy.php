@@ -60,8 +60,7 @@ else
         // Először kiválasztjuk a megjelenítendő hibajegyek listáját.
         // Plusz jogosultság nélkül mindenki csak a sajátját látja.
 
-        $origid = decryptid($id);
-        $where = "WHERE feladatok.id = $origid AND feladattipus = 1";
+        $where = "WHERE feladatok.pubid = $id AND feladattipus = 1";
 
         if($mindolvas)
         {}
@@ -106,6 +105,7 @@ else
             $szakid = $hibajegy['tipus'];
             $epulet = $hibajegy['epulet'];
             $helyiseg = $hibajegy['helyiseg'];
+            $origid = $hibajegy['hibid'];
 
             $hibajegyallapotok = mySQLConnect("SELECT felhasznalok.nev AS felhasznalo,
                     allapottipusok.folyamat AS esemeny,
@@ -177,9 +177,8 @@ else
                     {
                         if(isset($_GET['setpriority']))
                         {
-                            $hibajegyid = decryptid($id);
                             $prioritasid = $_GET['setpriority'];
-                            mySQLConnect("UPDATE feladatok SET prioritas = $prioritasid WHERE id = $hibajegyid");
+                            mySQLConnect("UPDATE feladatok SET prioritas = $prioritasid WHERE id = $origid");
                             header("Location: $RootPath/hibajegy/$id");
                         }
                         else
