@@ -226,7 +226,6 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
             {
                 header("Location: $RootPath/" . $_GET['kuldooldal'] . "?sikeres=bejelentkezes");
             }
-            die;
         }
     }
     else
@@ -284,6 +283,13 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
 {
     $szemelyesbeallitasok = mySQLConnect("SELECT * FROM szemelyesbeallitasok WHERE felhid = $felhasznaloid");
     $szemelyes = mysqli_fetch_assoc($szemelyesbeallitasok);
+
+    // Csoporttagságok begyüjtése
+    $csoporttagsagok = mySQLConnect("SELECT csoportok.nev AS csoportnev, alakulat
+        FROM csoportok
+            INNER JOIN csoporttagsagok ON csoportok.id = csoporttagsagok.csoport
+            LEFT JOIN csoportjogok ON csoportjogok.csoport = csoporttagsagok.csoport
+        WHERE felhasznalo = $felhasznaloid;");
 }
 
 // Menüterületeket tároló tömb elkészítése

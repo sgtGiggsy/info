@@ -60,7 +60,7 @@ else
         // Először kiválasztjuk a megjelenítendő hibajegyek listáját.
         // Plusz jogosultság nélkül mindenki csak a sajátját látja.
 
-        $origid = encryptId($id);
+        $origid = decryptid($id);
         $where = "WHERE feladatok.id = $origid AND feladattipus = 1";
 
         if($mindolvas)
@@ -76,9 +76,9 @@ else
 
         $hibajegy = mySQLConnect("SELECT feladatok.id AS hibid,
                 feladatok.felhasznalo AS felhasznalo,
-                alakulatok.nev AS alakulat, hatarido, elhalasztva,
-                felhasznalok.nev AS bejelento,
-                telefon,
+                alakulatok.nev AS alakulat, alakulatok.id AS alakulatid,
+                hatarido, elhalasztva, felhasznalok.nev AS bejelento,
+                felhasznalok.id AS bejelentoid, telefon,
                 feladatok.rovid AS rovid, bovitett, timestamp AS bejelentesideje,
                 eszkozneve, allapot, feladatok.epulet AS epulet, helyiseg,
                 feladatok.szakid AS tipus, prioritas, prioritasok.nev AS prioritasnev, 
@@ -149,17 +149,35 @@ else
     // Ha van megadott id, úgy a hiba adatainak megjelenítése
     elseif($id)
     {
+        // Megállapítjuk, hogy a felhasználó írhatja-e felelősként a hibajegyet
+        $irhat = false;
+        if($mindir)
+        {
+            $irhat = true;
+        }
+        elseif($csoportir)
+        {
+            foreach($csoporttagsagok as $csoport)
+            {
+                if($csoport['alakulat'] == $alakulat)
+                {
+                    $irhat = true;
+                    break;
+                }
+            }
+        }
+        
         // A hibajegy felső sora a szerkesztéssel, és help-pel
         ?><div class="dyntripplecol">
             <div class="infobox fullheight">
                 <div class="infoboxtitle"><?php
 
-                    // A prioritásválasztó menü megjelenítése a hiba fejlécében a $mindir jogó felhasználók részére
-                    if($mindir)
+                    // A prioritásválasztó menü megjelenítése a hiba fejlécében az írás jogú felhasználók részére
+                    if($irhat)
                     {
                         if(isset($_GET['setpriority']))
                         {
-                            $hibajegyid = encryptId($id);
+                            $hibajegyid = decryptid($id);
                             $prioritasid = $_GET['setpriority'];
                             mySQLConnect("UPDATE feladatok SET prioritas = $prioritasid WHERE id = $hibajegyid");
                             header("Location: $RootPath/hibajegy/$id");
@@ -194,8 +212,9 @@ else
 
                     ?>A(z) <?=$id?>. sorszámú hibajegy adatai<?php
 
-                    // Mindir jogú felhasználók számára, a hibajegy szerkesztésének megjelenítése
-                    if($mindir)
+                    // A mindir joggal rendelkező felhasználók bármely, a csoportir joggal rendelkező
+                    // felhasználók a saját maguk által készített hibajegyek adatait szerkeszthetik
+                    if($mindir || ($csoportir && $felhasznalo == $felhasznaloid))
                     {
                         ?><a class="help" href="<?=$RootPath?>/hibajegy/<?=$id?>?action=edit" onclick="return confirm('Figyelem!!!\nA hibajegy állapotának módosítása NEM szerkesztéssel történik. A hibajegy szerkesztésére KIZÁRÓLAG akkor van szükség, ha a felhasználó rosszul adott meg valamilyen adatot. (A hiba helye, leírása, az eszköz neve, típusa)\n\nBiztosan szerkeszteni szeretnéd a hibajegyet?')"><img src='<?=$RootPath?>/images/edit.png' alt='Hibajegy szerkesztése' title='Hibajegy szerkesztése'/></a><?php
                     }
@@ -249,7 +268,7 @@ else
             </div>
 
             <div class="szerkcard">
-                <div class="szerkcardtitle"><?=($mindir) ? "Állapotváltozás" : "További információ megadása" ?></div>
+                <div class="szerkcardtitle"><?=($irhat) ? "Állapotváltozás" : "További információ megadása" ?></div>
                 <div class="szerkcardbody">
                     <form action="<?=$RootPath?>/hibajegy&action=stateupdate<?=$kuldooldal?>" method="post" enctype="multipart/form-data" onsubmit="beKuld.disabled = true; return true;">
                         <div class="hibajegyallapotupdate">
@@ -257,11 +276,11 @@ else
 
                             <div>
                                 <label for="megjegyzes">Megjegyzés:</label><br>
-                                <textarea name="megjegyzes" id="megjegyzes" <?=(!$mindir) ? "required" : "" ?>></textarea>
+                                <textarea name="megjegyzes" id="megjegyzes" <?=(!$irhat) ? "required" : "" ?>></textarea>
                             </div>
 
                             <div><?php
-                                if($mindir)
+                                if($irhat)
                                 {
                                     ?><div id="halasztas" style="display: none">
                                         <label for="elhalasztva">Elhalasztás:</label><br>
@@ -271,25 +290,24 @@ else
                                     <div id="hatarido" style="display: none;">
                                         <label for="hatarido">Határidő:</label><br>
                                         <input type="date" id="hatarido" name="hatarido">
-                                    </div>
-                                    <?php
+                                    </div><?php
                                 }
 
-                                ?><div id="fajlok" <?=($mindir) ? 'style="display: none;"' : '' ?>>
+                                ?><div id="fajlok" <?=($irhat) ? 'style="display: none;"' : '' ?>>
                                     <label for="fajlok">Fényképek/képernyőképek hozzáadása</label><br>
                                     <input type="file" name="fajlok[]" accept="image/jpeg, image/png, image/bmp" multiple>
                                 </div>
                             </div>
 
                             <div><?php
-                                if($mindir || (!$mindir && $hibajegy['allapot'] == 0))
+                                if($irhat || (!$irhat && $hibajegy['allapot'] == 0))
                                 {
                                     ?><div>
                                         <label for="allapottipus">Állapot</label><br>
                                         <select name="allapottipus" id="allapottipus"><?php
                                         foreach($allapottipusok as $allapottipus)
                                         {
-                                            if($allapottipus['id'] != 0 && (($hibajegy['allapot'] == 1 && $allapottipus['id'] > 20) || ($mindir && $hibajegy['allapot'] == 0 && $allapottipus['id'] == 2) || (!$mindir && $hibajegy['allapot'] == 0 && $allapottipus['id'] == 1)))
+                                            if($allapottipus['id'] != 0 && (($hibajegy['allapot'] == 1 && $allapottipus['id'] > 20) || ($irhat && $hibajegy['allapot'] == 0 && $allapottipus['id'] == 2) || (!$irhat && $hibajegy['allapot'] == 0 && $allapottipus['id'] == 1)))
                                             {
                                                 ?><option value="<?=$allapottipus['id']?>"><?=$allapottipus['nev']?></option><?php
                                             }
@@ -299,7 +317,7 @@ else
                                 }
 
                                 ?><div>
-                                    <input type="submit" name="beKuld" value="<?=($mindir) ? 'Állapot frissítése' : 'Módosítás küldése' ?>">
+                                    <input type="submit" name="beKuld" value="<?=($irhat) ? 'Állapot frissítése' : 'Módosítás küldése' ?>">
                                 </div>
 
                             </div>
@@ -316,10 +334,15 @@ else
             ?><div class='oldalcim'>A hibajegyet még nem nyitotta meg senki a felelősök részéről</div><?php
 
             // Ha írás joggal rendelkező felhasználó nyitja meg, akkor a hibajegy állapota "látott"-ra frissül
-            if($mindir)
+            if($irhat)
             {
                 mySQLConnect("INSERT INTO feladatallapotok (feladat, felhasznalo, allapottipus, szerepkor)
                         VALUES ($origid, $felhasznaloid, '21', '3');");
+
+                $valosnev = $_SESSION[getenv('SESSION_NAME').'nev'];
+                $origfelhasznaloid = $hibajegy['bejelentoid'];
+                $origalakulat = $hibajegy['alakulatid'];
+                hibajegyErtesites("$valosnev frissítette a(z) $id számú hibajegy állapotát", "Megtekintve", $id, $origfelhasznaloid, $origalakulat);
             }
         }
 

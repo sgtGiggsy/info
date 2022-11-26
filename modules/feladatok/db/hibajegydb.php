@@ -16,13 +16,37 @@ if(isset($irhat) && $irhat)
         }
     }
 
-    if($mindir && @$_POST['felhasznalo'])
+    if($csoportir && @$_POST['felhasznalo'])
     {
         $felhid = $_POST['felhasznalo'];
     }
     else
     {
         $felhid = $felhasznaloid;
+    }
+
+    $valosnev = $_SESSION[getenv('SESSION_NAME').'nev'];
+
+    if(isset($_POST['id']) || isset($_POST['feladat']))
+    {
+        if(isset($_POST['id']))
+        {
+            $hibid = decryptid($_POST['id']);
+        }
+        else
+        {
+            $hibid = decryptid($_POST['feladat']);
+        }
+        $felhasznaloquery = mySQLConnect("SELECT felhasznalok.id AS id, felhasznalok.nev AS nev, felhasznalok.alakulat AS alakulat, feladatok.szakid AS szak
+                FROM felhasznalok
+                    LEFT JOIN feladatok ON feladatok.felhasznalo = felhasznalok.id
+                WHERE feladatok.id = $hibid");
+        $felhasznalo = mysqli_fetch_assoc($felhasznaloquery);
+        
+        $origfelhasznaloneve = $felhasznalo['nev'];
+        $origfelhasznaloid = $felhasznalo['id'];
+        $origalakulat = $felhasznalo['alakulat'];
+        $origszak = $felhasznalo['szak'];
     }
 
     if($_GET["action"] == "new")
@@ -38,12 +62,18 @@ if(isset($irhat) && $irhat)
         }
 
         $origid = mysqli_insert_id($con);
-        $last_id = cryptId($origid);        
+        $last_id = encryptid($origid);
+
+        $felhasznaloquery = mySQLConnect("SELECT nev FROM felhasznalok WHERE id = $felhid");
+        $felhasznaloneve = mysqli_fetch_assoc($felhasznaloquery)['nev'];
+
+        hibajegyErtesites("$felhasznaloneve új hibajegyet hozott létre", $_POST['rovid'], $last_id, $felhid, $alakulat, $_POST['szakid']);
     }
 
     elseif($_GET["action"] == "update")
     {
-        $origid = encryptId($_POST['id']);
+        $origid = decryptid($_POST['id']);
+        $sorszam = $_POST['id'];
         $stmt = $con->prepare('UPDATE feladatok SET felhasznalo=?, rovid=?, bovitett=?, fajl=?, eszkozneve=?, szakid=?, epulet=?, helyiseg=? WHERE id=?');
         $stmt->bind_param('ssssssssi', $_POST['felhasznalo'], $_POST['rovid'], $_POST['bovitett'], $_POST['fajl'], $_POST['eszkozneve'], $_POST['szakid'], $_POST['epulet'], $_POST['helyiseg'], $origid);
         $stmt->execute();
@@ -52,12 +82,15 @@ if(isset($irhat) && $irhat)
             echo "<h2>Hibajegy szerkesztése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
+
+        hibajegyErtesites("$valosnev szerkesztette a(z) $sorszam számú hibajegyet", $_POST['rovid'], $sorszam, $origfelhasznaloid, $origalakulat, $_POST['szakid']);
     }
 
     elseif($_GET["action"] == "stateupdate")
     {
-        $origid = encryptId($_POST['feladat']);
-        if($mindir)
+        $origid = decryptid($_POST['feladat']);
+        $sorszam = $_POST['feladat'];
+        if($csoportir)
         {
             $allapottipus = $_POST['allapottipus'];
             $szerepkor = 3;
@@ -96,7 +129,7 @@ if(isset($irhat) && $irhat)
                 $allapottipus = 0;
             }
 
-            if($csoportir)
+            if($csoportolvas)
             {
                 $szerepkor = 2;
             }
@@ -116,6 +149,17 @@ if(isset($irhat) && $irhat)
         }
 
         $stateupdateid = mysqli_insert_id($con);
+
+        $allapottipusquery = mySQLConnect("SELECT folyamat FROM allapottipusok WHERE id = $allapottipus");
+        $allapotneve = mysqli_fetch_assoc($allapottipusquery)['folyamat'];
+
+        $torzs = $allapotneve;
+        if($_POST['megjegyzes'])
+        {
+            $torzs .= ": " . $_POST['megjegyzes'];
+        }
+
+        hibajegyErtesites("$valosnev frissítette a(z) $sorszam számú hibajegy állapotát", $torzs, $sorszam, $origfelhasznaloid, $origalakulat, $origszak);
     }
 
     if(isset($_FILES["fajlok"]) && $origid)
@@ -162,6 +206,5 @@ if(isset($irhat) && $irhat)
 
         mySQLConnect("UPDATE feladatallapotok SET megjegyzes = '$fajlnevek' WHERE id = $stateupdateid;");
     }
-
     
 }

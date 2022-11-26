@@ -120,7 +120,7 @@ else
                     $szint = "kesz";
                 }
 
-                $hibid = cryptId($hibajegy['hibid'])
+                $hibid = encryptid($hibajegy['hibid'])
 
                 ?><tr class='kattinthatotr' data-href='./hibajegy/<?=$hibid?>'><?php
                     if($mindir)

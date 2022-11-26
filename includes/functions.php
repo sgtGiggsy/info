@@ -849,6 +849,37 @@ function vegpontLista($portok)
 	}
 }
 
+function hibajegyErtesites($ertesites, $szoveg, $hibajegyid, $felhasznalo, $alakulat, $szak = null)
+{
+	$url = "hibajegy/$hibajegyid";
+	$tipus = "11";
+	$con = mySQLConnect(false);
+	$stmt = $con->prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
+	$stmt->bind_param('ssss', $ertesites, $szoveg, $url, $tipus);
+	$stmt->execute();
+
+	$ertesitesid = mysqli_insert_id($con);
+
+	if($szak)
+	{
+		$szak = "AND (csoportok.szak = $szak OR csoportok.szak IS NULL)";
+	}
+	else
+	{
+		$szak = "";
+	}
+
+	mySQLConnect("INSERT INTO ertesites_megjelenik(felhasznalo, ertesites)
+			SELECT DISTINCT csoporttagsagok.felhasznalo AS felhasznalo, '$ertesitesid'
+				FROM csoportok
+                	INNER JOIN csoporttagsagok ON csoportok.id = csoporttagsagok.csoport
+					INNER JOIN csoportjogok ON csoporttagsagok.csoport = csoportjogok.csoport
+					INNER JOIN jogosultsagok ON jogosultsagok.felhasznalo = csoporttagsagok.felhasznalo
+    			WHERE menupont = 11 AND iras > 1 AND csoportjogok.alakulat = $alakulat $szak
+				UNION
+				SELECT id AS felhasznalo, '$ertesitesid' FROM felhasznalok WHERE id = $felhasznalo;");
+}
+
 function quickXSSfilter($string)
 {
 	$string = str_replace("<", "&lt;", $string);
@@ -861,13 +892,13 @@ function quickXSSfilter($string)
 	return $string;
 }
 
-function cryptId($n) {
+function encryptid($n) {
 	$n = ($n + 3) * 7;
 	$val = (((0x0000FFFF & $n) << 16) + ((0xFFFF0000 & $n) >> 16)) / 7;
     return $val;
 }
 
-function encryptId($n) {
+function decryptid($n) {
     $val = (((0x0000FFFF & $n) << 16) + ((0xFFFF0000 & $n) >> 16)) * 7;
 	return $val / 7 - 3;
 }
