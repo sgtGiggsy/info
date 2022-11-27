@@ -89,7 +89,7 @@ if($id)
         $eszkoz = mysqli_fetch_assoc($aktiveszkozok);
 }
 
-if(!$id || mysqli_num_rows($aktiveszkozok) == 0 || !@$csoportolvas || (isset($_POST) && !@$csoportir))
+if(!$id || mysqli_num_rows($aktiveszkozok) == 0 || !@$csoportolvas || (count($_POST) > 0 && !@$csoportir))
 {
     echo "<h2>Nincs ilyen sorszámú aktív eszköz, vagy nincs jogosultsága a megtekintéséhez!</h2>";
 }
@@ -502,23 +502,26 @@ else
                                         ?></select>
                                     </td>
                                     <td>
-                                        <div class="custom-select">
-                                            <select name="csatlakozas">
-                                                <option value="" selected>&nbsp;</option>
-                                                <option value="" selected>&nbsp;</option><?php
-                                                $elozo = null;
-                                                foreach($epuletportok as $x)
-                                                {
-                                                    // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
-                                                    // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
-                                                    if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                                        <div class="custom-select"><?php
+                                            if(isset($epuletportok))
+                                            {
+                                                ?><select name="csatlakozas">
+                                                    <option value="" selected>&nbsp;</option>
+                                                    <option value="" selected>&nbsp;</option><?php
+                                                    $elozo = null;
+                                                    foreach($epuletportok as $x)
                                                     {
-                                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                                        // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
+                                                        // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
+                                                        if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                                                        {
+                                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                                        }
+                                                        $elozo = $x['id'];
                                                     }
-                                                    $elozo = $x['id'];
-                                                }
-                                            ?></select>
-                                        </div>
+                                                ?></select><?php
+                                            }
+                                        ?></div>
                                     </td>
                                     <td style="width: 6.5em" class="dontprint"><input type="submit" value="Módosítás"></td>
                                 </form>
@@ -553,13 +556,16 @@ else
                                 ?></td>
                                 <td><?php
                                     $elozo = null;
-                                    foreach($epuletportok as $x)
+                                    if(isset($epuletportok))
                                     {
-                                        if($x['id'] != $elozo)
+                                        foreach($epuletportok as $x)
                                         {
-                                            ?><?=($x['id'] == $port['csatlakozas']) ? $x['aktiveszkoz'] . " " . $x['port'] : "" ?><?php
+                                            if($x['id'] != $elozo)
+                                            {
+                                                ?><?=($x['id'] == $port['csatlakozas']) ? $x['aktiveszkoz'] . " " . $x['port'] : "" ?><?php
+                                            }
+                                            $elozo = $x['id'];
                                         }
-                                        $elozo = $x['id'];
                                     }
                                 ?></td>
                             </tr><?php

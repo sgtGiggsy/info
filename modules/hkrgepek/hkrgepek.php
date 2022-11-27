@@ -29,7 +29,7 @@ else
             foreach($lista as $x)
             {
                 $hkrid = $x['id'];
-                ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/hkrszerkeszt/$$hkrid'" : "" ?>>
+                ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/hkrszerkeszt/$hkrid'" : "" ?>>
                     <td><?=$x['gepnev']?></td>
                     <td><?=$x['nev']?></td>
                     <td><?=($x['utolsoeredmeny'] == 1) ? "Sikeres" : "Sikertelen" ?></td>

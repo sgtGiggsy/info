@@ -1,5 +1,6 @@
 <?php
-if(isset($mindolvas) && !$mindolvas)
+
+if(!isset($felhid) && isset($csoportolvas) && !$csoportolvas)
 {
     getPermissionError();
 }

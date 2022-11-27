@@ -285,7 +285,7 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
     $szemelyes = mysqli_fetch_assoc($szemelyesbeallitasok);
 
     // Csoporttagságok begyüjtése
-    $csoporttagsagok = mySQLConnect("SELECT csoportok.nev AS csoportnev, alakulat
+    $csoporttagsagok = mySQLConnect("SELECT csoportok.nev AS csoportnev, alakulat, telephely
         FROM csoportok
             INNER JOIN csoporttagsagok ON csoportok.id = csoporttagsagok.csoport
             LEFT JOIN csoportjogok ON csoportjogok.csoport = csoporttagsagok.csoport
