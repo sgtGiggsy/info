@@ -891,3 +891,125 @@ function quickXSSfilter($string)
 	$string = str_replace(")", "&#41;", $string);
 	return $string;
 }
+
+function csoportWhere($csoporttagsagok, $csopwhereset)
+{
+	$alakulatok = array();
+    $telephelyek = array();
+
+	foreach($csoporttagsagok as $csoportjog)
+    {
+        if($csoportjog['alakulat'] && !in_array($csoportjog['alakulat'], $alakulatok))
+		{
+			$alakulatok[] = $csoportjog['alakulat'];
+		}
+		elseif($csoportjog['telephely'] && !in_array($csoportjog['telephely'], $telephelyek))
+		{
+			$telephelyek[] = $csoportjog['telephely'];
+		}
+    }
+
+	$where = "(";
+
+	if($csopwhereset['and'])
+	{
+		$where = "AND (";
+	}
+
+	if($csopwhereset['alakulatelo'])
+	{
+		$csopwhereset['alakulatelo'] = $csopwhereset['alakulatelo'] . ".";
+	}
+
+	if($csopwhereset['telephelyelo'])
+	{
+		$csopwhereset['telephelyelo'] = $csopwhereset['telephelyelo'] . ".";
+	}
+
+	$alakulatdb = count($alakulatok);
+	$telepehelydb = count($telephelyek);
+
+	$wherealak = "";
+	$wheretelep = "";
+	
+	for($i = 0; $i < $alakulatdb; $i++)
+	{
+		$wherealak .= $csopwhereset['alakulatelo'] . $csopwhereset['alakulatmegnevezes'] . " = " . $alakulatok[$i];
+
+		if($i != $alakulatdb - 1)
+		{
+			$wherealak .= " OR ";
+		}
+	}
+
+	if($csopwhereset['alakulatnull'])
+	{
+		if($alakulatdb > 0)
+		{
+			$wherealak .= " OR ";
+		}
+		$wherealak .= $csopwhereset['alakulatelo'] . $csopwhereset['alakulatmegnevezes'] . " IS NULL";
+	}
+
+	for($i = 0; $i < $telepehelydb; $i++)
+	{
+		$wheretelep .= $csopwhereset['telephelyelo'] . "telephely = " . $telephelyek[$i];
+
+		if($i != $telepehelydb - 1)
+		{
+			$wheretelep .= " OR ";
+		}
+	}
+
+	if($csopwhereset['telephelynull'])
+	{
+		if($telepehelydb > 0)
+		{
+			$wheretelep .= " OR ";
+		}
+		$wheretelep .= $csopwhereset['telephelyelo'] . "telephely IS NULL";
+	}
+
+	if(!$csopwhereset['tipus'])
+	{
+		if($telepehelydb == 0 && $alakulatdb == 0)
+		{
+			$where .= $csopwhereset['telephelyelo'] . "telephely = 999 AND " . $csopwhereset['alakulatelo'] . $csopwhereset['alakulatmegnevezes'] . " = 999";
+		}
+		else
+		{		
+			$where .= $wherealak;
+			if($wherealak)
+			{
+				$where .= " OR ";
+			}
+			$where .= $wheretelep;
+		}
+	}
+	elseif($csopwhereset['tipus'] == "alakulat")
+	{
+		if($alakulatdb == 0)
+		{
+			$where .= $csopwhereset['alakulatelo'] . $csopwhereset['alakulatmegnevezes'] . " = 999";
+		}
+		else
+		{
+			$where .= $wherealak;
+		}
+	}
+	elseif($csopwhereset['tipus'] == "telephely")
+	{
+		if($telepehelydb == 0)
+		{
+			$where .= $csopwhereset['telephelyelo'] . "telephely = 999";
+		}
+		else
+		{
+			$where .= $wheretelep;
+		}
+	}
+
+	$where .= ") ";
+
+	return $where;
+}

@@ -7,6 +7,23 @@ if($id)
     {
         $beepszur = "AND beepitesek.id = " . $_GET['beepites'];
     }
+
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => true,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+    }
+
     // Adatbázis műveletek rész    
     $aktiveszkozok = mySQLConnect("SELECT
             eszkozok.id AS eszkid,
@@ -67,12 +84,12 @@ if($id)
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                 LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
-        WHERE eszkozok.id = $id AND modellek.tipus < 11 $beepszur
+        WHERE eszkozok.id = $id AND modellek.tipus < 11 $beepszur $csoportwhere
         ORDER BY beepitesek.id DESC;");
         $eszkoz = mysqli_fetch_assoc($aktiveszkozok);
 }
 
-if((!$id || mysqli_num_rows($aktiveszkozok) == 0 || !@$csoportolvas) && (isset($_POST) && !@$csoportir))
+if(!$id || mysqli_num_rows($aktiveszkozok) == 0 || !@$csoportolvas || (isset($_POST) && !@$csoportir))
 {
     echo "<h2>Nincs ilyen sorszámú aktív eszköz, vagy nincs jogosultsága a megtekintéséhez!</h2>";
 }
@@ -753,11 +770,9 @@ else
         }
 
         function setVlan(id) {
-
             for(var i = 1; i < 1000; i++) {
                 if(document.getElementById("vlan-" + i)) {
                     select = document.getElementById("vlan-" + i);
-                    console.log(select);
                     select.value = id;
                 }
                 else {

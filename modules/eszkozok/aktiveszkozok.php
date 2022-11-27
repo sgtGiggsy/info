@@ -1,4 +1,8 @@
 <?php
+/*
+Az oldal megtekintéséhez legalább csoportolvas jogosultságra van szükség,
+hisz nincs értelme egyéni aktív eszközöknek.
+*/
 
 if(!$csoportolvas)
 {
@@ -20,6 +24,23 @@ else
     }
     
     $where = $szuresek['where'];
+    $csoportwhere = null;
+
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => true,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => null,                 // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+    }
 
     $mindeneszkoz = mySQLConnect("SELECT
             eszkozok.id AS id,
@@ -58,7 +79,7 @@ else
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
             LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
             $onjoin
-        WHERE $where
+        WHERE $where $csoportwhere
         ORDER BY telephely, epuletek.szam + 1, helyisegszam, rack, pozicio, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
     if($mindir) 
