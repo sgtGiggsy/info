@@ -1,7 +1,7 @@
 <?php
 
 // Ha nincs olvasási jog, vagy van írási kísérlet írási jog nélkül, letilt
-if(!@$mindolvas || (isset($_GET['action']) && !$mindir))
+if(!@$csoportolvas || (isset($_GET['action']) && !$csoportir))
 {
     getPermissionError();
 }
@@ -32,7 +32,7 @@ else
     }
 
     // Ha a felhasználó valótlan műveletet akart folytatni, letilt, de olvasási joggal továbbenged
-    if(!$irhat && !$dbir && !$mindolvas)
+    if(!$irhat && !$dbir && !$csoportolvas)
     {
         getPermissionError();
     }
@@ -100,14 +100,31 @@ else
     // Akkor futunk ki erre az ágra, ha van olvasási jog, és kiválasztott épület, de más nincs. Ez a sima megjelenítő felület
     else
     {
+        $csoportwhere = null;
+        if(!$mindolvas)
+        {
+            // A CsoportWhere űrlapja
+            $csopwhereset = array(
+                'tipus' => "telephely",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+                'and' => true,                          // Kerüljön-e AND a parancs elejére
+                'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+                'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+                'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+                'telephelynull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+                'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+            );
+
+            $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+        }
+
         $helyisegid = $_GET['id'];
-        $helyiseg = mySQLConnect("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
+        $helyisegek = mySQLConnect("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
             FROM helyisegek
                 INNER JOIN epuletek ON helyisegek.epulet = epuletek.id
                 INNER JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
                 INNER JOIN telephelyek ON epuletek.telephely = telephelyek.id
-            WHERE helyisegek.id = $helyisegid;");
-        $helyiseg = mysqli_fetch_assoc($helyiseg);
+            WHERE helyisegek.id = $helyisegid $csoportwhere;");
+        $helyiseg = mysqli_fetch_assoc($helyisegek);
 
         $rackek = mySQLConnect("SELECT rackszekrenyek.id AS id, rackszekrenyek.nev AS nev, gyartok.nev AS gyarto, unitszam
             FROM rackszekrenyek
@@ -165,133 +182,139 @@ else
             $rackszam = null;
         }
         
-
-        ?><div class="breadcumblist">
-            <ol vocab="https://schema.org/" typeof="BreadcrumbList">
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/">
-                    <span property="name">Kecskemét Informatika</span></a>
-                    <meta property="position" content="1">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epuletek/<?=$helyiseg['thelyid']?>">
-                    <span property="name"><?=$helyiseg['telephely']?></span></a>
-                    <meta property="position" content="2">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epulet/<?=$helyiseg['epid']?>">
-                    <span property="name"><?=$helyiseg['epuletszam']?>. <?=$helyiseg['tipus']?></span></a>
-                    <meta property="position" content="3">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <span property="name"><?=$helyiseg['helyisegszam']?>. helyiség (<?=$helyiseg['helyisegnev']?>)</span>
-                    <meta property="position" content="4">
-                </li>
-            </ol>
-        </div>
-
-        <?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/helyiseg/$helyisegid?action=edit'\">Helyiség szerkesztése</button>" : "" ?>
-        <div class="oldalcim"><?=$helyiseg['helyisegszam']?> (<?=$helyiseg['helyisegnev']?>)</div>
-        
-        <div class="oldalcim">Eszközök a helyiségben</div><?php
-        $ujoldalcim = $ablakcim . " - ". $helyiseg['epuletszam'] . ". " . $helyiseg['tipus'] . " " . $helyiseg['helyisegszam'] . ". helyiség (" . $helyiseg['helyisegnev'] . ")";
-        if(mysqli_num_rows($eszkozok) > 0)
+        if(mysqli_num_rows($helyisegek) != 1)
         {
-            ?><div>
-                <table id="eszkozok">
-                    <thead>
-                        <tr>
-                            <th class="tsorth" onclick="sortTable(0, 's', 'eszkozok')">IP cím</th>
-                            <th class="tsorth" onclick="sortTable(1, 's', 'eszkozok')">Eszköznév</th>
-                            <th class="tsorth" onclick="sortTable(2, 's', 'eszkozok')">Modell</th>
-                            <th class="tsorth" onclick="sortTable(3, 's', 'eszkozok')">Eszköztípus</th>
-                            <th class="tsorth" onclick="sortTable(4, 's', 'eszkozok')">Tulajdonos</th>
-                            <th class="tsorth" onclick="sortTable(5, 's', 'eszkozok')">Beépítve</th><?php
-                            if($rackszam > 0)
-                            {
-                                ?><th class="tsorth" onclick="sortTable(6, 's', 'eszkozok')">Rackszekrény</th>
-                                <th class="tsorth" onclick="sortTable(7, 'i', 'eszkozok')">Pozíció</th><?php
-                            }
-                            if($csoportir)
-                            {
-                                ?><th></th>
-                                <th></th>
-                                <th></th><?php
-                            }
-                        ?></tr>
-                    </thead>
-                    <tbody><?php
-                        foreach($eszkozok as $eszkoz)
-                        {
-                            $beepid = $eszkoz['beepid'];
-                            $eszkid = $eszkoz['id'];
-                            $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
-                            
-                            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
-                                <td><?=$eszkoz['ipcim']?></td>
-                                <td nowrap><?=$eszkoz['beepitesinev']?></td>
-                                <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
-                                <td><?=$eszkoz['tipus']?></td>
-                                <td><?=$eszkoz['tulajdonos']?></td>
-                                <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td><?php
+            getPermissionError();
+        }
+        else
+        {
+            ?><div class="breadcumblist">
+                <ol vocab="https://schema.org/" typeof="BreadcrumbList">
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/">
+                        <span property="name">Kecskemét Informatika</span></a>
+                        <meta property="position" content="1">
+                    </li>
+                    <li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/epuletek/<?=$helyiseg['thelyid']?>">
+                        <span property="name"><?=$helyiseg['telephely']?></span></a>
+                        <meta property="position" content="2">
+                    </li>
+                    <li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/epulet/<?=$helyiseg['epid']?>">
+                        <span property="name"><?=$helyiseg['epuletszam']?>. <?=$helyiseg['tipus']?></span></a>
+                        <meta property="position" content="3">
+                    </li>
+                    <li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <span property="name"><?=$helyiseg['helyisegszam']?>. helyiség (<?=$helyiseg['helyisegnev']?>)</span>
+                        <meta property="position" content="4">
+                    </li>
+                </ol>
+            </div>
+
+            <?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/helyiseg/$helyisegid?action=edit'\">Helyiség szerkesztése</button>" : "" ?>
+            <div class="oldalcim"><?=$helyiseg['helyisegszam']?> (<?=$helyiseg['helyisegnev']?>)</div>
+            
+            <div class="oldalcim">Eszközök a helyiségben</div><?php
+            $ujoldalcim = $ablakcim . " - ". $helyiseg['epuletszam'] . ". " . $helyiseg['tipus'] . " " . $helyiseg['helyisegszam'] . ". helyiség (" . $helyiseg['helyisegnev'] . ")";
+            if(mysqli_num_rows($eszkozok) > 0)
+            {
+                ?><div>
+                    <table id="eszkozok">
+                        <thead>
+                            <tr>
+                                <th class="tsorth" onclick="sortTable(0, 's', 'eszkozok')">IP cím</th>
+                                <th class="tsorth" onclick="sortTable(1, 's', 'eszkozok')">Eszköznév</th>
+                                <th class="tsorth" onclick="sortTable(2, 's', 'eszkozok')">Modell</th>
+                                <th class="tsorth" onclick="sortTable(3, 's', 'eszkozok')">Eszköztípus</th>
+                                <th class="tsorth" onclick="sortTable(4, 's', 'eszkozok')">Tulajdonos</th>
+                                <th class="tsorth" onclick="sortTable(5, 's', 'eszkozok')">Beépítve</th><?php
                                 if($rackszam > 0)
                                 {
-                                    ?><td><?=$eszkoz['rack']?></td>
-                                    <td><?=$eszkoz['pozicio']?></td><?php
+                                    ?><th class="tsorth" onclick="sortTable(6, 's', 'eszkozok')">Rackszekrény</th>
+                                    <th class="tsorth" onclick="sortTable(7, 'i', 'eszkozok')">Pozíció</th><?php
                                 }
                                 if($csoportir)
                                 {
-                                    szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
-                                    ?><?php
+                                    ?><th></th>
+                                    <th></th>
+                                    <th></th><?php
                                 }
-                            ?></tr><?php
-                        }
-                    ?></tbody>
-                </table>
-            </div><?php
-        }
-
-        if(mysqli_num_rows($rackek) > 0)
-        {
-            ?><div class="oldalcim">Rackszekrények a helyiségben</div>
-            <div>
-                <table id="rackek">
-                    <thead>
-                        <tr>
-                            <th class="tsorth" onclick="sortTable(0, 's', 'rackek')">Azonosító</th>
-                            <th class="tsorth" onclick="sortTable(1, 's', 'rackek')">Gyártó</th>
-                            <th class="tsorth" onclick="sortTable(2, 'i', 'rackek')">Unitszám</th><?php
-                            if($mindir)
+                            ?></tr>
+                        </thead>
+                        <tbody><?php
+                            foreach($eszkozok as $eszkoz)
                             {
-                                ?><th></th><?php
+                                $beepid = $eszkoz['beepid'];
+                                $eszkid = $eszkoz['id'];
+                                $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
+                                
+                                ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
+                                    <td><?=$eszkoz['ipcim']?></td>
+                                    <td nowrap><?=$eszkoz['beepitesinev']?></td>
+                                    <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
+                                    <td><?=$eszkoz['tipus']?></td>
+                                    <td><?=$eszkoz['tulajdonos']?></td>
+                                    <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td><?php
+                                    if($rackszam > 0)
+                                    {
+                                        ?><td><?=$eszkoz['rack']?></td>
+                                        <td><?=$eszkoz['pozicio']?></td><?php
+                                    }
+                                    if($csoportir)
+                                    {
+                                        szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
+                                        ?><?php
+                                    }
+                                ?></tr><?php
                             }
-                        ?></tr>
-                    </thead>
-                    <tbody><?php
-                        foreach($rackek as $rack)
-                        {
-                            $rackid = $rack['id']
-                            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/rack/<?=$rack['id']?>'>
-                                <td><?=$rack['nev']?></td>
-                                <td><?=$rack['gyarto']?></td>
-                                <td><?=$rack['unitszam']?></td><?php
+                        ?></tbody>
+                    </table>
+                </div><?php
+            }
+
+            if(mysqli_num_rows($rackek) > 0)
+            {
+                ?><div class="oldalcim">Rackszekrények a helyiségben</div>
+                <div>
+                    <table id="rackek">
+                        <thead>
+                            <tr>
+                                <th class="tsorth" onclick="sortTable(0, 's', 'rackek')">Azonosító</th>
+                                <th class="tsorth" onclick="sortTable(1, 's', 'rackek')">Gyártó</th>
+                                <th class="tsorth" onclick="sortTable(2, 'i', 'rackek')">Unitszám</th><?php
                                 if($mindir)
                                 {
-                                    ?><td><?=($csoportir) ? "<a href='$RootPath/rack/$rackid?action=edit'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td><?php
+                                    ?><th></th><?php
                                 }
-                            ?></tr><?php
-                        }
-                    ?></tbody>
-                </table>
-            </div><?php
+                            ?></tr>
+                        </thead>
+                        <tbody><?php
+                            foreach($rackek as $rack)
+                            {
+                                $rackid = $rack['id']
+                                ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/rack/<?=$rack['id']?>'>
+                                    <td><?=$rack['nev']?></td>
+                                    <td><?=$rack['gyarto']?></td>
+                                    <td><?=$rack['unitszam']?></td><?php
+                                    if($mindir)
+                                    {
+                                        ?><td><?=($csoportir) ? "<a href='$RootPath/rack/$rackid?action=edit'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td><?php
+                                    }
+                                ?></tr><?php
+                            }
+                        ?></tbody>
+                    </table>
+                </div><?php
+            }
+            ?><div class="oldalcim">Végpontok a helyiségben</div><?php
+                vegpontLista($portok);
         }
-        ?><div class="oldalcim">Végpontok a helyiségben</div><?php
-            vegpontLista($portok);
     }
 }

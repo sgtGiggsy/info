@@ -1,6 +1,6 @@
 <?php
 
-if(!$sajatolvas)
+if(!$csoportolvas)
 {
 	echo "Nincs jogosultsága az oldal megtekintésére!";
 }
@@ -8,6 +8,23 @@ else
 {
     $szuresek = getWhere("(modellek.tipus > 20 AND modellek.tipus < 26)");
     $where = $szuresek['where'];
+
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => true,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+    }
 
     $mindeneszkoz = mySQLConnect("SELECT
             eszkozok.id AS id,
@@ -52,7 +69,7 @@ else
                 LEFT JOIN vlanok ON beepitesek.vlan = vlanok.id
                 LEFT JOIN atviteliszabvanyok ON mediakonvertermodellek.transzpszabvany = atviteliszabvanyok.id
                 LEFT JOIN fizikairetegek ON mediakonvertermodellek.fizikaireteg = fizikairetegek.id
-        WHERE $where
+        WHERE $where $csoportwhere
         ORDER BY epuletek.szam + 1, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
     if($mindir) 

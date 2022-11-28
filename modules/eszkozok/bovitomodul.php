@@ -2,12 +2,12 @@
 
 // Elsőként annak ellenőrzése, hogy a felhasználó olvashatja-e,
 // majd megvizsgálni, hogy ha olvashatja, de írni szeretné, ahhoz van-e joga
-if(!@$mindolvas || (isset($_GET['action']) && !$mindir))
+if(!@$csoportolvas || (isset($_GET['action']) && !$csoportir))
 {
     getPermissionError();
 }
 // Ha van valamilyen módosítási kísérlet, ellenőrizni, hogy van-e rá joga a felhasználónak
-elseif(isset($_GET['action']) && $mindir)
+elseif(isset($_GET['action']) && $csoportir)
 {
     $meghiv = true;
     
@@ -16,6 +16,23 @@ elseif(isset($_GET['action']) && $mindir)
 }
 else
 {
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => true,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+    }
+    
     $bovitok = mySQLConnect("SELECT
             eszkozok.id AS id,
             beepitesek.id AS beepid,
@@ -28,8 +45,8 @@ else
             gyartok.nev AS gyarto,
             modellek.modell AS modell,
             varians,
-            beepitesideje,
-            kiepitesideje,
+            beepitesek.beepitesideje AS beepitesideje,
+            beepitesek.kiepitesideje AS kiepitesideje,
             alakulatok.rovid AS tulajdonos,
             raktarak.nev AS raktar,
             portok.port AS portnev,
@@ -44,13 +61,18 @@ else
                 INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
                 LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
                 LEFT JOIN portok ON beepitesek.switchport = portok.id
+                LEFT JOIN switchportok ON portok.id = switchportok.port
                 LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
                 LEFT JOIN fizikairetegek ON bovitomodellek.fizikaireteg = fizikairetegek.id
                 LEFT JOIN atviteliszabvanyok ON bovitomodellek.transzpszabvany = atviteliszabvanyok.id
                 LEFT JOIN sebessegek ON bovitomodellek.transzpsebesseg = sebessegek.id
                 LEFT JOIN csatlakozotipusok ON bovitomodellek.transzpcsatlakozo = csatlakozotipusok.id
-        WHERE eszkozok.id = $id AND modellek.tipus > 25 AND modellek.tipus < 31
+                LEFT JOIN beepitesek akteszk ON akteszk.eszkoz = switchportok.eszkoz
+                LEFT JOIN rackszekrenyek ON akteszk.rack = rackszekrenyek.id
+                LEFT JOIN helyisegek ON akteszk.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+                LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+        WHERE eszkozok.id = $id AND modellek.tipus > 25 AND modellek.tipus < 31 $csoportwhere
         ORDER BY beepitesek.id DESC;");
 
     if(mysqli_num_rows($bovitok) == 0)

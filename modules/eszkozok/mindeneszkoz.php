@@ -9,6 +9,23 @@ else
     $szuresek = getWhere("modellek.tipus > 0");
     $where = $szuresek['where'];
 
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => true,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+    }
+
     $mindeneszkoz = mySQLConnect("SELECT
             eszkozok.id AS id,
             beepitesek.id AS beepid,
@@ -41,7 +58,7 @@ else
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
             LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
-        WHERE $where
+        WHERE $where $csoportwhere
         ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
     ?><div class="PrintArea">

@@ -32,7 +32,8 @@ else
     }
 
     $telefonszamok = mySQLConnect("SELECT telefonszamok.id AS id,
-            szam,
+            telefonszamok.szam AS szam,
+            epuletek.szam AS epuletszam,
             cimke,
             vport.port AS faliport,
             telefonszamok.jog AS jog,
@@ -52,6 +53,8 @@ else
             LEFT JOIN tkozpontportok ON tkozpontportok.port = portok.id
             LEFT JOIN eszkozok ON tkozpontportok.eszkoz = eszkozok.id
             LEFT JOIN telefonkozpontok ON telefonkozpontok.eszkoz = eszkozok.id
+            LEFT JOIN vegpontiportok ON vport.id = vegpontiportok.port
+            LEFT JOIN epuletek ON vegpontiportok.epulet = epuletek.id
         $where
         $orderby;");
 
@@ -97,7 +100,7 @@ else
                 <td><?=$telefonszam['szam']?></td>
                 <td><?=$telefonszam['cimke']?></td>
                 <td title="<?=$telefonszam['jognev']?>"><?=$telefonszam['jog']?></td>
-                <td><?=$telefonszam['faliport']?></td>
+                <td><?=$telefonszam['epuletszam']?><?=($telefonszam['epuletszam']) ? ". épület," : "" ?> <?=$telefonszam['faliport']?></td>
                 <td><?=$telefonszam['kozpont']?></td>
                 <td><?=$telefonszam['kozpontport']?></td>
                 <td><?=$telefonszam['szammegjegyzes']?></td>

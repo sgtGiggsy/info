@@ -1,7 +1,7 @@
 <?php
 // Ha nincs bejelentkezett felhasználó,
 // vagy van, de írási művelettel próbálkozik írási jog nélkül
-if((isset($_GET['id']) && $_GET['id'] != @$felhasznaloid && !$mindolvas) || (!$mindir && isset($_GET['action'])))
+if((isset($_GET['id']) && $_GET['id'] != @$felhasznaloid && !$csoportolvas) || (!$mindir && isset($_GET['action'])))
 {
     getPermissionError();
 }
@@ -122,7 +122,7 @@ elseif($mindir && isset($_GET['action']))
             is eltarthat, és ezalatt a rendszer semmilyen visszajelzést nem ad az állapotról!</span></p>";
         
         $oldalcim = "Felhasználók szinkronizálása az Active Directory-val";
-        $form = "felhasznalosyncform";
+        $form .= "felhasznalosyncform";
 
         include('././templates/edit.tpl.php');
     }
@@ -155,11 +155,28 @@ else
     {
         $felhid = $felhasznaloid;
     }
+
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => "alakulat",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => true,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => "felhasznalok",                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => null,           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+    }
     
     $query = mySQLConnect("SELECT felhasznalok.id as felhid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, alakulatok.nev AS alakulat
             FROM felhasznalok
                 LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
-            WHERE felhasznalok.id = $felhid;");
+            WHERE felhasznalok.id = $felhid $csoportwhere;");
     $felhasznalo = mysqli_fetch_assoc($query);
 
     $jogok = mySQLConnect("SELECT menupontok.menupont AS menupont, iras, olvasas
@@ -168,87 +185,90 @@ else
             WHERE felhasznalo = $felhid AND olvasas IS NOT NULL AND olvasas != 0
             ORDER BY menupontok.menupont ASC;");
 
-    ?><div class="dyntripplecol">
-        <div class="infobox">
-            <div class="infoboxtitle">Felhasználó adatai<?php
-                if($mindir)
-                {
-                    ?><a class="help" href="<?=$RootPath?>/felhasznalo/<?=$felhid?>?action=edit"><img src='<?=$RootPath?>/images/edit.png' alt='Felhasználó módosítása' title='Felhasználó módosítása'/></a><?php
-                }
-            ?></div>
-            <div class="infoboxbody">
-                <div class="infoboxbodytwocol">
-                    <div><?php
-                        if($felhasznalo['profilkep'])
-                        {
-                            ?><img src="data:image/jpeg;base64,<?=base64_encode($felhasznalo['profilkep'])?>" /><?php
-                        }
-                    ?></div>
-                    <div></div>
-                    <div>Név:</div>
-                    <div><?=$felhasznalo['nev']?></div>
-                    <div>Felhasználónév:</div>
-                    <div><?=$felhasznalo['felhasznalonev']?></div>
-                    <div>Alakulat:</div>
-                    <div><?=$felhasznalo['alakulat']?></div>
-                    <div>Részleg:</div>
-                    <div><?=$felhasznalo['osztaly']?></div>
-                    <div>Beosztás:</div>
-                    <div><?=$felhasznalo['beosztas']?></div>
-                    <div>Telefon:</div>
-                    <div><?=$felhasznalo['telefon']?></div>
-                    <div>Email:</div>
-                    <div><?=$felhasznalo['email']?></div>
-                    <div>Első belépés ideje:</div>
-                    <div><?=$felhasznalo['elsobelepes']?></div>
+    if(mysqli_num_rows($query) != 1)
+    {
+        getPermissionError();
+    }
+    else
+    {
+        ?><div class="dyntripplecol">
+            <div class="infobox">
+                <div class="infoboxtitle">Felhasználó adatai<?php
+                    if($mindir)
+                    {
+                        ?><a class="help" href="<?=$RootPath?>/felhasznalo/<?=$felhid?>?action=edit"><img src='<?=$RootPath?>/images/edit.png' alt='Felhasználó módosítása' title='Felhasználó módosítása'/></a><?php
+                    }
+                ?></div>
+                <div class="infoboxbody">
+                    <div class="infoboxbodytwocol">
+                        <div><?php
+                            if($felhasznalo['profilkep'])
+                            {
+                                ?><img src="data:image/jpeg;base64,<?=base64_encode($felhasznalo['profilkep'])?>" /><?php
+                            }
+                        ?></div>
+                        <div></div>
+                        <div>Név:</div>
+                        <div><?=$felhasznalo['nev']?></div>
+                        <div>Felhasználónév:</div>
+                        <div><?=$felhasznalo['felhasznalonev']?></div>
+                        <div>Alakulat:</div>
+                        <div><?=$felhasznalo['alakulat']?></div>
+                        <div>Részleg:</div>
+                        <div><?=$felhasznalo['osztaly']?></div>
+                        <div>Beosztás:</div>
+                        <div><?=$felhasznalo['beosztas']?></div>
+                        <div>Telefon:</div>
+                        <div><?=$felhasznalo['telefon']?></div>
+                        <div>Email:</div>
+                        <div><?=$felhasznalo['email']?></div>
+                        <div>Első belépés ideje:</div>
+                        <div><?=$felhasznalo['elsobelepes']?></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="infobox">
-            <div class="infoboxtitle">Jogosultságok<?php
-                if($mindir)
-                {
-                    ?><a class="help" href="<?=$RootPath?>/felhasznalo/<?=$felhid?>?action=permissions"><img src='<?=$RootPath?>/images/edit.png' alt='Jogosultságok módosítása' title='Jogosultságok módosítása'/></a><?php
-                }
-            ?></div>
-            <div class="infoboxbody">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Menüpont</th>
-                            <th>Olvasási jog</th>
-                            <th>Írási jog</th>
-                        </tr>
-                    </thead>
-                    <tbody><?php
-                        foreach($jogok as $x)
-                        {
-                            ?><tr>
-                                <td><?=$x['menupont']?></td>
-                                <td><?=($x['olvasas'] == 3) ? "Mind" : (($x['olvasas'] == 2) ? "Csoport" : (($x['olvasas'] == 1) ? "Saját" : "Semmi")) ?></td>
-                                <td><?=($x['iras'] == 3) ? "Mind" : (($x['iras'] == 2) ? "Csoport" : (($x['iras'] == 1) ? "Saját" : "Semmi")) ?></td>
-                            </tr><?php
-                        }
-                    ?></tbody>
-                </table>
-                <div class="infoboxbodythreecol">
-                    <?php
-                    
+            <div class="infobox">
+                <div class="infoboxtitle">Jogosultságok<?php
+                    if($mindir)
+                    {
+                        ?><a class="help" href="<?=$RootPath?>/felhasznalo/<?=$felhid?>?action=permissions"><img src='<?=$RootPath?>/images/edit.png' alt='Jogosultságok módosítása' title='Jogosultságok módosítása'/></a><?php
+                    }
+                ?></div>
+                <div class="infoboxbody">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Menüpont</th>
+                                <th>Olvasási jog</th>
+                                <th>Írási jog</th>
+                            </tr>
+                        </thead>
+                        <tbody><?php
+                            foreach($jogok as $x)
+                            {
+                                ?><tr>
+                                    <td><?=$x['menupont']?></td>
+                                    <td><?=($x['olvasas'] == 3) ? "Mind" : (($x['olvasas'] == 2) ? "Csoport" : (($x['olvasas'] == 1) ? "Saját" : "Semmi")) ?></td>
+                                    <td><?=($x['iras'] == 3) ? "Mind" : (($x['iras'] == 2) ? "Csoport" : (($x['iras'] == 1) ? "Saját" : "Semmi")) ?></td>
+                                </tr><?php
+                            }
+                        ?></tbody>
+                    </table>
+                    <div class="infoboxbodythreecol">
+                        <?php
+                        
+                    ?></div>
+                </div>
+            </div>
+
+            <div class="infobox">
+                <div class="infoboxtitle">Bejelentkezések</div>
+                <div class="infoboxbody"><?php
+                    include('bejelentkezesek.php');
                 ?></div>
             </div>
-        </div>
-
-        <div class="infobox">
-            <div class="infoboxtitle">Bejelentkezések</div>
-            <div class="infoboxbody"><?php
-                include('bejelentkezesek.php');
-            ?></div>
-        </div>
-    </div><?php
-
-                
-
-    
+        </div><?php
+    }
 }
 ?>

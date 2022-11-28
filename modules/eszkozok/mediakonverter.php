@@ -2,12 +2,12 @@
 
 // Elsőként annak ellenőrzése, hogy a felhasználó olvashatja-e,
 // majd megvizsgálni, hogy ha olvashatja, de írni szeretné, ahhoz van-e joga
-if(!@$mindolvas || (isset($_GET['action']) && !$mindir))
+if(!@$csoportolvas || (isset($_GET['action']) && !$csoportir))
 {
     getPermissionError();
 }
 // Ha van valamilyen módosítási kísérlet, ellenőrizni, hogy van-e rá joga a felhasználónak
-elseif(isset($_GET['action']) && $mindir)
+elseif(isset($_GET['action']) && $csoportir)
 {
     $meghiv = true;
     
@@ -16,7 +16,24 @@ elseif(isset($_GET['action']) && $mindir)
 }
 else
 {
-	$mindeneszkoz = mySQLConnect("SELECT
+	$csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => true,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+    }
+    
+    $mindeneszkoz = mySQLConnect("SELECT
             eszkozok.id AS id,
             sorozatszam,
             gyartok.nev AS gyarto,
@@ -69,7 +86,7 @@ else
             LEFT JOIN fizikairetegek ON mediakonvertermodellek.fizikaireteg = fizikairetegek.id
             LEFT JOIN vlanok ON beepitesek.vlan = vlanok.id
             LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
-        WHERE eszkozok.id = $id
+        WHERE eszkozok.id = $id $csoportwhere
         ORDER BY beepitesek.id DESC;");
 	
 	if(mysqli_num_rows($mindeneszkoz) == 0)

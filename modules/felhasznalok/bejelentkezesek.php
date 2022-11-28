@@ -15,13 +15,38 @@ else
     {
         ?><div class='oldalcim'>Bejelentkezések</div><div class="contentcenter"><div><?php
     }
+
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => "alakulat",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => false,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => "felhasznalok",                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => null,           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+        if(!$where)
+        {
+            $where = "WHERE ";
+        }
+        else
+        {
+            $csoportwhere = "AND $csoportwhere";
+        }
+    }
+
     $lista = mySQLConnect("SELECT bejelentkezesek.id AS id, nev, ipcim, bongeszo, bongeszoverzio, oprendszer, oprendszerverzio, oprendszerarch, timestamp
             FROM bejelentkezesek
                 INNER JOIN felhasznalok ON bejelentkezesek.felhasznalo = felhasznalok.id
-            $where
+            $where $csoportwhere
             ORDER BY bejelentkezesek.id DESC");
-    ?>
-    <table id='bejelentkezesek'>
+    ?><table id='bejelentkezesek' style="max-width: unset;">
         <thead>
             <tr>
                 <th class="tsorth" onclick="sortTable(0, 's', 'bejelentkezesek')">Idő</th>

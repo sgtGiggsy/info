@@ -49,15 +49,43 @@ else
         $where = "WHERE felhasznalok.nev LIKE '%$keres%' OR felhasznalonev LIKE '%$keres%' OR osztaly LIKE '%$keres%'";
     }
 
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => "alakulat",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => false,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => "felhasznalok",                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => null,           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+        if(!$where)
+        {
+            $where = "WHERE ";
+        }
+        else
+        {
+            $csoportwhere = "AND $csoportwhere";
+        }
+    }
+
     $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, alakulatok.nev AS alakulat
         FROM felhasznalok
             LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
-        $where
+        $where $csoportwhere
         LIMIT $start, $megjelenit;");
 
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=addnew'">Új felhasználó</button><?php
+        ?><div class="szerkgombsor">
+            <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=addnew'">Új felhasználó</button>
+            <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=sync'">Meglévő felhasználók AD-val szinkronizálása</button>
+        </div><?php
     }
     ?><div class='oldalcim'>Felhasználók listája
         <div class="right">

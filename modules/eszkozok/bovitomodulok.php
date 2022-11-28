@@ -1,6 +1,6 @@
 <?php
 
-if(!$sajatolvas)
+if(!$csoportolvas)
 {
 	echo "Nincs jogosultsága az oldal megtekintésére!";
 }
@@ -9,6 +9,23 @@ else
     $szuresek = getWhere("(modellek.tipus > 25 AND modellek.tipus < 31)");
     $where = $szuresek['where'];
 
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => true,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+    }
+
     $mindeneszkoz = mySQLConnect("SELECT
             eszkozok.id AS id,
             sorozatszam,
@@ -16,8 +33,8 @@ else
             modellek.modell AS modell,
             varians,
             eszkoztipusok.nev AS tipus,
-            beepitesideje,
-            kiepitesideje,
+            beepitesek.beepitesideje AS beepitesideje,
+            beepitesek.kiepitesideje AS kiepitesideje,
             modellek.tipus AS tipusid,
             bovitomodellek.fizikaireteg,
             bovitomodellek.transzpszabvany,
@@ -45,7 +62,11 @@ else
                 LEFT JOIN fizikairetegek ON bovitomodellek.fizikaireteg = fizikairetegek.id
                 LEFT JOIN portok ON beepitesek.switchport = portok.id
                 LEFT JOIN switchportok ON portok.id = switchportok.port
-        WHERE $where
+                LEFT JOIN beepitesek akteszk ON akteszk.eszkoz = switchportok.eszkoz
+                LEFT JOIN rackszekrenyek ON akteszk.rack = rackszekrenyek.id
+                LEFT JOIN helyisegek ON akteszk.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+                LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+        WHERE $where $csoportwhere
         ORDER BY switchportok.eszkoz, portok.id, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
     $tipus = 'bovitok';

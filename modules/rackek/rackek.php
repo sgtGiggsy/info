@@ -1,11 +1,30 @@
 <?php
 
-if(!$sajatolvas)
+if(!$csoportolvas)
 {
 	echo "Nincs jogosultsága az oldal megtekintésére!";
 }
 else
 {
+    $where = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => "telephely",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => false,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+
+        $where = "WHERE $csoportwhere";
+    }
+    
     $rackek = mySQLConnect("SELECT rackszekrenyek.id AS id,
             rackszekrenyek.nev AS rack,
             gyartok.nev AS gyarto,
@@ -18,6 +37,7 @@ else
             LEFT JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
+        $where
         ORDER BY epuletszam, helyisegszam, helyisegnev, rack;");
 
     if($mindir) 

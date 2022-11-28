@@ -1,11 +1,28 @@
 <?php
 
-if(!@$mindolvas)
+if(!@$csoportolvas)
 {
 	getPermissionError();
 }
 else
 {
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => "telephely",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => false,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+    }
+
     $where = null;
     if(isset($_GET['id']))
     {
@@ -13,12 +30,17 @@ else
         $where = "WHERE epuletek.telephely = $thelyid";
     }
 
+    if(!$where && isset($csoportwhere))
+    {
+        $where = "WHERE ";
+    }
+
     $epuletek = mySQLConnect("SELECT epuletek.id AS id, szam, epuletek.nev AS nev, telephelyek.telephely AS telephely, epulettipusok.tipus AS tipus
-    FROM epuletek
-        LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
-        LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
-    $where
-    ORDER BY telephelyek.id, szam + 0;");
+        FROM epuletek
+            LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
+            LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
+        $where $csoportwhere
+        ORDER BY telephelyek.id, szam + 0;");
 
     if($mindir) 
     {

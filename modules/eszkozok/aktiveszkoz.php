@@ -8,6 +8,7 @@ if($id)
         $beepszur = "AND beepitesek.id = " . $_GET['beepites'];
     }
 
+    $csoportwhere = null;
     if(!$mindolvas)
     {
         // A CsoportWhere űrlapja

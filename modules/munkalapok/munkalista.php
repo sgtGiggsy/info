@@ -1,8 +1,8 @@
 <?php
 
-if(!@$mindolvas)
+if(!@$csoportolvas)
 {
-	echo "Nincs jogosultsága az oldal megtekintésére!";
+	getPermissionError();
 }
 else
 {
@@ -11,6 +11,31 @@ else
     {
         $keres = $_GET['kereses'];
         $where = "WHERE felhasznalok.nev LIKE '%$keres%' OR alakulatok.rovid LIKE '%$keres%' OR mv1.nev LIKE '%$keres%' OR mv2.nev LIKE '%$keres%' OR leiras LIKE '%$keres%' OR eszkoz LIKE '%$keres%'";
+    }
+    
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => "alakulat",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => false,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => "felhasznalok",                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => null,           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+        if(!$where)
+        {
+            $where = "WHERE ";
+        }
+        else
+        {
+            $csoportwhere = "AND $csoportwhere";
+        }
     }
     
     if(isset($_POST['oldalankent']))
@@ -71,7 +96,7 @@ else
             LEFT JOIN felhasznalok mv1 ON munkalapok.munkavegzo1 = mv1.id
             LEFT JOIN felhasznalok mv2 ON munkalapok.munkavegzo2 = mv2.id
             LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
-        $where    
+        $where $csoportwhere
         ORDER BY munkalapok.id DESC
         LIMIT $start, $megjelenit;");
 

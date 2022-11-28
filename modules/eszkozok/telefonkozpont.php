@@ -2,12 +2,12 @@
 
 // Elsőként annak ellenőrzése, hogy a felhasználó olvashatja-e,
 // majd megvizsgálni, hogy ha olvashatja, de írni szeretné, ahhoz van-e joga
-if(!@$mindolvas || (isset($_GET['action']) && !$mindir))
+if(!@$csoportolvas || (isset($_GET['action']) && !$csoportir))
 {
     getPermissionError();
 }
 // Ha van valamilyen módosítási kísérlet, ellenőrizni, hogy van-e rá joga a felhasználónak
-elseif(isset($_GET['action']) && $mindir)
+elseif(isset($_GET['action']) && $csoportir)
 {
     $meghiv = true;
     
@@ -16,6 +16,23 @@ elseif(isset($_GET['action']) && $mindir)
 }
 else
 {
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => true,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
+    }
+
     $kozpontid = $_GET['id'];
     $helyiseg = mySQLConnect("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
         FROM helyisegek
@@ -73,7 +90,7 @@ else
             LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-        WHERE eszkozok.id = $kozpontid
+        WHERE eszkozok.id = $kozpontid $csoportwhere
         ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
     $telefonkozpont = mysqli_fetch_assoc($telefonkozpont);
 
