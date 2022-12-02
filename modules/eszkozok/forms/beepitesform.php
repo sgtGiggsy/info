@@ -1,7 +1,7 @@
 <?php
 if(@$irhat)
 {
-    ?><form action="<?=$RootPath?>/<?=$_GET['page']?>?beepites&action=<?=($_GET['beepites']) ? 'update' : 'new' ?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+    ?><form action="<?=$RootPath?>/<?=$_GET['page']?><?=(isset($_GET['id'])) ? "/" . $_GET['id'] : "" ?>?beepites&action=<?=($_GET['beepites']) ? 'update' : 'new' ?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if($_GET['beepites'])
         {
             ?><input type ="hidden" id="id" name="id" value=<?=$beepid?>><?php
@@ -124,7 +124,7 @@ if(@$irhat)
     </form><?php    
                 if(isset($_GET['id']) && (!$tipus || $tipus == "aktiveszkoz" || $tipus == "sohoeszkoz"))
                 {
-                    ?><form style="margin-top: 1em" action="<?=$RootPath?>/portdb&action=clearportassign" method="post" onsubmit="return confirm('Figyelem!!!\nEzzel a switch ÖSSZES porthozzárendelését törlöd, nem csak a jelen beépítéshez tartozókat!\nBiztosan törölni szeretnéd a switch porthozzárendeléseit?');">
+                    ?><form style="margin-top: 1em" action="<?=$RootPath?>/portdb&action=clearportassign<?=$kuldooldal?>" method="post" onsubmit="return confirm('Figyelem!!!\nEzzel a switch ÖSSZES porthozzárendelését törlöd, nem csak a jelen beépítéshez tartozókat!\nBiztosan törölni szeretnéd a switch porthozzárendeléseit?');">
                         <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$beepeszk?>>
                         <div class="submit"><input type="submit" name="beKuld" value="Porthozzárendelések törlése"></div>
                     </form><?php

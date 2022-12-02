@@ -99,7 +99,7 @@ else
 {
     // A többi megjelenítési és adatbázis részt megelőzően először a breadcumbok betöltése történik meg,
     // mivel arra a betöltés formájától függetlenül mindenképp szükség lesz
-    if(isset($_GET['action']) && $_GET['action'] != 'addnew')
+    if(mysqli_num_rows($aktiveszkozok) != 0 || (isset($_GET['action']) && $_GET['action'] != 'addnew'))
     {
         ?><div class="breadcumblist">
             <ol vocab="https://schema.org/" typeof="BreadcrumbList">
@@ -129,7 +129,7 @@ else
                     <li property="itemListElement" typeof="ListItem">
                         <a property="item" typeof="WebPage"
                             href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
-                        <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
+                        <span property="name"><?=($eszkoz['helyisegszam']) ? $eszkoz['helyisegszam'] . ". helyiség" : "" ?><?=($eszkoz['helyisegszam'] && $eszkoz['helyisegnev']) ? " - " : "" ?><?=$eszkoz['helyisegnev']?></span></a>
                         <meta property="position" content="4">
                     </li>
                     <?php if($eszkoz['rackid'])
@@ -201,7 +201,7 @@ else
                 INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
                 INNER JOIN portok ON beepitesek.switchport = portok.id
                 INNER JOIN switchportok ON portok.id = switchportok.port
-            WHERE switchportok.eszkoz = $id
+            WHERE switchportok.eszkoz = $id AND beepitesek.kiepitesideje IS NULL
             ORDER BY portok.id;");
 
         if($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'])

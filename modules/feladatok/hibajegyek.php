@@ -31,7 +31,7 @@ else
             epuletek.nev AS epuletnev, epuletek.szam AS epuletszam,
             helyisegnev, helyisegszam,
             allapottipusok.folyamat AS allapottipus, modositok.nev AS modosito,
-            szakok.nev AS tipus, megjegyzes, feladatallapotok.timestamp AS timestamp, feladatok.prioritas AS prioritas,
+            szakok.nev AS tipus, feladatallapotok.megjegyzes AS megjegyzes, feladatallapotok.timestamp AS timestamp, feladatok.prioritas AS prioritas,
             (SELECT count(id) FROM feladatfajlok WHERE feladat = hibid) AS csatolmanyok
         FROM feladatok
             INNER JOIN felhasznalok ON feladatok.felhasznalo = felhasznalok.id
