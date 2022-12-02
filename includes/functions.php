@@ -509,18 +509,7 @@ function cancelForm()
 
 function mysqliNaturalSort($mysqliresult, $sortcriteria)
 {
-	$returnarr = array();
-    foreach($mysqliresult as $sor)
-    {
-        $element = array();
-		foreach($sor as $key => $value)
-		{
-			$element[$key] = $value;
-		}
-
-		//$port = array('portid' => $x['portid'], 'port' => $x['port'], 'hasznalatban' => $x['hasznalatban'], 'tipus' => $x['tipus'], 'szam' => $x['szam']);
-        $returnarr[] = $element;
-    }
+	$returnarr = mysqliToArray($mysqliresult);
 
     usort($returnarr, function($a, $b) use ($sortcriteria) {
 		if($a[$sortcriteria] == null)
@@ -739,6 +728,7 @@ function getCimkek($cimkek)
 
 function afterDBRedirect($con, $last_id = null)
 {
+	$RootPath = getenv('APP_ROOT_PATH');
 	$oldal = $_GET['page'];
 	// Ha új elemet vittünk fel, az átirányításhoz lekérjük az utolsó adatbázisművelet id-ját
     if(!isset($_POST['id']))
@@ -763,7 +753,7 @@ function afterDBRedirect($con, $last_id = null)
     // Ha nem volt hibaüzenet az adatbázisírás során, a felhasználó átirányítása, és eredményről való visszajelzés
     if(mysqli_errno($con) == 0)
     {
-        header("Location: ./$oldal/$id?sikeres=$action");
+        header("Location: $RootPath/$oldal/$id?sikeres=$action");
     }
 }
 
@@ -813,30 +803,36 @@ function vegpontLista($portok)
 	{
 		?><div class="vegpontlist"><?php
 			$elozoport = null;
+			$elozovlan = false;
 			foreach($portok as $port)
 			{
 				// Ha nem a ciklus első körében vagyunk, és egy új port adatait írjuk ki, az előző port divjeinek és hivatkozásának lezárása
 				if($elozoport && $elozoport != $port['portid'])
 				{
+					$elozovlan = false;
 					?></div></div></a><?php
 				}
 
 				// Ha egy új port adatait írjuk ki, új div nyitása
 				if($elozoport != $port['portid'])
 				{
+					if($port['vlan'] && $port['szam']) // Mivel egy szálon informatikai végpont mellett nem mehet más informatika, ha van telefon, csak az első VLAN kíírása (a többi ennek duplikáltja lenne)
+					{
+						$elozovlan = true;
+					}
 					?><a class="<?=($port['hasznalatban'] || $port['szam']) ? "foglalt" : "ures" ?>" href='<?=$RootPath?>/port/<?=$port['portid']?>'>
 						<div class="vegpont">
 							<div><?=$port['port']?></div>
 							<div>
-								<?=($port['szam']) ? "<div>" . $port['szam'] . "</div>" : "" ?>
-								<?=($port['vlan']) ? "<div>" . $port['vlan'] . "</div>" : "" ?><?php
+								<?=($port['vlan']) ? "<div>" . $port['vlan'] . "</div>" : "" ?>
+								<?=($port['szam']) ? "<div>" . $port['szam'] . "</div>" : "" ?><?php
 				}
 
 				// Ha egy már megjelenített port további kapcsolatait írjuk ki, csak a további adatok kiírása, új div nyitása nélkül
 				else
 				{
 					?><?=($port['szam']) ? "<div>" . $port['szam'] . "</div>" : "" ?>
-					<?=($port['vlan']) ? "<div>" . $port['vlan'] . "</div>" : "" ?><?php
+					<?=($port['vlan'] && !$elozovlan) ? "<div>" . $port['vlan'] . "</div>" : "" ?><?php
 				}
 
 				// A jelenlegi port azonosítása a ciklus következő iterációja részére
@@ -846,6 +842,135 @@ function vegpontLista($portok)
 			// A legutolsó port div-jeinek lezárása. FONTOS!!! Az utolsó iterációt követően MINDEN ESETBEN NYITVA MARAD KÉT DIV ÉS EGY HIVATKOZÁS.
 			?></div></div></a>
 		</div><?php
+	}
+}
+
+function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
+{
+	// JAVÍTANI VALÓ!!!!
+	// Mivel a rendszer nem tudja kezelni azt, hogy egy switchport két portra csatlakozzon, így jelenleg egy trükkel lett megoldva a megjelenítés, ami valószínűleg 99%-ban működik.
+	// Az eszközön csak az optikai pár ELSŐ felét kell kiválasztani, a megjelenítésnél a következő szál automatikusan foglaltnak minősül.
+	// Ebből adódóan a jelen megjelenítés nem működik, ha nem egymás melletti optikai szálakra van csatlakoztatva az eszköz.
+	// Másfajta átvitel (réz, mikró) esetén ilyen nincs, ott a rendszer egy portot egy porthoz csatlakozónak vesz
+	
+	$RootPath = getenv('APP_ROOT_PATH');
+
+	$where = "";
+	if($tipus == 'epulet')
+	{
+		$where = "transzportportok.epulet = $id";
+	}
+	elseif($tipus == 'rack')
+	{
+		$where = "rackportok.rack = $id";
+	}
+	elseif($tipus == 'helyiseg')
+	{
+		$where = "rackszekrenyek.helyiseg = $id";
+	}
+
+	$portok = mySQLConnect("SELECT DISTINCT portok.id AS portid, portok.port AS port,
+                eszkozok.id AS hasznalatban,
+                tultransz.port AS tulport,
+                epuletek.szam AS epuletszam,
+                epuletek.nev AS epuletnev,
+                beepitesek.nev AS beepitesnev,
+                netdevlocal.port AS helyieszkport,
+                remotebeep.nev AS szomszednev,
+                netdevremote.port AS szomszedeszkport,
+                transzportportok.fizikaireteg AS fizikaireteg,
+                IF((port1 = portok.id), port2, port1) AS hurokid,
+                (SELECT port FROM portok WHERE id = hurokid) AS huroktuloldal
+            FROM portok
+                INNER JOIN transzportportok ON transzportportok.port = portok.id
+                LEFT JOIN transzportportok tuloldal ON portok.csatlakozas = tuloldal.port
+                LEFT JOIN epuletek ON tuloldal.epulet = epuletek.id
+				LEFT JOIN epuletek helyi ON transzportportok.epulet = epuletek.id
+				LEFT JOIN rackportok ON rackportok.port = portok.id
+				LEFT JOIN rackszekrenyek ON rackportok.rack = rackszekrenyek.id
+				LEFT JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id
+                LEFT JOIN portok tultransz ON tuloldal.port = tultransz.id
+                LEFT JOIN portok netdevlocal ON portok.id = netdevlocal.csatlakozas
+                LEFT JOIN portok netdevremote ON portok.csatlakozas = netdevremote.csatlakozas
+                LEFT JOIN switchportok ON switchportok.port = netdevlocal.id
+                LEFT JOIN sohoportok ON sohoportok.port = netdevlocal.id
+                LEFT JOIN mediakonverterportok ON mediakonverterportok.port = netdevlocal.id
+                LEFT JOIN eszkozok ON switchportok.eszkoz = eszkozok.id OR mediakonverterportok.eszkoz = eszkozok.id OR sohoportok.eszkoz = eszkozok.id
+                LEFT JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
+                LEFT JOIN switchportok remoteswport ON remoteswport.port = netdevremote.id
+                LEFT JOIN sohoportok remotesohoport ON remotesohoport.port = netdevremote.id
+                LEFT JOIN mediakonverterportok remotemkport ON remotemkport.port = netdevremote.id
+                LEFT JOIN eszkozok remoteeszk ON remoteswport.eszkoz = remoteeszk.id OR remotemkport.eszkoz = remoteeszk.id OR remotesohoport.eszkoz = remoteeszk.id
+                LEFT JOIN beepitesek remotebeep ON remoteeszk.id = remotebeep.eszkoz
+                LEFT JOIN athurkolasok ON athurkolasok.port1 = portok.id OR athurkolasok.port2 = portok.id
+            WHERE $where AND beepitesek.kiepitesideje IS NULL AND remotebeep.kiepitesideje IS NULL
+            GROUP BY portok.id
+            ORDER BY portok.port;");
+	
+	if(mysqli_num_rows($portok) > 0)
+	{
+		?><div class="transzportlist"><?php
+			$elozoport = null;
+			$huroktulportok = mysqliToArray($portok);
+			foreach($portok as $port)
+			{
+				switch($port['fizikaireteg'])
+				{
+					case 1 : $retegtip = "rez"; break;
+					case 2 : $retegtip = "single"; break;
+					case 3 : $retegtip = "multi"; break;
+					case 4 : $retegtip = "mikro"; break;
+					default: $retegtip = "rez";
+				}
+				
+				?><a class="<?=($port['hasznalatban'] || $elozoport || $port['huroktuloldal']) ? "foglalt" : "ures" ?>" href='<?=$RootPath?>/port/<?=$port['portid']?>'>
+					<div class="infoboxtitle"><div class="fizikairetegtip <?=$retegtip?>"></div><?=$port['port']?><?=($port['tulport']) ? "<span class='center' style='width: unset'>-</span><span class='right'>" . $port['tulport'] . "</span>" : "" ?></div>
+					<div class="transzport">
+						<div><h4><?=($port['tulport']) ? $port['epuletszam'] . ". épület felé" : "" ?></h4></div><?php
+						if(!$elozoport)
+						{
+							if($port['huroktuloldal'])
+							{
+								?><div><?=($port['huroktuloldal']) ? "<strong>Áthurkolva: </strong>". $port['huroktuloldal'] : "" ?></div>
+								<div><?=($port['szomszednev']) ? "<strong>Ide érkező eszköz: </strong>". $port['szomszednev'] . " - " . $port['szomszedeszkport'] : "" ?></div><?php
+								foreach($huroktulportok as $tulport)
+								{
+									?><div><?=($tulport['szomszednev'] && $tulport['hurokid'] == $port['portid']) ? "<strong>Hurok túlfelére érkező eszköz: </strong>". $tulport['szomszednev'] . " - " . $tulport['szomszedeszkport'] : "" ?></div><?php
+								}
+							}
+							else
+							{
+								?><div><?=($port['beepitesnev']) ? "<strong>Helyi eszköz: </strong>". $port['beepitesnev'] . " - " . $port['helyieszkport'] : "" ?></div>
+								<div><?=($port['szomszednev']) ? "<strong>Távoli eszköz: </strong>". $port['szomszednev'] . " - " . $port['szomszedeszkport'] : "" ?></div><?php
+							}
+
+							if(($port['beepitesnev'] || ($port['huroktuloldal'] && $port['szomszednev'])) && ($port['fizikaireteg'] == 2 || $port['fizikaireteg'] == 3))
+							{
+								$elozoport = $port;
+							}
+						}
+						else
+						{
+							if($elozoport['huroktuloldal'])
+							{
+								?><div><?=($elozoport['huroktuloldal']) ? "<strong>Áthurkolva: </strong>". $elozoport['huroktuloldal'] : "" ?></div>
+								<div><?=($elozoport['szomszednev']) ? "<strong>Ide érkező eszköz: </strong>". $elozoport['szomszednev'] . " - " . $elozoport['szomszedeszkport'] : "" ?></div><?php
+								foreach($huroktulportok as $tulport)
+								{
+									?><div><?=($tulport['hurokid'] == $elozoport['portid']) ? "<strong>Hurok túlfelére érkező eszköz: </strong>". $tulport['szomszednev'] . " - " . $tulport['szomszedeszkport'] : "" ?></div><?php
+								}
+							}
+							else
+							{
+								?><div><?=($elozoport['beepitesnev']) ? "<strong>Helyi eszköz: </strong>". $elozoport['beepitesnev'] . " - " . $elozoport['helyieszkport'] : "" ?></div>
+								<div><?=($elozoport['szomszednev']) ? "<strong>Távoli eszköz: </strong>". $elozoport['szomszednev'] . " - " . $elozoport['szomszedeszkport'] : "" ?></div><?php
+							}
+							$elozoport = null;
+						}
+					?></div>
+				</a><?php
+			}
+		?></div><?php
 	}
 }
 
@@ -1012,4 +1137,21 @@ function csoportWhere($csoporttagsagok, $csopwhereset)
 	$where .= ") ";
 
 	return $where;
+}
+
+function mysqliToArray($mysqlires)
+{
+	$returnarr = array();
+    foreach($mysqlires as $sor)
+    {
+        $element = array();
+		foreach($sor as $key => $value)
+		{
+			$element[$key] = $value;
+		}
+
+		//$port = array('portid' => $x['portid'], 'port' => $x['port'], 'hasznalatban' => $x['hasznalatban'], 'tipus' => $x['tipus'], 'szam' => $x['szam']);
+        $returnarr[] = $element;
+    }
+	return $returnarr;
 }

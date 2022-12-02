@@ -35,7 +35,7 @@ else
         $where = "WHERE ";
     }
 
-    $epuletek = mySQLConnect("SELECT epuletek.id AS id, szam, epuletek.nev AS nev, telephelyek.telephely AS telephely, epulettipusok.tipus AS tipus
+    $epuletek = mySQLConnect("SELECT epuletek.id AS id, szam, epuletek.nev AS nev, telephelyek.telephely AS telephely, epulettipusok.tipus AS tipus, epuletek.megjegyzes AS megjegyzes, naprakesz
         FROM epuletek
             LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
             LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
@@ -64,9 +64,11 @@ else
             <table id="<?=$telephely?>">
             <thead>
                 <tr>
-                    <th class="tsorth" onclick="sortTable(0, 'i', '<?=$telephely?>')">Épületszám</th>
-                    <th class="tsorth" onclick="sortTable(1, 's', '<?=$telephely?>')">Épület megnevezése</th>
-                    <th class="tsorth" onclick="sortTable(2, 's', '<?=$telephely?>')">Típus</th><?php
+                    <th class="tsorth">&nbsp;&nbsp;</th>                    
+                    <th class="tsorth" onclick="sortTable(1, 'i', '<?=$telephely?>')">Épületszám</th>
+                    <th class="tsorth" onclick="sortTable(2, 's', '<?=$telephely?>')">Épület megnevezése</th>
+                    <th class="tsorth" onclick="sortTable(3, 's', '<?=$telephely?>')">Típus</th>
+                    <th class="tsorth">Megjegyzés</th><?php
                     if($mindir)
                     {
                         ?><th></th><?php
@@ -78,9 +80,11 @@ else
         }
 
         ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/epulet/<?=$epulet['id']?>'>
+            <td><?=($epulet['naprakesz']) ? "&check;" : "" ?></td>
             <td><?=$epulet['szam']?></td>
             <td><?=$epulet['nev']?></td>
-            <td><?=$epulet['tipus']?></td><?php
+            <td><?=$epulet['tipus']?></td>
+            <td><?=$epulet['megjegyzes']?></td><?php
             if($mindir)
             {
                 ?><td><a href='<?=$RootPath?>/epulet/<?=$epulet['id']?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Épület szerkesztése' title='Épület szerkesztése'/></a></td><?php

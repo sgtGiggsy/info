@@ -14,8 +14,8 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO epuletek (szam, telephely, nev, tipus) VALUES (?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $_POST['szam'], $_POST['telephely'], $_POST['nev'], $_POST['tipus']);
+        $stmt = $con->prepare('INSERT INTO epuletek (szam, telephely, nev, tipus, megjegyzes) VALUES (?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssss', $_POST['szam'], $_POST['telephely'], $_POST['nev'], $_POST['tipus'], $_POST['megjegyzes']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
@@ -29,8 +29,8 @@ if(isset($irhat) && $irhat)
     }
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE epuletek SET szam=?, telephely=?, nev=?, tipus=? WHERE id=?');
-        $stmt->bind_param('ssssi', $_POST['szam'], $_POST['telephely'], $_POST['nev'], $_POST['tipus'], $_POST['id']);
+        $stmt = $con->prepare('UPDATE epuletek SET szam=?, telephely=?, nev=?, tipus=?, megjegyzes=?, naprakesz=? WHERE id=?');
+        $stmt->bind_param('ssssssi', $_POST['szam'], $_POST['telephely'], $_POST['nev'], $_POST['tipus'], $_POST['megjegyzes'], $_POST['naprakesz'], $_POST['id']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

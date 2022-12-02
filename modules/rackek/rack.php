@@ -93,10 +93,14 @@ elseif(!isset($_GET['action']))
             LEFT JOIN rackportok ON rackportok.port = portok.id
             LEFT JOIN portok csatlakoz ON portok.id = csatlakoz.csatlakozas
             LEFT JOIN switchportok ON switchportok.port = csatlakoz.id
+            LEFT JOIN sohoportok ON sohoportok.port = csatlakoz.id
+            LEFT JOIN mediakonverterportok ON mediakonverterportok.port = csatlakoz.id
+            LEFT JOIN beepitesek ON sohoportok.eszkoz = beepitesek.eszkoz OR mediakonverterportok.eszkoz = beepitesek.eszkoz
             LEFT JOIN rackszekrenyek ON rackportok.rack = rackszekrenyek.id
             LEFT JOIN telefonszamok ON telefonszamok.port = portok.id
-            LEFT JOIN vlanok ON switchportok.vlan = vlanok.id
-        WHERE rackportok.rack = $id
+            LEFT JOIN vlanok ON switchportok.vlan = vlanok.id OR beepitesek.vlan = vlanok.id
+            LEFT JOIN transzportportok ON transzportportok.port = portok.id
+        WHERE rackportok.rack = $id AND transzportportok.id IS NULL
         ORDER BY portok.port ASC;");
 
     $eszkozok = mySQLConnect("SELECT
@@ -158,7 +162,7 @@ elseif(!isset($_GET['action']))
                 <li property="itemListElement" typeof="ListItem">
                     <a property="item" typeof="WebPage"
                         href="<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>">
-                    <span property="name"><?=$helyiseg['helyisegszam']?>. helyiség (<?=$helyiseg['helyisegnev']?>)</span></a>
+                    <span property="name"><?=($helyiseg['helyisegszam']) ? $helyiseg['helyisegszam'] . ". helyiség" : "" ?><?=($helyiseg['helyisegszam'] && $helyiseg['helyisegnev']) ? " - " : "" ?><?=$helyiseg['helyisegnev']?></span></a>
                     <meta property="position" content="4">
                 </li>
                 <li><b>></b></li>
@@ -223,10 +227,10 @@ elseif(!isset($_GET['action']))
             </div><?php
         }
 
-        if(mysqli_num_rows($portok) > 0)
-        {
-            ?><div class="oldalcim">Patch portok a szekrényben</div><?php
+        ?><div class="oldalcim">Transzport portok a szekrényben</div><?php
+                transzportPortLista($id, 'rack');
+
+        ?><div class="oldalcim">Patch portok a szekrényben</div><?php
             vegpontLista($portok);
-        }
     }
 }

@@ -341,7 +341,9 @@ ol, ul {
 }
 
 .infoboxbodybp {
-    padding: 1em !important;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0em 0.5em 1em 0.5em !important;
 }
 
 .infoboxbodybp select {
@@ -840,9 +842,9 @@ input:checked + .slider:before {
 /* Az elemek container-e */
 .select-items {
     display: grid;
-    min-width: 10em;
-    max-width: 500px;
-    grid-template-columns: repeat(5, minmax(0, min-content));
+    grid-template-columns: repeat(5, minmax(min-content, max-content));
+    min-width: 10ch;
+/*    max-width: 500px;*/
     min-height: 1em;
     max-height: 300px;
     overflow-y: auto;
@@ -851,7 +853,6 @@ input:checked + .slider:before {
     bottom: 2em;
     right: 0;
     z-index: 99;
-    scrollbar-gutter: stable;
     scrollbar-width: thin;
 }
   
@@ -1695,7 +1696,7 @@ div[id^=tennivalobody-].close {
     width: 100%;
 }
 
-/* --- Végpontok listája --- */
+/* --- Végpontok, transzport portok listája --- */
 
 .vegpontlist {
     display: grid;
@@ -1703,18 +1704,58 @@ div[id^=tennivalobody-].close {
     grid-gap: 0.5em;
 }
 
-.vegpontlist a {
+.transzportlist {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 15em);
+    grid-gap: 0.5em;
+}
+
+.vegpontlist a, .transzportlist a {
     text-decoration: none;
+}
+
+.vegpont, .transzport {
+    padding: 0.5em;
+    background-color: var(--cardbase);
+    border: 1px solid var(--infotitleborder);
+    overflow: auto;
 }
 
 .vegpont {
     display: grid;
     grid-template-columns: max-content minmax(0, max-content);
     grid-gap: 0.8em;
-    padding: 0.5em;
-    background-color: var(--cardbase);
-    border: 1px solid var(--infotitleborder);
-    overflow: auto;
+}
+
+.transzport div {
+    margin-top: 0.4em;
+}
+
+.fizikairetegtip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 0;
+    width: 0;
+    border-left: 15px solid;
+    border-top: 15px solid;
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+}
+
+.rez {
+    border-top-color: #413232;
+    border-left-color: #413232;
+}
+
+.multi {
+    border-top-color: #cc7400;
+    border-left-color: #cc7400;
+}
+
+.single {
+    border-top-color: #e1bc00;
+    border-left-color: #e1bc00;
 }
 
 .foglalt {

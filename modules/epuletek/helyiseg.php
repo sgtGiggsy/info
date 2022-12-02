@@ -137,11 +137,15 @@ else
                 LEFT JOIN vegpontiportok ON vegpontiportok.port = portok.id
                 LEFT JOIN portok csatlakoz ON portok.id = csatlakoz.csatlakozas
                 LEFT JOIN switchportok ON switchportok.port = csatlakoz.id
+                LEFT JOIN sohoportok ON sohoportok.port = csatlakoz.id
+                LEFT JOIN mediakonverterportok ON mediakonverterportok.port = csatlakoz.id
+                LEFT JOIN beepitesek ON sohoportok.eszkoz = beepitesek.eszkoz OR mediakonverterportok.eszkoz = beepitesek.eszkoz
                 LEFT JOIN rackszekrenyek ON rackportok.rack = rackszekrenyek.id
                 LEFT JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id OR vegpontiportok.helyiseg = helyisegek.id
                 LEFT JOIN telefonszamok ON telefonszamok.port = portok.id
-                LEFT JOIN vlanok ON switchportok.vlan = vlanok.id
-            WHERE helyisegek.id = $helyisegid
+                LEFT JOIN vlanok ON switchportok.vlan = vlanok.id OR beepitesek.vlan = vlanok.id
+                LEFT JOIN transzportportok ON transzportportok.port = portok.id
+            WHERE helyisegek.id = $helyisegid AND transzportportok.id IS NULL
             ORDER BY rackportok.rack ASC, portok.id ASC;");
 
         $eszkozok = mySQLConnect("SELECT
@@ -212,7 +216,7 @@ else
                     </li>
                     <li><b>></b></li>
                     <li property="itemListElement" typeof="ListItem">
-                        <span property="name"><?=$helyiseg['helyisegszam']?>. helyiség (<?=$helyiseg['helyisegnev']?>)</span>
+                        <span property="name"><?=($helyiseg['helyisegszam']) ? $helyiseg['helyisegszam'] . ". helyiség" : "" ?><?=($helyiseg['helyisegszam'] && $helyiseg['helyisegnev']) ? " - " : "" ?><?=$helyiseg['helyisegnev']?></span>
                         <meta property="position" content="4">
                     </li>
                 </ol>
@@ -313,6 +317,9 @@ else
                     </table>
                 </div><?php
             }
+            ?><div class="oldalcim">Transzport portok a helyiségben</div><?php
+            transzportPortLista($id, 'helyiseg');
+
             ?><div class="oldalcim">Végpontok a helyiségben</div><?php
                 vegpontLista($portok);
         }

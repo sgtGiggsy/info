@@ -21,7 +21,7 @@ if(@$irhat)
                     <select id="utolsoport" name="utolsoport"><?php
                         foreach($epuletportok as $x)
                         {
-                            ?><option value="<?=$x["id"]?>" selected><?=$x['port']?></option><?php
+                            ?><option value="<?=$x["id"]?>"><?=$x['port']?></option><?php
                         }
                     ?></select>
                 </div>

@@ -313,6 +313,38 @@ if(isset($mindir) && $mindir)
         }
     }
 
+    elseif($_GET["action"] == "generate" && $_GET["tipus"] == "transzport") // Verziókövetés kész
+    {
+        for($i = $_POST['kezdoport']; $i <= $_POST['zaroport']; $i++)
+        {
+            $portsorszam = str_pad($i, $_POST['nullara'], "0", STR_PAD_LEFT);
+            $port = $_POST['portelotag'] . $portsorszam;
+
+            $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
+            $stmt->bind_param('ss', $port, $_POST['csatlakozo']);
+            $stmt->execute();
+
+            $last_id = mysqli_insert_id($con);
+            $modif_id = modId("1", "port", $last_id);
+            mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $last_id");
+
+            $stmt = $con->prepare('INSERT INTO transzportportok (epulet, port, fizikaireteg, modid) VALUES (?, ?, ?, ?)');
+            $stmt->bind_param('ssss', $_POST['epulet'], $last_id, $_POST['fizikaireteg'], $modif_id);
+            $stmt->execute();
+        }
+
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>Portok hozzáadása sikertelen!<br></h2>";
+            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
+        {
+            $targeturl = $RootPath . "/" . $_GET['kuldooldal'] . "/" . $_GET['kuldooldalid'] . "?action=edit";
+            header("Location: $targeturl");
+        }
+    }
+
     elseif($_GET["action"] == "generate" && $_GET["tipus"] == "rack") // Verziókövetés kész
     {
         for($i = $_POST['elsoport']; $i <= $_POST['utolsoport']; $i++)
@@ -397,6 +429,112 @@ if(isset($mindir) && $mindir)
         else
         {
             redirectToKuldo();
+        }
+    }
+
+    elseif($_GET["action"] == "transzporttarsitas") // Verziókövetés kész
+    {
+        for($i = 1; $i < 1000; $i++)
+        {
+            if(isset($_POST['portid-'.$i]))
+            {
+                $helyiportid = $_POST['portid-'.$i];
+                $oldszomszed = $_POST['oldszomszed-'.$i];
+                $szomszed = $_POST['szomszed-'.$i];
+                $null = null;
+
+                // Csak akkor kell írnunk az adatbázist, ha volt szomszédos port, de nem egyezik meg a jelenlegivel
+                if($oldszomszed != $szomszed)
+                {
+                    //// Először a helyi port állapotát frissítjük
+                    // A jelen állapot mentése
+                    mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
+                        SELECT id, port, csatlakozo, csatlakozas, modid
+                        FROM portok
+                        WHERE id = $helyiportid");
+
+                    // A tényleges módosítás folyamata
+                    $modif_id = modId("2", "port", $helyiportid);    
+                    $stmt = $con->prepare('UPDATE portok SET csatlakozas=?, modid=? WHERE id=?');
+                    $stmt->bind_param('ssi', $szomszed, $modif_id, $helyiportid);
+                    $stmt->execute();
+
+                    //// Ezt követően a távoli port állapotát frissítjük
+                    //A jelen állapot mentése
+                    mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
+                        SELECT id, port, csatlakozo, csatlakozas, modid
+                        FROM portok
+                        WHERE id = $szomszed");
+                    
+                    // A tényleges módosítás folyamata
+                    $modif_id = modId("2", "port", $szomszed);
+                    $stmt = $con->prepare('UPDATE portok SET csatlakozas=?, modid=? WHERE id=?');
+                    $stmt->bind_param('ssi', $helyiportid, $modif_id, $szomszed);
+                    $stmt->execute();
+                    
+                    // Ha volt szomszéd, eltávolítjuk róla a jelenlegi portot
+                    if($oldszomszed)
+                    {
+                        // Elsőként megnézzük, hogy az adott szomszédporthoz nem csatlakozott-e ebben a frissítési kérésben egy másik port
+                        $aktualisport = mySQLConnect("SELECT csatlakozas FROM portok WHERE id = $oldszomszed");
+                        $aktualisport = mysqli_fetch_assoc($aktualisport)['csatlakozas'];
+                        
+                        // Ha a távoli portra továbbra is a jelen port van csatlakoztatva, nullázás
+                        if($aktualisport != $helyiportid)
+                        {
+                            //A jelen állapot mentése
+                            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
+                                SELECT id, port, csatlakozo, csatlakozas, modid
+                                FROM portok
+                                WHERE id = $oldportid");
+
+                            // A tényleges módosítás folyamata
+                            $modif_id = modId("2", "port", $oldportid);
+                            $stmt = $con->prepare('UPDATE portok SET csatlakozas=?, modid=? WHERE id=?');
+                            $stmt->bind_param('ssi', $null, $modif_id, $oldportid);
+                            $stmt->execute();
+                        }
+                    }
+                }
+
+                $hurok = $_POST['hurok-'.$i];
+                $letezik = mySQLConnect("SELECT id FROM athurkolasok WHERE (port1 = $helyiportid OR port2 = $helyiportid) AND (port1 = $hurok OR port2 = $hurok)");
+                if($letezik)
+                {
+                    $letezik = mysqli_num_rows($letezik) > 0;
+                }
+                $letezikhelyi = mySQLConnect("SELECT id FROM athurkolasok WHERE (port1 = $helyiportid OR port2 = $helyiportid)");
+                $letezikhelyi = mysqli_num_rows($letezikhelyi) > 0;
+                $leteziktavoli = mySQLConnect("SELECT id FROM athurkolasok WHERE (port1 = $hurok OR port2 = $hurok)");
+                if($leteziktavoli)
+                {
+                    $leteziktavoli = mysqli_num_rows($leteziktavoli) > 0;
+                }
+                
+                if(!$letezik)
+                {
+                    if($letezikhelyi)
+                    {
+                        mySQLConnect("DELETE FROM athurkolasok WHERE (port1 = $helyiportid OR port2 = $helyiportid)");
+                    }
+
+                    if($leteziktavoli)
+                    {
+                        mySQLConnect("DELETE FROM athurkolasok WHERE (port1 = $hurok OR port2 = $hurok)");
+                    }
+
+                    if($hurok)
+                    {
+                        $stmt = $con->prepare('INSERT INTO athurkolasok (port1, port2) VALUES (?, ?)');
+                        $stmt->bind_param('ss', $helyiportid, $hurok);
+                        $stmt->execute();
+                    }
+                }
+            }
+            else
+            {
+                break;
+            }
         }
     }
 
