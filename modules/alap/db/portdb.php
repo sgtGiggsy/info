@@ -1,6 +1,6 @@
 <?php
 
-if(isset($mindir) && $mindir)
+if(isset($csoportir) && $csoportir)
 {
     $con = mySQLConnect(false);
     $timestamp = date('Y-m-d H:i:s');
@@ -24,7 +24,12 @@ if(isset($mindir) && $mindir)
 
         if($tulportid)
         {
-            $iftulportswitch = mySQLConnect("SELECT portok.id AS id FROM portok INNER JOIN switchportok ON switchportok.port = portok.id WHERE portok.id = $tulportid;");
+            // Mivel switchre direktben nem lesz kötve soho eszköz, itt csak switcheket, és médiakonvertereket ellenőrzünk
+            $iftulportswitch = mySQLConnect("SELECT portok.id AS id
+                FROM portok
+                    LEFT JOIN switchportok ON switchportok.port = portok.id
+                    LEFT JOIN mediakonverterportok ON mediakonverterportok.port = portok.id
+                WHERE switchportok.port = $tulportid OR mediakonverterportok.port = $tulportid;");
         }
         $iftulportchange = mySQLConnect("SELECT id FROM portok WHERE csatlakozas = $helyiportid;");
 
@@ -612,7 +617,12 @@ if(isset($mindir) && $mindir)
 
         if($tulportid)
         {
-            $iftulportswitch = mySQLConnect("SELECT portok.id AS id FROM portok INNER JOIN switchportok ON switchportok.port = portok.id WHERE portok.id = $tulportid;");
+            $iftulportswitch = mySQLConnect("SELECT portok.id AS id
+                FROM portok
+                    LEFT JOIN switchportok ON switchportok.port = portok.id
+                    LEFT JOIN mediakonverterportok ON mediakonverterportok.port = portok.id
+                    LEFT JOIN sohoportok ON sohoportok.port = portok.id
+                WHERE switchportok.port = $tulportid OR mediakonverterportok.port = $tulportid OR sohoportok.port = $tulportid;");
         }
         $iftulportchange = mySQLConnect("SELECT id FROM portok WHERE csatlakozas = $helyiportid;");
         

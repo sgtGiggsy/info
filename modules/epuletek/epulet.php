@@ -328,7 +328,7 @@ else
                 LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                 LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
-            WHERE helyisegek.epulet = $epid AND kiepitesideje IS NULL AND (modellek.tipus < 6 OR (modellek.tipus > 19 AND modellek.tipus < 31))
+            WHERE helyisegek.epulet = $epid AND kiepitesideje IS NULL AND (modellek.tipus < 10 OR (modellek.tipus > 19 AND modellek.tipus < 31))
             ORDER BY rack, pozicio;");
 
         if($csoportir)

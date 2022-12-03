@@ -149,14 +149,15 @@ else
         {
             $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
                 FROM portok
-                    INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-                WHERE epulet = $epuletid
+                    LEFT JOIN vegpontiportok ON vegpontiportok.port = portok.id
+                    LEFT JOIN transzportportok ON transzportportok.port = portok.id
+                WHERE vegpontiportok.epulet = $epuletid OR transzportportok.epulet = $epuletid
                 ORDER BY aktiveszkoz, id;");
         }
         
         $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
         // Szerkesztő gombok
-        if($mindir)
+        if($csoportir)
         {
             ?><div style='display: inline-flex'>
                 <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Eszköz szerkesztése</button><?php
