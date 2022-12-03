@@ -56,7 +56,7 @@ if(isset($irhat) && $irhat)
             elseif($eszkoztipus == "mediakonverter")
             {
                 $eszkoz = $last_id;
-                include("./db/portdb.php");
+                include("././modules/alap/db/portdb.php");
             }
 
             elseif($eszkoztipus == "simkartya")

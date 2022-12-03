@@ -2,7 +2,7 @@
 
 // Elsőként annak ellenőrzése, hogy a felhasználó olvashatja-e,
 // majd megvizsgálni, hogy ha olvashatja, de írni szeretné, ahhoz van-e joga
-if(!@$csoportolvas || (isset($_GET['action']) && !$csoportir))
+if(!@$csoportolvas || (isset($_GET['action']) && !$csoportir) || (!isset($_GET['action']) && !$id))
 {
     getPermissionError();
 }
@@ -44,6 +44,7 @@ else
             epuletek.nev AS epuletnev,
             epuletek.szam AS epuletszam,
             alakulatok.nev AS tulajdonos,
+            helyisegek.id AS helyisegid,
             helyisegszam,
             helyisegnev,
             beepitesideje,
@@ -97,6 +98,50 @@ else
     {
 		$eszkoz = mysqli_fetch_assoc($mindeneszkoz);
 
+        $epuletid = $eszkoz['epuletid'];
+        $helyisegid = $eszkoz['helyisegid'];
+
+        $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
+        $switchportok = mySQLConnect("SELECT mediakonverterportok.id AS id, eszkoz, sebesseg, portok.port, csatlakozo, portok.id AS portid, csatlakozas, szabvany
+            FROM mediakonverterportok
+                INNER JOIN portok ON mediakonverterportok.port = portok.id
+                WHERE eszkoz = $id;");
+
+        if($epuletid)
+        {
+            $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
+                    FROM portok
+                        INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
+                    WHERE epulet = $epuletid
+                UNION
+                    SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
+                    FROM portok
+                        INNER JOIN transzportportok ON transzportportok.port = portok.id
+                    WHERE epulet = $epuletid
+                UNION
+                    SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
+                    FROM portok
+                        INNER JOIN switchportok ON portok.id = switchportok.port
+                        INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
+                        INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
+                        LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                        LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+                    WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
+                UNION
+                    SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
+                    FROM portok
+                        INNER JOIN sohoportok ON portok.id = sohoportok.port
+                        INNER JOIN eszkozok ON sohoportok.eszkoz = eszkozok.id
+                        INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
+                        LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                        LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+                    WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
+                    ORDER BY aktiveszkoz, port;");
+        }
+        
+        $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
+        $atviteliszabvanyok = mySQLConnect("SELECT * FROM atviteliszabvanyok;");
+
         ?><div class="breadcumblist">
             <ol vocab="https://schema.org/" typeof="BreadcrumbList">
                 <li property="itemListElement" typeof="ListItem">
@@ -135,7 +180,7 @@ else
         </div><?php
 
     // Szerkesztő gombok
-        if($mindir)
+        if($csoportir)
         {
             ?><div style='display: inline-flex'>
                 <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Eszköz szerkesztése</button><?php
@@ -214,6 +259,92 @@ else
                     <div><?=$eszkoz['lanportsebesseg']?> Mbit</div>
                 </div>
             </div>
-        </div><?php
+        </div>
+        
+        <div class="oldalcim">Portok</div>
+        <table id="switchportok">
+            <thead>
+                <tr>
+                    <th class="tsorth" onclick="sortTable(0, 's', 'switchportok')">Portnév</th>
+                    <th class="tsorth" onclick="sortTable(1, 's', 'switchportok')">Sebesség</th>
+                    <th class="tsorth" onclick="sortTable(2, 's', 'switchportok')">Szabvány</th>
+                    <th class="tsorth" onclick="sortTable(3, 's', 'switchportok')">Csatlakozó</th>
+                    <th class="tsorth" onclick="sortTable(4, 's', 'switchportok')">Végpont</th>
+                </tr>
+            </thead>
+            <tbody><?php
+                foreach($switchportok as $port)
+                {
+                    ?><tr>
+                        <!--<form action="">-->
+                        <form action="?page=portdb&action=update&tipus=mediakonverter" method="post">
+                            <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
+                            <input type ="hidden" id="portid" name="portid" value=<?=$port['portid']?>>
+                            <td><input style="width: max-content" type="text" name="port" value="<?=$port['port']?>"></td>
+                            <td>
+                                <select name="sebesseg">
+                                    <option value=""></option><?php
+                                    foreach($sebessegek as $x)
+                                    {
+                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['sebesseg']) ? "selected" : "" ?>><?=$x['sebesseg']?></option><?php
+                                    }
+                                ?></select>
+                            </td>
+                            <td>
+                                <select id="szabvany" name="szabvany">
+                                    <option value="" selected></option><?php
+                                    foreach($atviteliszabvanyok as $x)
+                                    {
+                                        ?><option value="<?=$x["id"]?>" <?= ($x['id'] == $port['szabvany']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                    }
+                                ?></select>
+                            </td>
+                            <td>
+                                <select name="csatlakozo">
+                                    <option value=""></option><?php
+                                    foreach($csatlakozotipusok as $x)
+                                    {
+                                        ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozo']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                    }
+                                ?></select>
+                            </td>
+                            <td>
+                                <select name="csatlakozas">
+                                    <option value="" selected></option><?php
+                                    $elozo = null;
+                                    foreach($epuletportok as $x)
+                                    {
+                                        // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
+                                        // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
+                                        if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                                        {
+                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                        }
+                                        $elozo = $x['id'];
+                                    }
+                                ?></select>
+                            </td>
+                            <td><input type="submit" value="Módosítás"></td>
+                        </form>
+                    </tr><?php
+                }
+            ?></tbody>
+        </table>
+
+        <script>
+            $("form").on("submit", function (e) {
+                var dataString = $(this).serialize();
+
+                $.ajax({
+                type: "POST",
+                data: dataString,
+                url: "<?=$RootPath?>/portdb?action=update&tipus=mediakonverter",
+                success: function () {
+                    showToaster("Port szerkesztése sikeres...");
+                }
+            });
+            e.preventDefault();
+            });
+        </script><?php
 	}
 }

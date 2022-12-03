@@ -1,7 +1,7 @@
 <?php
 if(@$irhat)
 {
-    ?><form action="<?=$RootPath?>/<?=$eszkoztipus?><?=(isset($_GET['id'])) ? '/' . $_GET['id'] . '&action=update' : '&action=new' ?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+    ?><form action="<?=$RootPath?>/<?=$eszkoztipus?><?=(isset($_GET['id'])) ? '/' . $_GET['id'] . '&action=update' : '&action=new' ?>&tipus=<?=$eszkoztipus?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if(isset($_GET['id']))
         {
             ?><input type ="hidden" id="id" name="id" value=<?=$id?>><?php
@@ -74,6 +74,33 @@ if(@$irhat)
                     </div><?php
 
                     $magyarazat .= "<strong>Szoftver</strong><p>Az eszközön futó szoftver verziószáma.</p>";
+                }
+
+                if($eszkoztipus == "mediakonverter")
+                {
+                    ?><div>
+                        <label for="transzportszam">Transzport portszám:</label><br>
+                        <select name="transzportszam">
+                            <option value="" selected></option><?php
+                            for($i = 1; $i <= 8; $i++)
+                            {
+                                ?><option value="<?=$i?>"><?=$i?></option><?php
+                            }
+                        ?></select>
+                    </div>
+
+                    <?php $magyarazat .= "<strong>PoE képes</strong><p>Akkor kell bejelölni, ha az eszköz rendelkezik PoE képességgel bíró portokkal.</p>"; ?>
+                    
+                    <div>
+                        <label for="accessportszam">Access portszám:</label><br>
+                        <select name="accessportszam">
+                            <option value="" selected></option><?php
+                            for($i = 1; $i <= 8; $i++)
+                            {
+                                ?><option value="<?=$i?>"><?=$i?></option><?php
+                            }
+                        ?></select>
+                    </div><?php
                 }
 
                 if($eszkoztipus == "aktiveszkoz")

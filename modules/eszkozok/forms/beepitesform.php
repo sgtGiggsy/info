@@ -14,7 +14,7 @@ if(@$irhat)
                 $magyarazat .= "<strong>Eszköz</strong><p>Csak a beépítés során módosítható. Amennyiben új eszköz kerül a helyére,
                     a jelen eszköz beépítését le kell zárni a kiépítési idő megadásával, majd a másik eszközt új beépítésként felvinni.</p>";
 
-                if(!$tipus || $tipus == "aktiveszkoz" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "sohoeszkoz")
+                if(!$tipus || $tipus == "aktiveszkoz" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "sohoeszkoz" || $tipus == "mediakonverter")
                 {
                             
                     ?><div>
@@ -46,7 +46,7 @@ if(@$irhat)
                     $magyarazat .= "<strong>Helyiség</strong><p>Csak abban az esetben kell megadni, ha az eszköz <b>nincs</b> rack szekrénybe építve.</p>";
                 }
 
-                if(!$tipus || $tipus == "aktiveszkoz" || $tipus == "mediakonverter" || $tipus == "soho")
+                if(!$tipus || $tipus == "aktiveszkoz" || $tipus == "mediakonverter" || $tipus == "sohoeszkoz")
                 {
                     rackPicker($beeprack);
                     $magyarazat .= "<strong>Rackszekrény</strong><p>Amennyiben az eszköz rackszekrénybe van építve, csak ezt kell megadni.</p>";

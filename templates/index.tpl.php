@@ -447,7 +447,7 @@
 	}
 
 	<?php
-	if(isset($_GET['page']) && ($_GET['page'] != "aktiveszkoz" || ($_GET['page'] == "aktiveszkoz" && isset($_GET['action']))))
+	if(isset($_GET['page']) && $_GET['page'] != "aktiveszkoz" && $_GET['page'] != "sohoeszkoz" && $_GET['page'] != "mediakonverter" || ($_GET['page'] == "aktiveszkoz" && isset($_GET['action'])))
 	{
 		?>
 		$("form").on("submit", function (e) {
