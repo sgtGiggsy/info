@@ -20,48 +20,51 @@ if(!isset($_GET['action']) || $_GET['action'] == "edit" || $_GET['action'] == "s
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
     }
     
-    $epid = $_GET['id'];
-    $epuletek = mySQLConnect("SELECT epuletek.id AS id, szam AS epuletszam, epuletek.nev AS nev, telephelyek.telephely AS telephely, telephelyek.id AS thelyid, epulettipusok.tipus AS tipus
-        FROM epuletek
-            LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
-            LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
-        WHERE epuletek.id = $epid $csoportwhere;");
-
-    $epulet = mysqli_fetch_assoc($epuletek);
-
-    if(mysqli_num_rows($epuletek) != 1)
+    if(isset($_GET['id']))
     {
-        $permission = false;
-    }
-    else
-    {
-        ?><div class="breadcumblist">
-            <ol vocab="https://schema.org/" typeof="BreadcrumbList">
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/">
-                    <span property="name">Kecskemét Informatika</span></a>
-                    <meta property="position" content="1">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epuletek/<?=$epulet['thelyid']?>">
-                    <span property="name"><?=$epulet['telephely']?></span></a>
-                    <meta property="position" content="2">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem"><?php
-                    if(isset($_GET['action']))
-                    {
-                        ?><a property="item" typeof="WebPage"
-                                href="<?=$RootPath?>/epulet/<?=$epulet['id']?>"><?php
-                    }
-                    ?><span property="name"><?=$epulet['epuletszam']?>. <?=$epulet['tipus']?></span><?=(isset($_GET['action'])) ? "</a>" : "" ?>
-                    <meta property="position" content="3">
-                </li>
-            </ol>
-        </div><?php
+        $epid = $_GET['id'];
+        $epuletek = mySQLConnect("SELECT epuletek.id AS id, szam AS epuletszam, epuletek.nev AS nev, telephelyek.telephely AS telephely, telephelyek.id AS thelyid, epulettipusok.tipus AS tipus
+            FROM epuletek
+                LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
+                LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
+            WHERE epuletek.id = $epid $csoportwhere;");
+
+        $epulet = mysqli_fetch_assoc($epuletek);
+
+        if(mysqli_num_rows($epuletek) != 1)
+        {
+            $permission = false;
+        }
+        else
+        {
+            ?><div class="breadcumblist">
+                <ol vocab="https://schema.org/" typeof="BreadcrumbList">
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/">
+                        <span property="name">Kecskemét Informatika</span></a>
+                        <meta property="position" content="1">
+                    </li>
+                    <li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem">
+                        <a property="item" typeof="WebPage"
+                            href="<?=$RootPath?>/epuletek/<?=$epulet['thelyid']?>">
+                        <span property="name"><?=$epulet['telephely']?></span></a>
+                        <meta property="position" content="2">
+                    </li>
+                    <li><b>></b></li>
+                    <li property="itemListElement" typeof="ListItem"><?php
+                        if(isset($_GET['action']))
+                        {
+                            ?><a property="item" typeof="WebPage"
+                                    href="<?=$RootPath?>/epulet/<?=$epulet['id']?>"><?php
+                        }
+                        ?><span property="name"><?=$epulet['epuletszam']?>. <?=$epulet['tipus']?></span><?=(isset($_GET['action'])) ? "</a>" : "" ?>
+                        <meta property="position" content="3">
+                    </li>
+                </ol>
+            </div><?php
+        }
     }
 }
 
@@ -216,10 +219,9 @@ else
     {
         $magyarazat = null;
         
-        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, portok.csatlakozas AS csatlakozas, port1, port2
+        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, portok.csatlakozas AS csatlakozas, athurkolas
                 FROM portok
                     INNER JOIN transzportportok ON transzportportok.port = portok.id
-                    LEFT JOIN athurkolasok ON portok.id = athurkolasok.port1 OR portok.id = athurkolasok.port2
                 WHERE epulet = $id
                 ORDER BY portok.port;");
         
@@ -252,40 +254,6 @@ else
                 LEFT JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
             WHERE epulet = $epid
             ORDER BY emelet, helyisegszam + 0;");
-
-        $transzportportok = mySQLConnect("SELECT DISTINCT portok.id AS portid, portok.port AS port,
-                eszkozok.id AS hasznalatban,
-                tultransz.port AS tulport,
-                epuletek.szam AS epuletszam,
-                epuletek.nev AS epuletnev,
-                beepitesek.nev AS beepitesnev,
-                netdevlocal.port AS helyieszkport,
-                remotebeep.nev AS szomszednev,
-                netdevremote.port AS szomszedeszkport,
-                transzportportok.fizikaireteg AS fizikaireteg,
-                IF((port1 = portok.id), port2, port1) AS hurokid,
-                (SELECT port FROM portok WHERE id = hurokid) AS huroktuloldal
-            FROM portok
-                INNER JOIN transzportportok ON transzportportok.port = portok.id
-                LEFT JOIN transzportportok tuloldal ON portok.csatlakozas = tuloldal.port
-                LEFT JOIN epuletek ON tuloldal.epulet = epuletek.id
-                LEFT JOIN portok tultransz ON tuloldal.port = tultransz.id
-                LEFT JOIN portok netdevlocal ON portok.id = netdevlocal.csatlakozas
-                LEFT JOIN portok netdevremote ON portok.csatlakozas = netdevremote.csatlakozas
-                LEFT JOIN switchportok ON switchportok.port = netdevlocal.id
-                LEFT JOIN sohoportok ON sohoportok.port = netdevlocal.id
-                LEFT JOIN mediakonverterportok ON mediakonverterportok.port = netdevlocal.id
-                LEFT JOIN eszkozok ON switchportok.eszkoz = eszkozok.id OR mediakonverterportok.eszkoz = eszkozok.id OR sohoportok.eszkoz = eszkozok.id
-                LEFT JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
-                LEFT JOIN switchportok remoteswport ON remoteswport.port = netdevremote.id
-                LEFT JOIN sohoportok remotesohoport ON remotesohoport.port = netdevremote.id
-                LEFT JOIN mediakonverterportok remotemkport ON remotemkport.port = netdevremote.id
-                LEFT JOIN eszkozok remoteeszk ON remoteswport.eszkoz = remoteeszk.id OR remotemkport.eszkoz = remoteeszk.id OR remotesohoport.eszkoz = remoteeszk.id
-                LEFT JOIN beepitesek remotebeep ON remoteeszk.id = remotebeep.eszkoz
-                LEFT JOIN athurkolasok ON athurkolasok.port1 = portok.id OR athurkolasok.port2 = portok.id
-            WHERE transzportportok.epulet = $id AND beepitesek.kiepitesideje IS NULL AND remotebeep.kiepitesideje IS NULL
-            GROUP BY portok.id
-            ORDER BY portok.port;");
 
         $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban,
                 telefonszamok.szam AS szam, vlanok.nev AS vlan

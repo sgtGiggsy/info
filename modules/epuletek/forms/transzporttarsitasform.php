@@ -31,22 +31,11 @@ if(@$irhat)
                                 </div>
                                 <div>
                                     <label for="hurok-<?=$i?>">Épületen belüli áthurkolás</label>
-                                    <select class="hurkok" id="hurok-<?=$x['id']?>" name="hurok-<?=$i?>" onchange="atHurkolas(<?=$i?>, <?=$x['id']?>);">
+                                    <select class="hurkok" id="hurok-<?=$x['id']?>" name="hurok-<?=$i?>" onchange="atHurkolas(<?=$x['id']?>);">
                                         <option value=""></option><?php
                                         foreach($epuletportok as $hurok)
                                         {
-                                            $select = null;
-                                            if($x['id'] == $x['port1'])
-                                            {
-                                                $select = $x['port2'];
-                                            }
-                                            elseif($x['id'] == $x['port2'])
-                                            {
-                                                $select = $x['port1'];
-                                            }
-
-                                            ?><option value="<?=$hurok['id']?>" <?=($select == $hurok['id']) ? "selected" : "" ?>><?=$hurok['port']?></option>
-                                            <?php
+                                            ?><option value="<?=$hurok['id']?>" <?=($x['id'] == $hurok['athurkolas']) ? "selected" : "" ?>><?=$hurok['port']?></option><?php
                                         }
                                     ?></select>
                                 </div>
@@ -62,24 +51,32 @@ if(@$irhat)
     </div>
     
     <script>
-        function atHurkolas(sorsz, port) {
+        function atHurkolas(port) {
             // Nullázás, törölni kell minden korábbi társítást mielőtt az újat felvesszük
             var torlendo = document.getElementsByClassName("hurkok");
+            var select = document.getElementById("hurok-" + port);
+            var value = select.value;
+            
             l = torlendo.length;
             for (i = 0; i < l; i++) {
                 var selElmnt = torlendo[i];
-                if(selElmnt.value == port) {
+                // Töröljük a jelenleg társítani próbált port társításait, illetve az összes portról
+                // töröljük a jelenleg társítani próbált portot
+                if(selElmnt.value == port || (select != selElmnt && selElmnt.value == value)) {
                     selElmnt.value = "";
                 }
             }
 
-            var select = document.getElementById("hurok-" + port);
-            var value = select.value;
-            var text = select.options[select.selectedIndex].text;
-
             var tulold = document.getElementById("hurok-" + value);
             if(tulold) {
                 tulold.value = port;
+            }
+
+            // Mivel a port önmagával való hurkolásának nincs értelme, így ha ilyesmivel próbálkoznánk,
+            // a rendszer azt törli
+            if(value == port)
+            {
+                select.value = "";
             }
         }
     </script><?php

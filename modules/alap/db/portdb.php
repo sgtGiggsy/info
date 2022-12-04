@@ -38,8 +38,8 @@ if(isset($csoportir) && $csoportir)
             FROM switchportok
             WHERE id = $switchportid");
 
-        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-            SELECT id, port, csatlakozo, csatlakozas, modid
+        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+            SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
             FROM portok
             WHERE id = $helyiportid");
         
@@ -57,8 +57,8 @@ if(isset($csoportir) && $csoportir)
             {
                 $modif_id = modId("2", "port", $tulportid);
                 $idtonull = $nullid['id'];
-                mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-                SELECT id, port, csatlakozo, csatlakozas, modid
+                mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+                SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
                 FROM portok
                 WHERE id = $idtonull");
                 
@@ -72,8 +72,8 @@ if(isset($csoportir) && $csoportir)
                 FROM switchportok
                 WHERE port = $tulportid");
 
-            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-                SELECT id, port, csatlakozo, csatlakozas, modid
+            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+                SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
                 FROM portok
                 WHERE id = $tulportid");
             
@@ -92,8 +92,8 @@ if(isset($csoportir) && $csoportir)
 
             $modif_id = modId("2", "port", $oldportid);
             
-            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-                SELECT id, port, csatlakozo, csatlakozas, modid
+            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+                SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
                 FROM portok
                 WHERE id = $oldportid");
             
@@ -157,8 +157,8 @@ if(isset($csoportir) && $csoportir)
             FROM sohoportok
             WHERE id = $sohid");
 
-        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-            SELECT id, port, csatlakozo, csatlakozas, modid
+        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+            SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
             FROM portok
             WHERE id = $portid");        
 
@@ -450,35 +450,39 @@ if(isset($csoportir) && $csoportir)
 
     elseif($_GET["action"] == "transzporttarsitas") // Verziókövetés kész
     {
+        $null = null;
+        
         for($i = 1; $i < 1000; $i++)
         {
+            $jelenportmod = null;
             if(isset($_POST['portid-'.$i]))
             {
                 $helyiportid = $_POST['portid-'.$i];
                 $oldszomszed = $_POST['oldszomszed-'.$i];
                 $szomszed = $_POST['szomszed-'.$i];
-                $null = null;
+                $hurok = $_POST['hurok-'.$i];
 
                 // Csak akkor kell írnunk az adatbázist, ha volt szomszédos port, de nem egyezik meg a jelenlegivel
                 if($oldszomszed != $szomszed)
                 {
                     //// Először a helyi port állapotát frissítjük
                     // A jelen állapot mentése
-                    mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-                        SELECT id, port, csatlakozo, csatlakozas, modid
+                    mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+                        SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
                         FROM portok
                         WHERE id = $helyiportid");
 
                     // A tényleges módosítás folyamata
-                    $modif_id = modId("2", "port", $helyiportid);    
+                    $modif_id = modId("2", "port", $helyiportid);
+                    $jelenportmod = $modif_id;
                     $stmt = $con->prepare('UPDATE portok SET csatlakozas=?, modid=? WHERE id=?');
                     $stmt->bind_param('ssi', $szomszed, $modif_id, $helyiportid);
                     $stmt->execute();
 
                     //// Ezt követően a távoli port állapotát frissítjük
                     //A jelen állapot mentése
-                    mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-                        SELECT id, port, csatlakozo, csatlakozas, modid
+                    mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+                        SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
                         FROM portok
                         WHERE id = $szomszed");
                     
@@ -499,8 +503,8 @@ if(isset($csoportir) && $csoportir)
                         if($aktualisport != $helyiportid)
                         {
                             //A jelen állapot mentése
-                            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-                                SELECT id, port, csatlakozo, csatlakozas, modid
+                            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+                                SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
                                 FROM portok
                                 WHERE id = $oldportid");
 
@@ -513,39 +517,8 @@ if(isset($csoportir) && $csoportir)
                     }
                 }
 
-                $hurok = $_POST['hurok-'.$i];
-                $letezik = mySQLConnect("SELECT id FROM athurkolasok WHERE (port1 = $helyiportid OR port2 = $helyiportid) AND (port1 = $hurok OR port2 = $hurok)");
-                if($letezik)
-                {
-                    $letezik = mysqli_num_rows($letezik) > 0;
-                }
-                $letezikhelyi = mySQLConnect("SELECT id FROM athurkolasok WHERE (port1 = $helyiportid OR port2 = $helyiportid)");
-                $letezikhelyi = mysqli_num_rows($letezikhelyi) > 0;
-                $leteziktavoli = mySQLConnect("SELECT id FROM athurkolasok WHERE (port1 = $hurok OR port2 = $hurok)");
-                if($leteziktavoli)
-                {
-                    $leteziktavoli = mysqli_num_rows($leteziktavoli) > 0;
-                }
-                
-                if(!$letezik)
-                {
-                    if($letezikhelyi)
-                    {
-                        mySQLConnect("DELETE FROM athurkolasok WHERE (port1 = $helyiportid OR port2 = $helyiportid)");
-                    }
-
-                    if($leteziktavoli)
-                    {
-                        mySQLConnect("DELETE FROM athurkolasok WHERE (port1 = $hurok OR port2 = $hurok)");
-                    }
-
-                    if($hurok)
-                    {
-                        $stmt = $con->prepare('INSERT INTO athurkolasok (port1, port2) VALUES (?, ?)');
-                        $stmt->bind_param('ss', $helyiportid, $hurok);
-                        $stmt->execute();
-                    }
-                }
+                // Itt következik az áthurkolás
+                atHurkolas($helyiportid, $hurok, $con, $jelenportmod);
             }
             else
             {
@@ -631,8 +604,8 @@ if(isset($csoportir) && $csoportir)
             FROM mediakonverterportok
             WHERE id = $switchportid");
 
-        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-            SELECT id, port, csatlakozo, csatlakozas, modid
+        mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+            SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
             FROM portok
             WHERE id = $helyiportid");
         
@@ -650,8 +623,8 @@ if(isset($csoportir) && $csoportir)
             {
                 $modif_id = modId("2", "port", $tulportid);
                 $idtonull = $nullid['id'];
-                mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-                    SELECT id, port, csatlakozo, csatlakozas, modid
+                mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+                    SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
                     FROM portok
                     WHERE id = $idtonull");
                 
@@ -660,8 +633,8 @@ if(isset($csoportir) && $csoportir)
                 $stmt->execute();
             }
 
-            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-                SELECT id, port, csatlakozo, csatlakozas, modid
+            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+                SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
                 FROM portok
                 WHERE id = $tulportid");
             
@@ -676,8 +649,8 @@ if(isset($csoportir) && $csoportir)
 
             $modif_id = modId("2", "port", $oldportid);
             
-            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, modid)
-                SELECT id, port, csatlakozo, csatlakozas, modid
+            mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+                SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
                 FROM portok
                 WHERE id = $oldportid");
             

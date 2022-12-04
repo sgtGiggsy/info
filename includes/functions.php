@@ -879,8 +879,8 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
                 remotebeep.nev AS szomszednev,
                 netdevremote.port AS szomszedeszkport,
                 transzportportok.fizikaireteg AS fizikaireteg,
-                IF((port1 = portok.id), port2, port1) AS hurokid,
-                (SELECT port FROM portok WHERE id = hurokid) AS huroktuloldal
+                portok.athurkolas AS athurkolas,
+                hurok.port AS huroktuloldal
             FROM portok
                 INNER JOIN transzportportok ON transzportportok.port = portok.id
                 LEFT JOIN transzportportok tuloldal ON portok.csatlakozas = tuloldal.port
@@ -892,6 +892,7 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
                 LEFT JOIN portok tultransz ON tuloldal.port = tultransz.id
                 LEFT JOIN portok netdevlocal ON portok.id = netdevlocal.csatlakozas
                 LEFT JOIN portok netdevremote ON portok.csatlakozas = netdevremote.csatlakozas
+				LEFT JOIN portok hurok ON portok.athurkolas = hurok.id
                 LEFT JOIN switchportok ON switchportok.port = netdevlocal.id
                 LEFT JOIN sohoportok ON sohoportok.port = netdevlocal.id
                 LEFT JOIN mediakonverterportok ON mediakonverterportok.port = netdevlocal.id
@@ -902,7 +903,6 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
                 LEFT JOIN mediakonverterportok remotemkport ON remotemkport.port = netdevremote.id
                 LEFT JOIN eszkozok remoteeszk ON remoteswport.eszkoz = remoteeszk.id OR remotemkport.eszkoz = remoteeszk.id OR remotesohoport.eszkoz = remoteeszk.id
                 LEFT JOIN beepitesek remotebeep ON remoteeszk.id = remotebeep.eszkoz
-                LEFT JOIN athurkolasok ON athurkolasok.port1 = portok.id OR athurkolasok.port2 = portok.id
             WHERE $where AND beepitesek.kiepitesideje IS NULL AND remotebeep.kiepitesideje IS NULL
             GROUP BY portok.id
             ORDER BY portok.port;");
@@ -935,7 +935,7 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
 								<div><?=($port['szomszednev']) ? "<strong>Ide érkező eszköz: </strong>". $port['szomszednev'] . " - " . $port['szomszedeszkport'] : "" ?></div><?php
 								foreach($huroktulportok as $tulport)
 								{
-									?><div><?=($tulport['szomszednev'] && $tulport['hurokid'] == $port['portid']) ? "<strong>Hurok túlfelére érkező eszköz: </strong>". $tulport['szomszednev'] . " - " . $tulport['szomszedeszkport'] : "" ?></div><?php
+									?><div><?=($tulport['szomszednev'] && $tulport['athurkolas'] == $port['portid']) ? "<strong>Hurok túlfelére érkező eszköz: </strong>". $tulport['szomszednev'] . " - " . $tulport['szomszedeszkport'] : "" ?></div><?php
 								}
 							}
 							else
@@ -957,7 +957,7 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
 								<div><?=($elozoport['szomszednev']) ? "<strong>Ide érkező eszköz: </strong>". $elozoport['szomszednev'] . " - " . $elozoport['szomszedeszkport'] : "" ?></div><?php
 								foreach($huroktulportok as $tulport)
 								{
-									?><div><?=($tulport['hurokid'] == $elozoport['portid']) ? "<strong>Hurok túlfelére érkező eszköz: </strong>". $tulport['szomszednev'] . " - " . $tulport['szomszedeszkport'] : "" ?></div><?php
+									?><div><?=($tulport['athurkolas'] == $elozoport['portid']) ? "<strong>Hurok túlfelére érkező eszköz: </strong>". $tulport['szomszednev'] . " - " . $tulport['szomszedeszkport'] : "" ?></div><?php
 								}
 							}
 							else
@@ -1154,4 +1154,81 @@ function mysqliToArray($mysqlires)
         $returnarr[] = $element;
     }
 	return $returnarr;
+}
+
+function atHurkolas($helyiportid, $hurok, $con, $jelenportmod)
+{
+	$null = null;
+
+	// Kezdetként annak ellenőrzése, hogy a jelenlegi port szerepel-e hurokként valahol,
+	// illetve, hogy a jelen portra van-e rakva hurok
+	$huroktul = mySQLConnect("SELECT id FROM portok WHERE athurkolas = $helyiportid");
+	$huroktul = mysqli_fetch_assoc($huroktul);
+	if($huroktul)
+	{	
+		$huroktul = $huroktul['id'];
+	}
+
+	$jelenhurok = mySQLConnect("SELECT athurkolas, modid FROM portok WHERE id = $helyiportid");
+	$jelenhurokat = mysqli_fetch_assoc($jelenhurok);
+	if($jelenhurokat)
+	{
+		$jelenhurok = $jelenhurokat['athurkolas'];
+	}
+
+	if(!$jelenportmod && ($hurok != $huroktul || $hurok != $jelenhurok))
+	{
+		mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+			SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
+			FROM portok
+			WHERE id = $helyiportid");
+
+			// A tényleges módosítás folyamata
+			$modif_id = modId("2", "port", $helyiportid);
+	}
+	else
+	{
+		$modif_id = $jelenhurokat['modid'];
+	}
+
+	// Ha a hurokként küldött port nem egyezik azzal, ahol a jelen port hurokként szerepel, úgy modosít
+	if($hurok != $huroktul)
+	{
+		if($huroktul)
+		{
+			mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+				SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
+				FROM portok
+				WHERE id = $huroktul");
+		}
+
+		if($hurok)
+		{
+			mySQLConnect("INSERT INTO portok_history (portid, port, csatlakozo, csatlakozas, athurkolas, modid)
+				SELECT id, port, csatlakozo, csatlakozas, athurkolas, modid
+				FROM portok
+				WHERE id = $hurok");
+		}
+		
+		// Először azon port hurkának nullázása, ahol a jelen port hurokként szerepel
+		$stmt = $con->prepare('UPDATE portok SET athurkolas=?, modid=? WHERE id=?');
+		$stmt->bind_param('ssi', $null, $modif_id, $huroktul);
+		$stmt->execute();
+
+		// Majd a jelen port hurokként beállítása a hurokként küldött portra, ha az nem null értékű
+		if($hurok)
+		{
+			$stmt = $con->prepare('UPDATE portok SET athurkolas=?, modid=? WHERE id=?');
+			$stmt->bind_param('ssi', $helyiportid, $modif_id, $hurok);
+			$stmt->execute();
+		}
+	}
+
+	// Ha a jelenlegi porton más van beállítva huroknak, mint amit a form küldött, módosítás
+	if($hurok != $jelenhurok)
+	{
+		$stmt = $con->prepare('UPDATE portok SET athurkolas=?, modid=? WHERE id=?');
+		$stmt->bind_param('ssi', $hurok, $modif_id, $helyiportid);
+		$stmt->execute();
+	}
 }
