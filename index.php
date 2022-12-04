@@ -167,7 +167,6 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
                 $userid = mysqli_fetch_assoc($result)['id'];
                 $_SESSION[getenv('SESSION_NAME').'id'] = true;
                 logLogin($userid);
-                print_r($_GET['kuldooldal']);
                 $loginsuccess = true;
             }
             else
@@ -221,10 +220,12 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
             if(isset($_GET['kuldooldalid']))
             {
                 header("Location: $RootPath/" . $_GET['kuldooldal'] . "/" . $_GET['kuldooldalid'] . "?sikeres=bejelentkezes");
+                die;
             }
             else
             {
                 header("Location: $RootPath/" . $_GET['kuldooldal'] . "?sikeres=bejelentkezes");
+                die;
             }
         }
     }

@@ -414,11 +414,11 @@ function priorityPicker($current)
 
 	?><div>
 	<label for="prioritas">Prioritás:</label><br>
-	<select id="prioritas" name="prioritas">
+	<select name="prioritas">
 		<option value="" selected></option><?php
 		foreach($priority as $x)
 		{
-			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+			?><option value="<?php echo $x["id"] ?>" <?= ((!$current && $x['id'] == 3) || $current == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
 		}
 	?></select>
 	</div><?php

@@ -1,6 +1,7 @@
 <?php
 ?><div class="headlogo" id="headlogo">
-    <img src="<?=$RootPath?>/images/headlogo.png" height="45px">
+    <a href="<?=$RootPath?>">
+        <img src="<?=$RootPath?>/images/headlogo.png" height="45px"></a>
 </div><?php
 
 if(isset($enablekeres) && $enablekeres)

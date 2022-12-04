@@ -969,6 +969,11 @@ td img {
     text-align: right;
 }
 
+.nullp {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
 /* ------------------------------- Fejléc ------------------------------- */
 .topmenubase {
     top: 0;

@@ -361,7 +361,7 @@ else
                                         <input type="date" id="hatarido" name="hatarido">
                                     </div>
                                     
-                                    <div id="felelos" style="display: none;">
+                                    <div id="felelos" class="nullp" style="display: none;">
                                         <div id="felelos-1" style="display: block;">
                                             <label for="felelos">Felelős</label><br>
                                             <select name="felelos[]" id="felelos_sel-1" class="hjegyfelelosok">
