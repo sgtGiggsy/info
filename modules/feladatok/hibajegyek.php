@@ -17,11 +17,33 @@ else
     {}
     elseif($csoportolvas)
     {
-        $where .= " AND felhasznalok.alakulat = $alakulat";
+        $where .= " AND (felhasznalok.alakulat = $alakulat";
     }
     elseif($sajatolvas)
     {
-        $where .= " AND feladatok.felhasznalo = $felhasznaloid";
+        $where .= " AND (feladatok.felhasznalo = $felhasznaloid";
+    }
+
+    $csoportwhere = null;
+    if(!$mindolvas)
+    {
+        // A CsoportWhere űrlapja
+        $csopwhereset = array(
+            'tipus' => "alakulat",                 // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'and' => false,                          // Kerüljön-e AND a parancs elejére
+            'alakulatelo' => "felhasznalok",                  // A tábla neve, ahonnan az alakulat neve jön
+            'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
+            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'telephelynull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
+            'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+        );
+
+        $csoportwhere = "OR " . csoportWhere($csoporttagsagok, $csopwhereset) . ")";
+    }
+
+    if(!$csoportir)
+    {
+        $csoportwhere = ")";
     }
 
     $hibajegyek = mySQLConnect("SELECT feladatok.id AS hibid, pubid,
@@ -42,7 +64,7 @@ else
             LEFT JOIN helyisegek ON feladatok.helyiseg = helyisegek.id
             LEFT JOIN epuletek ON feladatok.epulet = epuletek.id
             LEFT JOIN szakok ON feladatok.szakid = szakok.id
-        $where
+        $where $csoportwhere
         ORDER BY feladatok.timestamp DESC");
 
     if($sajatir) 
@@ -70,7 +92,7 @@ else
     <table id="<?=$tipus?>">
         <thead>
             <tr><?php
-                if($mindir)
+                if($csoportir)
                 {
                     ?><th class="prioritas"></th><?php
                     $i = 1;
@@ -90,7 +112,7 @@ else
         <tbody><?php
             foreach($hibajegyek as $hibajegy)
             {
-                if($mindir)
+                if($csoportir)
                 {
                     switch($hibajegy['prioritas'])
                     {
@@ -123,7 +145,7 @@ else
                 $hibid = $hibajegy['pubid']
 
                 ?><tr class='kattinthatotr' data-href='./hibajegy/<?=$hibid?>'><?php
-                    if($mindir)
+                    if($csoportir)
                     {
                         ?><td class="prioritas <?=$szint?>"></td><?php
                     }

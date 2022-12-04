@@ -101,6 +101,8 @@ if(isset($irhat) && $irhat)
     elseif($_GET["action"] == "stateupdate")
     {
         $sorszam = $_POST['feladat'];
+        $megjegyzes = $_POST['megjegyzes'];
+
         if($csoportir)
         {
             $allapottipus = $_POST['allapottipus'];
@@ -150,8 +152,36 @@ if(isset($irhat) && $irhat)
             }
         }
 
+        $kijeloltfelelosok = null;
+        foreach($_POST['felelos'] as $felelos)
+        {
+            if($felelos)
+            {
+                if(!$kijeloltfelelosok)
+                {
+                    $kijeloltfelelosok = "Kijelölt felelős(ök):<br>";
+                }
+                $fnev = mySQLConnect("SELECT nev FROM felhasznalok WHERE id = $felelos");
+                $fnev = mysqli_fetch_assoc($fnev)['nev'];
+                $kijeloltfelelosok .= "- $fnev<br>";
+
+                $stmt = $con->prepare('INSERT INTO feladatfelelosok (feladat, felhasznalo) VALUES (?, ?)');
+                $stmt->bind_param('ss', $origid, $felelos);
+                $stmt->execute();
+            }
+        }
+
+        if($kijeloltfelelosok)
+        {
+            if($megjegyzes)
+            {
+                $megjegyzes .= "<br>";
+            }
+            $megjegyzes .= $kijeloltfelelosok;
+        }
+
         $stmt = $con->prepare('INSERT INTO feladatallapotok (feladat, felhasznalo, allapottipus, megjegyzes, szerepkor) VALUES (?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssss', $origid, $felhasznaloid, $allapottipus, $_POST['megjegyzes'], $szerepkor);
+        $stmt->bind_param('sssss', $origid, $felhasznaloid, $allapottipus, $megjegyzes, $szerepkor);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

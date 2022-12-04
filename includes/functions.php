@@ -989,10 +989,6 @@ function hibajegyErtesites($ertesites, $szoveg, $hibajegyid, $felhasznalo, $alak
 	{
 		$szak = "AND (csoportok.szak = $szak OR csoportok.szak IS NULL)";
 	}
-	else
-	{
-		$szak = "";
-	}
 
 	mySQLConnect("INSERT INTO ertesites_megjelenik(felhasznalo, ertesites)
 			SELECT DISTINCT csoporttagsagok.felhasznalo AS felhasznalo, '$ertesitesid'
