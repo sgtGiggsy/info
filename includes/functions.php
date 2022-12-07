@@ -767,7 +767,7 @@ function getPermissionError()
 function redirectToKuldo($sikeres = null)
 {
 	$RootPath = getenv('APP_ROOT_PATH');
-	$targeturl = $RootPath . "/" . $_GET['kuldooldal'] . "/" . $_GET['kuldooldalid'];
+	$targeturl = $RootPath . "/" . $_GET['kuldooldal'] . ((isset($_GET['kuldooldalid'])) ? "/" . $_GET['kuldooldalid'] : "");
 
 	if($sikeres == "uj")
 	{

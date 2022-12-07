@@ -42,6 +42,10 @@ elseif(isset($_GET['action']) && ($_GET['action'] == "addnew" || $_GET['action']
         $button = "Szerkesztés";
         $oldalcim = "Rack szerkesztése";
         $beuszok = array(array('cimszoveg' => 'Portok rackhez kötése', 'formnev' => 'modules/rackek/forms/portrackhezform'));
+        if($mindir)
+        {
+            $beuszok[] = array('cimszoveg' => 'Portok resetelése', 'formnev' => 'modules/alap/forms/portresetform');
+        }
     }
     
     include('./templates/edit.tpl.php');

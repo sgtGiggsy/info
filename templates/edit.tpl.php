@@ -1,5 +1,20 @@
 <?php
-
+if(isset($beuszok) && $beuszok)
+{
+    $i = 1;
+    foreach($beuszok as $beuszo)
+    {
+        ?><div id="slidein-<?=$i?>">
+            <div class="szerkcard">
+                <div class="szerkcardtitle"><?=$beuszo['cimszoveg']?><a class="help" onclick="showSlideIn('<?=$i?>')">X</a></div>
+                <div class="szerkcardbody">
+                        <?php include("./" . $beuszo['formnev'] . ".php") ?>
+                </div>
+            </div>
+        </div><?php
+        $i++;
+    }
+}
 ?><div class="szerkcard">
     <div class="szerkcardtitle"><?=$oldalcim?><a class="help" onclick="rejtMutat('magyarazat')">?</a></div><?php
     if(isset($beuszok) && $beuszok)
@@ -26,20 +41,4 @@
 
         </div>
     </div>
-</div><?php
-if(isset($beuszok) && $beuszok)
-{
-    $i = 1;
-    foreach($beuszok as $beuszo)
-    {
-        ?><div id="slidein-<?=$i?>">
-            <div class="szerkcard">
-                <div class="szerkcardtitle"><?=$beuszo['cimszoveg']?><a class="help" onclick="showSlideIn('<?=$i?>')">X</a></div>
-                <div class="szerkcardbody">
-                        <?php include("./" . $beuszo['formnev'] . ".php") ?>
-                </div>
-            </div>
-        </div><?php
-        $i++;
-    }
-}
+</div>

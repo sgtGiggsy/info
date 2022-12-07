@@ -3,6 +3,7 @@
 if(isset($csoportir) && $csoportir)
 {
     $con = mySQLConnect(false);
+    $null = null;
     $timestamp = date('Y-m-d H:i:s');
 
     foreach($_POST as $key => $value)
@@ -18,7 +19,6 @@ if(isset($csoportir) && $csoportir)
         $tulportid = $_POST['csatlakozas'];
         $helyiportid = $_POST['portid'];
         $switchportid = $_POST['id'];
-        $null = null;
 
         $modif_id = modId("2", "port", $helyiportid);
 
@@ -450,8 +450,6 @@ if(isset($csoportir) && $csoportir)
 
     elseif($_GET["action"] == "transzporttarsitas") // Verziókövetés kész
     {
-        $null = null;
-        
         for($i = 1; $i < 1000; $i++)
         {
             $jelenportmod = null;
@@ -524,6 +522,16 @@ if(isset($csoportir) && $csoportir)
             {
                 break;
             }
+        }
+    }
+
+    elseif($_GET["action"] == "vegponthurkolas") // Verziókövetés kész
+    {
+        $elemszam = count($_POST['portid']);
+        for($i = 1; $i < $elemszam; $i++)
+        {
+            // Itt következik az áthurkolás
+            atHurkolas($_POST['portid'][$i], $_POST['hurok'][$i], $con, null);
         }
     }
 
@@ -654,7 +662,6 @@ if(isset($csoportir) && $csoportir)
                 FROM portok
                 WHERE id = $oldportid");
             
-            $null = null;
             $stmt = $con->prepare('UPDATE portok SET csatlakozas=?, modid=? WHERE id=?');
             $stmt->bind_param('ssi', $null, $modif_id, $oldportid);
             $stmt->execute();
@@ -707,6 +714,43 @@ if(isset($csoportir) && $csoportir)
             WHERE switchportok.eszkoz = $eszkoz OR sohoportok.eszkoz = $eszkoz)");
 
         if(@$reload)
+        {
+            redirectToKuldo();
+        }
+    }
+
+    elseif($_GET["action"] == "reset")
+    {
+        for($i = $_POST['elsoport']; $i <= $_POST['utolsoport']; $i++)
+        {
+            $modif_id = modId("2", "port", $i);
+            mySQLConnect("UPDATE portok SET modid = $modif_id WHERE id = $i");
+            
+            mySQLConnect("INSERT INTO vegpontiportok_history (vegpontiportid, epulet, port, helyiseg, modid)
+                SELECT id, epulet, port, helyiseg, modid
+                FROM vegpontiportok
+                WHERE port = $i");
+            
+            $stmt = $con->prepare('UPDATE vegpontiportok SET helyiseg=?, modid=? WHERE port=?');
+            $stmt->bind_param('ssi', $null, $modif_id, $i);
+            $stmt->execute();
+
+            mySQLConnect("INSERT INTO rackportok_history (rackportid, rack, port, modid)
+                SELECT id, rack, port, modid
+                FROM rackportok
+                WHERE port = $i");
+
+            $stmt = $con->prepare('DELETE FROM rackportok WHERE port=?');
+            $stmt->bind_param('i', $i);
+            $stmt->execute();
+        }
+
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>Portok hozzáadása sikertelen!<br></h2>";
+            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+        else
         {
             redirectToKuldo();
         }

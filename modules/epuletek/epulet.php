@@ -1,7 +1,7 @@
 <?php
 
 $permission = true;
-if(!isset($_GET['action']) || $_GET['action'] == "edit" || $_GET['action'] == "szamtarsitas" || $_GET['action'] == "transzporttarsitas")
+if(!isset($_GET['action']) || $_GET['action'] == "edit" || $_GET['action'] == "szamtarsitas" || $_GET['action'] == "transzporttarsitas" || $_GET['action'] == "vegponthurkolas")
 {
     $csoportwhere = null;
     if(!$mindolvas)
@@ -93,7 +93,7 @@ else
         }
 
         // Ha a kért művelet a szerkesztő oldal betöltése, az írás változót true-ra állítjuk
-        if($_GET['action'] == "addnew" || $_GET['action'] == "edit" || $_GET['action'] == "szamtarsitas" || $_GET['action'] == "transzporttarsitas")
+        if($_GET['action'] == "addnew" || $_GET['action'] == "edit" || $_GET['action'] == "szamtarsitas" || $_GET['action'] == "transzporttarsitas" || $_GET['action'] == "vegponthurkolas")
         {
             $irhat = true;
         }
@@ -106,13 +106,13 @@ else
     }
 
     // Ha a kért művelet jár adatbázisművelettel, az adatbázis műveletekért felelős oldal meghívása
-    elseif($irhat && $dbir && count($_POST) > 0 || ((@$_GET['action'] == "szamtarsitas" || @$_GET['action'] == "transzporttarsitas") && count($_POST) > 0))
+    elseif($irhat && $dbir && count($_POST) > 0 || ((@$_GET['action'] == "szamtarsitas" || @$_GET['action'] == "transzporttarsitas" || @$_GET['action'] == "vegponthurkolas") && count($_POST) > 0))
     {
         if($_GET['action'] == "szamtarsitas")
         {
             include("./modules/epuletek/db/telefonszamokdb.php");
         }
-        elseif($_GET['action'] == "transzporttarsitas")
+        elseif($_GET['action'] == "transzporttarsitas" || $_GET['action'] == "vegponthurkolas")
         {
             include("./modules/alap/db/portdb.php");
             redirectToKuldo();
@@ -127,7 +127,7 @@ else
     }
 
     // Ha a kért művelet nem jár adatbázisművelettel és nem a telefonszámok társítását elvégző felület, a szerkesztési felület meghívása
-    elseif($irhat && !$dbir && $_GET['action'] != "szamtarsitas" && $_GET['action'] != "transzporttarsitas")
+    elseif($irhat && !$dbir && $_GET['action'] != "szamtarsitas" && $_GET['action'] != "transzporttarsitas" && $_GET['action'] != "vegponthurkolas")
     {
         $szam = $telephely = $nev = $tipus = $emelet = $magyarazat = $naprakesz = $megjegyzes = null;
         $beuszok = array();
@@ -165,6 +165,10 @@ else
             $beuszok[] = array('cimszoveg' => 'Helyiségek generálása', 'formnev' => $alapform . 'helyiseggenform');
             $beuszok[] = array('cimszoveg' => 'Végpontok generálása', 'formnev' => $alapform . 'vegpontgenform');
             $beuszok[] = array('cimszoveg' => 'Transzport portok generálása', 'formnev' => $alapform . 'transzportgenform');
+            if($mindir)
+            {
+                $beuszok[] = array('cimszoveg' => 'Portok resetelése', 'formnev' => 'modules/alap/forms/portresetform');
+            }
         }
 
         include('./templates/edit.tpl.php');
@@ -240,6 +244,25 @@ else
         include('./templates/edit.tpl.php');
     }
 
+    elseif($irhat && $_GET['action'] == "vegponthurkolas")
+    {
+        $magyarazat = null;
+        
+        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, portok.csatlakozas AS csatlakozas, athurkolas
+                FROM portok
+                    INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
+                WHERE epulet = $id
+                ORDER BY portok.port;");
+
+        $epuletportok = mysqliNaturalSort($epuletportok, 'port');
+
+        $button = "Portok összehurkolása";
+        $oldalcim = "Az épület portjainak összehurkolása";
+        $form = $alapform . "vegponthurkolasform";
+
+        include('./templates/edit.tpl.php');
+    }
+
     // Akkor futunk ki erre az ágra, ha van olvasási jog, és kiválasztott épület, de más nincs. Ez a sima megjelenítő felület
     else
     {
@@ -304,7 +327,8 @@ else
             ?><div style='display: inline-flex'>
                 <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Épület szerkesztése</button>&nbsp;
                 <button type='button' onclick="location.href='./<?=$id?>?action=szamtarsitas'">Épület portjainak telefonszámmal társítása</button>&nbsp;
-                <button type='button' onclick="location.href='./<?=$id?>?action=transzporttarsitas'">Épület transzport portjainak társítása</button><?php
+                <button type='button' onclick="location.href='./<?=$id?>?action=transzporttarsitas'">Épület transzport portjainak társítása</button>&nbsp;
+                <button type='button' onclick="location.href='./<?=$id?>?action=vegponthurkolas'">Épület portjainak összehurkolása</button><?php
                 if(isset($elozmenyek) && mysqli_num_rows($elozmenyek) > 0)
                 {
                     ?><button type='button' onclick='rejtMutat("elozmenyek")'>Szerkesztési előzmények</button><?php

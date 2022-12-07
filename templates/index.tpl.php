@@ -30,7 +30,7 @@
 		<?php $menuterulet = 1; include('./includes/menu.inc.php'); ?>		
 
 		<!-- Lábléc -->
-		<div class="bottom-line"><p><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p></div>
+		<div class="bottom-line"><p><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p><span id="constatus"></span></div>
 
 		<!-- Betöltés során látható területen kívül eső, illetve nem létező tartalmak -->
 		<div id="snackbar"></div>
@@ -38,6 +38,19 @@
 	</div>
 </body>
 <script>
+
+	window.addEventListener('load', () => {
+		const status = navigator.onLine;
+		console.log(status);
+	})
+	window.addEventListener('offline', (e) => {
+		console.log('offline');
+	});
+
+	window.addEventListener('online', (e) => {
+		console.log('online');
+	});
+
 	function sortTable(n, t, tname) {
 		var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
 		table = document.getElementById(tname);
@@ -160,18 +173,6 @@
 
 	$(document).ready(function($) {
 		$(".kattinthatotr").click(function() {
-		window.document.location = $(this).data("href");
-			});
-	});
-
-	$(document).ready(function($) {
-		$(".kattinthatotr-1").click(function() {
-		window.document.location = $(this).data("href");
-			});
-	});
-
-	$(document).ready(function($) {
-		$(".kattinthatotr-2").click(function() {
 		window.document.location = $(this).data("href");
 			});
 	});
@@ -310,7 +311,7 @@
 		}
 
 		// Jelenleg statikusan maximum 4 beúszó elemet tud kezelni a függvény
-		for(var i = 1; i <= 4; i++)
+		for(var i = 1; i <= 6; i++)
 		{
 			var x = document.getElementById(animnev + i);
 

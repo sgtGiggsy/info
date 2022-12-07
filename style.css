@@ -2005,7 +2005,7 @@ div[id^=tennivalobody-].close {
   }
 
 /* Beúszó menü */
-#slidein-1, #slidein-2, #slidein-3, #slidein-4 {
+#slidein-1, #slidein-2, #slidein-3, #slidein-4, #slidein-5, #slidein-6 {
     visibility: hidden;
     background-color: var(--cardbase);
     z-index: 1;
@@ -2017,14 +2017,14 @@ div[id^=tennivalobody-].close {
     border-radius: 1em;
 }
 
-#slidein-1.show, #slidein-2.show, #slidein-3.show, #slidein-4.show {
+#slidein-1.show, #slidein-2.show, #slidein-3.show, #slidein-4.show, #slidein-5.show, #slidein-6.show {
     visibility: visible;
     top: 8em;
     right: 0;
     animation: 1s ease-in-out 0s 1 slideIn;
 }
 
-#slidein-1.hide, #slidein-2.hide, #slidein-3.hide, #slidein-4.hide {
+#slidein-1.hide, #slidein-2.hide, #slidein-3.hide, #slidein-4.hide, #slidein-5.hide, #slidein-6.hide {
     visibility: visible;
     animation: 1s ease-in-out 0s 1 slideOut;
 }
