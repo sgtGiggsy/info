@@ -3,13 +3,8 @@
 if(isset($mindir) && $mindir)
 {
     $con = mySQLConnect(false);
-    foreach($_POST as $key => $value)
-    {
-        if ($value == "NULL" || $value == "")
-        {
-            $_POST[$key] = NULL;
-        }
-    }
+
+    purifyPost();
 
     if($_GET["action"] == "new")
     {

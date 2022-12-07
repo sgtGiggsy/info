@@ -1228,3 +1228,18 @@ function atHurkolas($helyiportid, $hurok, $con, $jelenportmod)
 		$stmt->execute();
 	}
 }
+
+function purifyPost($ishtml = false)
+{
+	foreach($_POST as $key => $value)
+    {
+        if ($value == "NULL" || $value == "")
+        {
+            $_POST[$key] = NULL;
+        }
+		elseif(!$ishtml)
+        {
+            $_POST[$key] = quickXSSfilter($value);
+        }
+    }
+}

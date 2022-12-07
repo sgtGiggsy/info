@@ -4,13 +4,7 @@ if(isset($irhat) && $irhat)
 {
     $con = mySQLConnect(false);
 
-    foreach($_POST as $key => $value)
-    {
-        if ($value == "NULL" || $value == "")
-        {
-            $_POST[$key] = NULL;
-        }
-    }
+    purifyPost();
 
     $beepido = dateTimeLocalToTimeStamp($_POST['beepitesideje']);
     $kiepido = dateTimeLocalToTimeStamp($_POST['kiepitesideje']);

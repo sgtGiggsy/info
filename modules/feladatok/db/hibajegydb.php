@@ -4,17 +4,7 @@ if(isset($irhat) && $irhat)
 {
     $con = mySQLConnect(false);
 
-    foreach($_POST as $key => $value)
-    {
-        if ($value == "NULL" || $value == "")
-        {
-            $_POST[$key] = NULL;
-        }
-        else
-        {
-            $_POST[$key] = quickXSSfilter($value);
-        }
-    }
+    purifyPost();
 
     if($csoportir && @$_POST['felhasznalo'])
     {

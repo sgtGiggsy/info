@@ -4,13 +4,7 @@ if(isset($felhasznaloid))
 {
     $con = mySQLConnect(false);
 
-    foreach($_POST as $key => $value)
-    {
-        if ($value == "NULL" || $value == "")
-        {
-            $_POST[$key] = NULL;
-        }
-    }
+    purifyPost();
 
     $szemelyesdb = mySQLConnect("SELECT * FROM szemelyesbeallitasok WHERE felhid = $felhasznaloid");
 

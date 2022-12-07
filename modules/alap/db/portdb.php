@@ -6,13 +6,7 @@ if(isset($csoportir) && $csoportir)
     $null = null;
     $timestamp = date('Y-m-d H:i:s');
 
-    foreach($_POST as $key => $value)
-    {
-        if ($value == "NULL" || $value == "")
-        {
-            $_POST[$key] = NULL;
-        }
-    }
+    purifyPost();
 
     if($_GET["action"] == "update" && $_GET["tipus"] == "switch") // Verziókövetés kész
     {

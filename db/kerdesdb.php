@@ -15,13 +15,7 @@ else
     else
     {
         $con = mySQLConnect(false);
-        foreach($_POST as $key => $value)
-        {
-            if ($value == "NULL")
-            {
-                $_POST[$key] = NULL;
-            }
-        }
+         purifyPost();
 
         if($_GET["action"] == "new")
         {

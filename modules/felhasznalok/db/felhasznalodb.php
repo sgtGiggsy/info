@@ -4,14 +4,7 @@ if(isset($irhat) && $irhat)
 {
     $con = mySQLConnect(false);
 
-    foreach($_POST as $key => $value)
-    {
-        //echo "$key: $value <br>";
-        if ($value == "NULL" || $value == "")
-        {
-            $_POST[$key] = NULL;
-        }
-    }
+    purifyPost();
 
     if($_GET["action"] == "new")
     {

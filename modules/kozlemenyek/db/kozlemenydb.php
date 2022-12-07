@@ -6,13 +6,7 @@ if (!$irhat)
 else
 {
     $con = mySQLConnect(false);
-    foreach($_POST as $key => $value)
-    {
-        if ($value == "NULL")
-        {
-            $_POST[$key] = NULL;
-        }
-    }
+    purifyPost(true);
 
     if(!isset($_POST['link']) || !$_POST['link'])
     {
