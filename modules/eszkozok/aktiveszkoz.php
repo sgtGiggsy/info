@@ -90,7 +90,7 @@ if($id)
         $eszkoz = mysqli_fetch_assoc($aktiveszkozok);
 }
 
-if(!$id || mysqli_num_rows($aktiveszkozok) == 0 || !@$csoportolvas || (count($_POST) > 0 && !@$csoportir))
+if((!$id && !isset($_GET['action'])) || (@$aktiveszkozok && mysqli_num_rows($aktiveszkozok) == 0) || !@$csoportolvas || (count($_POST) > 0 && !@$csoportir))
 {
     echo "<h2>Nincs ilyen sorszámú aktív eszköz, vagy nincs jogosultsága a megtekintéséhez!</h2>";
 }
@@ -99,7 +99,7 @@ else
 {
     // A többi megjelenítési és adatbázis részt megelőzően először a breadcumbok betöltése történik meg,
     // mivel arra a betöltés formájától függetlenül mindenképp szükség lesz
-    if(mysqli_num_rows($aktiveszkozok) != 0 || (isset($_GET['action']) && $_GET['action'] != 'addnew'))
+    if((@$aktiveszkozok && mysqli_num_rows($aktiveszkozok) != 0) || (isset($_GET['action']) && $_GET['action'] != 'addnew'))
     {
         ?><div class="breadcumblist">
             <ol vocab="https://schema.org/" typeof="BreadcrumbList">

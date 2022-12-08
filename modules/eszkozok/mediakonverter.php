@@ -308,22 +308,25 @@ else
                                     }
                                 ?></select>
                             </td>
-                            <td>
-                                <select name="csatlakozas">
-                                    <option value="" selected></option><?php
-                                    $elozo = null;
-                                    foreach($epuletportok as $x)
-                                    {
-                                        // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
-                                        // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
-                                        if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                            <td><?php
+                                if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
+                                {
+                                    ?><select name="csatlakozas">
+                                        <option value="" selected></option><?php
+                                        $elozo = null;
+                                        foreach($epuletportok as $x)
                                         {
-                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                            // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
+                                            // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
+                                            if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                                            {
+                                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                            }
+                                            $elozo = $x['id'];
                                         }
-                                        $elozo = $x['id'];
-                                    }
-                                ?></select>
-                            </td>
+                                    ?></select><?php
+                                }
+                            ?></td>
                             <td><input type="submit" value="Módosítás"></td>
                         </form>
                     </tr><?php

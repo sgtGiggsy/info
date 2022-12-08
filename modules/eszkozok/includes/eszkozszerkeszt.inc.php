@@ -312,13 +312,6 @@ elseif(isset($_GET['beepites']) && isset($_GET['action']))
         }
     }
 
-
-
-
-
-
-
-
 }
 else
 {
@@ -384,11 +377,12 @@ else
         ORDER BY tipus ASC, gyartok.nev ASC, modell ASC;");
 
         $raktarak = mySQLConnect("SELECT * FROM raktarak;");
+        $wifiszabvanyok = mySQLConnect("SELECT * FROM wifitipusok");
         
         $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = 
         $uplinkportok = $szoftver = $nev = $leadva = $hibas = $raktar =
         $megjegyzes = $poe = $ssh = $web = $felhasznaloszam = $simtipus =
-        $telefonszam = $pinkod = $pukkod = $magyarazat = null;
+        $telefonszam = $pinkod = $pukkod = $magyarazat = $wifi = null;
 
         $button = "Új eszköz";
         $oldalcim = "Új " . $currentpage['menupont'] . " létrehozása";
@@ -429,6 +423,7 @@ else
                     $portszam = @$aktiveszkoz['lanportok'];
                     $uplinkportok = @$aktiveszkoz['wanportok'];
                     $szoftver = @$aktiveszkoz['szoftver'];
+                    $wifi = @$aktiveszkoz['wifi'];
                 }
                 $beuszok = array(array('cimszoveg' => 'Portok generálása', 'formnev' => 'modules/eszkozok/forms/porteszkozhozform'));
             }

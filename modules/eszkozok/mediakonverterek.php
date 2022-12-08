@@ -143,11 +143,11 @@ else
                             <td><?=$eszkoz['tipus']?></td>
                             <td><?=$eszkoz['technologia']?></td>
                             <td><?=$eszkoz['transzportszabvany']?></td>
-                            <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
-                            <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
-                            <td><?=$eszkoz['rack']?></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                             <td><?=$eszkoz['raktar']?></td>
-                            <td><?=$eszkoz['vlan']?></td><?php
+                            <td></td><?php
                         if($csoportir)
                         {
                             ?><td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td>

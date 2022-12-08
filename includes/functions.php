@@ -880,7 +880,8 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
                 netdevremote.port AS szomszedeszkport,
                 transzportportok.fizikaireteg AS fizikaireteg,
                 portok.athurkolas AS athurkolas,
-                hurok.port AS huroktuloldal
+                hurok.port AS huroktuloldal,
+				portok.csatlakozo AS csatlakozo
             FROM portok
                 INNER JOIN transzportportok ON transzportportok.port = portok.id
                 LEFT JOIN transzportportok tuloldal ON portok.csatlakozas = tuloldal.port
@@ -944,7 +945,8 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
 								<div><?=($port['szomszednev']) ? "<strong>Távoli eszköz: </strong>". $port['szomszednev'] . " - " . $port['szomszedeszkport'] : "" ?></div><?php
 							}
 
-							if(($port['beepitesnev'] || ($port['huroktuloldal'] && $port['szomszednev'])) && ($port['fizikaireteg'] == 2 || $port['fizikaireteg'] == 3))
+							// Ha ST csatlakozó, és van rajta eszköz, akkor a következő portot is foglaltnak vesszük
+							if($port['csatlakozo'] == 3 && $port['beepitesnev'] && ($port['fizikaireteg'] == 2 || $port['fizikaireteg'] == 3))
 							{
 								$elozoport = $port;
 							}

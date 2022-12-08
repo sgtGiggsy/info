@@ -35,8 +35,8 @@ if(isset($irhat) && $irhat)
 
             if($eszkoztipus == "sohoeszkoz")
             {
-                $stmt = $con->prepare('INSERT INTO sohoeszkozok (eszkoz, mac, lanportok, wanportok, szoftver, modid) VALUES (?, ?, ?, ?, ?, ?)');
-                $stmt->bind_param('ssssss', $last_id, $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $modif_id);
+                $stmt = $con->prepare('INSERT INTO sohoeszkozok (eszkoz, mac, lanportok, wanportok, szoftver, wifi, modid) VALUES (?, ?, ?, ?, ?, ?, ?)');
+                $stmt->bind_param('sssssss', $last_id, $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $_POST['wifi'], $modif_id);
                 $stmt->execute();
             }
 
@@ -51,6 +51,7 @@ if(isset($irhat) && $irhat)
             {
                 $eszkoz = $last_id;
                 include("././modules/alap/db/portdb.php");
+                $last_id = $eszkoz;
             }
 
             elseif($eszkoztipus == "simkartya")
@@ -99,13 +100,13 @@ if(isset($irhat) && $irhat)
 
             elseif($eszkoztipus == "sohoeszkoz")
             {
-                mySQLConnect("INSERT INTO sohoeszkozok_history (sohoeszkozid, eszkoz, wanportok, lanportok, mac, szoftver, modid)
-                    SELECT id, eszkoz, wanportok, lanportok, mac, szoftver, modid
+                mySQLConnect("INSERT INTO sohoeszkozok_history (sohoeszkozid, eszkoz, wanportok, lanportok, mac, szoftver, wifi, modid)
+                    SELECT id, eszkoz, wanportok, lanportok, mac, szoftver, wifi, modid
                     FROM sohoeszkozok
                     WHERE eszkoz = $eszkoz");
                 
-                $stmt = $con->prepare('UPDATE sohoeszkozok SET mac=?, lanportok=?, wanportok=?, szoftver=?, modid=? WHERE eszkoz=?');
-                $stmt->bind_param('sssssi', $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $modif_id, $_POST['id']);
+                $stmt = $con->prepare('UPDATE sohoeszkozok SET mac=?, lanportok=?, wanportok=?, szoftver=?, wifi=?, modid=? WHERE eszkoz=?');
+                $stmt->bind_param('ssssssi', $_POST['mac'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $_POST['wifi'], $modif_id, $_POST['id']);
                 $stmt->execute();
             }
 

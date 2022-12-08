@@ -63,7 +63,8 @@ else
             beepitesek.nev AS beepitesinev,
             ipcimek.ipcim AS ipcim,
             raktarak.nev AS raktar,
-            vlanok.nev AS vlan
+            vlanok.nev AS vlan,
+            wifitipusok.nev AS wifi
         FROM eszkozok
                 INNER JOIN sohoeszkozok ON eszkozok.id = sohoeszkozok.eszkoz
                 INNER JOIN modellek ON eszkozok.modell = modellek.id
@@ -79,6 +80,7 @@ else
                 LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
                 LEFT JOIN vlanok ON vlanok.id = beepitesek.vlan
+                LEFT JOIN wifitipusok ON wifitipusok.id = sohoeszkozok.wifi
         WHERE eszkozok.id = $id AND modellek.tipus > 5 AND modellek.tipus < 11 $csoportwhere
         ORDER BY beepitesek.id DESC;");
 
@@ -163,7 +165,7 @@ else
                 <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Eszköz szerkesztése</button><?php
                 if(isset($elozmenyek) && mysqli_num_rows($elozmenyek) > 0)
                 {
-                    ?><button type='button' onclick=rejtMutat("elozmenyek")>Szerkesztési előzmények</button><?php
+                    ?><button type='button' onclick='rejtMutat("elozmenyek")'>Szerkesztési előzmények</button><?php
                 }
             ?></div><?php
         }
@@ -221,6 +223,8 @@ else
                     <div><?=$eszkoz['sorozatszam']?></div>
                     <div>MAC Address</div>
                     <div><?=$eszkoz['mac']?></div>
+                    <div>WiFi</div>
+                    <div><?=($eszkoz['wifi']) ? $eszkoz['wifi'] : "Nincs" ?></div>
                     <div>Szoftver</div>
                     <div><?=$eszkoz['szoftver']?></div>
                     <div>LAN portok</div>

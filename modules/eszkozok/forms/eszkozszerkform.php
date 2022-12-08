@@ -68,6 +68,20 @@ if(@$irhat)
 
                     <?php $magyarazat .= "<strong>Uplink/WAN portok száma</strong><p>A hálózati eszközök csatlakoztatására tervezett portok száma.</p>"; ?>
 
+
+                    <div>
+                        <label for="wifi">WiFi:</label><br>
+                        <select id="wifi" name="wifi">
+                            <option value="" selected></option><?php
+                            foreach($wifiszabvanyok as $x)
+                            {
+                                ?><option value="<?=$x["id"]?>" <?= ($wifi == $x['id']) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                            }
+                        ?></select>
+                    </div>
+
+                    <?php $magyarazat .= "<strong>WiFi</strong><p>Az eszköz által ismert legfrisebb WiFi szabvány.</p>"; ?>
+
                     <div>
                         <label for="szoftver">Szoftver:</label><br>
                         <input type="text" accept-charset="utf-8" name="szoftver" id="szoftver" value="<?=$szoftver?>"></input>
