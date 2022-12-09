@@ -149,11 +149,16 @@ else
                 WHERE eszkoz = $id;");
         if($epuletid)
         {
-            $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
+            $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
                 FROM portok
                     LEFT JOIN vegpontiportok ON vegpontiportok.port = portok.id
                     LEFT JOIN transzportportok ON transzportportok.port = portok.id
-                WHERE vegpontiportok.epulet = $epuletid OR transzportportok.epulet = $epuletid
+                    LEFT JOIN switchportok ON switchportok.port = portok.id
+                    LEFT JOIN mediakonverterportok ON mediakonverterportok.port = portok.id
+                    LEFT JOIN beepitesek ON switchportok.eszkoz = beepitesek.eszkoz OR mediakonverterportok.eszkoz = beepitesek.eszkoz
+                    LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                    LEFT JOIN helyisegek ON beepitesek.helyiseg = beepitesek.helyiseg OR rackszekrenyek.helyiseg
+                WHERE vegpontiportok.epulet = $epuletid OR transzportportok.epulet = $epuletid OR helyisegek.epulet = $epuletid
                 ORDER BY aktiveszkoz, id;");
         }
         

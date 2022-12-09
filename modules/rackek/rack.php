@@ -92,8 +92,9 @@ elseif(!isset($_GET['action']))
         WHERE rackszekrenyek.id = $id $csoportwhere;");
     $rack = mysqli_fetch_assoc($rackek);
 
-    $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban, szam, vlanok.nev AS vlan
+    $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban, szam, vlanok.nev AS vlan, hurok.port AS athurkolas
         FROM portok
+            LEFT JOIN portok hurok ON portok.athurkolas = hurok.id
             LEFT JOIN rackportok ON rackportok.port = portok.id
             LEFT JOIN portok csatlakoz ON portok.id = csatlakoz.csatlakozas
             LEFT JOIN switchportok ON switchportok.port = csatlakoz.id

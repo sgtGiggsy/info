@@ -177,8 +177,9 @@ else
                 LEFT JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
             WHERE helyiseg = $helyisegid;");
         
-        $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban, szam, vlanok.nev AS vlan
+        $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban, szam, vlanok.nev AS vlan, hurok.port AS athurkolas
             FROM portok
+                LEFT JOIN portok hurok ON portok.athurkolas = hurok.id
                 LEFT JOIN rackportok ON rackportok.port = portok.id
                 LEFT JOIN vegpontiportok ON vegpontiportok.port = portok.id
                 LEFT JOIN portok csatlakoz ON portok.id = csatlakoz.csatlakozas

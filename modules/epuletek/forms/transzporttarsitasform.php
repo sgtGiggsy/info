@@ -70,6 +70,11 @@ if(@$irhat)
 
             var tulold = document.getElementById("hurok-" + value);
             if(tulold) {
+                // Ha VAN a kiválasztott porton másik, a felhasználó figyelmeztetése, hogy az a hurok törlésre kerül
+                if(tulold.value)
+                {
+                    alert("Port hurkolás eltávolítva a(z) " + tulold.options[tulold.selectedIndex].text + " portról");
+                }
                 tulold.value = port;
             }
 

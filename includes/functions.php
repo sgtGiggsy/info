@@ -820,12 +820,13 @@ function vegpontLista($portok)
 					{
 						$elozovlan = true;
 					}
-					?><a class="<?=($port['hasznalatban'] || $port['szam']) ? "foglalt" : "ures" ?>" href='<?=$RootPath?>/port/<?=$port['portid']?>'>
+					?><a class="<?=($port['hasznalatban'] || $port['szam'] || $port['athurkolas']) ? "foglalt" : "ures" ?>" href='<?=$RootPath?>/port/<?=$port['portid']?>'>
 						<div class="vegpont">
 							<div><?=$port['port']?></div>
 							<div>
 								<?=($port['vlan']) ? "<div>" . $port['vlan'] . "</div>" : "" ?>
-								<?=($port['szam']) ? "<div>" . $port['szam'] . "</div>" : "" ?><?php
+								<?=($port['szam']) ? "<div>" . $port['szam'] . "</div>" : "" ?>
+								<?=($port['athurkolas']) ? "<div>" . $port['athurkolas'] . "</div>" : "" ?><?php
 				}
 
 				// Ha egy már megjelenített port további kapcsolatait írjuk ki, csak a további adatok kiírása, új div nyitása nélkül
