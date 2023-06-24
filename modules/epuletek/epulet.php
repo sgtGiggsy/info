@@ -233,6 +233,8 @@ else
                 FROM portok
                     INNER JOIN transzportportok ON transzportportok.port = portok.id
                     LEFT JOIN epuletek ON transzportportok.epulet = epuletek.id
+                    LEFT JOIN transzportportok csat ON portok.csatlakozas = csat.port
+                WHERE (portok.csatlakozas IS NULL OR csat.epulet = $id) AND transzportportok.epulet != $id
                 ORDER BY epuletek.szam, portok.port;");
 
         $epuletportok = mysqliNaturalSort($epuletportok, 'port');

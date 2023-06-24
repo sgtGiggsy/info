@@ -192,6 +192,7 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
         echo "<h2>$hiba</h2>";
         ?><script type='text/javascript'>alert('<?=$hiba?>')</script>
         <head><meta http-equiv="refresh" content="0; URL='./belepes'" /></head><?php
+        die;
     }
 }
 

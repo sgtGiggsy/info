@@ -142,42 +142,7 @@ else
         $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
         $atviteliszabvanyok = mySQLConnect("SELECT * FROM atviteliszabvanyok;");
 
-        ?><div class="breadcumblist">
-            <ol vocab="https://schema.org/" typeof="BreadcrumbList">
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/">
-                    <span property="name">Kecskemét Informatika</span></a>
-                    <meta property="position" content="1">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
-                    <span property="name"><?=$eszkoz['telephely']?></span></a>
-                    <meta property="position" content="2">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
-                    <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
-                    <meta property="position" content="3">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
-                    <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
-                    <meta property="position" content="4">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <span property="name"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?> (<?=$eszkoz['sorozatszam']?>)</span>
-                    <meta property="position" content="4">
-                </li>
-            </ol>
-        </div><?php
+        showBreadcumb($eszkoz);
 
     // Szerkesztő gombok
         if($csoportir)

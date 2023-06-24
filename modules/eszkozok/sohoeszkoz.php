@@ -92,52 +92,7 @@ else
     {
         $eszkoz = mysqli_fetch_assoc($aktiveszkozok);
 
-        ?><div class="breadcumblist">
-            <ol vocab="https://schema.org/" typeof="BreadcrumbList">
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/">
-                    <span property="name">Kecskemét Informatika</span></a>
-                    <meta property="position" content="1">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
-                    <span property="name"><?=$eszkoz['telephely']?></span></a>
-                    <meta property="position" content="2">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
-                    <span property="name"><?=$eszkoz['epuletszam']?>. <?=$eszkoz['epulettipus']?></span></a>
-                    <meta property="position" content="3">
-                </li>
-                <li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <a property="item" typeof="WebPage"
-                        href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
-                    <span property="name"><?=$eszkoz['helyisegszam']?> (<?=$eszkoz['helyisegnev']?>)</span></a>
-                    <meta property="position" content="4">
-                </li>
-                <?php if($eszkoz['rackid'])
-                {
-                    ?><li><b>></b></li>
-                    <li property="itemListElement" typeof="ListItem">
-                        <a property="item" typeof="WebPage"
-                            href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
-                        <span property="name"><?=$eszkoz['rack']?></span></a>
-                        <meta property="position" content="4">
-                    </li><?php
-                }
-                ?><li><b>></b></li>
-                <li property="itemListElement" typeof="ListItem">
-                    <span property="name"><?=$eszkoz['beepitesinev']?> (<?=$eszkoz['ipcim']?>)</span>
-                    <meta property="position" content="4">
-                </li>
-            </ol>
-        </div><?php
+        showBreadcumb($eszkoz);
 
         $epuletid = $eszkoz['epuletid'];
         $helyisegid = $eszkoz['helyisegid'];

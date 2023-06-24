@@ -45,6 +45,7 @@ function checkLDAPConnection($host)
 
 function parseUserAgent($uastring)
 {
+	$arch = null;
 	$browser = explode(" ", $uastring);
 	$os = explode("; ", (explode(" (", $uastring))[1]);
 	if((str_contains($uastring, "like Gecko") && !str_contains($uastring, "like Gecko)")) || str_contains($uastring, "MSIE"))
@@ -96,7 +97,6 @@ function parseUserAgent($uastring)
 			$opsystem = "Linux";
 		}
 
-		$arch = null;
 		if(str_contains($x, "64"))
 		{
 			$arch = "64bit";
@@ -1245,4 +1245,90 @@ function purifyPost($ishtml = false)
             $_POST[$key] = quickXSSfilter($value);
         }
     }
+}
+
+function showHelyiseg($szam, $nev = null)
+{
+	($szam) ? $szam . ". helyiség" : "";
+	($szam && $nev) ? " - " : "";
+	echo $nev;
+}
+
+function showEpulet($szam, $tipus = null)
+{
+	($szam) ? $szam : "";
+	($szam && $tipus) ? ". " : "";
+	echo $tipus;
+}
+
+function showBreadcumb($eszkoz, $lastlink = false)
+{
+	$RootPath = getenv('APP_ROOT_PATH');
+	$i = 1;
+
+	?><div class="breadcumblist">
+		<ol vocab="https://schema.org/" typeof="BreadcrumbList">
+			<li property="itemListElement" typeof="ListItem">
+				<a property="item" typeof="WebPage"
+					href="<?=$RootPath?>/">
+				<span property="name">Kecskemét Informatika</span></a>
+				<meta property="position" content="<?=$i++?>">
+			</li><?php
+			if($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])
+            {
+				?><?=($eszkoz['thelyid']) ? "<li><b>></b></li>" : "" ?>
+				<li property="itemListElement" typeof="ListItem">
+					<a property="item" typeof="WebPage"
+						href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
+					<span property="name"><?=$eszkoz['telephely']?></span></a>
+					<meta property="position" content="<?=$i++?>">
+				</li>
+				<?=($eszkoz['epuletid']) ? "<li><b>></b></li>" : "" ?>
+				<li property="itemListElement" typeof="ListItem">
+					<a property="item" typeof="WebPage"
+						href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
+					<span property="name"><?=showEpulet($eszkoz['epuletszam'], $eszkoz['epulettipus'])?></span></a>
+					<meta property="position" content="<?=$i++?>">
+				</li>
+				<?=($eszkoz['helyisegid']) ? "<li><b>></b></li>" : "" ?>
+				<li property="itemListElement" typeof="ListItem">
+					<a property="item" typeof="WebPage"
+						href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
+					<span property="name"><?=showHelyiseg($eszkoz['helyisegszam'], $eszkoz['helyisegnev'])?></span></a>
+					<meta property="position" content="<?=$i++?>">
+				</li>
+				<?php if(isset($eszkoz['rackid']))
+				{
+					?><li><b>></b></li>
+					<li property="itemListElement" typeof="ListItem">
+						<a property="item" typeof="WebPage"
+							href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
+						<span property="name"><?=$eszkoz['rack']?></span></a>
+						<meta property="position" content="<?=$i++?>">
+					</li><?php
+				}
+
+				?><?=($eszkoz['beepitesinev'] || $eszkoz['ipcim']) ? "<li><b>></b></li>" : "hh" ?>
+				<li property="itemListElement" typeof="ListItem">
+					<span property="name"><?=($eszkoz['beepitesinev']) ? $eszkoz['beepitesinev'] : "" ?> <?=(isset($eszkoz['ipcim']) && $eszkoz['ipcim']) ? "(" . $eszkoz['ipcim'] . ")" : "" ?></span>
+					<meta property="position" content="<?=$i++?>">
+				</li><?php
+			}
+			else
+			{
+				?><li><b>></b></li>
+				<li property="itemListElement" typeof="ListItem">
+					<a property="item" typeof="WebPage"
+						href="<?=$RootPath?>/aktiveszkozok">
+					<span property="name">Aktív eszközök</span></a>
+					<meta property="position" content="<?=$i++?>">
+				</li>
+				<li><b>></b></li>
+				<li property="itemListElement" typeof="ListItem">
+					<span property="name"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</span>
+					<meta property="position" content="<?=$i++?>">
+				</li><?php
+			}
+		?></ol>
+	</div><?php
 }

@@ -6,7 +6,7 @@ if(!$csoportolvas)
 }
 else
 {
-    $szuresek = getWhere("(modellek.tipus = 6 OR modellek.tipus = 7)");
+    $szuresek = getWhere("(modellek.tipus > 5 AND modellek.tipus < 11)");
     $where = $szuresek['where'];
 
     $csoportwhere = null;

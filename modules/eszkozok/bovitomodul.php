@@ -155,14 +155,14 @@ else
                         <li property="itemListElement" typeof="ListItem">
                             <a property="item" typeof="WebPage"
                                 href="<?=$RootPath?>/epulet/<?=$aktiveszkoz['epuletid']?>">
-                            <span property="name"><?=$aktiveszkoz['epuletszam']?>. <?=$aktiveszkoz['epulettipus']?></span></a>
+                            <span property="name"><?=showEpulet($aktiveszkoz['epuletszam'], $aktiveszkoz['epulettipus'])?></span></a>
                             <meta property="position" content="3">
                         </li>
                         <li><b>></b></li>
                         <li property="itemListElement" typeof="ListItem">
                             <a property="item" typeof="WebPage"
                                 href="<?=$RootPath?>/helyiseg/<?=$aktiveszkoz['helyisegid']?>">
-                            <span property="name"><?=$aktiveszkoz['helyisegszam']?> (<?=$aktiveszkoz['helyisegnev']?>)</span></a>
+                            <span property="name"><?=showHelyiseg($aktiveszkoz['helyisegszam'], $aktiveszkoz['helyisegnev'])?></span></a>
                             <meta property="position" content="4">
                         </li>
                         <?php if($aktiveszkoz['rackid'])
