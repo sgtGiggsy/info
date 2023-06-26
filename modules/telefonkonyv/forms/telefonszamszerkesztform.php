@@ -137,7 +137,8 @@ if(@$irhat)
 
                 <div>
                     <label for="rendfokozat" id="rendfokozatcimke">Rendfokozat*</label>
-                    <select name="rendfokozat" id="rendfokozat" required><?php
+                    <select name="rendfokozat" id="rendfokozat" required>
+                        <option value=""></option><?php
                         foreach($rendfokozatok as $x)
                         {
                             ?><option value="<?=$x['id']?>" <?=($x['id'] == $rendfokozat) ? "selected" : "" ?>><?=$x['nev']?></option><?php
@@ -255,8 +256,7 @@ if(@$irhat)
     </form>
 
     <script>
-        function switchBeosztas()
-        {
+        function switchBeosztas() {
             let i, reszletes, egyszeru;
 
             reszletes = document.getElementsByClassName("reszletes");
@@ -300,7 +300,7 @@ if(@$irhat)
         {
             if(document.getElementById('ujbeo').selected)
             {
-                requireModositasoka();
+                requireModositasOka();
                 
                 beosztasnev = document.getElementById('beosztasnev');
                 beosztasnev.value = null;
@@ -340,7 +340,7 @@ if(@$irhat)
         }
 
         function delUser() {
-            requireModositasoka();
+            requireModositasOka();
 
             nevmezo = document.getElementById('nev');
             nevmezo.value = "";
@@ -370,7 +370,7 @@ if(@$irhat)
             mobil.value = null;
         }
 
-        function requireModositasoka() {
+        function requireModositasOka() {
             modositasoka = document.getElementById('modositasoka');
             modositasoka.required = true;
 
@@ -394,6 +394,10 @@ if(@$irhat)
                 if(!x)
                     window.location.href="<?=$RootPath?>/telefonkonyv";
                     <?php
+            }
+            if(!$beosztas)
+            {
+                ?>switchBeosztas()<?php
             }
             ?>
         });

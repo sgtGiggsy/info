@@ -21,22 +21,37 @@ if(!isset($sorrend))
 if(isset($_GET['csoport']))
 {
     $csoport = $_GET["csoport"];
-    $where = "WHERE telefonkonyvbeosztasok.csoport = $csoport";
+    $where = "WHERE telefonkonyvcsoportok.id = $csoport";
 }
 elseif(isset($csoport))
 {
-    $where = "WHERE telefonkonyvbeosztasok.csoport = $csoport";
+    $where = "WHERE telefonkonyvcsoportok.id = $csoport";
 }
 
 
 $telkonyvbeosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.nev AS beosztas,
             telefonkonyvfelhasznalok.nev AS dolgozo,
-            telefonkonyvbeosztasok.sorrend AS sorrend
+            telefonkonyvbeosztasok.sorrend AS sorrend,
+            telefonkonyvcsoportok.sorrend AS csoportsorrend
         FROM telefonkonyvbeosztasok
             LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
             LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
         $where
-        ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
+    UNION
+        SELECT telefonkonyvvaltozasok.beosztasnev AS beosztas,
+            IF(telefonkonyvfelhasznalok.nev, telefonkonyvfelhasznalok.nev, telefonkonyvvaltozasok.nev) AS dolgozo,
+            telefonkonyvvaltozasok.sorrend AS sorrend,
+            telefonkonyvcsoportok.sorrend AS csoportsorrend
+        FROM telefonkonyvvaltozasok
+            LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvvaltozasok.felhid = telefonkonyvfelhasznalok.id
+            LEFT JOIN telefonkonyvcsoportok ON telefonkonyvvaltozasok.csoport = telefonkonyvcsoportok.id
+        $where");
+
+$telkonyvbeosztasok = mysqliToArray($telkonyvbeosztasok);
+
+$csoportsorrend  = array_column($telkonyvbeosztasok, 'csoportsorrend');
+$sorrend = array_column($telkonyvbeosztasok, 'sorrend');
+array_multisort($csoportsorrend, SORT_ASC, $sorrend, SORT_ASC, $telkonyvbeosztasok);
 
     $sorrendszamlalo = 0;
     
@@ -70,7 +85,7 @@ $telkonyvbeosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.nev AS beoszta
         $sorrendszamlalo++;
     }
 
-    if(mysqli_num_rows($telkonyvbeosztasok) == 0 || !$origvolt)
+    if(count($telkonyvbeosztasok) == 0 || !$origvolt)
     {
         ?><option value="999999" selected>!!! UTOLSÓ ELEM !!!</option><?php
     }

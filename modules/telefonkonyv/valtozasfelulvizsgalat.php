@@ -30,7 +30,7 @@ else
 
         $magyarazat = $sorrend = $elotag = $nev = $titulus = $rendfokozat = $belsoszam = $belsoszam2 = $kozcelu = 
         $fax = $kozcelufax = $mobil = $csoport = $csoportid = $felhasznalo = $megjegyzes = $modositasoka = $timestamp =
-        $bejelento = $modositasoka = $allapot = $felhid = $beosztasnev = null;
+        $bejelento = $modositasoka = $allapot = $felhid = $beosztasnev = $beowhere = null;
         $beosztas = $origbeosztas = 0;
 
         $button = "Módosítások rögzítése";
@@ -193,10 +193,10 @@ else
                     $origfelhid = $telefonszam['origfelhid'];
                     $origbeosztasnev = $telefonszam['origbeosztasnev'];
                     $origsorrend = $telefonszam['origsorrend'];
+
+                    $beowhere =  "OR telefonkonyvbeosztasok.id = $origbeosztas OR telefonkonyvbeosztasok.id = $beosztas";
                 }
             }
-            $oldalcim .= "     <br><small>Beküldő: $bejelento ($timestamp)</small>";
-
 
             $beosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS id,
                     telefonkonyvbeosztasok.nev AS nev,
@@ -204,7 +204,7 @@ else
                     telefonkonyvcsoportok.nev AS csoportnev
                 FROM telefonkonyvbeosztasok
                     LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
-                WHERE telefonkonyvcsoportok.id > 1 AND (telefonkonyvbeosztasok.felhid IS NULL OR telefonkonyvbeosztasok.id = $origbeosztas OR telefonkonyvbeosztasok.id = $beosztas)
+                WHERE telefonkonyvcsoportok.id > 1 AND (telefonkonyvbeosztasok.felhid IS NULL $beowhere)
                 ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
         }
 

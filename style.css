@@ -414,6 +414,20 @@ ol, ul {
     max-height: 200px;
 }
 
+.modmessage {
+
+}
+
+.modmessagebody {
+    padding-bottom: 0.7em !important;
+    padding-top: 0.2em !important
+}
+
+.modmessagebody p {
+    padding-top: 1em !important;
+    font-size: 1.1em;
+}
+
 .fullheight {
     max-height: unset;
 }

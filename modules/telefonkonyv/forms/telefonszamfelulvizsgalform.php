@@ -1,9 +1,18 @@
 <?php
 if(@$irhat)
 {
-    ?><form action="<?=$RootPath?>/valtozasfelulvizsgalat&action=review<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
-        <h2><?=$modositasoka?></h2>
-        <div class="ketharmad">
+    ?><form action="<?=$RootPath?>/valtozasfelulvizsgalat&action=review<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+        if($modositasoka)
+        {
+            ?><div class="infobox modmessage">
+                <div class="infoboxtitle">A módosítást végző <?=$bejelento?> üzenete:</div>
+                <div class="infoboxbody modmessagebody">
+                    <small><?=$timestamp?></small>
+                    <p><?=$modositasoka?></p>
+                </div>
+            </div><?php
+        }
+        ?><div class="ketharmad">
             <input type ="hidden" id="id" name="id" value="<?=$_GET['id']?>">
             <input type ="hidden" id="allapot" name="allapot" value="3">
             <input type ="hidden" id="eredetisor" name="eredetisor" value="<?=$origsorrend?>">
@@ -49,7 +58,7 @@ if(@$irhat)
                 <div>
                     <label for="beosztasnev" id="beosztasnevcimke">Beosztás megnevezése</label>
                     <div class="delbuttoninput">
-                        <input type="text" id="beosztasnev" name="beosztasnev" value="<?=$beosztasnev?>" <?=($beosztasnev != $origbeosztasnev) ? "style='background-color: yellow; color: black'; title='" . $origbeosztasnev . "'" : "" ?> onchange="setAllapotPartial()"><?php
+                        <input type="text" id="beosztasnev" name="beosztasnev" value="<?=$beosztasnev?>" <?=($beosztasnev != $origbeosztasnev) ? "style='background-color: yellow; color: black'; title='" . (($origbeosztasnev) ? $origbeosztasnev : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()"><?php
                         if($beosztasnev != $origbeosztasnev)
                         {
                             ?><button onclick="restoreOriginal('beosztasnev', '<?=$origbeosztasnev?>'); return false;">Eredeti állapot</button><?php
@@ -63,7 +72,7 @@ if(@$irhat)
                 <div>
                     <label for="csoport">Alegység</label>
                     <div class="delbuttoninput">
-                        <select name="csoport" id="csoport" <?=($csoport != $origcsoport) ? "style='background-color: yellow; color: black'; title='" . $origcsoportnev . "'" : "" ?> onchange="setAllapotPartial(); refreshList()">
+                        <select name="csoport" id="csoport" <?=($csoport != $origcsoport) ? "style='background-color: yellow; color: black'; title='" . (($origcsoportnev) ? $origcsoportnev : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial(); refreshList()">
                             <option value=""></option><?php
                             foreach($csoportok as $x)
                             {
@@ -84,7 +93,7 @@ if(@$irhat)
                 <div>
                     <label for="sorrend">Sorrend</label>
                     <div class="delbuttoninput">
-                        <select name="sorrend" id="sorrend" <?=($sorrend != $origsorrend) ? "style='background-color: yellow; color: black'; title='" . $origsorrend . "'" : "" ?> onchange="setAllapotPartial()">
+                        <select name="sorrend" id="sorrend" <?=($sorrend != $origsorrend) ? "style='background-color: yellow; color: black'; title='" . (($origsorrend) ? $origsorrend : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()">
                             <?php $novaltozatlan = true; include("./modules/telefonkonyv/includes/beosztaslist.php"); ?>
                         </select><?php
                         if($sorrend != $origsorrend)
@@ -122,7 +131,7 @@ if(@$irhat)
                 <div>
                     <label for="nev">Név*</label>
                     <div class="delbuttoninput">
-                        <input type="text" name="nev" value="<?=$nev?>" <?=($nev != $orignev) ? "style='background-color: yellow; color: black'; title='" . $orignev . "'" : "" ?> required onchange="setAllapotPartial()"><?php
+                        <input type="text" name="nev" id="nev" value="<?=$nev?>" <?=($nev != $orignev) ? "style='background-color: yellow; color: black'; title='" . (($orignev) ? $orignev : "ÜRES VOLT" ) . "'" : "" ?> required onchange="setAllapotPartial()"><?php
                         if($nev != $orignev)
                         {
                             ?><button onclick="restoreOriginal('nev', '<?=$orignev?>'); return false;">Eredeti állapot</button><?php
@@ -154,7 +163,8 @@ if(@$irhat)
                 <div>
                     <label for="rendfokozat">Rendfokozat*</label>
                     <div class="delbuttoninput">
-                        <select name="rendfokozat" id="rendfokozat" <?=($rendfokozat != $origrendfokozat) ? "style='background-color: yellow; color: black'; title='" . $origrendfokozatnev . "'" : "" ?> required onchange="setAllapotPartial()"><?php
+                        <select name="rendfokozat" id="rendfokozat" <?=($rendfokozat != $origrendfokozat) ? "style='background-color: yellow; color: black'; title='" . (($origrendfokozatnev) ? $origrendfokozatnev : "ÜRES VOLT") . "'" : "" ?> required onchange="setAllapotPartial()">
+                            <option value=""></option><?php
                             foreach($rendfokozatok as $x)
                             {
                                 ?><option value="<?=$x['id']?>" <?=($x['id'] == $rendfokozat) ? "selected" : "" ?>><?=$x['nev']?></option><?php
@@ -172,7 +182,7 @@ if(@$irhat)
                 <div>
                     <label for="felhasznalo">Felhasználó</label>
                     <div class="delbuttoninput">
-                        <select name="felhasznalo" id="felhasznalo" <?=($felhasznalo != $origfelhasznalo) ? "style='background-color: yellow; color: black'; title='" . $origfelhasznalonev . "'" : "" ?> onchange="setAllapotPartial()">
+                        <select name="felhasznalo" id="felhasznalo" <?=($felhasznalo != $origfelhasznalo) ? "style='background-color: yellow; color: black'; title='" . (($origfelhasznalonev) ? $origfelhasznalonev : "ÜRES VOLT") . "'" : "" ?> onchange="setAllapotPartial()">
                             <option value=""></option><?php
                             foreach($felhasznalok as $x)
                             {
@@ -204,7 +214,7 @@ if(@$irhat)
                 <div>
                     <label for="belsoszam">Belső szám*</label>
                     <div class="delbuttoninput">
-                        <input type="text" name="belsoszam" value="<?=$belsoszam?>" <?=($belsoszam != $origbelsoszam) ? "style='background-color: yellow; color: black'; title='" . $origbelsoszam . "'" : "" ?> required onchange="setAllapotPartial()"><?php
+                        <input type="text" id="belsoszam" name="belsoszam" value="<?=$belsoszam?>" <?=($belsoszam != $origbelsoszam) ? "style='background-color: yellow; color: black'; title='" . (($origbelsoszam) ? $origbelsoszam : "ÜRES VOLT" ). "'" : "" ?> required onchange="setAllapotPartial()"><?php
                         if($belsoszam != $origbelsoszam)
                         {
                             ?><button onclick="restoreOriginal('belsoszam', '<?=$origbelsoszam?>'); return false;">Eredeti állapot</button><?php
@@ -217,7 +227,7 @@ if(@$irhat)
                 <div>
                     <label for="belsoszam2">Alternatív belső szám:</label>
                     <div class="delbuttoninput">
-                        <input type="text" name="belsoszam2" value="<?=$belsoszam2?>" <?=($belsoszam2 != $origbelsoszam2) ? "style='background-color: yellow; color: black'; title='" . $origbelsoszam2 . "'" : "" ?> onchange="setAllapotPartial()">
+                        <input type="text" id="belsoszam2" name="belsoszam2" value="<?=$belsoszam2?>" <?=($belsoszam2 != $origbelsoszam2) ? "style='background-color: yellow; color: black'; title='" . (($origbelsoszam2) ? $origbelsoszam2 : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()">
                         <?php
                         if($belsoszam2 != $origbelsoszam2)
                         {
@@ -232,7 +242,7 @@ if(@$irhat)
                 <div>
                     <label for="kozcelu">Közcélú szám</label>
                     <div class="delbuttoninput">
-                        <input type="text" name="kozcelu" value="<?=$kozcelu?>" <?=($kozcelu != $origkozcelu) ? "style='background-color: yellow; color: black'; title='" . $origkozcelu . "'" : "" ?> onchange="setAllapotPartial()"><?php
+                        <input type="text" id="kozcelu" name="kozcelu" value="<?=$kozcelu?>" <?=($kozcelu != $origkozcelu) ? "style='background-color: yellow; color: black'; title='" . (($origkozcelu) ? $origkozcelu : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()"><?php
                         if($kozcelu != $origkozcelu)
                         {
                             ?><button onclick="restoreOriginal('kozcelu', '<?=$origkozcelu?>'); return false;">Eredeti állapot</button><?php
@@ -247,7 +257,7 @@ if(@$irhat)
                 <div>
                     <label for="fax">Fax szám</label>
                     <div class="delbuttoninput">
-                        <input type="text" name="fax" value="<?=$fax?>" <?=($fax != $origfax) ? "style='background-color: yellow; color: black'; title='" . $origfax . "'" : "" ?> onchange="setAllapotPartial()"><?php
+                        <input type="text" id="fax" name="fax" value="<?=$fax?>" <?=($fax != $origfax) ? "style='background-color: yellow; color: black'; title='" . (($origfax) ? $origfax : "ÜRES VOLT" ). "'" : "" ?> onchange="setAllapotPartial()"><?php
                         if($fax != $origfax)
                         {
                             ?><button onclick="restoreOriginal('fax', '<?=$origfax?>'); return false;">Eredeti állapot</button><?php
@@ -261,7 +271,7 @@ if(@$irhat)
                 <div>
                     <label for="kozcelufax">Közcélú fax szám</label>
                     <div class="delbuttoninput">
-                        <input type="text" name="kozcelufax" value="<?=$kozcelufax?>" <?=($kozcelufax != $origkozcelufax) ? "style='background-color: yellow; color: black'; title='" . $origkozcelufax . "'" : "" ?> onchange="setAllapotPartial()"><?php
+                        <input type="text" id="kozcelufax" name="kozcelufax" value="<?=$kozcelufax?>" <?=($kozcelufax != $origkozcelufax) ? "style='background-color: yellow; color: black'; title='" . (($origkozcelufax) ? $origkozcelufax : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()"><?php
                         if($kozcelufax != $origkozcelufax)
                         {
                             ?><button onclick="restoreOriginal('kozcelufax', '<?=$origkozcelufax?>'); return false;">Eredeti állapot</button><?php
@@ -275,7 +285,7 @@ if(@$irhat)
                 <div>
                     <label for="mobil">Szolgálati mobil száma</label>
                     <div class="delbuttoninput">
-                        <input type="text" name="mobil" value="<?=$mobil?>" <?=($mobil != $origmobil) ? "style='background-color: yellow; color: black'; title='" . $origmobil . "'" : "" ?> onchange="setAllapotPartial()"><?php
+                        <input type="text" id="mobil" name="mobil" value="<?=$mobil?>" <?=($mobil != $origmobil) ? "style='background-color: yellow; color: black'; title='" . (($origmobil) ? $origmobil : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()"><?php
                         if($mobil != $origmobil)
                         {
                             ?><button onclick="restoreOriginal('mobil', '<?=$origmobil?>'); return false;">Eredeti állapot</button><?php

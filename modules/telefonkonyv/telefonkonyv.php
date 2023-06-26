@@ -5,7 +5,8 @@ $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
 
 $alegysegek = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1;");
 
-$telefonkonyvmentett = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS telszamid,
+$telefonkonyvmentett = mySQLConnect("SELECT null AS modid,
+        telefonkonyvbeosztasok.id AS telszamid,
         telefonkonyvbeosztasok.nev AS beosztas,
         nevelotagok.nev AS elotag,
         telefonkonyvfelhasznalok.nev AS nev,
@@ -31,7 +32,8 @@ $telefonkonyvmentett = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS telszam
         LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
     ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
 
-$valtozasok = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS telszamid,
+$valtozasok = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS modid,
+        telefonkonyvbeosztasok.id AS telszamid,
         telefonkonyvvaltozasok.beosztasnev AS beosztas,
         nevelotagok.nev AS elotag,
         telefonkonyvvaltozasok.nev AS nev,
@@ -86,13 +88,14 @@ foreach($valtozasok as $ujbejegyzes)
 {
     if(!$ujbejegyzes['telszamid'])
     {
+        $ujbejegyzes['uj'] = true;
         $telefonkonyv[] = $ujbejegyzes;
     }
 }
 
-$volume  = array_column($telefonkonyv, 'csoportsorrend');
-$edition = array_column($telefonkonyv, 'beosorrend');
-array_multisort($volume, SORT_ASC, $edition, SORT_ASC, $telefonkonyv);
+$csoportsorrend  = array_column($telefonkonyv, 'csoportsorrend');
+$beosorrend = array_column($telefonkonyv, 'beosorrend');
+array_multisort($csoportsorrend, SORT_ASC, $beosorrend, SORT_ASC, $telefonkonyv);
 
 $oszlopok = array(
     array('nev' => '', 'tipus' => 's'),
@@ -175,7 +178,9 @@ foreach($alegysegek as $alegyseg)
                     $szamlalo++;
                 }
                 $telszamid = $telefonszam['telszamid'];
-                ?><tr <?=($csoportir) ? "class='kattinthatotr'" . "data-href='$RootPath/telefonszamvaltozas/$telszamid'" : "" ?> id="<?=$telefonszam['csoport']?>-<?=$szamlalo?>" style="font-weight: normal; <?=($telefonszam['uj'] && $globaltelefonkonyvadmin) ? 'font-style: italic;' : '' ?>">
+                ?><tr <?=($csoportir) ? "class='kattinthatotr' data-href='$RootPath/telefonszamvaltozas" . (($telefonszam['uj']) ? "?modid=" . $telefonszam['modid'] : "/" . $telszamid) . "'" : "" ?>
+                        id="<?=$telefonszam['csoport']?>-<?=$szamlalo?>"
+                        style="font-weight: normal; <?=($telefonszam['uj'] && $globaltelefonkonyvadmin) ? 'font-style: italic;' : '' ?>">
                     <td></td>
                     <td><?=$telefonszam['beosztas']?></td>
                     <td style="width:4ch"><?=$telefonszam['elotag']?></td>
