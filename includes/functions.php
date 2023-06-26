@@ -510,8 +510,12 @@ function cancelForm()
 function mysqliNaturalSort($mysqliresult, $sortcriteria)
 {
 	$returnarr = mysqliToArray($mysqliresult);
+	return arrayNaturalSort($returnarr, $sortcriteria);
+}
 
-    usort($returnarr, function($a, $b) use ($sortcriteria) {
+function arrayNaturalSort($returnarr, $sortcriteria)
+{
+	usort($returnarr, function($a, $b) use ($sortcriteria) {
 		if($a[$sortcriteria] == null)
 		{
 			$a[$sortcriteria] = "zzzzz";
@@ -1331,4 +1335,57 @@ function showBreadcumb($eszkoz, $lastlink = false)
 			}
 		?></ol>
 	</div><?php
+}
+
+function telefonKonyvAdminCheck($mindir)
+{
+	$globaltelefonkonyvadmin = false;
+	$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+
+    if($mindir)
+    {
+        $globaltelefonkonyvadmin = true;
+    }
+    elseif($felhasznaloid)
+    {
+        $tkonyvjog = mySQLConnect("SELECT * FROM telefonkonyvadminok WHERE felhasznalo = $felhasznaloid ORDER BY csoport ASC");
+		if(mysqli_num_rows($tkonyvjog) > 0)
+		{
+        	$tkonyvjog = mysqli_fetch_assoc($tkonyvjog)['csoport'];
+			if($tkonyvjog == 1)
+			{
+				$globaltelefonkonyvadmin = true;
+			}
+		}
+    }
+
+	return $globaltelefonkonyvadmin;
+}
+
+function telSzamSzetvalaszt($telszam, $elotaghossz, $telszamhossz)
+{
+    $elotag = substr($telszam, 0, $elotaghossz);
+    $telszam = substr($telszam, $elotaghossz, $telszamhossz);
+
+    $teljesszam = array(
+        'elotag' => $elotag,
+        'telszam' => $telszam
+    );
+
+    return $teljesszam;
+}
+
+function formatTelnum($telszam)
+{
+	$temp1 = substr($telszam, 0, 3);
+	$temp2 = substr($telszam, 3);
+
+	if($telszam)
+	{
+		return $temp1 . "-" . $temp2;
+	}
+	else
+	{
+		return null;
+	}
 }

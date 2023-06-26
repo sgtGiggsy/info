@@ -39,16 +39,26 @@
 </body>
 <script>
 
+	$(".kattinthatotr").click(function() {
+				window.document.location = $(this).data("href");
+				console.log("ktr");
+		});
+
 	window.addEventListener('load', () => {
 		const status = navigator.onLine;
 		console.log(status);
 	})
+
 	window.addEventListener('offline', (e) => {
 		console.log('offline');
 	});
 
 	window.addEventListener('online', (e) => {
 		console.log('online');
+	});
+
+	document.getElementById("alegysegfilter").addEventListener("search", function(event) {
+		filterAlegyseg('alegysegfilter', 'telefonkonyv');
 	});
 
 	function sortTable(n, t, tname) {
@@ -136,7 +146,8 @@
 		for (i = 0; i < tr.length; i++)
 		{
 			td = tr[i].getElementsByTagName("td")[oszlop];
-			if (td)
+			tdfirst = tr[i].getElementsByTagName("td")[0];
+			if(td)
 			{
 				txtValue = td.textContent || td.innerText;
 				if (txtValue.toUpperCase().indexOf(filter) > -1)
@@ -152,7 +163,102 @@
 					tr[i].style.display = "none";
 					tr[i].style.color = filter;
 				}
-			}       
+			}
+
+			//console.log(tdfirst.colSpan);
+			if(tdfirst && tdfirst.colSpan > 1)
+			{
+				if(tr[i].style.color == filter)
+				{
+					tr[i].style.display = "";
+					tr[i].style.color = "";
+				}
+				else
+				{
+					tr[i].style.display = "none";
+					tr[i].style.color = filter;
+				}
+			}
+		}
+	}
+
+	function filterAlegyseg(szures, tablazat)
+	{
+		var input, filter, table, tr, i, txtValue;
+		input = document.getElementById(szures);
+		filter = input.value.toUpperCase();
+		table = document.getElementById(tablazat);
+		tr = table.getElementsByTagName("tr");
+
+		//console.log(table.length);
+		for (i = 1; i < tr.length; i++)
+		{
+			//console.log(table.rows[i].id);
+			txtValue = table.rows[i].id;
+			if (txtValue.toUpperCase().indexOf(filter) > -1)
+			{
+				if(tr[i].style.color == filter)
+				{
+					tr[i].style.display = "";
+					tr[i].style.color = "";
+				}
+			}
+			else
+			{
+				tr[i].style.display = "none";
+				tr[i].style.color = filter;
+			}
+		}
+	}
+
+	function showHideAlegyseg(alegyseg, tablazat)
+	{
+		var filter, table, tr, td, i, txtValue;
+		var voltmar = false;
+		filter = alegyseg.toUpperCase();
+		table = document.getElementById(tablazat);
+		tr = table.getElementsByTagName("tr");
+		cimsor = alegyseg+"-0";
+
+		for (i = 1; i < tr.length; i++)
+		{
+			txtValue = table.rows[i].id;
+			//console.log(txtValue + " " + cimsor);
+			if (txtValue.toUpperCase().indexOf(filter) > -1 && txtValue != cimsor)
+			{
+				voltmar = true;
+				if(tr[i].style.display == "none")
+				{
+					tr[i].style.display = "";
+				}
+				else
+				{
+					tr[i].style.display = "none";
+				}
+			}
+			else if(voltmar)
+			{
+				break;
+			}
+		}
+	}
+
+	function verifyExist(datalist, field, tooltipid)
+	{
+		list = document.getElementById(datalist);
+		listlength = list.options.length
+
+		input = document.getElementById(field);
+		filter = input.value.toUpperCase();
+
+		for (i = 0; i < listlength; i++)
+		{
+			if(filter == list.options[i].value)
+			{
+				var popup = document.getElementById(tooltipid);
+				popup.classList.toggle("show");
+				setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 6000);
+			}
 		}
 	}
 
@@ -171,12 +277,6 @@
 	}
 	?>
 
-	$(document).ready(function($) {
-		$(".kattinthatotr").click(function() {
-		window.document.location = $(this).data("href");
-			});
-	});
-
 	function rejtMutat(id) {
 		if(document.getElementById(id).style.display == "block")
 		{
@@ -185,6 +285,17 @@
 		else
 		{
 			document.getElementById(id).style.display = "block";
+		}
+	};
+
+	function ipHistory(id) {
+		if(document.getElementById(id).style.display == "none")
+		{
+			document.getElementById(id).style.display = "";
+		}
+		else
+		{
+			document.getElementById(id).style.display = "none";
 		}
 	};
 

@@ -38,7 +38,7 @@ if(isset($beuszok) && $beuszok)
                 <h2 style="text-align: center">Súgó</h2>
                 <?=$magyarazat?>
             </div>
-
         </div>
+        <?=(isset($csillaggaljelolt)) ? $csillaggaljelolt : "" ?>
     </div>
 </div>

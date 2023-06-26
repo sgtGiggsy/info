@@ -28,6 +28,7 @@
     --basefont: #000000;
     --fontlight: #e0e0e0;
     --fontlight2: #f7f7f7;
+    --greyfont: #a1a1a1;
     --contentbg: #ededed;
     --menu: #2d373c;
     --menuhover: #1f282d;
@@ -635,6 +636,40 @@ textarea:focus, input:focus, select:focus {
     outline: 1px solid var(--shadow);
 }
 
+.telinput, .delbuttoninput {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-bottom: 0 !important;
+}
+  
+.telprefix {
+    position: absolute;
+    z-index: 99;
+    left: 0.5em;
+    color: var(--greyfont);
+}
+  
+.telinput input {
+    flex-grow: 1;
+}
+
+.delbuttoninput button {
+    font-variant: small-caps;
+    font-size: 1.3em;
+    position: absolute;
+    right: 0;
+    border-radius: 0 0.25em 0.25em 0;
+    margin-bottom: 1px;
+    padding: 0px 0.7em 1px 0.7em !important;
+    border-left: 1px solid var(--addnewborder);
+    border-top: 1px solid var(--lightborder);
+    border-right: 1px solid var(--lightborder);
+    border-bottom: 1px solid var(--lightborder);
+}
+
+
+
 /* A .tox a TinyMCE beviteli mezőjének wrapperje */
 .tox {
     border-radius: 0.45em !important;
@@ -912,6 +947,16 @@ td img {
     max-width: initial;
 }
 
+.telefonkonyvtabla {
+    width: 100%;
+    max-width: 100%;
+}
+
+.telefonkonyvelvalaszto {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
 /* Speciális táblázatok */
 .tsorth {
     cursor: pointer;
@@ -937,6 +982,10 @@ td img {
 
 .transpinput select option {
     background-color: var(--selectbg);
+}
+
+.smallinput select, .smallinput input[type="text"] {
+    font-size: 0.8em;
 }
 
 .online {
@@ -2004,6 +2053,40 @@ div[id^=tennivalobody-].close {
     to {bottom: 0; opacity: 0;}
   }
 
+/* Tooltip */
+.ttipcontainer {
+    -webkit-user-select: none;
+    position: relative;
+}
+
+.tooltip {
+    position: absolute;
+    top: -80%;
+    left: 50%;
+    margin-left: -80px;
+    width: 300px;
+    background-color: var(--toasterbg);
+    color: var(--fontlight);
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0 !important;
+    visibility: hidden;
+}
+
+.tooltip::before {
+    content: "";
+    border-width: 20px;
+    border-style: solid;
+    top: 15%;
+    left: -40px;
+    border-color: transparent var(--toasterbg) transparent transparent;
+    position: absolute;
+}
+
+.show {
+    visibility: visible;
+}
+
 /* Beúszó menü */
 #slidein-1, #slidein-2, #slidein-3, #slidein-4, #slidein-5, #slidein-6 {
     visibility: hidden;
@@ -2184,6 +2267,16 @@ div[id^=tennivalobody-].close {
 
     tr:nth-child(even) {
         background-color: #ddd !important;
+        color-adjust: exact;
+    }
+
+    .nostripes tr:nth-child(odd) {
+        background-color: #FFF !important;
+        color-adjust: exact;
+    }
+
+    .nostripes tr:nth-child(even) {
+        background-color: #FFF !important;
         color-adjust: exact;
     }
 
