@@ -1,9 +1,18 @@
 <?php
 if(@$irhat)
 {
-    ?><form action="<?=$RootPath?>/telefonszamvaltozas&action=new<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
-        <h2><?=$adminmegjegyzes?></h2>
-        <div class="ketharmad"><?php
+    ?><form action="<?=$RootPath?>/telefonszamvaltozas&action=new<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+        if($adminmegjegyzes)
+        {
+            ?><div class="infobox modmessage">
+                <div class="infoboxtitle">A Telefonkönyv adminisztrátorának megjegyzése</div>
+                <div class="infoboxbody modmessagebody">
+                    <small><?=$admintimestamp?></small>
+                    <p><?=$adminmegjegyzes?></p>
+                </div>
+            </div><?php
+        }
+        ?><div class="ketharmad"><?php
             $magyarazat .= "<strong>Tudnivalók</strong><p>Minden *-gal megjelölt mező kitöltése kötelező.
                 A <i>SÚGÓ</i> bármikor bezárható a felette jobboldalt látható ?-re kattintva.</p>";
             if(isset($_GET['id']))

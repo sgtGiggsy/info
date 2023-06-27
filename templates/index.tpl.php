@@ -218,13 +218,12 @@
 		filter = alegyseg.toUpperCase();
 		table = document.getElementById(tablazat);
 		tr = table.getElementsByTagName("tr");
-		cimsor = alegyseg+"-0";
 
-		for (i = 1; i < tr.length; i++)
+		for (i = 0; i < tr.length; i++)
 		{
 			txtValue = table.rows[i].id;
-			//console.log(txtValue + " " + cimsor);
-			if (txtValue.toUpperCase().indexOf(filter) > -1 && txtValue != cimsor)
+			alegysegcim = alegyseg+"0";
+			if (txtValue.toUpperCase().indexOf(filter) > -1 && txtValue != alegysegcim)
 			{
 				voltmar = true;
 				if(tr[i].style.display == "none")

@@ -26,7 +26,7 @@ else
 
         $felhasznalok = mySQLConnect("SELECT id, nev, felhasznalonev FROM felhasznalok ORDER BY nev");
 
-        $csoportok = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1;");
+        $csoportok = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1 AND torolve IS NULL;");
 
         $magyarazat = $sorrend = $elotag = $nev = $titulus = $rendfokozat = $belsoszam = $belsoszam2 = $kozcelu = 
         $fax = $kozcelufax = $mobil = $csoport = $csoportid = $felhasznalo = $megjegyzes = $modositasoka = $timestamp =

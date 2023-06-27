@@ -66,8 +66,9 @@ if(isset($irhat) && $irhat)
 
     elseif($_GET["action"] == "review")
     {
-        $stmt = $con->prepare('UPDATE telefonkonyvvaltozasok SET beosztas=?, beosztasnev=?, elotag=?, nev=?, titulus=?, rendfokozat=?, belsoszam=?, belsoszam2=?, kozcelu=?, fax=?, kozcelufax=?, mobil=?, csoport=?, felhasznalo=?, sorrend=?, megjegyzes=?, adminmegjegyzes=?, allapot=? WHERE id=?');
-        $stmt->bind_param('ssssssssssssssssssi', $_POST['beosztas'], $_POST['beosztasnev'], $_POST['elotag'], $_POST['nev'], $_POST['titulus'], $_POST['rendfokozat'], $_POST['belsoszam'], $_POST['belsoszam2'], $_POST['kozcelu'], $_POST['fax'], $_POST['kozcelufax'], $_POST['mobil'], $_POST['csoport'], $_POST['felhasznalo'], $_POST['sorrend'], $_POST['megjegyzes'], $_POST['adminmegjegyzes'], $_POST['allapot'], $_POST['id']);
+        $timestamp = timeStampForSQL();
+        $stmt = $con->prepare('UPDATE telefonkonyvvaltozasok SET beosztas=?, beosztasnev=?, elotag=?, nev=?, titulus=?, rendfokozat=?, belsoszam=?, belsoszam2=?, kozcelu=?, fax=?, kozcelufax=?, mobil=?, csoport=?, felhasznalo=?, sorrend=?, megjegyzes=?, adminmegjegyzes=?, admintimestamp=?, allapot=? WHERE id=?');
+        $stmt->bind_param('sssssssssssssssssssi', $_POST['beosztas'], $_POST['beosztasnev'], $_POST['elotag'], $_POST['nev'], $_POST['titulus'], $_POST['rendfokozat'], $_POST['belsoszam'], $_POST['belsoszam2'], $_POST['kozcelu'], $_POST['fax'], $_POST['kozcelufax'], $_POST['mobil'], $_POST['csoport'], $_POST['felhasznalo'], $_POST['sorrend'], $_POST['megjegyzes'], $_POST['adminmegjegyzes'], $timestamp, $_POST['allapot'], $_POST['id']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

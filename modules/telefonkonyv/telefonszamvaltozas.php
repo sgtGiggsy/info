@@ -22,22 +22,6 @@ else
         redirectToGyujto("telefonkonyv");
     }
 
-    $beowhere = null;
-    if($id)
-    {
-        $beowhere = "OR telefonkonyvbeosztasok.id = $id";
-    }
-
-    $beosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS id,
-                telefonkonyvbeosztasok.nev AS nev,
-                telefonkonyvcsoportok.nev AS csoportid,
-                telefonkonyvcsoportok.nev AS csoportnev
-            FROM telefonkonyvbeosztasok
-                LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
-                LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
-            WHERE telefonkonyvcsoportok.id > 1 AND (telefonkonyvbeosztasok.felhid IS NULL $beowhere)
-            ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
-
     $rendfokozatok = mySQLConnect("SELECT * FROM rendfokozatok ORDER BY id");
 
     $nevelotagok = mySQLConnect("SELECT * FROM nevelotagok");
@@ -48,10 +32,10 @@ else
 
     $tkonyvfelhasznalok = mySQLConnect("SELECT nev FROM telefonkonyvfelhasznalok;");
 
-    $csoportok = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1;");
+    $csoportok = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1 AND torolve IS NULL;");
 
     $modkerwhere = $magyarazat = $beosztas = $felhid = $beosztasnev = $elotag = $nev = $titulus = $rendfokozat = $belsoszam = $belsoszam2 = $kozcelu = 
-    $fax = $kozcelufax = $mobil = $csoport = $csoportid = $felhasznalo = $megjegyzes = $modositasoka = $felhid = $adminmegjegyzes = null;
+    $fax = $kozcelufax = $mobil = $csoport = $csoportid = $felhasznalo = $megjegyzes = $modositasoka = $felhid = $adminmegjegyzes = $modwhere = null;
     $sorrend = 9999;
 
     $button = "Mentés";
@@ -90,9 +74,9 @@ else
         }
         else
         {
-            $telefonszam = mysqli_fetch_assoc($modositasok);
+            $telefonszam = mysqli_fetch_assoc($telefonszam);
         }
-    }    
+    }
     elseif(isset($_GET['modid']))
     {
         $modid = $_GET['modid'];
@@ -112,6 +96,8 @@ else
                 telefonkonyvvaltozasok.felhasznalo AS felhasznalo,
                 sorrend,
                 csoport,
+                adminmegjegyzes,
+                admintimestamp,
                 telefonkonyvvaltozasok.megjegyzes AS megjegyzes
             FROM telefonkonyvvaltozasok
             WHERE telefonkonyvvaltozasok.id = $modid
@@ -131,9 +117,31 @@ else
 
     if($irhat)
     {
+        $beowhere = "telefonkonyvbeosztasok.felhid IS NULL";
+        if($id)
+        {
+            $beowhere = "(" . $beowhere . " OR telefonkonyvbeosztasok.id = $id" . ")";
+        }
+
+        if(isset($modid) && $modid)
+        {
+            $beowhere = "(" . $beowhere . " OR telefonkonyvvaltozasok.id = $modid" . ")";
+        }
+        
+        $beosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS id,
+                telefonkonyvbeosztasok.nev AS nev,
+                telefonkonyvcsoportok.nev AS csoportid,
+                telefonkonyvcsoportok.nev AS csoportnev
+            FROM telefonkonyvbeosztasok
+                LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
+                LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
+                LEFT JOIN telefonkonyvvaltozasok ON telefonkonyvvaltozasok.beosztas = telefonkonyvbeosztasok.id
+            WHERE telefonkonyvcsoportok.id > 1 AND $beowhere
+            ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
+        
         $beosztasnev = $telefonszam['beosztasnev'];
-        $beosztas = $telefonszam['beosztas'];
-        $felhid = $telefonszam['felhid'];
+        
+        
         $elotag = $telefonszam['elotag'];
         $nev = $telefonszam['nev'];
         $titulus = $telefonszam['titulus'];
@@ -142,14 +150,23 @@ else
         $megjegyzes = $telefonszam['megjegyzes'];
         $csoport = $telefonszam['csoport'];
         $sorrend = $telefonszam['sorrend'];
+        $admintimestamp = $telefonszam['admintimestamp'];
+        $felhid = 0;
+        $beosztas = 0;
         if($telefonszam['felhid'])
         {
-            
+            $felhid = $telefonszam['felhid'];
         }
         if($telefonszam['beosztas'])
         {
-            
+            $beosztas = $telefonszam['beosztas'];
         }
+
+        if(isset($telefonszam['adminmegjegyzes']) && $telefonszam['adminmegjegyzes'])
+        {
+            $adminmegjegyzes = $telefonszam['adminmegjegyzes'];
+        }
+
         //$adminmegjegyzes = $telefonszam['adminmegjegyzes'];
 
 
@@ -199,16 +216,19 @@ else
             }
         ?></datalist><?php
 
-        if($beosztas || $felhid)
+        if(isset($modid) && $modid)
         {
-            $beowhere = "(telefonkonyvvaltozasok.beosztas = $beosztas OR telefonkonyvvaltozasok.felhid = $felhid) AND";
+            $modwhere = "telefonkonyvvaltozasok.id = $modid AND";
         }
-
+        elseif($beosztas || $felhid)
+        {
+            $modwhere = "(telefonkonyvvaltozasok.beosztas = $beosztas OR telefonkonyvvaltozasok.felhid = $felhid) AND";
+        }
 
         $modositaskerelmek = mySQLConnect("SELECT felhasznalok.nev AS bejelento, timestamp
                 FROM telefonkonyvvaltozasok
                     INNER JOIN felhasznalok ON telefonkonyvvaltozasok.bejelento = felhasznalok.id
-                WHERE $beowhere telefonkonyvvaltozasok.modid = (SELECT id FROM telefonkonyvmodositaskorok ORDER BY id DESC LIMIT 1)
+                WHERE $modwhere telefonkonyvvaltozasok.modid = (SELECT id FROM telefonkonyvmodositaskorok ORDER BY id DESC LIMIT 1)
                     AND telefonkonyvvaltozasok.allapot < 2;");
 
         if(mysqli_num_rows($modositaskerelmek) > 0)

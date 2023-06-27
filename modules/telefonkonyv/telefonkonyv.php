@@ -165,21 +165,26 @@ foreach($alegysegek as $alegyseg)
         </thead>
         <tbody><?php
             $elozocsoport = 0;
+            $csoportszamlalo = 0;
 
             foreach($telefonkonyv as $telefonszam)
             {
                 if($elozocsoport != $telefonszam['csoport'])
                 {
                     $szamlalo = 0;
-                    ?><tr id="<?=$telefonszam['csoport']?>-<?=$szamlalo?>">
-                        <td colspan=<?=count($oszlopok)?> style="cursor:pointer" class="telefonkonyvelvalaszto" onclick="showHideAlegyseg('<?=$telefonszam['csoport']?>', '<?=$tipus?>')"><?=$telefonszam['csoport']?></td>
+                    $csoportnevalap = "csoport" . $csoportszamlalo . "-";
+                    $csoportnev = $csoportnevalap . $szamlalo;
+                    ?><tr id="<?=$csoportnev?>">
+                        <td colspan=<?=count($oszlopok)?> style="cursor:pointer" class="telefonkonyvelvalaszto" onclick="showHideAlegyseg('<?=$csoportnevalap?>', '<?=$tipus?>')"><?=$telefonszam['csoport']?></td>
                     </tr><?php
                     $elozocsoport = $telefonszam['csoport'];
+                    $csoportszamlalo++;
                     $szamlalo++;
                 }
                 $telszamid = $telefonszam['telszamid'];
+                $csoportnev = $csoportnevalap . $szamlalo;
                 ?><tr <?=($csoportir) ? "class='kattinthatotr' data-href='$RootPath/telefonszamvaltozas" . (($telefonszam['uj']) ? "?modid=" . $telefonszam['modid'] : "/" . $telszamid) . "'" : "" ?>
-                        id="<?=$telefonszam['csoport']?>-<?=$szamlalo?>"
+                        id="<?=$csoportnev?>"
                         style="font-weight: normal; <?=($telefonszam['uj'] && $globaltelefonkonyvadmin) ? 'font-style: italic;' : '' ?>">
                     <td></td>
                     <td><?=$telefonszam['beosztas']?></td>

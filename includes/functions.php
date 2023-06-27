@@ -192,6 +192,11 @@ function dateTimeLocalToTimeStamp($datetimelocal)
 	}
 }
 
+function timeStampForSQL()
+{
+	return date('Y-m-d H:i:s');
+}
+
 function alakulatValaszto($ldapres)
 {
 	if(str_contains($ldapres, "59"))
@@ -1387,5 +1392,21 @@ function formatTelnum($telszam)
 	else
 	{
 		return null;
+	}
+}
+
+function verifyWholeNum($szam)
+{
+	if(is_int($szam))
+	{
+		return true;
+	}
+	elseif(ctype_digit($szam))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
