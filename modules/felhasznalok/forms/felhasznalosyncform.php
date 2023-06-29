@@ -3,7 +3,7 @@ if(@$irhat)
 {
     ?><div class="contentcenter">
         <div>
-            <form action="<?=$RootPath?>/felhasznaloszerkeszt?action=adszinkronizalas<?=$kuldooldal?>" method="post">
+            <form action="<?=$RootPath?>/felhasznalo?action=sync<?=$kuldooldal?>" method="post">
 
                 <div>
                     <label for="felhasznalonev">Felhasználónév:

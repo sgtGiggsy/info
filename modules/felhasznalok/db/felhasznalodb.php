@@ -80,7 +80,7 @@ if(isset($irhat) && $irhat)
         //{}
     }
 
-    elseif($_GET['action'] == "adszinkronizalas")
+    elseif($_GET['action'] == "sync")
     {
         $ldapusername = $_POST['felhasznalonev'] . "@" . $LDAP_DOMAIN;
         $plainpassword = $_POST['jelszo'];
@@ -108,18 +108,21 @@ if(isset($irhat) && $irhat)
                         {
                             $ldapresults = ldap_get_entries($ldapconnection, $ldapsearch);
                             // Ha nincs email, vagy megjelenő név valakinél megadva, warningot dobna a lekérés, így el kell nyomnunk az esetleges hibaüzenetet
-                            @$email = $ldapresults[0]['mail'][0];
-                            @$nev = $ldapresults[0]['displayname'][0];
-                            @$osztaly = $ldapresults[0]['department'][0];
-                            @$alakulat = alakulatValaszto($ldapresults[0]['company'][0]);
-                            @$telefon = $ldapresults[0]['telephonenumber'][0];
-                            @$beosztas = $ldapresults[0]['title'][0];
-                            @$thumb = $ldapresults[0]['thumbnailphoto'][0];
-      
-                            if ($stmt = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, alakulat=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?'))
+                            if($ldapresults[0]['displayname'][0])
                             {
-                                $stmt->bind_param('ssssssss', $nev, $email, $osztaly, $alakulat, $telefon, $beosztas, $thumb, $samaccountname);
-                                $stmt->execute();
+                                @$email = $ldapresults[0]['mail'][0];
+                                @$nev = $ldapresults[0]['displayname'][0];
+                                @$osztaly = $ldapresults[0]['department'][0];
+                                @$alakulat = alakulatValaszto($ldapresults[0]['company'][0]);
+                                @$telefon = $ldapresults[0]['telephonenumber'][0];
+                                @$beosztas = $ldapresults[0]['title'][0];
+                                @$thumb = $ldapresults[0]['thumbnailphoto'][0];
+        
+                                if ($stmt = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, alakulat=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?'))
+                                {
+                                    $stmt->bind_param('ssssssss', $nev, $email, $osztaly, $alakulat, $telefon, $beosztas, $thumb, $samaccountname);
+                                    $stmt->execute();
+                                }
                             }
                         }
                     }

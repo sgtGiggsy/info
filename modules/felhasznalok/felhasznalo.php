@@ -17,7 +17,7 @@ elseif($mindir && isset($_GET['action']))
     $irhat = false;
 
     // Ha a kért művelet nem a szerkesztő oldal betöltése, az adatbázis változót true-ra állítjuk
-    if($_GET['action'] == "new" || $_GET['action'] == "update" || $_GET['action'] == "delete" || $_GET['action'] == "adszinkronizalas" || ($_GET['action'] == "permissions" && count($_POST) > 0))
+    if($_GET['action'] == "new" || $_GET['action'] == "update" || $_GET['action'] == "delete" || $_GET['action'] == "sync" || ($_GET['action'] == "permissions" && count($_POST) > 0))
     {
         $irhat = true;
         $dbir = true;
@@ -31,7 +31,7 @@ elseif($mindir && isset($_GET['action']))
             // Ez jelzi a visszajelző funkciónak, hogy milyen üzenetet kell kiírnia
             $dbop = "szerkesztes";
         }
-        elseif($_GET['action'] == "adszinkronizalas")
+        elseif($_GET['action'] == "sync")
         {
             // Ez jelzi a visszajelző funkciónak, hogy milyen üzenetet kell kiírnia
             $dbop = "szinkronizalas";
@@ -53,7 +53,6 @@ elseif($mindir && isset($_GET['action']))
     elseif($irhat && $dbir && count($_POST) > 0)
     {
         include("./modules/felhasznalok/db/felhasznalodb.php");
-
         // A kiinduló oldalra visszairányító függvény meghívása.
         redirectToKuldo($dbop);
     }
@@ -130,11 +129,18 @@ elseif($mindir && isset($_GET['action']))
 // A személyes beállítások meghívása
 elseif(isset($_SESSION[getenv('SESSION_NAME').'id']) && isset($_GET['beallitasok']))
 {
+    $switchstate = false;
     $magyarazat = null;
     $irhat = true;
+    $id = $_SESSION[getenv('SESSION_NAME').'id'];
     $form = "modules/felhasznalok/forms/szemelyesbeallitasokform";
     $button = "Beállítások szerkesztése";
     $oldalcim = "Személyes beállítások szerkesztése";
+    $jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $id AND menupont = 5 AND olvasas > 1");
+    if(mysqli_num_rows($jogosultsagok) > 0)
+    {
+        $switchstate = true;
+    }
 
     if(count($_POST) > 0)
     {
@@ -157,7 +163,7 @@ else
     }
 
     $csoportwhere = null;
-    if(!$mindolvas)
+    if(!$mindolvas && $felhid != $_SESSION[getenv('SESSION_NAME').'id'])
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
