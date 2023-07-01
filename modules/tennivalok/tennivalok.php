@@ -83,9 +83,9 @@ else
                             {
                                 ?><form id="tennivalo" action="<?=$RootPath?>/tennivalodb?action=update" method="POST">
                                     <input type ="hidden" id="id" name="id" value=<?=$tennivalo['id']?>>
-                                    <label class="tennivalokcb">
+                                    <label class="customcb">
                                         <input type="checkbox" name="befejezve" id="befejezve" value="1" onChange='submit()' <?=($tennivalo['befejezve']) ? "checked" : "" ?>>
-                                        <span class="tenivalokjelolo"></span>
+                                        <span class="customcbjelolo tennivalokjelolo"></span>
                                     </label></form><?php
                             }
                         ?></div>

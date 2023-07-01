@@ -914,6 +914,77 @@ input:checked + .slider:before {
     background-color: rgba(0, 0, 0, 0.1);
 }
 
+/* EGYEDI CHECKBOX */
+.customcb {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+  
+/* Hide the browser's default checkbox */
+.customcb input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+  
+/* Create a custom checkbox */
+.customcbjelolo {
+    position: absolute;
+    top: 0;
+    right: 0em;
+    height: 1.5em;
+    width: 1.5em;
+    border-radius: 25%;
+    border: 4px solid var(--cbchecked);
+}
+
+.tablejelolo {
+    top: -0.75em;
+}
+  
+/* On mouse-over, add a grey background color */
+.customcb:hover input ~ .customcbjelolo {
+    
+}
+  
+/* When the checkbox is checked, add a blue background */
+.customcb input:checked ~ .customcbjelolo {
+    background-color: var(--cbchecked);
+}
+  
+/* Create the checkmark/indicator (hidden when not checked) */
+.customcbjelolo:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+ 
+/* Show the checkmark when checked */
+.customcb input:checked ~ .customcbjelolo:after {
+    display: block;
+}
+  
+/* Style the checkmark/indicator */
+.customcbjelolo:after {
+    left: 0.2em;
+    top: -0.1em;
+    width: 0.6em;
+    height: 1em;
+    border: solid var(--fontlight);
+    border-width: 0 6px 6px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    box-shadow: 3px 3px 3px var(--shadow);
+}
+
 /* ------------------------------- Táblázatok ------------------------------- */
 /* Táblázat alapbeállítások */
 table {
@@ -1383,6 +1454,46 @@ td img {
 }
 
 /* ------------------------------- Breadcumbok ------------------------------- */
+#backtotop {
+    position: fixed;
+    right: 2em;
+    bottom: -4em;
+    cursor: pointer;
+}
+
+#backtotop.show {
+    bottom: 2em;
+    -webkit-animation: swimup 0.5s;
+    animation: swimup 0.5s;
+}
+
+#backtotop.hide {
+    bottom: -4em;
+    -webkit-animation: swimdown 0.5s;
+    animation: swimdown 0.5s;
+}
+
+@keyframes swimup {
+    from {bottom: -4em; opacity: 0;}
+    to {bottom: 2em; opacity: 1;}
+}
+
+@-webkit-keyframes swimup {
+    from {bottom: -4em; opacity: 0;}
+    to {bottom: 2em; opacity: 1;}
+}
+
+@keyframes swimdown {
+    from {bottom: 2em; opacity: 0;}
+    to {bottom: -4em; opacity: 1;}
+}
+
+@-webkit-keyframes swimdown {
+    from {bottom: 2em; opacity: 0;}
+    to {bottom: -4em; opacity: 1;}
+}
+
+/* ------------------------------- Breadcumbok ------------------------------- */
 .breadcumblist {
     float: left;
     padding: 0px 0px 15px 0px;
@@ -1631,71 +1742,14 @@ div[id^=tennivalobody-].close {
 }
 
 /* A tennivalók checkboxa */
-/* Customize the label (the container) */
-.tennivalokcb {
-    display: block;
-    position: relative;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-  
-/* Hide the browser's default checkbox */
-.tennivalokcb input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-}
-  
-/* Create a custom checkbox */
-.tenivalokjelolo {
-    position: absolute;
+.tennivalokjelolo {
     top: 0;
     right: -1.8em;
-    height: 1.5em;
-    width: 1.5em;
-    border-radius: 25%;
-    border: 4px solid var(--cbchecked);
 }
-  
-/* On mouse-over, add a grey background color */
-.tennivalokcb:hover input ~ .tenivalokjelolo {
-    
-}
-  
-/* When the checkbox is checked, add a blue background */
-.tennivalokcb input:checked ~ .tenivalokjelolo {
-    background-color: var(--cbchecked);
-}
-  
-/* Create the checkmark/indicator (hidden when not checked) */
-.tenivalokjelolo:after {
-    content: "";
-    position: absolute;
-    display: none;
-}
- 
-/* Show the checkmark when checked */
-.tennivalokcb input:checked ~ .tenivalokjelolo:after {
-    display: block;
-}
-  
-/* Style the checkmark/indicator */
-.tenivalokjelolo:after {
+
+.tennivalokjelolo:after {
     left: 0.2em;
     top: -0.1em;
-    width: 0.6em;
-    height: 1em;
-    border: solid var(--fontlight);
-    border-width: 0 6px 6px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-    box-shadow: 3px 3px 3px var(--shadow);
 }
 
 /* -- Csoportok -- */

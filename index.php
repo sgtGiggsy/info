@@ -3,6 +3,7 @@
 include('./includes/config.inc.php');
 include('./includes/functions.php');
 $RootPath = getenv('APP_ROOT_PATH');
+$dbcallcount = 0;
 
 // Session indítása, vagy folytatása
 if (session_status() == PHP_SESSION_NONE) {

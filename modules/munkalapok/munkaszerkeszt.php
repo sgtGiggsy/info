@@ -21,9 +21,17 @@ else
     $hely = $_SESSION[getenv('SESSION_NAME')."defaultmunkahely"];
     $ugyintezo = $_SESSION[getenv('SESSION_NAME')."defaultugyintezo"];
     $munkavegzo1 = $_SESSION[getenv('SESSION_NAME').'id'];
+    $datalist = mySQLConnect("SELECT DISTINCT leiras FROM munkalapok ORDER BY leiras DESC");
 
     $button = "Munka rögzítése";
     $button2 = "Munka rögzítése és nyomtatása";
+
+    ?><datalist id="munkaleirasok"><?php
+    foreach($datalist as $elem)
+    {
+        ?><option><?=$elem['leiras']?></option><?php
+    }
+    ?></datalist><?php
 
     if(isset($_GET['id']))
     {
@@ -116,7 +124,6 @@ else
         </div>
     </div>
 <script>
-    
     
 </script>
 <?php

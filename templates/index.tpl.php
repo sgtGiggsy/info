@@ -24,17 +24,18 @@
 		?></div>
 
 		<!-- Fejléc -->
-		<div class="topmenubase"></div><?php include('./templates/header.tpl.php'); ?>
+		<div class="topmenubase" id="topmenuelement"></div><?php include('./templates/header.tpl.php'); ?>
 
 		<!-- Menürész -->
 		<?php $menuterulet = 1; include('./includes/menu.inc.php'); ?>		
 
 		<!-- Lábléc -->
-		<div class="bottom-line"><p><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p><span id="constatus"></span></div>
+		<div class="bottom-line"><p><?=($mindir) ? "Adatbázis hívások száma: " . $dbcallcount . " " : "" ?><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p><span id="constatus"></span></div>
 
 		<!-- Betöltés során látható területen kívül eső, illetve nem létező tartalmak -->
 		<div id="snackbar"></div>
 		<div id="formkuldatfedes" class="formkuldatfedes"><div class="formkuldmessage">Művelet folyamatban, kérlek várj...<br><div class="loader"></div></div></div>
+		<img src="<?=$RootPath?>/images/back.png" alt= "Vissza" id="backtotop" onclick="scrollToTop()"/>
 	</div>
 </body>
 <script>
@@ -44,9 +45,29 @@
 				console.log("ktr");
 		});
 
+	function scrollToTop() {
+		document.getElementById('topmenuelement').scrollIntoView({
+			behavior: 'smooth'
+		});
+	};
+
+	window.addEventListener("scroll", (event) => {
+		let scroll = this.scrollY;
+		var x = document.getElementById("backtotop");
+
+		if(scroll > 1000)
+		{
+        	x.className = "show";
+		}
+		if(scroll < 1000 && x.className == "show")
+		{
+        	x.className = "hide";
+		}
+	});
+
 	window.addEventListener('load', () => {
 		const status = navigator.onLine;
-		console.log(status);
+		//console.log(status);
 	})
 
 	window.addEventListener('offline', (e) => {
@@ -57,9 +78,16 @@
 		console.log('online');
 	});
 
-	document.getElementById("alegysegfilter").addEventListener("search", function(event) {
-		filterAlegyseg('alegysegfilter', 'telefonkonyv');
-	});
+	<?php
+	if(isset($csoportfilter))
+	{
+		?>
+		document.getElementById("<?=$csoportfilter?>").addEventListener("search", function(event) {
+			filterCsoport('<?=$csoportfilter?>', '<?=$tipus?>');
+		});
+		<?php
+	}
+	?>
 
 	function sortTable(n, t, tname) {
 		var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
@@ -135,9 +163,9 @@
 		}
 	};
 
-	function filterTable(szures, tablazat, oszlop)
+	function filterTable(szures, tablazat, oszlop, szuloszur = false)
 	{
-		var input, filter, table, tr, td, i, txtValue;
+		var input, filter, table, tr, td, i, txtValue, szuloelem;
 		input = document.getElementById(szures);
 		filter = input.value.toUpperCase();
 		table = document.getElementById(tablazat);
@@ -147,42 +175,42 @@
 		{
 			td = tr[i].getElementsByTagName("td")[oszlop];
 			tdfirst = tr[i].getElementsByTagName("td")[0];
+			if(tdfirst && tdfirst.innerHTML && szuloszur)
+			{
+				szuloelem = tr[i];
+				if (szuloelem.title == oszlop || !szuloelem.title)
+				{
+					szuloelem.style.display = "none";
+					szuloelem.title = oszlop;
+				}
+			}
 			if(td)
 			{
-				txtValue = td.textContent || td.innerText;
+				txtValue = td.textContent;
 				if (txtValue.toUpperCase().indexOf(filter) > -1)
 				{
-					if(tr[i].style.color == filter)
+					if(tr[i].title == oszlop || !tr[i].title)
 					{
+						if(szuloszur && szuloelem.title == oszlop)
+						{
+							szuloelem.style.display = "";
+						}
 						tr[i].style.display = "";
-						tr[i].style.color = "";
 					}
 				}
 				else
 				{
 					tr[i].style.display = "none";
-					tr[i].style.color = filter;
+					tr[i].title = oszlop;
 				}
 			}
 
 			//console.log(tdfirst.colSpan);
-			if(tdfirst && tdfirst.colSpan > 1)
-			{
-				if(tr[i].style.color == filter)
-				{
-					tr[i].style.display = "";
-					tr[i].style.color = "";
-				}
-				else
-				{
-					tr[i].style.display = "none";
-					tr[i].style.color = filter;
-				}
-			}
+			
 		}
 	}
 
-	function filterAlegyseg(szures, tablazat)
+	function filterCsoport(szures, tablazat)
 	{
 		var input, filter, table, tr, i, txtValue;
 		input = document.getElementById(szures);
@@ -190,11 +218,10 @@
 		table = document.getElementById(tablazat);
 		tr = table.getElementsByTagName("tr");
 
-		//console.log(table.length);
+		//console.log(tr.length);
 		for (i = 1; i < tr.length; i++)
 		{
-			//console.log(table.rows[i].id);
-			txtValue = table.rows[i].id;
+			txtValue = table.rows[i].className;
 			if (txtValue.toUpperCase().indexOf(filter) > -1)
 			{
 				if(tr[i].style.color == filter)
@@ -211,19 +238,19 @@
 		}
 	}
 
-	function showHideAlegyseg(alegyseg, tablazat)
+	function showHideCsoport(csoport, tablazat)
 	{
 		var filter, table, tr, td, i, txtValue;
 		var voltmar = false;
-		filter = alegyseg.toUpperCase();
+		filter = csoport.toUpperCase();
 		table = document.getElementById(tablazat);
 		tr = table.getElementsByTagName("tr");
 
 		for (i = 0; i < tr.length; i++)
 		{
 			txtValue = table.rows[i].id;
-			alegysegcim = alegyseg+"0";
-			if (txtValue.toUpperCase().indexOf(filter) > -1 && txtValue != alegysegcim)
+			csoportcim = csoport+"0";
+			if (txtValue.toUpperCase().indexOf(filter) > -1 && txtValue != csoportcim)
 			{
 				voltmar = true;
 				if(tr[i].style.display == "none")
