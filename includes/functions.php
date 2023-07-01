@@ -4,6 +4,8 @@ function mySQLConnect($querystring = null)
 {
 	## MySQL connect ##
 	include('config.inc.php');
+
+	$GLOBALS['dbcallcount']++;
 	
 	@$con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 
@@ -199,11 +201,11 @@ function timeStampForSQL()
 
 function alakulatValaszto($ldapres)
 {
-	if(str_contains($ldapres, "59"))
+	if(str_contains($ldapres, "101"))
 	{
 		return 1;
 	}
-	elseif(str_contains($ldapres, "43"))
+	elseif(str_contains($ldapres, "43") || str_contains($ldapres, "51"))
 	{
 		return 2;
 	}
@@ -1025,6 +1027,18 @@ function quickXSSfilter($string)
 	return $string;
 }
 
+function revertXSSfilter($string)
+{
+	$string = str_replace("&lt;", "<", $string);
+	$string = str_replace("&gt;", ">", $string);
+	$string = str_replace("&#123;", "{", $string);
+	$string = str_replace("&#125;", "}", $string);
+	$string = str_replace("&#36;", "$", $string);
+	$string = str_replace("&#40;", "(", $string);
+	$string = str_replace("&#41;", ")", $string);
+	return $string;
+}
+
 function csoportWhere($csoporttagsagok, $csopwhereset)
 {
 	$alakulatok = array();
@@ -1353,7 +1367,7 @@ function telefonKonyvAdminCheck($mindir)
     }
     elseif($felhasznaloid)
     {
-        $tkonyvjog = mySQLConnect("SELECT * FROM telefonkonyvadminok WHERE felhasznalo = $felhasznaloid ORDER BY csoport ASC");
+        $tkonyvjog = mySQLConnect("SELECT * FROM telefonkonyvadminok WHERE felhasznalo = $felhasznaloid ORDER BY csoport ASC LIMIT 1");
 		if(mysqli_num_rows($tkonyvjog) > 0)
 		{
         	$tkonyvjog = mysqli_fetch_assoc($tkonyvjog)['csoport'];
@@ -1408,5 +1422,278 @@ function verifyWholeNum($szam)
 	else
 	{
 		return false;
+	}
+}
+
+function generateSimpleExcel($fejlec, $sorok)
+{
+	$oszlopnevek = array();
+	$oszlopmezok = array();
+
+	foreach($fejlec as $x)
+	{
+		$oszlopnevek[] = revertXSSfilter($x['nev']);
+		$oszlopmezok[] = $x['adatmezo'];
+	}
+	$exportdata = array($oszlopnevek);
+
+	foreach($sorok as $sor)
+	{
+		$adatok = array();
+		foreach($oszlopmezok as $mezonev)
+		{
+			foreach($sor as $key => $value)
+			{
+				if($key == $mezonev)
+				{
+					$adatok[] = revertXSSfilter($value);
+					break;
+				}
+			}
+		}
+		$exportdata[] = $adatok;
+	}
+
+/* DEBUG CÉLOKRA, KIÍRJA A GENERÁLT TÁBLÁZATOT
+	?><table><?php
+	foreach($exportdata as $sor)
+	{
+		?><tr><?php
+		foreach($sor as $mezo)
+		{
+			?><td><?=$mezo?></td><?php
+		}
+		?></tr><?php
+	}
+
+	?></table>
+	<?php */
+
+	return $exportdata;
+}
+
+function exportExcel($data, $fajlnev)
+{
+	include_once('./classes/xlsxwriter.class.php');
+
+	$file = "./uploads/$fajlnev.xlsx";
+    $writer = new XLSXWriter();
+    $writer->writeSheet($data);
+	$writer->
+    $writer->writeToFile($file);
+
+    if (file_exists($file)) {
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/xlsx');
+        header('Content-Disposition: attachment; filename="'.basename($file).'"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($file));
+        ob_clean();
+        readfile($file);
+        exit;
+    }
+}
+
+function telefonKonyvImport()
+{
+	$con = mySQLConnect(false);
+
+	$bemenet = "./tkmod.csv";
+	
+	$oldtklist = csvToArray($bemenet);
+	
+	$rendfokozatok = mySQLConnect("SELECT * FROM rendfokozatok ORDER BY id");
+	
+	$nevelotagok = mySQLConnect("SELECT * FROM nevelotagok");
+	
+	$titulusok = mySQLConnect("SELECT * FROM titulusok");
+	
+	$felhasznalok = mySQLConnect("SELECT id, nev, felhasznalonev FROM felhasznalok ORDER BY nev");
+	
+	$alegysegek = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1 AND torolve IS NULL;");
+	
+	$alegysegid = 0;
+	$sorrend = 0;
+
+	foreach($oldtklist as $sor)
+	{
+		if($sor['beosztasnev'] == "Szervezeti egység:")
+		{
+			foreach($alegysegek as $alegyseg)
+			{
+				if($alegyseg['nev'] == $sor['elotag'])
+				{
+					$alegysegid = $alegyseg['id'];
+					$sorrend = 0;
+					break;
+				}
+			}
+		}
+		else
+		{
+			// Telefonkönyv felhasználók
+			$felhid = null;
+			if($sor['nev'])
+			{
+				$elotagid = $titulusid = $rendfokozatid = $mobil = $felhasznaloid = null;
+				foreach($nevelotagok as $x)
+				{
+					if($sor['elotag'] == $x['nev'])
+					{
+						$elotagid = $x['id'];
+						break;
+					}
+				}
+
+				foreach($titulusok as $x)
+				{
+					if($sor['titulus'] == $x['nev'])
+					{
+						$titulusid = $x['id'];
+						break;
+					}
+				}
+
+				foreach($rendfokozatok as $x)
+				{
+					if($sor['rendfokozat'] == $x['nev'])
+					{
+						$rendfokozatid = $x['id'];
+						break;
+					}
+				}
+
+				if($sor['mobil'])
+				{
+					if(str_contains($sor['mobil'], "0106-30-"))
+					{
+						$mobil = $sor['mobil'];
+					}
+					else
+					{
+						$mobil = "0106-30-" . $sor['mobil'];
+					}
+				}
+
+				foreach($felhasznalok as $x)
+				{
+					if(str_contains(strtolower($x['nev']), strtolower($sor['nev'])) && str_contains($x['telefon'], $sor['belsoszam']))
+					{
+						$felhasznaloid = $x['id'];
+						break;
+					}
+				}
+
+				$stmt = $con->prepare('INSERT INTO telefonkonyvfelhasznalok (elotag, nev, titulus, rendfokozat, mobil, felhasznalo) VALUES (?, ?, ?, ?, ?, ?)');
+				$stmt->bind_param('ssssss', $elotagid, $sor['nev'], $titulusid, $rendfokozatid, $mobil, $felhasznaloid);
+				$stmt->execute();
+
+				$felhid = mysqli_insert_id($con);
+			}
+			
+			// Telefonkönyv beosztások
+			$beosztasnev = $belsoszam = $belsoszam2 = $kozcelu = $fax = $kozcelufax = null;
+			$csoport = $alegysegid;
+			$beosztasnev = $sor['beosztasnev'];
+			$sorrend++;
+
+			if(!str_contains($sor['belsoszam'], "02-43-"))
+			{
+				$belsoszam = "02-43-" . $sor['belsoszam'];
+			}
+			else
+			{
+				$szamok = explode(" ", $sor['belsoszam']);
+				
+				if(isset($szamok[0]))
+				{
+					$tenylegesszam = str_replace(",", "", $szamok[0]);
+					$belsoszam = $tenylegesszam;
+				}
+
+				if(isset($szamok[1]))
+				{
+					$belsoszam2 = $szamok[1];
+				}
+			}
+			
+			if($sor['fax'])
+			{
+				if(str_contains($sor['fax'], "02-43-"))
+				{
+					$fax = $sor['fax'];
+				}
+				else
+				{
+					$fax = "02-43-" . $sor['fax'];
+				}
+			}
+
+			if($sor['kozcelu'])
+			{
+				if(str_contains($sor['kozcelu'], "0106-76-"))
+				{
+					$kozcelu = $sor['kozcelu'];
+				}
+				else
+				{
+					$kozcelu = "0106-76-" . $sor['kozcelu'];
+				}
+			}
+
+			if($sor['kozcelufax'])
+			{
+				if(str_contains($sor['kozcelufax'], "0106-76-"))
+				{
+					$kozcelufax = $sor['kozcelufax'];
+				}
+				else
+				{
+					$kozcelufax = "0106-76-" . $sor['kozcelufax'];
+				}
+			}
+
+			$stmt = $con->prepare('INSERT INTO telefonkonyvbeosztasok (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, felhid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+			$stmt->bind_param('sssssssss', $alegysegid, $beosztasnev, $sorrend, $belsoszam, $belsoszam2, $fax, $kozcelu, $kozcelufax, $felhid);
+			$stmt->execute();
+
+			echo $sor['beosztasnev'] . "<br>";
+		}
+	}
+}
+
+function getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $where = false, $field = null)
+{
+	if($globaltelefonkonyvadmin)
+	{
+		if($where)
+		{
+			$where = "WHERE telefonkonyvvaltozasok.modid = (SELECT MAX(id) FROM telefonkonyvmodositaskorok)";
+		}
+		else
+		{
+			$where = null;
+		}
+		return $where;
+	}
+	else
+	{
+		if(!$field)
+		{
+			$field = "telefonkonyvbeosztasok.csoport";
+		}
+		else
+		{
+			$field = "telefonkonyvcsoportok.id";
+		}
+		$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+		$pretag = "AND";
+		if($where)
+		{
+			$pretag = "WHERE";
+		}
+		return "$pretag $field IN (SELECT csoport FROM telefonkonyvadminok WHERE felhasznalo = $felhasznaloid)";
 	}
 }
