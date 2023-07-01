@@ -6,7 +6,13 @@ if(!$csoportolvas)
 }
 else
 {
-    $alegysegek = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE torolve IS NULL ORDER BY sorrend;");
+    $alegysegek = mySQLConnect("SELECT telefonkonyvcsoportok.id AS telcsopid,
+            telefonkonyvcsoportok.nev AS nev,
+            telefonkonyvcsoportok.sorrend AS sorrend,
+            (SELECT COUNT(id) FROM telefonkonyvbeosztasok WHERE csoport = telcsopid) AS beosztasok
+        FROM telefonkonyvcsoportok
+        WHERE telefonkonyvcsoportok.torolve IS NULL AND telefonkonyvcsoportok.id > 1
+        ORDER BY telefonkonyvcsoportok.sorrend;");
 
     if($mindir) 
     {
@@ -26,7 +32,7 @@ else
         <tbody><?php
             foreach($alegysegek as $alegyseg)
             {
-                $alegysegid = $alegyseg['id'];
+                $alegysegid = $alegyseg['telcsopid'];
                 ?><tr>
                     <td><?=$alegyseg['sorrend']?></td>
                     <td><?=$alegyseg['nev']?></td>
@@ -34,7 +40,7 @@ else
                     <td><?php
                         if($mindir)
                         {
-                            ?><form action="<?=$RootPath?>/telefonkonyvalegyseg?action=delete" method="post" onsubmit="return confirm('Biztosan törölni szeretnéd ezt az alegységet?'); beKuld.disabled = true; return true;">
+                            ?><form action="<?=$RootPath?>/telefonkonyvalegyseg?action=delete" method="post" onsubmit="return confirm('FIGYELEM!\n\nA törölni kívánt alegységhez <?=$alegyseg['beosztasok']?> beosztás tartozik!\nBiztosan törölni szeretnéd ezt az alegységet?'); beKuld.disabled = true; return true;">
                                 <input type ="hidden" id="id" name="id" value=<?=$alegysegid?>>
                                 <input type ="hidden" id="sorrend" name="sorrend" value=<?=$alegyseg['sorrend']?>>
                                 <input type="submit" name="beKuld" value="X">
