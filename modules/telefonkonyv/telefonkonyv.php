@@ -1,13 +1,26 @@
 <?php
 
 $szamlalo = null;
+$csoportfilter = "alegysegfilter";
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
+
+$where = "WHERE telefonkonyvbeosztasok.allapot > 1";
+$where2 = "WHERE telefonkonyvvaltozasok.allapot > 1 AND  telefonkonyvvaltozasok.allapot < 4";
+if(isset($_GET['kereses']))
+{
+    $keres = $_GET['kereses'];
+    $szurt = " AND telefonkonyvfelhasznalok.nev LIKE '%$keres%' OR telefonkonyvcsoportok.nev LIKE '%$keres%' OR belsoszam LIKE '%$keres%' OR belsoszam2 LIKE '%$keres%' OR mobil LIKE '%$keres%'";
+    $where .= $szurt;
+    $where2 .= $szurt;
+}
 
 $alegysegek = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1;");
 
-$telefonkonyvmentett = mySQLConnect("SELECT null AS modid,
+$telefonkonyvorig = mySQLConnect("SELECT NULL AS modid,
         telefonkonyvbeosztasok.id AS telszamid,
+        telefonkonyvcsoportok.nev AS csoport,
         telefonkonyvbeosztasok.nev AS beosztas,
+        telefonkonyvbeosztasok.allapot AS allapot,
         nevelotagok.nev AS elotag,
         telefonkonyvfelhasznalok.nev AS nev,
         titulusok.nev AS titulus,
@@ -18,7 +31,6 @@ $telefonkonyvmentett = mySQLConnect("SELECT null AS modid,
         fax,
         kozcelufax,
         mobil,
-        telefonkonyvcsoportok.nev AS csoport,
         felhasznalok.felhasznalonev AS felhasznalo,
         telefonkonyvbeosztasok.megjegyzes AS megjegyzes,
         telefonkonyvcsoportok.sorrend AS csoportsorrend,
@@ -30,47 +42,51 @@ $telefonkonyvmentett = mySQLConnect("SELECT null AS modid,
         LEFT JOIN rendfokozatok ON telefonkonyvfelhasznalok.rendfokozat = rendfokozatok.id
         LEFT JOIN felhasznalok ON telefonkonyvfelhasznalok.felhasznalo = felhasznalok.id
         LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
+        LEFT JOIN telefonkonyvvaltozasok ON telefonkonyvbeosztasok.id = telefonkonyvvaltozasok.ujbeoid
+    $where
     ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
 
-$valtozasok = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS modid,
-        telefonkonyvbeosztasok.id AS telszamid,
-        telefonkonyvvaltozasok.beosztasnev AS beosztas,
+$telefonkonyvuj = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS modid,
+        telefonkonyvvaltozasok.origbeoid AS telszamid,
+        telefonkonyvcsoportok.nev AS csoport,
+        telefonkonyvbeosztasok_mod.nev AS beosztas,
+        telefonkonyvbeosztasok_mod.allapot AS allapot,
         nevelotagok.nev AS elotag,
-        telefonkonyvvaltozasok.nev AS nev,
+        telefonkonyvfelhasznalok.nev AS nev,
         titulusok.nev AS titulus,
         rendfokozatok.nev AS rendfokozat,
-        telefonkonyvvaltozasok.belsoszam AS belsoszam,
-        telefonkonyvvaltozasok.belsoszam2 AS belsoszam2,
-        telefonkonyvvaltozasok.kozcelu AS kozcelu,
-        telefonkonyvvaltozasok.fax AS fax,
-        telefonkonyvvaltozasok.kozcelufax AS kozcelufax,
-        telefonkonyvvaltozasok.mobil AS mobil,
-        telefonkonyvcsoportok.nev AS csoport,
+        belsoszam,
+        belsoszam2,
+        kozcelu,
+        fax,
+        kozcelufax,
+        mobil,
         felhasznalok.felhasznalonev AS felhasznalo,
-        telefonkonyvvaltozasok.megjegyzes AS megjegyzes,
+        telefonkonyvbeosztasok_mod.megjegyzes AS megjegyzes,
         telefonkonyvcsoportok.sorrend AS csoportsorrend,
-        telefonkonyvvaltozasok.sorrend AS beosorrend
-    FROM telefonkonyvvaltozasok
-        LEFT JOIN nevelotagok ON telefonkonyvvaltozasok.elotag = nevelotagok.id
-        LEFT JOIN titulusok ON telefonkonyvvaltozasok.titulus = titulusok.id
-        LEFT JOIN rendfokozatok ON telefonkonyvvaltozasok.rendfokozat = rendfokozatok.id
-        LEFT JOIN telefonkonyvbeosztasok ON telefonkonyvvaltozasok.beosztas = telefonkonyvbeosztasok.id
-        LEFT JOIN telefonkonyvcsoportok ON telefonkonyvvaltozasok.csoport = telefonkonyvcsoportok.id
-        LEFT JOIN felhasznalok ON telefonkonyvvaltozasok.felhasznalo = felhasznalok.id
-    WHERE (telefonkonyvvaltozasok.allapot > 1 AND telefonkonyvvaltozasok.allapot < 4)
-        AND telefonkonyvvaltozasok.modid = (SELECT id FROM telefonkonyvmodositaskorok ORDER BY id DESC LIMIT 1)
-    ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
+        telefonkonyvbeosztasok_mod.sorrend AS beosorrend
+    FROM telefonkonyvbeosztasok_mod
+        LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok_mod.felhid = telefonkonyvfelhasznalok.id
+        LEFT JOIN nevelotagok ON telefonkonyvfelhasznalok.elotag = nevelotagok.id
+        LEFT JOIN titulusok ON telefonkonyvfelhasznalok.titulus = titulusok.id
+        LEFT JOIN rendfokozatok ON telefonkonyvfelhasznalok.rendfokozat = rendfokozatok.id
+        LEFT JOIN felhasznalok ON telefonkonyvfelhasznalok.felhasznalo = felhasznalok.id
+        LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok_mod.csoport = telefonkonyvcsoportok.id
+        LEFT JOIN telefonkonyvvaltozasok ON telefonkonyvbeosztasok_mod.id = telefonkonyvvaltozasok.ujbeoid
+    $where2
+    ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok_mod.sorrend;");
 
 $telefonkonyv = array();
 
 $uj = false;
-foreach($telefonkonyvmentett as $fixbejegyzes)
+foreach($telefonkonyvorig as $fixbejegyzes)
 {
-    foreach($valtozasok as $ujbejegyzes)
+    foreach($telefonkonyvuj as $ujbejegyzes)
     {
         $uj = false;
         if($fixbejegyzes['telszamid'] == $ujbejegyzes['telszamid'])
         {
+            //echo $ujbejegyzes['nev'] . "<br>";
             $ujbejegyzes['uj'] = true;
             $telefonkonyv[] = $ujbejegyzes;
             $uj = true;
@@ -84,7 +100,7 @@ foreach($telefonkonyvmentett as $fixbejegyzes)
     }
 }
 
-foreach($valtozasok as $ujbejegyzes)
+foreach($telefonkonyvuj as $ujbejegyzes)
 {
     if(!$ujbejegyzes['telszamid'])
     {
@@ -98,39 +114,52 @@ $beosorrend = array_column($telefonkonyv, 'beosorrend');
 array_multisort($csoportsorrend, SORT_ASC, $beosorrend, SORT_ASC, $telefonkonyv);
 
 $oszlopok = array(
-    array('nev' => '', 'tipus' => 's'),
-    array('nev' => 'Beosztás', 'tipus' => 's'),
-    array('nev' => 'Előtag', 'tipus' => 's'),
-    array('nev' => 'Név', 'tipus' => 's'),
-    array('nev' => 'Titulus', 'tipus' => 's'),
-    array('nev' => 'Rendfokozat', 'tipus' => 's'),
-    array('nev' => 'Belső szám', 'tipus' => 's'),
-    array('nev' => 'Közcélú', 'tipus' => 's'),
-    array('nev' => 'Fax', 'tipus' => 's'),
-    array('nev' => 'Közcélú fax', 'tipus' => 's'),
-    array('nev' => 'Szolgálati mobil', 'tipus' => 's'),
-    array('nev' => 'Megjegyzés', 'tipus' => 's')
+    array('nev' => '', 'tipus' => 's', 'adatmezo' => 'csoport'),
+    array('nev' => 'Beosztás', 'tipus' => 's', 'adatmezo' => 'beosztas'),
+    array('nev' => 'Előtag', 'tipus' => 's', 'adatmezo' => 'elotag'),
+    array('nev' => 'Név', 'tipus' => 's', 'adatmezo' => 'nev'),
+    array('nev' => 'Titulus', 'tipus' => 's', 'adatmezo' => 'titulus'),
+    array('nev' => 'Rendfokozat', 'tipus' => 's', 'adatmezo' => 'rendfokozat'),
+    array('nev' => 'Belső szám', 'tipus' => 's', 'adatmezo' => 'belsoszam'),
+    array('nev' => 'Közcélú', 'tipus' => 's', 'adatmezo' => 'kozcelu'),
+    array('nev' => 'Fax', 'tipus' => 's', 'adatmezo' => 'fax'),
+    array('nev' => 'Közcélú fax', 'tipus' => 's', 'adatmezo' => 'kozcelufax'),
+    array('nev' => 'Szolgálati mobil', 'tipus' => 's', 'adatmezo' => 'mobil'),
+    array('nev' => 'Megjegyzés', 'tipus' => 's', 'adatmezo' => 'megjegyzes')
 );
+
+if(isset($_GET['action']) && $_GET['action'] == "exportexcel")
+{
+    include("./modules/telefonkonyv/includes/telefonkonyvexport.php");
+}
+
 $oszlopszam = 0;
 $tipus = "telefonkonyv";
+$enablekeres = true;
 
 ?><datalist id="alegysegek"><?php
 foreach($alegysegek as $alegyseg)
 {
     ?><option><?=$alegyseg['nev']?></option><?php
 }
-?></datalist>
+?></datalist><?php
+if(isset($_GET['kereses']))
+{
+    ?><h2>Eredmények a keresőkifejezésre: <span style="font-size: 1.5em"><?=$_GET['kereses']?></span></h2><br><br><?php
+}
 
-
+?><div class="szerkgombsor">
+    <button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv?action=exportexcel'">Telefonkönyv mentése Excel-be</button>
+</div>
 <div class="PrintArea">
     <div class="oldalcim">Telefonkönyv
         <div class="szuresvalaszto">Alegységre szűrés
             <input style="width: 40ch"
                     size="1"
                     type="search"
-                    id="alegysegfilter"
+                    id="<?=$csoportfilter?>"
                     list="alegysegek"
-                    onkeyup="filterAlegyseg('alegysegfilter', '<?=$tipus?>')"
+                    onkeyup="filterCsoport('<?=$csoportfilter?>', '<?=$tipus?>')"
                     placeholder="Alegység"
                     title="Alegység">
         </div>
@@ -147,7 +176,7 @@ foreach($alegysegek as $alegyseg)
                                 size="1"
                                 type="search"
                                 id="f<?=$oszlopszam?>"
-                                onkeyup="filterTable('f<?=$oszlopszam?>', '<?=$tipus?>', <?=$oszlopszam?>)"
+                                onkeyup="filterTable('f<?=$oszlopszam?>', '<?=$tipus?>', <?=$oszlopszam?>, true)"
                                 placeholder="<?=$oszlop['nev']?>"
                                 title="<?=$oszlop['nev']?>">
                             <br></span>
@@ -174,23 +203,24 @@ foreach($alegysegek as $alegyseg)
                     $szamlalo = 0;
                     $csoportnevalap = "csoport" . $csoportszamlalo . "-";
                     $csoportnev = $csoportnevalap . $szamlalo;
-                    ?><tr id="<?=$csoportnev?>">
-                        <td colspan=<?=count($oszlopok)?> style="cursor:pointer" class="telefonkonyvelvalaszto" onclick="showHideAlegyseg('<?=$csoportnevalap?>', '<?=$tipus?>')"><?=$telefonszam['csoport']?></td>
-                    </tr><?php
                     $elozocsoport = $telefonszam['csoport'];
+                    ?><tr id="<?=$csoportnev?>" class="<?=$elozocsoport?>">
+                        <td colspan=<?=count($oszlopok)?> style="cursor:pointer" class="telefonkonyvelvalaszto" onclick="showHideCsoport('<?=$csoportnevalap?>', '<?=$tipus?>')"><?=$telefonszam['csoport']?></td>
+                    </tr><?php
+                    
                     $csoportszamlalo++;
                     $szamlalo++;
                 }
                 $telszamid = $telefonszam['telszamid'];
                 $csoportnev = $csoportnevalap . $szamlalo;
-                ?><tr <?=($csoportir) ? "class='kattinthatotr' data-href='$RootPath/telefonszamvaltozas" . (($telefonszam['uj']) ? "?modid=" . $telefonszam['modid'] : "/" . $telszamid) . "'" : "" ?>
+                ?><tr <?=($csoportir) ? "class='kattinthatotr $elozocsoport' data-href='$RootPath/telefonszamvaltozas" . (($telefonszam['allapot'] == 4) ? "?modid=" . $telefonszam['modid'] : "/" . $telszamid) . "'" : "" ?>
                         id="<?=$csoportnev?>"
-                        style="font-weight: normal; <?=($telefonszam['uj'] && $globaltelefonkonyvadmin) ? 'font-style: italic;' : '' ?>">
+                        style="font-weight: normal; <?=($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) ? 'font-style: italic;' : '' ?>">
                     <td></td>
                     <td><?=$telefonszam['beosztas']?></td>
-                    <td style="width:4ch"><?=$telefonszam['elotag']?></td>
+                    <td style="width:4ch; text-align:right;"><?=$telefonszam['elotag']?></td>
                     <td><?=$telefonszam['nev']?></td>
-                    <td style="width:5ch"><?=$telefonszam['titulus']?></td>
+                    <td style="width:5ch; text-align:right;"><?=$telefonszam['titulus']?></td>
                     <td style="width:8ch"><?=$telefonszam['rendfokozat']?></td>
                     <td><?=$telefonszam['belsoszam']?><?=($telefonszam['belsoszam2']) ? "<br>" . $telefonszam['belsoszam2'] : "" ?></td>
                     <td><?=$telefonszam['kozcelu']?></td>
@@ -204,3 +234,17 @@ foreach($alegysegek as $alegyseg)
         ?></tbody>
     </table>
 </div>
+<script><?php
+$oszlopszam = 0;
+foreach($oszlopok as $oszlop)
+{
+    if($oszlop['nev'])
+    {
+        ?>
+        document.getElementById("f<?=$oszlopszam?>").addEventListener("search", function(event) {
+			filterTable('f<?=$oszlopszam?>', '<?=$tipus?>', <?=$oszlopszam?>, true);
+		}); <?php
+    }
+    $oszlopszam++;
+}
+?></script>

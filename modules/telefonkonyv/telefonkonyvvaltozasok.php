@@ -1,44 +1,69 @@
 <?php
+$globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
+if($globaltelefonkonyvadmin || $csoportir)
+{   
+    $valtozaskorok = mySQLConnect("SELECT * FROM telefonkonyvmodositaskorok ORDER BY id DESC;");
+    $modositasikor = mysqli_fetch_assoc($valtozaskorok);
+    $modkorid = $modositasikor['id'];
+    $excelenged = true;
 
-if($globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir))
-{
-    if($globaltelefonkonyvadmin && isset($_GET['action']) && $_GET['action'] == "confirmchanges")
+    if(isset($_GET['modositasikor']))
     {
-        $irhat = true;
-        include("./modules/telefonkonyv/db/telefonkonyvdb.php");
-        
-        redirectToGyujto("telefonkonyvvaltozasok");
+        $modkorid = $_GET['modositasikor'];
+        foreach($valtozaskorok as $kor)
+        {
+            if($kor['id'] == $modkorid)
+            {
+                if($kor['lezarva'])
+                {
+                    $excelenged = false;
+                }
+                break;
+            }
+        }
     }
-    
-    $szamlalo = null;
 
+    $szamlalo = null;
+    $csoportfilter = "alegysegfilter";
+
+    $tkonyvwheresettings = array(
+        'where' => true,
+        'mezonev' => true,
+        'felhasznalo' => '',
+        'modkorszur' => true,
+        'modid' => $modkorid
+    );
+    $where = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwheresettings);
     $alegysegek = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1;");
 
     $telefonkonyv = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS valtozasid,
-            telefonkonyvbeosztasok.nev AS beosztas,
+            telefonkonyvbeosztasok_mod.id AS telszamid,
+            telefonkonyvbeosztasok_mod.nev AS beosztas,
             nevelotagok.nev AS elotag,
-            telefonkonyvvaltozasok.nev AS nev,
+            telefonkonyvfelhasznalok.nev AS nev,
             titulusok.nev AS titulus,
             rendfokozatok.nev AS rendfokozat,
-            telefonkonyvvaltozasok.belsoszam AS belsoszam,
-            telefonkonyvvaltozasok.belsoszam2 AS belsoszam2,
-            telefonkonyvvaltozasok.kozcelu AS kozcelu,
-            telefonkonyvvaltozasok.fax AS fax,
-            telefonkonyvvaltozasok.kozcelufax AS kozcelufax,
-            telefonkonyvvaltozasok.mobil AS mobil,
+            telefonkonyvbeosztasok_mod.belsoszam AS belsoszam,
+            telefonkonyvbeosztasok_mod.belsoszam2 AS belsoszam2,
+            telefonkonyvbeosztasok_mod.kozcelu AS kozcelu,
+            telefonkonyvbeosztasok_mod.fax AS fax,
+            telefonkonyvbeosztasok_mod.kozcelufax AS kozcelufax,
+            telefonkonyvfelhasznalok.mobil AS mobil,
             telefonkonyvcsoportok.nev AS csoport,
-            telefonkonyvvaltozasok.beosztasnev AS beosztasnev,
-            felhasznalok.felhasznalonev AS felhasznalo,
-            telefonkonyvvaltozasok.megjegyzes AS megjegyzes,
+            felhasznalok.felhasznalonev AS felhasznalonev,
+            felhasznalok.nev AS modosito,
+            telefonkonyvbeosztasok_mod.megjegyzes AS megjegyzes,
             telefonkonyvvaltozasok.allapot AS allapot
         FROM telefonkonyvvaltozasok
-            LEFT JOIN nevelotagok ON telefonkonyvvaltozasok.elotag = nevelotagok.id
-            LEFT JOIN titulusok ON telefonkonyvvaltozasok.titulus = titulusok.id
-            LEFT JOIN rendfokozatok ON telefonkonyvvaltozasok.rendfokozat = rendfokozatok.id
-            LEFT JOIN telefonkonyvbeosztasok ON telefonkonyvvaltozasok.beosztas = telefonkonyvbeosztasok.id
-            LEFT JOIN telefonkonyvcsoportok ON (telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id OR telefonkonyvvaltozasok.csoport = telefonkonyvcsoportok.id)
-            LEFT JOIN felhasznalok ON telefonkonyvvaltozasok.felhasznalo = felhasznalok.id
-        ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
+            LEFT JOIN telefonkonyvbeosztasok_mod ON telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok_mod.id
+            LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvvaltozasok.ujfelhid = telefonkonyvfelhasznalok.id
+            LEFT JOIN nevelotagok ON telefonkonyvfelhasznalok.elotag = nevelotagok.id
+            LEFT JOIN titulusok ON telefonkonyvfelhasznalok.titulus = titulusok.id
+            LEFT JOIN rendfokozatok ON telefonkonyvfelhasznalok.rendfokozat = rendfokozatok.id
+            LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok_mod.csoport = telefonkonyvcsoportok.id
+            LEFT JOIN felhasznalok ON telefonkonyvvaltozasok.bejelento = felhasznalok.id
+        $where
+        ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok_mod.sorrend;");
 
     $oszlopok = array(
         array('nev' => '', 'tipus' => 's'),
@@ -54,8 +79,35 @@ if($globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir))
         array('nev' => 'Szolgálati mobil', 'tipus' => 's'),
         array('nev' => 'Megjegyzés', 'tipus' => 's')
     );
+    if($globaltelefonkonyvadmin)
+    {
+        $oszlopok[] = array('nev' => 'Bejelentő', 'tipus' => 's');
+    }
+
     $oszlopszam = 0;
     $tipus = "telefonkonyv";
+
+    if($globaltelefonkonyvadmin && isset($_GET['action']) && $_GET['action'] == "exportexcel")
+    {    
+        mySQLConnect("UPDATE telefonkonyvmodositaskorok SET excelexport = 1 WHERE id = $modkorid");
+        include("./modules/telefonkonyv/includes/telefonkonyvmodositasexport.php");
+    }
+    elseif($globaltelefonkonyvadmin && isset($_GET['action']) && $_GET['action'] == "confirmchanges")
+    {
+        if($modositasikor['excelexport'])
+        {
+            $irhat = true;
+            include("./modules/telefonkonyv/db/telefonkonyvdb.php");
+            
+            redirectToGyujto("telefonkonyvvaltozasok");
+        }
+        else
+        {
+            $uzenet = "Sajnálom, de a változások nem véglegesíthetőek az Excel exportálás elkészülte előtt";
+            ?><h2 style="color: #990000"><?=$uzenet?></h2>
+            <script>alert("<?=$uzenet?>")</script><?php
+        }
+    }
 
     ?><datalist id="alegysegek"><?php
     foreach($alegysegek as $alegyseg)
@@ -66,17 +118,35 @@ if($globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir))
 
     if($globaltelefonkonyvadmin) 
     {
-        ?><button type="button" onclick="confirmDiscard()">Jóváhagyott módosítások rögzítése</button><?php
+        ?><div class="szerkgombsor"><?php
+            if($excelenged)
+            {
+                ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyvvaltozasok?action=exportexcel'">Módosítási Excel fájl generálása</button><?php
+            }
+            if($modositasikor['excelexport'])
+            {
+                ?><button type="button" onclick="confirmDiscard()">Jóváhagyott módosítások rögzítése</button><?php
+            }
+        ?></div><?php
     }
     ?><div class="PrintArea">
-        <div class="oldalcim">Telefonkönyv
+        <div class="oldalcim">Telefonkönyv módosítások (<?=$modositasikor['megkezdve']?> - <?=$modositasikor['lezarva']?>)
+            <div class="buttondropdown">
+                <span style="cursor: pointer;" onclick="showPopup('korabbikorok')">⮟</span>
+                <div id="korabbikorok" onmouseleave="hidePopup('korabbikorok')"><?php
+                    foreach($valtozaskorok as $kor)
+                    {
+                        ?><a href="<?=$RootPath?>/telefonkonyvvaltozasok?modositasikor=<?=$kor['id']?>"><?=$kor['megkezdve']?> - <?=$kor['lezarva']?></a><?php
+                    }
+                ?></div>
+            </div>
             <div class="szuresvalaszto">Alegységre szűrés
                 <input style="width: 40ch"
                         size="1"
                         type="search"
-                        id="alegysegfilter"
+                        id="<?=$csoportfilter?>"
                         list="alegysegek"
-                        onkeyup="filterAlegyseg('alegysegfilter', '<?=$tipus?>')"
+                        onkeyup="filterCsoport('<?=$csoportfilter?>', '<?=$tipus?>')"
                         placeholder="Alegység"
                         title="Alegység">
             </div>
@@ -111,6 +181,7 @@ if($globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir))
             </thead>
             <tbody><?php
                 $elozocsoport = 0;
+                $csoportszamlalo = 0;
 
                 foreach($telefonkonyv as $telefonszam)
                 {
@@ -126,27 +197,38 @@ if($globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir))
                     if($elozocsoport != $telefonszam['csoport'])
                     {
                         $szamlalo = 0;
-                        ?><tr id="<?=$telefonszam['csoport']?>-<?=$szamlalo?>">
-                            <td colspan=<?=count($oszlopok)?> style="cursor:pointer" class="telefonkonyvelvalaszto" onclick="showHideAlegyseg('<?=$telefonszam['csoport']?>', '<?=$tipus?>')"><?=$telefonszam['csoport']?></td>
-                        </tr><?php
+                        $csoportnevalap = "csoport" . $csoportszamlalo . "-";
+                        $csoportnev = $csoportnevalap . $szamlalo;
                         $elozocsoport = $telefonszam['csoport'];
+                        ?><tr id="<?=$csoportnev?>" class="<?=$elozocsoport?>">
+                            <td colspan=<?=count($oszlopok)?> style="cursor:pointer" class="telefonkonyvelvalaszto" onclick="showHideCsoport('<?=$csoportnevalap?>', '<?=$tipus?>')"><?=$telefonszam['csoport']?></td>
+                        </tr><?php
+
+                        $csoportszamlalo++;
                         $szamlalo++;
                     }
                     $valtozasid = $telefonszam['valtozasid'];
-                    ?><tr <?=($csoportir) ? "class='kattinthatotr'" . "data-href='$RootPath/valtozasfelulvizsgalat/$valtozasid'" : "" ?> id="<?=$telefonszam['csoport']?>-<?=$szamlalo?>" style="font-weight: normal;">
+                    $csoportnev = $csoportnevalap . $szamlalo;
+                    ?><tr class='kattinthatotr <?=$elozocsoport?>' <?=($globaltelefonkonyvadmin) ?  "data-href='$RootPath/valtozasfelulvizsgalat/$valtozasid'" : "data-href='$RootPath/telefonszamvaltozas?modid=$valtozasid'" ?>
+                            id="<?=$csoportnev?>"
+                            style="font-weight: normal;">
                         <td class="prioritas <?=$allapot?>"></td>
-                        <td><?=$telefonszam['beosztasnev']?></td>
-                        <td style="width:4ch"><?=$telefonszam['elotag']?></td>
+                        <td><?=$telefonszam['beosztas']?></td>
+                        <td style="width:4ch; text-align:right;"><?=$telefonszam['elotag']?></td>
                         <td><?=$telefonszam['nev']?></td>
-                        <td style="width:5ch"><?=$telefonszam['titulus']?></td>
-                        <td style="width:8ch"><?=$telefonszam['rendfokozat']?></td>
+                        <td style="width:5ch; text-align:right;"><?=$telefonszam['titulus']?></td>
+                        <td style="width:8ch;"><?=$telefonszam['rendfokozat']?></td>
                         <td><?=$telefonszam['belsoszam']?><?=($telefonszam['belsoszam2']) ? "<br>" . $telefonszam['belsoszam2'] : "" ?></td>
                         <td><?=$telefonszam['kozcelu']?></td>
                         <td><?=$telefonszam['fax']?></td>
                         <td><?=$telefonszam['kozcelufax']?></td>
                         <td><?=$telefonszam['mobil']?></td>
-                        <td><?=$telefonszam['megjegyzes']?></td>
-                    </tr><?php
+                        <td><?=$telefonszam['megjegyzes']?></td><?php
+                        if($globaltelefonkonyvadmin)
+                        {
+                            ?><td><?=$telefonszam['modosito']?> (<?=$telefonszam['felhasznalonev']?>)</td><?php
+                        }
+                    ?></tr><?php
                     $szamlalo++;
                 }
             ?></tbody>
@@ -165,6 +247,12 @@ if($globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir))
             {
                 return false;
             }
+        }
+
+        function openKorabbi()
+        {
+            korabbi = document.getElementById('korabbikorok');
+            korabbi.style.display = "block";
         }
     </script><?php
 }

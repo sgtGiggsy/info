@@ -1181,7 +1181,7 @@ td img {
 }
 
 /* Fejléc lenyíló elemei */
-#profilpopup, #notifpopup {
+#profilpopup, #notifpopup, #korabbikorok {
     background-color: var(--headpopupbg);
     box-shadow: -3px 3px 5px var(--shadow);
     display: flex;
@@ -1229,7 +1229,7 @@ td img {
     border-radius: 100px;
 }
 
-#profilpopup a {
+#profilpopup a, #korabbikorok a {
     padding: 12px 20px 12px 20px;
     background-color: var(--headpopupbg);
     text-decoration: none;
@@ -1260,13 +1260,18 @@ td img {
     color: var(--fontlight);
 }
 
-#profilpopup a:hover {
+#profilpopup a:hover, #korabbikorok a:hover {
     color: var(--linkhover);
     background-color: var(--menuhover);
 }
 
-#profilpopup.show, #notifpopup.show {
+#profilpopup.show, #notifpopup.show, #korabbikorok.show {
     visibility: visible;
+}
+
+#korabbikorok {
+    top: unset;
+    width: max-content;
 }
 
 #notifications {
@@ -1528,6 +1533,7 @@ td img {
 /* Oldal cím */
 .oldalcim {
     position: relative;
+    display: flex;
     height: 1.6em;
     font-size: 1.5em;
     font-weight: bold;
@@ -1539,6 +1545,23 @@ td img {
 
 .oldalcim p {
     margin: 0;
+}
+
+.oldalcim button {
+    padding: 0;
+    border: #000000 0px;
+    background-color: transparent;
+}
+
+.buttondropdown {
+    margin-left: 1em;
+    position: relative;
+}
+
+.buttondropdown div {
+    position: absolute;
+    right: 0;
+    top: 1.6em;
 }
 
 /* Szerkesztő gombok */

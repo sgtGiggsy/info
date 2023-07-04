@@ -5,7 +5,7 @@ function mySQLConnect($querystring = null)
 	## MySQL connect ##
 	include('config.inc.php');
 
-	$GLOBALS['dbcallcount']++;
+	@$GLOBALS['dbcallcount']++;
 	
 	@$con = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
 
@@ -1356,10 +1356,17 @@ function showBreadcumb($eszkoz, $lastlink = false)
 	</div><?php
 }
 
-function telefonKonyvAdminCheck($mindir)
+function telefonKonyvAdminCheck($mindir, $felhid = null)
 {
 	$globaltelefonkonyvadmin = false;
-	$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+	if(!$felhid)
+	{
+		$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+	}
+	else
+	{
+		$felhasznaloid = $felhid;
+	}
 
     if($mindir)
     {
@@ -1664,36 +1671,58 @@ function telefonKonyvImport()
 	}
 }
 
-function getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $where = false, $field = null)
+function getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $settings)
 {
-	if($globaltelefonkonyvadmin)
+	$where = null;
+	$filtercount = 0;
+	if(@$settings['where'])
 	{
-		if($where)
+		$where = "WHERE ";
+	}
+
+	if(@$settings['and'])
+	{
+		$where = "AND ";
+	}
+
+	if(@$settings['modkorszur'])
+	{
+		$filtercount++;
+		$modid = "(SELECT MAX(id) FROM telefonkonyvmodositaskorok)";
+		if($settings['modid'])
 		{
-			$where = "WHERE telefonkonyvvaltozasok.modid = (SELECT MAX(id) FROM telefonkonyvmodositaskorok)";
+			$modid = $settings['modid'];
+		}
+		$where .= "telefonkonyvvaltozasok.modid = $modid";
+	}
+
+	if(!$globaltelefonkonyvadmin)
+	{
+		$mezonev = "telefonkonyvbeosztasok.csoport";
+		$osszekotes = " ";
+		if(@$settings['mezonev'])
+		{
+			$mezonev = "telefonkonyvcsoportok.id";
+		}
+		if(@$settings['felhasznalo'])
+		{
+			$felhasznalo = $settings['felhasznalo'];
 		}
 		else
 		{
-			$where = null;
+			$felhasznalo = $_SESSION[getenv('SESSION_NAME').'id'];
 		}
-		return $where;
+		if($filtercount > 0)
+		{
+			$osszekotes = " AND ";
+		}
+		$where .= "$osszekotes $mezonev IN (SELECT csoport FROM telefonkonyvadminok WHERE felhasznalo = $felhasznalo)";
 	}
-	else
+
+	if($where == "WHERE " || $where == "AND ")
 	{
-		if(!$field)
-		{
-			$field = "telefonkonyvbeosztasok.csoport";
-		}
-		else
-		{
-			$field = "telefonkonyvcsoportok.id";
-		}
-		$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
-		$pretag = "AND";
-		if($where)
-		{
-			$pretag = "WHERE";
-		}
-		return "$pretag $field IN (SELECT csoport FROM telefonkonyvadminok WHERE felhasznalo = $felhasznaloid)";
+		$where = null;
 	}
+//var_dump($where);
+	return $where;
 }

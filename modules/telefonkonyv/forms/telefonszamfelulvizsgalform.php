@@ -5,9 +5,9 @@ if(@$irhat)
         if($modositasoka)
         {
             ?><div class="infobox modmessage">
-                <div class="infoboxtitle">A módosítást végző <?=$bejelento?> üzenete:</div>
+                <div class="infoboxtitle">A módosítást végző <?=$modosito?> üzenete:</div>
                 <div class="infoboxbody modmessagebody">
-                    <small><?=$timestamp?></small>
+                    <small><?=$modositasideje?></small>
                     <p><?=$modositasoka?></p>
                 </div>
             </div><?php
@@ -16,9 +16,7 @@ if(@$irhat)
             <input type ="hidden" id="id" name="id" value="<?=$_GET['id']?>">
             <input type ="hidden" id="allapot" name="allapot" value="3">
             <input type ="hidden" id="eredetisor" name="eredetisor" value="<?=$origsorrend?>">
-
             <div>
-
                 <div>
                     <label for="beosztas">Beosztás</label>
                     <div class="delbuttoninput">
@@ -37,13 +35,13 @@ if(@$irhat)
                                     ?><optgroup label="<?=$x['csoportnev']?>"><?php
                                     $elozocsop = $x['csoportid'];
                                 }
-                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $beosztas) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $origbeoid) ? "selected" : "" ?>><?=$x['nev']?></option><?php
                             }
                             ?></optgroup>
                         </select><?php
-                        if($beosztas != $origbeosztas)
+                        if($beoid != $origbeoid)
                         {
-                            ?><button onclick="restoreOriginal('beosztas', '<?=$origbeosztas?>'); return false;">Eredeti állapot</button><?php
+                            ?><button onclick="restoreOriginal('beosztas', '<?=$origbeoid?>'); return false;">Eredeti állapot</button><?php
                         }
                     ?>
                     </div>
@@ -58,10 +56,10 @@ if(@$irhat)
                 <div>
                     <label for="beosztasnev" id="beosztasnevcimke">Beosztás megnevezése</label>
                     <div class="delbuttoninput">
-                        <input type="text" id="beosztasnev" name="beosztasnev" value="<?=$beosztasnev?>" <?=($beosztasnev != $origbeosztasnev) ? "style='background-color: yellow; color: black'; title='" . (($origbeosztasnev) ? $origbeosztasnev : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()"><?php
-                        if($beosztasnev != $origbeosztasnev)
+                        <input type="text" id="beosztasnev" name="beosztasnev" value="<?=$beosztas?>" <?=($beosztas != $origbeosztas) ? "style='background-color: yellow; color: black'; title='" . (($origbeosztas) ? $origbeosztas : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()"><?php
+                        if($beosztas != $origbeosztas)
                         {
-                            ?><button onclick="restoreOriginal('beosztasnev', '<?=$origbeosztasnev?>'); return false;">Eredeti állapot</button><?php
+                            ?><button onclick="restoreOriginal('beosztasnev', '<?=$origbeosztas?>'); return false;">Eredeti állapot</button><?php
                         }
                     ?></div>
                 </div>
@@ -72,16 +70,16 @@ if(@$irhat)
                 <div>
                     <label for="csoport">Alegység</label>
                     <div class="delbuttoninput">
-                        <select name="csoport" id="csoport" <?=($csoport != $origcsoport) ? "style='background-color: yellow; color: black'; title='" . (($origcsoportnev) ? $origcsoportnev : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial(); refreshList()">
+                        <select name="csoport" id="csoport" <?=($csoportid != $origcsoportid) ? "style='background-color: yellow; color: black'; title='" . (($origcsoport) ? $origcsoport : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial(); refreshList()">
                             <option value=""></option><?php
                             foreach($csoportok as $x)
                             {
-                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $csoport) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $csoportid) ? "selected" : "" ?>><?=$x['nev']?></option><?php
                             }
                         ?></select><?php
-                        if($csoport != $origcsoport)
+                        if($csoportid != $origcsoportid)
                         {
-                            ?><button onclick="restoreOriginal('csoport', '<?=$origcsoport?>'); return false;">Eredeti állapot</button><?php
+                            ?><button onclick="restoreOriginal('csoport', '<?=$origcsoportid?>'); return false;">Eredeti állapot</button><?php
                         }
                     ?></div>
                 </div>
@@ -111,16 +109,16 @@ if(@$irhat)
                 <div>
                     <label for="elotag">Előtag</label>
                     <div class="delbuttoninput">
-                        <select name="elotag" id="elotag" <?=($elotag != $origelotag) ? "style='background-color: yellow; color: black'; title='" . (($origelotagnev) ? $origelotagnev : "ÜRES VOLT" )  . "'" : "" ?> onchange="setAllapotPartial()">
+                        <select name="elotag" id="elotag" <?=($elotagid != $origelotagid) ? "style='background-color: yellow; color: black'; title='" . (($origelotag) ? $origelotag : "ÜRES VOLT" )  . "'" : "" ?> onchange="setAllapotPartial()">
                             <option value=""></option><?php
                             foreach($nevelotagok as $x)
                             {
-                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $elotag) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $elotagid) ? "selected" : "" ?>><?=$x['nev']?></option><?php
                             }
                         ?></select><?php
-                        if($elotag != $origelotag)
+                        if($elotagid != $origelotagid)
                         {
-                            ?><button onclick="restoreOriginal('elotag', '<?=$origelotag?>'); return false;">Eredeti állapot</button><?php
+                            ?><button onclick="restoreOriginal('elotag', '<?=$origelotagid?>'); return false;">Eredeti állapot</button><?php
                         }
                     ?></div>
                 </div>
@@ -129,9 +127,9 @@ if(@$irhat)
                     Nem kötelező mező.</p>" ?>
 
                 <div>
-                    <label for="nev">Név*</label>
+                    <label for="nev">Név</label>
                     <div class="delbuttoninput">
-                        <input type="text" name="nev" id="nev" value="<?=$nev?>" <?=($nev != $orignev) ? "style='background-color: yellow; color: black'; title='" . (($orignev) ? $orignev : "ÜRES VOLT" ) . "'" : "" ?> required onchange="setAllapotPartial()"><?php
+                        <input type="text" name="nev" id="nev" value="<?=$nev?>" <?=($nev != $orignev) ? "style='background-color: yellow; color: black'; title='" . (($orignev) ? $orignev : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()"><?php
                         if($nev != $orignev)
                         {
                             ?><button onclick="restoreOriginal('nev', '<?=$orignev?>'); return false;">Eredeti állapot</button><?php
@@ -144,16 +142,16 @@ if(@$irhat)
                 <div>
                     <label for="titulus">Titulus</label>
                     <div class="delbuttoninput">
-                        <select name="titulus" id="titulus" <?=($titulus != $origtitulus) ? "style='background-color: yellow; color: black'; title='" . (($origtitulusnev) ? $origtitulusnev : "ÜRES VOLT") . "'" : "" ?> onchange="setAllapotPartial()">
+                        <select name="titulus" id="titulus" <?=($titulusid != $origtitulusid) ? "style='background-color: yellow; color: black'; title='" . (($origtitulus) ? $origtitulus : "ÜRES VOLT") . "'" : "" ?> onchange="setAllapotPartial()">
                             <option value=""></option><?php
                             foreach($titulusok as $x)
                             {
-                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $titulus) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $titulusid) ? "selected" : "" ?>><?=$x['nev']?></option><?php
                             }
                         ?></select><?php
-                        if($titulus != $origtitulus)
+                        if($titulusid != $origtitulusid)
                         {
-                            ?><button onclick="restoreOriginal('titulus', '<?=$origtitulus?>'); return false;">Eredeti állapot</button><?php
+                            ?><button onclick="restoreOriginal('titulus', '<?=$origtitulusid?>'); return false;">Eredeti állapot</button><?php
                         }
                     ?></div>
                 </div>
@@ -161,18 +159,18 @@ if(@$irhat)
                 <?php $magyarazat .= "<strong>Titulus</strong><p>A dolgozó jogállása. Szerződéses, ÖMT, stb.<br>Nem kötelező mező.</p>" ?>
 
                 <div>
-                    <label for="rendfokozat">Rendfokozat*</label>
+                    <label for="rendfokozat">Rendfokozat</label>
                     <div class="delbuttoninput">
-                        <select name="rendfokozat" id="rendfokozat" <?=($rendfokozat != $origrendfokozat) ? "style='background-color: yellow; color: black'; title='" . (($origrendfokozatnev) ? $origrendfokozatnev : "ÜRES VOLT") . "'" : "" ?> required onchange="setAllapotPartial()">
+                        <select name="rendfokozat" id="rendfokozat" <?=($rendfokozatid != $origrendfokozatid) ? "style='background-color: yellow; color: black'; title='" . (($origrendfokozat) ? $origrendfokozat : "ÜRES VOLT") . "'" : "" ?> onchange="setAllapotPartial()">
                             <option value=""></option><?php
                             foreach($rendfokozatok as $x)
                             {
-                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $rendfokozat) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $rendfokozatid) ? "selected" : "" ?>><?=$x['nev']?></option><?php
                             }
                         ?></select><?php
-                        if($rendfokozat != $origrendfokozat)
+                        if($rendfokozatid != $origrendfokozatid)
                         {
-                            ?><button onclick="restoreOriginal('rendfokozat', '<?=$origrendfokozat?>'); return false;">Eredeti állapot</button><?php
+                            ?><button onclick="restoreOriginal('rendfokozat', '<?=$origrendfokozatid?>'); return false;">Eredeti állapot</button><?php
                         }
                     ?></div>
                 </div>
@@ -182,16 +180,16 @@ if(@$irhat)
                 <div>
                     <label for="felhasznalo">Felhasználó</label>
                     <div class="delbuttoninput">
-                        <select name="felhasznalo" id="felhasznalo" <?=($felhasznalo != $origfelhasznalo) ? "style='background-color: yellow; color: black'; title='" . (($origfelhasznalonev) ? $origfelhasznalonev : "ÜRES VOLT") . "'" : "" ?> onchange="setAllapotPartial()">
+                        <select name="felhasznalo" id="felhasznalo" <?=($aduserid != $origaduserid) ? "style='background-color: yellow; color: black'; title='" . (($origadusernev) ? $origadusernev : "ÜRES VOLT") . "'" : "" ?> onchange="setAllapotPartial()">
                             <option value=""></option><?php
                             foreach($felhasznalok as $x)
                             {
-                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $felhasznalo) ? "selected" : "" ?>><?=$x['nev']?> (<?=$x['felhasznalonev']?>)</option><?php
+                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $aduserid) ? "selected" : "" ?>><?=$x['nev']?> (<?=$x['felhasznalonev']?>)</option><?php
                             }
                         ?></select><?php
-                        if($felhasznalo != $origfelhasznalo)
+                        if($aduserid != $origaduserid)
                         {
-                            ?><button onclick="restoreOriginal('felhasznalo', '<?=$origfelhasznalo?>'); return false;">Eredeti állapot</button><?php
+                            ?><button onclick="restoreOriginal('felhasznalo', '<?=$origaduserid?>'); return false;">Eredeti állapot</button><?php
                         }
                     ?></div>
                 </div>

@@ -25,13 +25,15 @@ if(@$irhat)
             <input type ="hidden" id="varosielohivo" name="varosielohivo" value="<?=$varosielohivo?>">
             <input type ="hidden" id="mobilelohivo" name="mobilelohivo" value="<?=$mobilelohivo?>">
             <input type ="hidden" id="eredetisor" name="eredetisor" value="<?=$sorrend?>">
+            <input type ="hidden" id="origbeoid" name="origbeoid" value="<?=$beosztas?>">
+            <input type ="hidden" id="origfelhid" name="origfelhid" value="<?=$felhid?>">
             <div>
                 <div id="beosztasalap">
                     <button onclick="switchBeosztas(); return false;">Beosztás szerkesztése</button><br>
                     <label for="beosztas">Beosztás*</label>
-                    <select name="beosztas" id="beosztas" onchange="checkIfNew();">
+                    <select name="beosztas" id="beosztas" onchange="checkIfNew();" required>
                         <option></option>
-                        <option value="" id="ujbeo">Új beosztás létrehozása</option><?php
+                        <option value="0" id="ujbeo" <?=($addnew) ? "selected" : "" ?>>Új beosztás létrehozása</option><?php
                         $elozocsop = 0;
                         foreach($beosztasok as $x)
                         {
@@ -327,10 +329,21 @@ if(@$irhat)
             }
             else
             {
+                let xhttp = new XMLHttpRequest();
                 beosztas = document.getElementById('beosztas');
                 elem = beosztas.selectedIndex;
+                beoid = beosztas.value;
                 beosztasnev = document.getElementById('beosztasnev');
                 beosztasnev.value = beosztas[elem].textContent;
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("csoport").innerHTML = this.responseText;
+                        }
+                };
+                xhttp.open("GET", "<?=$RootPath?>/modules/telefonkonyv/includes/csoportlist.php?felhid=" + <?=$felhasznaloid?> + "&beoid=" + beoid, true);
+                xhttp.send();
+                
+                setTimeout(() => { refreshList(); }, 500);
             }
         }
 
@@ -401,7 +414,7 @@ if(@$irhat)
                 var x = confirm("<?=$onloadfelugro?>");
 
                 if(!x)
-                    window.location.href="<?=$RootPath?>/telefonkonyv";
+                    window.location.href="<?=$RootPath?>/telefonkonyvvaltozasok";
                     <?php
             }
             if(!$beosztas)
