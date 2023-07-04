@@ -8,6 +8,16 @@ if(isset($irhat) && $irhat)
     $modid = mySQLConnect("SELECT MAX(id) AS id FROM telefonkonyvmodositaskorok;");
     $modid = mysqli_fetch_assoc($modid)['id'];
 
+    $telefonkonyvcsoportid = $_POST['csoport'];
+
+    $bejelentonev = mySQLConnect("SELECT nev FROM felhasznalok WHERE id = $bejelento");
+    $bejelentonev = mysqli_fetch_assoc($bejelentonev)['nev'];
+
+    $alegysegnev = mySQLConnect("SELECT nev FROM telefonkonyvcsoportok WHERE id = $telefonkonyvcsoportid");
+    $alegysegnev = mysqli_fetch_assoc($alegysegnev)['nev'];
+
+    $bekuldtime = timeStampForSQL();
+
     purifyPost();
 
     // ----- ADATELŐKÉSZÍTÉS ----- //
@@ -54,6 +64,7 @@ if(isset($irhat) && $irhat)
 
             $valtallapot = 1;
             $elemallapot = 1;
+            $felvittvaltozasok = array();
 
             $stmt = $con->prepare('INSERT INTO telefonkonyvfelhasznalok (elotag, nev, titulus, rendfokozat, mobil, felhasznalo, allapot) VALUES (?, ?, ?, ?, ?, ?, ?)');
             $stmt->bind_param('sssssss', $_POST['elotag'], $nev, $_POST['titulus'], $_POST['rendfokozat'], $mobil, $_POST['felhasznalo'], $elemallapot);
@@ -71,10 +82,30 @@ if(isset($irhat) && $irhat)
             $stmt->bind_param('ssssssss', $modid, $_POST['beosztas'], $beomodid, $_POST['origfelhid'], $felhid, $bejelento, $_POST['modositasoka'], $valtallapot);
             $stmt->execute();
 
+            $tvaltozasid = mysqli_insert_id($con);
+
+            $valtozas = array(
+                'cim' => "A(z) $beosztasnev beosztás módosításra került a telefonkönyvben",
+                'szoveg' => "$bejelentonev felhasználó módosította a(z) $alegysegnev alegység $beosztasnev beosztását",
+                'url' => "valtozasfelulvizsgalat/$tvaltozasid",
+                'tipus' => '88',
+                'csoportid' => $telefonkonyvcsoportid
+            );
+            $felvittvaltozasok[] = $valtozas;
+
             if($_POST['origbeoid'] && $_POST['beosztas'] != $_POST['origbeoid'])
             {
                 $origbeoid = $_POST['origbeoid'];
                 $null = null;
+
+                $oldbeo = mySQLConnect("SELECT telefonkonyvbeosztasok.nev AS beonev, telefonkonyvcsoportok.nev AS alegyseg, telefonkonyvcsoportok.id AS csoportid
+                        FROM telefonkonyvbeosztasok
+                            LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
+                        WHERE telefonkonyvbeosztasok.id = $origbeoid");
+                $oldbeo = mysqli_fetch_assoc($oldbeo);
+                $beosztasnev = $oldbeo['beonev'];
+                $alegysegnev = $oldbeo['alegyseg'];
+                $oldtelefonkonyvcsoportid = $oldbeo['csoportid'];
 
                 mySQLConnect("INSERT INTO telefonkonyvbeosztasok_mod (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, megjegyzes, allapot)
                     SELECT csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, megjegyzes, $elemallapot
@@ -87,11 +118,65 @@ if(isset($irhat) && $irhat)
                 $stmt = $con->prepare('INSERT INTO telefonkonyvvaltozasok (modid, origbeoid, ujbeoid, origfelhid, ujfelhid, bejelento, modositasoka, allapot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
                 $stmt->bind_param('ssssssss', $modid, $_POST['origbeoid'], $beoid, $_POST['origfelhid'], $null, $bejelento, $_POST['modositasoka'], $valtallapot);
                 $stmt->execute();
+
+                $tvaltozasid = mysqli_insert_id($con);
+                
+                $valtozas = array(
+                    'cim' => "A(z) $beosztasnev beosztás módosításra került a telefonkönyvben",
+                    'szoveg' => "$bejelentonev felhasználó módosította a(z) $alegysegnev alegység $beosztasnev beosztását",
+                    'url' => "valtozasfelulvizsgalat/$tvaltozasid",
+                    'tipus' => '88',
+                    'csoportid' => $oldtelefonkonyvcsoportid
+                );
+                $felvittvaltozasok[] = $valtozas;
             }
             if(mysqli_errno($con) != 0)
             {
                 echo "<h2>A változás beküldése sikertelen!<br></h2>";
                 echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+            }
+            // Ellenőrizzük, hogy a módosítást beküldő személy telefonkönyv global admin-e.
+            if(!$globaltelefonkonyvadmin)
+            {
+                $ujcsopfelhasznalok = mySQLConnect("SELECT felhasznalo FROM telefonkonyvadminok WHERE csoport = $telefonkonyvcsoportid OR csoport = 1;");
+                if(isset($oldtelefonkonyvcsoportid) && $oldtelefonkonyvcsoportid)
+                {
+                    $oldcsopfelhasznalok = mySQLConnect("SELECT felhasznalo FROM telefonkonyvadminok WHERE csoport = $oldtelefonkonyvcsoportid OR csoport = 1;");
+                }
+                $ertesitendok = null;
+
+                foreach($felvittvaltozasok as $ertesites)
+                {
+                    if($ertesites)
+                    {
+                        $stmt = $con->prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
+                        $stmt->bind_param('ssss', $ertesites['cim'], $ertesites['szoveg'], $ertesites['url'], $ertesites['tipus']);
+                        $stmt->execute();
+
+                        $notifid = mysqli_insert_id($con);
+
+                        foreach($ujcsopfelhasznalok as $felh)
+                        {
+                            $felhid = $felh['felhasznalo'];
+                            $ertesitendok .= " ($notifid, $felhid),";
+                        }
+
+                        if(isset($oldcsopfelhasznalok) && isset($oldtelefonkonyvcsoportid) && $ertesites['csoportid'] == $oldtelefonkonyvcsoportid)
+                        {
+                            foreach($oldcsopfelhasznalok as $felh)
+                            {
+                                $felhid = $felh['felhasznalo'];
+                                $ertesitendok .= " ($notifid, $felhid),";
+                            }
+                        }
+                    }
+                }
+                $ertesitendok = rtrim($ertesitendok ,",");
+                $ertesitendok .= ";";
+                $mysqlcommand = "INSERT INTO ertesites_megjelenik (ertesites, felhasznalo) VALUES $ertesitendok";
+                var_dump($mysqlcommand);
+                mySQLConnect($mysqlcommand);
+                die;
             }
         }
     }
