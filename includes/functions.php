@@ -1388,6 +1388,20 @@ function telefonKonyvAdminCheck($mindir, $felhid = null)
 	return $globaltelefonkonyvadmin;
 }
 
+function telefonKonyvCsoportjogok()
+{
+	$returnarray = array();
+	$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+	$tkonyvjog = mySQLConnect("SELECT csoport FROM telefonkonyvadminok WHERE felhasznalo = $felhasznaloid ORDER BY csoport ASC");
+
+	foreach($tkonyvjog as $jog)
+	{
+		$returnarray[] = $jog['csoport'];
+	}
+
+	return $returnarray;
+}
+
 function telSzamSzetvalaszt($telszam, $elotaghossz, $telszamhossz)
 {
     $elotag = substr($telszam, 0, $elotaghossz);
@@ -1700,10 +1714,15 @@ function getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $settings)
 	{
 		$mezonev = "telefonkonyvbeosztasok.csoport";
 		$osszekotes = " ";
-		if(@$settings['mezonev'])
+		if(@$settings['mezonev'] && $settings['mezonev'] !== "telefonkonyvbeosztasok_mod")
 		{
 			$mezonev = "telefonkonyvcsoportok.id";
 		}
+		elseif(@$settings['mezonev'] && $settings['mezonev'] === "telefonkonyvbeosztasok_mod")
+		{
+			$mezonev = "telefonkonyvbeosztasok_mod.csoport";
+		}
+
 		if(@$settings['felhasznalo'])
 		{
 			$felhasznalo = $settings['felhasznalo'];
@@ -1725,4 +1744,91 @@ function getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $settings)
 	}
 //var_dump($where);
 	return $where;
+}
+
+function telefonKonyvNotify($ertesites, $csoport, $felhasznalo = 0, $admintertesit = false)
+{
+	$con = mySQLConnect(false);
+	$adminnotify = $ertesitendok = null;
+
+	if($admintertesit)
+	{
+		$adminnotify = "OR csoport = 1";
+	}
+
+	$felhasznalolist = mySQLConnect("SELECT felhasznalo FROM telefonkonyvadminok WHERE felhasznalo != $felhasznalo AND (csoport = $csoport $adminnotify);");
+
+	if($ertesites)
+	{
+		$stmt = $con->prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
+		$stmt->bind_param('ssss', $ertesites['cim'], $ertesites['szoveg'], $ertesites['url'], $ertesites['tipus']);
+		$stmt->execute();
+
+		$notifid = mysqli_insert_id($con);
+
+		foreach($felhasznalolist as $felh)
+		{
+			$felhid = $felh['felhasznalo'];
+			$ertesitendok .= " ($notifid, $felhid),";
+		}
+
+		$ertesitendok = rtrim($ertesitendok ,",");
+		$ertesitendok .= ";";
+		if($ertesitendok != ";")
+		{
+			$mysqlcommand = "INSERT INTO ertesites_megjelenik (ertesites, felhasznalo) VALUES $ertesitendok";
+			mySQLConnect($mysqlcommand);
+		}
+	}
+}
+
+function getBeosztasList($where, $beosztas, $modid)
+{
+	if($beosztas)
+	{
+		$meglevobeo = "telefonkonyvbeosztasok.id = $beosztas OR (";
+		$zarozar = ")";
+	}
+	$beowhere = "telefonkonyvbeosztasok.felhid IS NULL";
+
+	if($modid)
+	{
+		$beowhere = "(" . $beowhere . " OR telefonkonyvvaltozasok.id = $modid" . ")";
+	}
+
+	// Kizárólag az eredeti, nem felülírt beosztások
+	$beosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS id,
+                telefonkonyvbeosztasok.nev AS nev,
+                telefonkonyvcsoportok.nev AS csoportid,
+                telefonkonyvcsoportok.nev AS csoportnev
+            FROM telefonkonyvbeosztasok
+                LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
+                LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
+                LEFT JOIN telefonkonyvvaltozasok ON (telefonkonyvvaltozasok.origbeoid = telefonkonyvbeosztasok.id OR telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok.id)
+            WHERE $meglevobeo
+                telefonkonyvcsoportok.id > 1
+                AND telefonkonyvbeosztasok.allapot > 1
+                AND $beowhere
+                $where
+                $zarozar
+            ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
+
+	// Kizárólag a módosított és elfogadott beosztások
+	/*$beosztasokmod = mySQLConnect("SELECT telefonkonyvbeosztasok_mod.id AS id,
+				telefonkonyvbeosztasok_mod.nev AS nev,
+				telefonkonyvcsoportok.nev AS csoportid,
+				telefonkonyvcsoportok.nev AS csoportnev
+			FROM telefonkonyvbeosztasok
+				LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
+				LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
+				LEFT JOIN telefonkonyvvaltozasok ON (telefonkonyvvaltozasok.origbeoid = telefonkonyvbeosztasok.id OR telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok.id)
+			WHERE $meglevobeo
+				telefonkonyvcsoportok.id > 1
+				AND telefonkonyvbeosztasok.allapot > 1
+				AND $beowhere
+				$where
+				$zarozar
+				ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");*/
+
+	return $beosztasok;
 }

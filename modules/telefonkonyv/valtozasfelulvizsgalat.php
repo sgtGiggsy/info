@@ -3,7 +3,8 @@
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
 if(!$globaltelefonkonyvadmin)
 {
-    getPermissionError();
+    header("Location: $RootPath/telefonszamvaltozas?modid=$id");
+    //getPermissionError();
 }
 else
 {

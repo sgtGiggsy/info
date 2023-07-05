@@ -3,6 +3,8 @@
 $szamlalo = null;
 $csoportfilter = "alegysegfilter";
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
+if(!$globaltelefonkonyvadmin)
+        $csoportjogok = telefonKonyvCsoportjogok();
 
 $where = "WHERE telefonkonyvbeosztasok.allapot > 1";
 $where2 = "WHERE telefonkonyvvaltozasok.allapot > 1 AND  telefonkonyvvaltozasok.allapot < 4";
@@ -34,7 +36,8 @@ $telefonkonyvorig = mySQLConnect("SELECT NULL AS modid,
         felhasznalok.felhasznalonev AS felhasznalo,
         telefonkonyvbeosztasok.megjegyzes AS megjegyzes,
         telefonkonyvcsoportok.sorrend AS csoportsorrend,
-        telefonkonyvbeosztasok.sorrend AS beosorrend
+        telefonkonyvbeosztasok.sorrend AS beosorrend,
+        telefonkonyvcsoportok.id AS csopid
     FROM telefonkonyvbeosztasok
         LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
         LEFT JOIN nevelotagok ON telefonkonyvfelhasznalok.elotag = nevelotagok.id
@@ -64,7 +67,8 @@ $telefonkonyvuj = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS modid,
         felhasznalok.felhasznalonev AS felhasznalo,
         telefonkonyvbeosztasok_mod.megjegyzes AS megjegyzes,
         telefonkonyvcsoportok.sorrend AS csoportsorrend,
-        telefonkonyvbeosztasok_mod.sorrend AS beosorrend
+        telefonkonyvbeosztasok_mod.sorrend AS beosorrend,
+        telefonkonyvcsoportok.id AS csopid
     FROM telefonkonyvbeosztasok_mod
         LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok_mod.felhid = telefonkonyvfelhasznalok.id
         LEFT JOIN nevelotagok ON telefonkonyvfelhasznalok.elotag = nevelotagok.id
@@ -215,7 +219,7 @@ if(isset($_GET['kereses']))
                 $csoportnev = $csoportnevalap . $szamlalo;
                 ?><tr <?=($csoportir) ? "class='kattinthatotr $elozocsoport' data-href='$RootPath/telefonszamvaltozas" . (($telefonszam['allapot'] == 4) ? "?modid=" . $telefonszam['modid'] : "/" . $telszamid) . "'" : "" ?>
                         id="<?=$csoportnev?>"
-                        style="font-weight: normal; <?=($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) ? 'font-style: italic;' : '' ?>">
+                        style="<?=($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) ? 'font-style: italic; font-weight: normal;' : ((!$globaltelefonkonyvadmin && in_array($telefonszam['csopid'], $csoportjogok)) ? "font-style: italic; " : "font-weight: normal;" )?>">
                     <td></td>
                     <td><?=$telefonszam['beosztas']?></td>
                     <td style="width:4ch; text-align:right;"><?=$telefonszam['elotag']?></td>

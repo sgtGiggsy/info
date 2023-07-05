@@ -7,10 +7,18 @@ if(@!$csoportir)
 else
 {
     $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
+    if(!$globaltelefonkonyvadmin)
+        $csoportjogok = telefonKonyvCsoportjogok();
 
     $tkonyvwhereadmin = array(
         'where' => false,
         'mezonev' => false,
+        'and' => true
+    );
+
+    $tkonyvwheremod = array(
+        'where' => false,
+        'mezonev' => "telefonkonyvbeosztasok_mod",
         'and' => true
     );
 
@@ -24,6 +32,7 @@ else
     $varosielohivo = $_SESSION[getenv('SESSION_NAME').'varosielohivo'];
     $mobilelohivo = $_SESSION[getenv('SESSION_NAME').'mobilelohivo'];
     $where = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwhereadmin);
+    $wheremod = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwheremod);
     $wherecsoport = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwherecsoport);
     $csillaggaljelolt = "A csillaggal jelölt mezők kitöltése kötelező.";
 
@@ -47,7 +56,7 @@ else
 
     $csoportok = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1 AND torolve IS NULL $wherecsoport;");
 
-    $modkerwhere = $magyarazat = $beosztas = $felhid = $beosztasnev = $elotag = $nev = $titulus = $rendfokozat = $belsoszam = $belsoszam2 = $kozcelu = $fax = $kozcelufax =
+    $magyarazat = $beosztas = $modid = $felhid = $beosztasnev = $elotag = $nev = $titulus = $rendfokozat = $belsoszam = $belsoszam2 = $kozcelu = $fax = $kozcelufax =
     $mobil = $csoport = $csoportid = $felhasznalo = $megjegyzes = $modositasoka = $felhid = $adminmegjegyzes = $admintimestamp = $modwhere = $meglevobeo = $addnew = $zarozar = null;
     $sorrend = 9999;
 
@@ -88,6 +97,53 @@ else
         else
         {
             $telefonszam = mysqli_fetch_assoc($telefonszam);
+        }
+    }
+    elseif(isset($_GET['modid']))
+    {
+        $modid = $_GET['modid'];
+
+        $modositasok = mySQLConnect("SELECT telefonkonyvvaltozasok.origbeoid AS beosztas,
+                telefonkonyvbeosztasok_mod.nev AS beosztasnev,
+                telefonkonyvfelhasznalok.id AS felhid,
+                elotag,
+                telefonkonyvfelhasznalok.nev AS nev,
+                titulus,
+                rendfokozat,
+                belsoszam,
+                belsoszam2,
+                kozcelu,
+                fax,
+                kozcelufax,
+                mobil,
+                felhasznalo,
+                sorrend,
+                csoport,
+                megjegyzes,
+                telefonkonyvvaltozasok.allapot AS allapot
+            FROM telefonkonyvbeosztasok_mod
+                LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok_mod.felhid = telefonkonyvfelhasznalok.id
+                LEFT JOIN telefonkonyvvaltozasok ON telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok_mod.id
+            WHERE telefonkonyvvaltozasok.id = $modid
+                $wheremod;");
+        $telefonszam = mysqli_fetch_assoc($modositasok);
+
+        if(!@$telefonszam['beosztas'] || (!$globaltelefonkonyvadmin && !in_array($telefonszam['csoport'], $csoportjogok)))
+        {
+            echo "<h2>Erre a számra ebben a hónapban már lett leadva véglegesített módosítási kérelem,
+                nem létezik, vagy nincs jogosultsága a szerkesztéséhez!</h2>";
+            $irhat = false;
+        }
+    }
+    elseif(isset($_GET['action']) && $_GET['action'] == "addnew")
+    {
+        $addnew = true;
+    }
+
+    if($irhat)
+    {
+        if(isset($telefonszam) && $telefonszam)
+        {
             $beosztasnev = $telefonszam['beosztasnev'];
             $elotag = $telefonszam['elotag'];
             $nev = $telefonszam['nev'];
@@ -157,80 +213,8 @@ else
                 $mobil = formatTelnum($mobil['telszam']);
             }
         }
-    }
-    elseif(isset($_GET['modid']))
-    {
-        $modid = $_GET['modid'];
 
-        $modositasok = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS beosztas,
-                telefonkonyvbeosztasok.nev AS beosztasnev,
-                telefonkonyvfelhasznalok.id AS felhid,
-                elotag,
-                telefonkonyvfelhasznalok.nev AS nev,
-                titulus,
-                rendfokozat,
-                belsoszam,
-                belsoszam2,
-                kozcelu,
-                fax,
-                kozcelufax,
-                mobil,
-                felhasznalo,
-                sorrend,
-                csoport,
-                megjegyzes
-            FROM telefonkonyvbeosztasok
-                LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
-                LEFT JOIN telefonkonyvvaltozasok ON telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok.id
-            WHERE telefonkonyvvaltozasok.id = $modid
-                $where
-                AND telefonkonyvvaltozasok.allapot < 2");
-
-        if(mysqli_num_rows($modositasok) == 0)
-        {
-            echo "<h2>Erre a számra ebben a hónapban már lett leadva véglegesített módosítási kérelem,
-                nem létezik, vagy nincs jogosultsága a szerkesztéséhez!</h2>";
-            $irhat = false;
-        }
-        else
-        {
-            $telefonszam = mysqli_fetch_assoc($modositasok);
-        }
-    }
-    elseif(isset($_GET['action']) && $_GET['action'] == "addnew")
-    {
-        $addnew = true;
-    }
-
-    if($irhat)
-    {
-        if($beosztas)
-        {
-            $meglevobeo = "telefonkonyvbeosztasok.id = $beosztas OR (";
-            $zarozar = ")";
-        }
-        $beowhere = "telefonkonyvbeosztasok.felhid IS NULL";
-
-        if(isset($modid) && $modid)
-        {
-            $beowhere = "(" . $beowhere . " OR telefonkonyvvaltozasok.id = $modid" . ")";
-        }
-        
-        $beosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS id,
-                telefonkonyvbeosztasok.nev AS nev,
-                telefonkonyvcsoportok.nev AS csoportid,
-                telefonkonyvcsoportok.nev AS csoportnev
-            FROM telefonkonyvbeosztasok
-                LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
-                LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
-                LEFT JOIN telefonkonyvvaltozasok ON (telefonkonyvvaltozasok.origbeoid = telefonkonyvbeosztasok.id OR telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok.id)
-            WHERE $meglevobeo
-                telefonkonyvcsoportok.id > 1
-                AND telefonkonyvbeosztasok.allapot > 1
-                AND $beowhere
-                $where
-                $zarozar
-            ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
+        $beosztasok = getBeosztasList($where, $beosztas, $modid);
 
         $oldalcim = "Telefonszám szerkesztése";
 

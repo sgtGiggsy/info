@@ -193,7 +193,7 @@ if($globaltelefonkonyvadmin || $csoportir)
                         case 4: $allapot = "alacsony"; break;
                         default: $allapot = "kritikus";
                     }
-                    
+
                     if($elozocsoport != $telefonszam['csoport'])
                     {
                         $szamlalo = 0;
