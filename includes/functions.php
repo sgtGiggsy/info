@@ -1687,7 +1687,7 @@ function telefonKonyvImport()
 
 function getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $settings)
 {
-	$where = null;
+	$where = $current = null;
 	$filtercount = 0;
 	if(@$settings['where'])
 	{
@@ -1735,7 +1735,11 @@ function getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $settings)
 		{
 			$osszekotes = " AND ";
 		}
-		$where .= "$osszekotes $mezonev IN (SELECT csoport FROM telefonkonyvadminok WHERE felhasznalo = $felhasznalo)";
+		if(@$settings['currcsopid'])
+		{
+			$current = "$mezonev = " . $settings['currcsopid'] . " OR ";
+		}
+		$where .= "$osszekotes $current $mezonev IN (SELECT csoport FROM telefonkonyvadminok WHERE felhasznalo = $felhasznalo)";
 	}
 
 	if($where == "WHERE " || $where == "AND ")
@@ -1786,7 +1790,13 @@ function getBeosztasList($where, $beosztas, $modid)
 {
 	if($beosztas)
 	{
-		$meglevobeo = "telefonkonyvbeosztasok.id = $beosztas OR (";
+		$meglevobeo = "(telefonkonyvbeosztasok.id = $beosztas
+				OR telefonkonyvbeosztasok.id IN (SELECT origbeoid
+							FROM telefonkonyvvaltozasok
+								INNER JOIN telefonkonyvbeosztasok_mod ON telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok_mod.id
+							WHERE telefonkonyvbeosztasok_mod.felhid IS NULL
+			   				AND telefonkonyvvaltozasok.allapot > 1 AND telefonkonyvvaltozasok.allapot < 4)
+							AND telefonkonyvvaltozasok.modid = (SELECT MAX(id) FROM telefonkonyvmodositaskorok)) OR (";
 		$zarozar = ")";
 	}
 	$beowhere = "telefonkonyvbeosztasok.felhid IS NULL";
@@ -1796,8 +1806,10 @@ function getBeosztasList($where, $beosztas, $modid)
 		$beowhere = "(" . $beowhere . " OR telefonkonyvvaltozasok.id = $modid" . ")";
 	}
 
+	// 
+
 	// Kizárólag az eredeti, nem felülírt beosztások
-	$beosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS id,
+	$query = "SELECT telefonkonyvbeosztasok.id AS id,
                 telefonkonyvbeosztasok.nev AS nev,
                 telefonkonyvcsoportok.nev AS csoportid,
                 telefonkonyvcsoportok.nev AS csoportnev
@@ -1811,7 +1823,11 @@ function getBeosztasList($where, $beosztas, $modid)
                 AND $beowhere
                 $where
                 $zarozar
-            ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
+            ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;";
+	
+	//var_dump($query);
+
+	$beosztasok = mySQLConnect($query);
 
 	// Kizárólag a módosított és elfogadott beosztások
 	/*$beosztasokmod = mySQLConnect("SELECT telefonkonyvbeosztasok_mod.id AS id,

@@ -6,9 +6,17 @@ if(@!$csoportir)
 }
 else
 {
+    $magyarazat = $beosztas = $modid = $felhid = $beosztasnev = $elotag = $nev = $titulus = $rendfokozat = $belsoszam = $belsoszam2 = $kozcelu = $fax = $kozcelufax = $currbeoid =
+    $mobil = $csoport = $csoportid = $felhasznalo = $megjegyzes = $modositasoka = $felhid = $adminmegjegyzes = $admintimestamp = $modwhere = $meglevobeo = $addnew = $zarozar = null;
+    $sorrend = 9999;
+    
     $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
+    
     if(!$globaltelefonkonyvadmin)
         $csoportjogok = telefonKonyvCsoportjogok();
+
+    if(isset($_GET['id']) && $_GET['id'])
+        $currbeoid = $_GET['id'];
 
     $tkonyvwhereadmin = array(
         'where' => false,
@@ -22,18 +30,11 @@ else
         'and' => true
     );
 
-    $tkonyvwherecsoport = array(
-        'where' => false,
-        'mezonev' => true,
-        'and' => true
-    );
-
     $belsoelohivo = $_SESSION[getenv('SESSION_NAME').'belsoelohivo'];
     $varosielohivo = $_SESSION[getenv('SESSION_NAME').'varosielohivo'];
     $mobilelohivo = $_SESSION[getenv('SESSION_NAME').'mobilelohivo'];
     $where = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwhereadmin);
     $wheremod = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwheremod);
-    $wherecsoport = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwherecsoport);
     $csillaggaljelolt = "A csillaggal jelölt mezők kitöltése kötelező.";
 
     if(count($_POST) > 0)
@@ -43,22 +44,6 @@ else
         
         redirectToGyujto("telefonkonyv");
     }
-
-    $rendfokozatok = mySQLConnect("SELECT * FROM rendfokozatok ORDER BY id");
-
-    $nevelotagok = mySQLConnect("SELECT * FROM nevelotagok");
-
-    $titulusok = mySQLConnect("SELECT * FROM titulusok");
-
-    $felhasznalok = mySQLConnect("SELECT id, nev, felhasznalonev FROM felhasznalok ORDER BY nev");
-
-    $tkonyvfelhasznalok = mySQLConnect("SELECT nev FROM telefonkonyvfelhasznalok;");
-
-    $csoportok = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1 AND torolve IS NULL $wherecsoport;");
-
-    $magyarazat = $beosztas = $modid = $felhid = $beosztasnev = $elotag = $nev = $titulus = $rendfokozat = $belsoszam = $belsoszam2 = $kozcelu = $fax = $kozcelufax =
-    $mobil = $csoport = $csoportid = $felhasznalo = $megjegyzes = $modositasoka = $felhid = $adminmegjegyzes = $admintimestamp = $modwhere = $meglevobeo = $addnew = $zarozar = null;
-    $sorrend = 9999;
 
     $button = "Mentés";
     $irhat = true;
@@ -142,6 +127,29 @@ else
 
     if($irhat)
     {
+        $tkonyvwherecsoport = array(
+            'where' => false,
+            'mezonev' => true,
+            'and' => true,
+            'currcsopid' => $telefonszam['csoport']
+        );
+
+        $wherecsoport = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwherecsoport);
+        
+        $rendfokozatok = mySQLConnect("SELECT * FROM rendfokozatok ORDER BY id");
+
+        $nevelotagok = mySQLConnect("SELECT * FROM nevelotagok");
+    
+        $titulusok = mySQLConnect("SELECT * FROM titulusok");
+    
+        $felhasznalok = mySQLConnect("SELECT id, nev, felhasznalonev FROM felhasznalok ORDER BY nev");
+    
+        $tkonyvfelhasznalok = mySQLConnect("SELECT nev FROM telefonkonyvfelhasznalok;");
+    
+        $csoportquery = "SELECT * FROM telefonkonyvcsoportok WHERE id > 1 AND torolve IS NULL $wherecsoport;";
+        //var_dump($csoportquery);
+        $csoportok = mySQLConnect($csoportquery);
+
         if(isset($telefonszam) && $telefonszam)
         {
             $beosztasnev = $telefonszam['beosztasnev'];
@@ -240,11 +248,16 @@ else
                 WHERE $modwhere telefonkonyvvaltozasok.modid = (SELECT MAX(id) FROM telefonkonyvmodositaskorok)
                     AND telefonkonyvvaltozasok.allapot < 2;");
 
-        if(mysqli_num_rows($modositaskerelmek) > 0)
+        if(mysqli_num_rows($modositaskerelmek) > 0 && !isset($_GET['modid']))
         {
             $modositasadatok = mysqli_fetch_assoc($modositaskerelmek);
 
-            $onloadfelugro = "A kért felhasználóra, vagy beosztásra már küldött be elfogadásra váró módosítási kérelmet " . $modositasadatok['bejelento'] . " " . $modositasadatok['timestamp'] . "-kor. Biztosan szeretnél másik kérelmet beadni?";
+            $onloadfelugro = "A kiválasztott felhasználóra, vagy beosztásra már küldött be elfogadásra váró módosítási kérelmet " . $modositasadatok['bejelento'] . " " . $modositasadatok['timestamp'] . "-kor. Biztosan szeretnél másik kérelmet beadni?";
+        }
+
+        if(isset($csoportjogok) && !in_array($csoport, $csoportjogok))
+        {
+            $onloadfelugro = "A kiválasztott felhasználó, vagy beosztás nem egy általad kezelt alegységhez tartozik. Biztosan őt szeretnéd szerkeszteni?";
         }
 
         include('././templates/edit.tpl.php');

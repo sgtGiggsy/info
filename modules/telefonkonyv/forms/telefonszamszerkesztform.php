@@ -31,7 +31,7 @@ if(@$irhat)
                 <div id="beosztasalap">
                     <button onclick="switchBeosztas(); return false;">Beosztás szerkesztése</button><br>
                     <label for="beosztas">Beosztás*</label>
-                    <select name="beosztas" id="beosztas" onchange="checkIfNew();" required>
+                    <select name="beosztas" id="beosztas" onchange="checkIfNew();refreshSelections()" required>
                         <option></option>
                         <option value="0" id="ujbeo" <?=($addnew) ? "selected" : "" ?>>Új beosztás létrehozása</option><?php
                         $elozocsop = 0;
@@ -189,7 +189,7 @@ if(@$irhat)
                     <label for="belsoszam">Belső szám*</label>
                     <div class="telinput">
                         <span class="telprefix"><?=$belsoelohivo?></span>
-                        <input style="padding-left: <?=strlen($belsoelohivo)?>ch;" type="tel" maxlength="4" onkeypress="return onlyNumberKey(event)" name="belsoszam" value="<?=$belsoszam?>" required>
+                        <input style="padding-left: <?=strlen($belsoelohivo)?>ch;" type="tel" maxlength="4" onkeypress="return onlyNumberKey(event)" name="belsoszam" id="belsoszam" value="<?=$belsoszam?>" required>
                     </div>
                 </div>
 
@@ -199,7 +199,7 @@ if(@$irhat)
                     <label for="belsoszam2">Alternatív belső szám:</label>
                     <div class="telinput">
                         <span class="telprefix"><?=$belsoelohivo?></span>
-                        <input style="padding-left: <?=strlen($belsoelohivo)?>ch;" type="tel" maxlength="4" onkeypress="return onlyNumberKey(event)" name="belsoszam2" value="<?=$belsoszam2?>">
+                        <input style="padding-left: <?=strlen($belsoelohivo)?>ch;" type="tel" maxlength="4" onkeypress="return onlyNumberKey(event)" name="belsoszam2" id="belsoszam2" value="<?=$belsoszam2?>">
                     </div>
                 </div>
 
@@ -210,7 +210,7 @@ if(@$irhat)
                     <label for="kozcelu">Közcélú szám</label>
                     <div class="telinput">
                         <span class="telprefix"><?=$varosielohivo?></span>
-                        <input style="padding-left: <?=strlen($varosielohivo)?>ch;" type="tel" maxlength="7" onkeypress="return onlyNumberKey(event)" onkeyup="addDash(this)" name="kozcelu" value="<?=$kozcelu?>">
+                        <input style="padding-left: <?=strlen($varosielohivo)?>ch;" type="tel" maxlength="7" onkeypress="return onlyNumberKey(event)" onkeyup="addDash(this)" name="kozcelu" id="kozcelu" value="<?=$kozcelu?>">
                     </div>
                 </div>
 
@@ -222,7 +222,7 @@ if(@$irhat)
                     <label for="fax">Fax szám</label>
                     <div class="telinput">
                         <span class="telprefix"><?=$belsoelohivo?></span>
-                        <input style="padding-left: <?=strlen($belsoelohivo)?>ch;" type="tel" maxlength="4" onkeypress="return onlyNumberKey(event)" name="fax" value="<?=$fax?>">
+                        <input style="padding-left: <?=strlen($belsoelohivo)?>ch;" type="tel" maxlength="4" onkeypress="return onlyNumberKey(event)" name="fax" id="fax" value="<?=$fax?>">
                     </div>
                 </div>
 
@@ -233,7 +233,7 @@ if(@$irhat)
                     <label for="kozcelufax">Közcélú fax szám</label>
                     <div class="telinput">
                         <span class="telprefix"><?=$varosielohivo?></span>
-                        <input style="padding-left: <?=strlen($varosielohivo)?>ch;" type="tel" maxlength="7" onkeypress="return onlyNumberKey(event)" onkeyup="addDash(this)" name="kozcelufax" value="<?=$kozcelufax?>">
+                        <input style="padding-left: <?=strlen($varosielohivo)?>ch;" type="tel" maxlength="7" onkeypress="return onlyNumberKey(event)" onkeyup="addDash(this)" name="kozcelufax" id="kozcelufax" value="<?=$kozcelufax?>">
                     </div>
                 </div>
 
@@ -436,6 +436,26 @@ if(@$irhat)
                 }
             };
             xhttp.open("GET", "<?=$RootPath?>/modules/telefonkonyv/includes/beosztaslist.php?csoport=" + csopid + "&eredeti=" + eredeti, true);
+            xhttp.send();
+        }
+
+        function refreshSelections() {
+            let xhttp = new XMLHttpRequest();
+            let beoid, eredeti;
+            beoid = document.getElementById("beosztas").value;
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var jsonObj = JSON.parse(this.responseText);
+                    //console.log(jsonObj[0].sorrend);
+                    document.getElementById("sorrend").value = jsonObj[0].sorrend;
+                    document.getElementById("belsoszam").value = jsonObj[0].belsoszam;
+                    document.getElementById("belsoszam2").value = jsonObj[0].belsoszam2;
+                    document.getElementById("fax").value = jsonObj[0].fax;
+                    document.getElementById("kozcelu").value = jsonObj[0].kozcelu;
+                    document.getElementById("kozcelufax").value = jsonObj[0].kozcelufax;
+                }
+            };
+            xhttp.open("GET", "<?=$RootPath?>/modules/telefonkonyv/includes/refreshselections.php?beoid=" + beoid, true);
             xhttp.send();
         }
     </script><?php
