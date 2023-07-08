@@ -12,15 +12,18 @@ if(isset($irhat) && $irhat)
 
         mySQLConnect("DELETE FROM telefonkonyvadminok WHERE felhasznalo = $id;");
 
-        foreach($_POST['csoport'] as $csoportid)
+        if(isset($_POST['csoport']))
         {
-            $stmt = $con->prepare('INSERT INTO telefonkonyvadminok (felhasznalo, csoport) VALUES (?, ?)');
-            $stmt->bind_param('ss', $id, $csoportid);
-            $stmt->execute();
-            if(mysqli_errno($con) != 0)
+            foreach($_POST['csoport'] as $csoportid)
             {
-                echo "<h2>A változás beküldése sikertelen!<br></h2>";
-                echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+                $stmt = $con->prepare('INSERT INTO telefonkonyvadminok (felhasznalo, csoport) VALUES (?, ?)');
+                $stmt->bind_param('ss', $id, $csoportid);
+                $stmt->execute();
+                if(mysqli_errno($con) != 0)
+                {
+                    echo "<h2>A változás beküldése sikertelen!<br></h2>";
+                    echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+                }
             }
         }
 
@@ -32,7 +35,7 @@ if(isset($irhat) && $irhat)
         {        
             mySQLConnect("DELETE FROM jogosultsagok WHERE felhasznalo = $id AND menupont = $menusorszam;");
 
-            if(count($_POST['csoport']) > 0)
+            if(isset($_POST['csoport']))
             {
                 $stmt = $con->prepare('INSERT INTO jogosultsagok (felhasznalo, menupont, iras, olvasas) VALUES (?, ?, ?, ?)');
                 $stmt->bind_param('ssss', $id, $menusorszam, $iras, $olvasas);

@@ -3,8 +3,8 @@
 $szamlalo = null;
 $csoportfilter = "alegysegfilter";
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
-if(!$globaltelefonkonyvadmin)
-        $csoportjogok = telefonKonyvCsoportjogok();
+if(!$globaltelefonkonyvadmin && isset($felhasznaloid))
+    $csoportjogok = telefonKonyvCsoportjogok();
 
 $where = "WHERE telefonkonyvbeosztasok.allapot > 1";
 $where2 = "WHERE telefonkonyvvaltozasok.allapot > 1 AND  telefonkonyvvaltozasok.allapot < 4";
@@ -219,7 +219,7 @@ if(isset($_GET['kereses']))
                 $csoportnev = $csoportnevalap . $szamlalo;
                 ?><tr <?=($csoportir) ? "class='kattinthatotr $elozocsoport' data-href='$RootPath/telefonszamvaltozas" . (($telefonszam['allapot'] == 4) ? "?modid=" . $telefonszam['modid'] : "/" . $telszamid) . "'" : "" ?>
                         id="<?=$csoportnev?>"
-                        style="<?=($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) ? 'font-style: italic; font-weight: normal;' : ((!$globaltelefonkonyvadmin && in_array($telefonszam['csopid'], $csoportjogok)) ? "font-style: italic; " : "font-weight: normal;" )?>">
+                        style="<?=($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) ? 'font-style: italic; font-weight: normal;' : ((!$globaltelefonkonyvadmin && isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok)) ? "font-style: italic; " : "font-weight: normal;" )?>">
                     <td></td>
                     <td><?=$telefonszam['beosztas']?></td>
                     <td style="width:4ch; text-align:right;"><?=$telefonszam['elotag']?></td>
