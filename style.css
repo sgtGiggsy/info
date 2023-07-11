@@ -1110,10 +1110,11 @@ td img {
 
 /* ------------------------------- Fejléc ------------------------------- */
 .topmenubase {
+    display: grid;
+    grid-template-columns: 200px 1fr max-content 1fr max-content;
     top: 0;
     height: 50px;
     width: 100%;
-    padding: 5px;
     background-color: var(--topbase);
     background-image: linear-gradient(to bottom right, var(--topbase), var(--topbase2nd));
     border-bottom: 1px solid var(--topborder);
@@ -1127,8 +1128,8 @@ td img {
 .topmenuikonok {
     display: inline-flex;
     align-items: center;
-    grid-column-start: 3;
-    grid-column-end: 4;
+    grid-column-start: 5;
+    grid-column-end: 6;
     grid-row-start: 1;
     grid-row-end: 2;
     justify-content: right;
@@ -1157,27 +1158,72 @@ td img {
 }
 
 .headlogo {
-    display: inline-flex;
+    /*display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center;*/
     grid-column-start: 1;
     grid-column-end: 2;
     grid-row-start: 1;
     grid-row-end: 2;
 }
 
-.kereses {
+.kereses, .topmenuszoveges {
     display: inline-flex;
     align-items: center;
     justify-content: left;
-    grid-column-start: 2;
-    grid-column-end: 3;
     grid-row-start: 1;
     grid-row-end: 2;
 }
 
+.kereses {
+    grid-column-start: 2;
+    grid-column-end: 3;
+}
+
 .kereses button {
     max-width: 7ch;
+}
+
+.topmenuszoveges {
+    grid-column-start: 3;
+    grid-column-end: 4;
+}
+
+.topmenuarea {
+    font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
+    font-size: 1rem;
+    text-transform: capitalize;
+}
+
+.topmenuarea a {
+    text-decoration: none;
+}
+
+.topmenu {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row!important;
+    padding-left: 0;
+    list-style: none;
+    margin: 0;
+}
+
+.topmenuitem, .topmenuitem-active {
+    display: inline-block;
+}
+
+.topmenuitem a, .topmenuitem-active a {
+    padding: 15px 10px;
+}
+
+.topmenuitem-active, .topmenuitem-active a {
+    color: var(--link);
+    background-color: var(--menuhover);
+} 
+
+.topmenuitem a:hover {
+    color: var(--linkhover);
+    background-color: var(--menuhover);
 }
 
 /* Fejléc lenyíló elemei */

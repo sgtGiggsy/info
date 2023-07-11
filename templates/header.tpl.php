@@ -14,6 +14,14 @@ if(isset($enablekeres) && $enablekeres)
         </form>
     </div><?php
 }
+
+if(isset($topmenuszoveges) && $topmenuszoveges)
+{
+    ?><div class="topmenuszoveges"><?php
+        $menuterulet = 3; include('./includes/menu.inc.php');
+    ?></div><?php
+}
+
 ?><div class="topmenuikonok"><?php
 if($_SESSION[getenv('SESSION_NAME').'id'])
 {

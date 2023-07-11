@@ -78,6 +78,23 @@ if($menuterulet == 2)
 	}
 }
 
+if($menuterulet == 3 && isset($pagename) && isset($contextmenujogok))
+{
+	?><nav class="topmenuarea">
+		<ul class="topmenu"><?php
+			foreach($menuk[3] as $menupont)
+			{
+				if(@$contextmenujogok[$menupont['oldal']] || @$contextmenujogok[$menupont['gyujtooldal']])
+				{
+					?><li <?=($menupont['oldal'] == $aloldal || $menupont['gyujtooldal'] == $aloldal) ? 'class="topmenuitem-active"' : 'class="topmenuitem"' ?>>
+						<a href="<?=$RootPath?>/<?=$pagetofind?>/<?=$pagename?>/<?=$menupont['gyujtooldal']?>"><?=trim($menupont['menupont'])?></a>
+					<li><?php
+				}
+			}
+		?></ul>
+   </nav><?php
+}
+
 if($kinyit)
 {
 	?><script>

@@ -24,7 +24,7 @@
 		?></div>
 
 		<!-- Fejléc -->
-		<div class="topmenubase" id="topmenuelement"></div><?php include('./templates/header.tpl.php'); ?>
+		<div class="topmenubase" id="topmenuelement"><?php include('./templates/header.tpl.php'); ?></div>
 
 		<!-- Menürész -->
 		<?php $menuterulet = 1; include('./includes/menu.inc.php'); ?>		

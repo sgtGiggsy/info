@@ -6,7 +6,11 @@ RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 
 RewriteRule ^ - [L]
+
+RewriteRule ^api/([^/]+)/?$   ./api/api.php?list=$1 [L,QSA]
+RewriteRule ^api/([^/]+)/([^/]+)/?$   ./api/api.php?list=$1&param=$2 [L,QSA]
+
 RewriteRule ^([^/]+)/?$ index.php?page=$1 [L,QSA]
 RewriteRule ^([^/]+)/([^/]+)/?$ index.php?page=$1&id=$2 [L,QSA]
-RewriteRule ^([^/]+)/([^/]+)/([^/]+)/?$ index.php?page=$1&$2=$3 [L,QSA]
-
+RewriteRule ^([^/]+)/([^/]+)/([^/]+)/?$ index.php?page=$1&subpage=$2&param=$3 [L,QSA]
+RewriteRule ^([^/]+)/([^/]+)/([^/]+)/([^/]+)/?$ index.php?page=$1&subpage=$2&param=$3&id=$4 [L,QSA]

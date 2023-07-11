@@ -397,7 +397,7 @@ catch(Exception $e)
 {
     http_response_code(404);
     $currentpage['url'] = "404";
-    $currentpage['cimszoveg'] = "Oldal nem található!";
+    $currentpage['gyujtocimszoveg'] = "Oldal nem található!";
 }
 
 // Folyamatértesítés
