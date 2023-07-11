@@ -1,15 +1,17 @@
 <?php
-if(!(isset($_SESSION[getenv('SESSION_NAME').'jogosultsag']) && $_SESSION[getenv('SESSION_NAME').'jogosultsag'] > 10))
+if(!$contextmenujogok['kerdeslista'])
 {
     echo "<h2>Az oldal kizárólag adminisztrátorok számára érhető el!</h2>";
 }
 else
 {
-    $con = mySQLConnect("SELECT id as kerdid, kerdes,
-            (SELECT COUNT(id) FROM tesztvalaszok WHERE kerdes = kerdid) AS kerdesszam,
-            (SELECT COUNT(tesztvalaszok.id) FROM tesztvalaszok INNER JOIN valaszok ON tesztvalaszok.valasz = valaszok.id WHERE tesztvalaszok.kerdes = kerdid AND valaszok.helyes = 1) helyes
-        FROM kerdesek
+    $kerdeseklistaja = mySQLConnect("SELECT id as kerdid, kerdes,
+            (SELECT COUNT(id) FROM vizsgak_kitoltesvalaszok WHERE kerdes = kerdid) AS kerdesszam,
+            (SELECT COUNT(vizsgak_kitoltesvalaszok.id) FROM vizsgak_kitoltesvalaszok INNER JOIN vizsgak_valaszlehetosegek ON vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id WHERE vizsgak_kitoltesvalaszok.kerdes = kerdid AND vizsgak_valaszlehetosegek.helyes = 1) AS helyes
+        FROM vizsgak_kerdesek
+        WHERE vizsga = $vizsgaid
         ORDER BY id DESC;");
+
     ?><div class="oldalcim">Kérdések</div>
     <a href='./kerdesszerkeszt'>Új kérdés felvitele</a>
     <table>
@@ -18,20 +20,22 @@ else
                 <th>Azonosító</th>
                 <th>Kérdés</th>
                 <th>Megválaszolva</th>
-                <th>Sikeres %</th>
+                <th>Helyes</th>
+                <th>%</th>
             </tr>
         </thead>
         <tbody>
     <?php
-        foreach ($con as $x)
+        foreach ($kerdeseklistaja as $x)
         {
             $id = $x['kerdid'];
-            ?><tr class='kattinthatotr' data-href='./kerdesszerkeszt/<?=$id?>'><?php
-                echo "<td>" . $id . "</td>";
-                echo "<td>" . $x['kerdes'] . "</td>";
-                echo "<td>" . $x['kerdesszam'] . "</td>";
-                echo "<td>" . $x['helyes'] . "</td>";
-            echo "</tr>"; 
+            ?><tr class='kattinthatotr' data-href='./kerdesszerkeszt/<?=$id?>'>
+                <td><?=$id?></td>
+                <td><?=$x['kerdes']?></td>
+                <td><?=$x['kerdesszam']?></td>
+                <td><?=$x['helyes']?></td>
+                <td><?=round($x['helyes']/$x['kerdesszam']*100, 2)?></td>
+              </tr><?php
         }
         ?></tbody>
     </table><?php

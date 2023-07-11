@@ -1,5 +1,5 @@
 <?php
-if(!$csoportir)
+if(!$felhasznaloid)
 {
     getPermissionError();
 }
@@ -71,14 +71,17 @@ else
                     {
                         $elozovizsga = $vizsga['vizsganev'];
                         ?><tr>
-                            <td colspan=<?=count($oszlopok)?> class="telefonkonyvelvalaszto"><a href="<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>" style="width: 100%; height: 100%; display: block;"><?=$vizsga['vizsganev']?></a></td>
+                            <td colspan=<?=count($oszlopok)?> class="telefonkonyvelvalaszto"><a href="<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/ismerteto" style="width: 100%; height: 100%; display: block;"><?=$vizsga['vizsganev']?></a></td>
                         </tr><?php
                     }
-                    ?><tr>
-                        <td></td>
-                        <td><a href='<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>'><?=$vizsga['vizsgaadmin']?></td>
-                        <td></td>
-                    </tr><?php
+                    if($mindir)
+                    {
+                        ?><tr>
+                            <td></td>
+                            <td><a href='<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/adminszerkeszt/<?=$vizsga['szerkesztoid']?>'><?=$vizsga['vizsgaadmin']?></td>
+                            <td></td>
+                        </tr><?php
+                    }
                 }
             ?></tbody>
         </table>
