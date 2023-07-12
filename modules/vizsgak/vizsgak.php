@@ -29,7 +29,7 @@ else
     $tipus = "szerkesztok";
 
     ?><div class="szerkgombsor">
-        <button type="button" onclick="location.href='<?=$RootPath?>/vizsgaadminok?action=addnew'">Új szerkesztő felvétele</button>
+        <button type="button" onclick="location.href='<?=$RootPath?>/vizsga?action=addnew'">Új vizsga létrehozása</button>
     </div>
     <div class="PrintArea">
         <div class="oldalcim"><?=$oldalcimsor?></div>

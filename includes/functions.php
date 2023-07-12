@@ -1788,6 +1788,7 @@ function telefonKonyvNotify($ertesites, $csoport, $felhasznalo = 0, $admintertes
 
 function getBeosztasList($where, $beosztas, $modid)
 {
+	$meglevobeo = $zarozar = null;
 	if($beosztas)
 	{
 		$meglevobeo = "(telefonkonyvbeosztasok.id = $beosztas
@@ -1847,4 +1848,72 @@ function getBeosztasList($where, $beosztas, $modid)
 				ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");*/
 
 	return $beosztasok;
+}
+
+function arrayMultiDimension($array)
+{
+   rsort($array);
+   return isset($my_arr[0]) && is_array($my_arr[0]);
+}
+
+function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimappa)
+{
+	$con = mySQLConnect(false);
+	$feltoltesimappa = "$gyokermappa/$egyedimappa/";
+	$feltoltottfajlok = array();
+    $uploadids = array();
+
+	if(arrayMultiDimension($fajlok))
+	{
+		$db = count($fajlok['name']);
+	}
+	else
+	{
+		$fajl = $fajlok;
+		$fajlok = array($fajl);
+		$db = 1;
+	}
+
+	for($i = 0; $i < $db; $i++)
+	{
+		if (!in_array($fajlok[$i]['type'], $mediatype))
+		{
+			$uzenet = "A fájl típusa nem megengedett: " . $fajlok[$i]['name'];
+		}
+		else
+		{
+			if(!file_exists($feltoltesimappa))
+			{
+				mkdir($feltoltesimappa, 0777, true);
+			}
+
+			$fajlnev = strtolower(str_replace(".", time() . ".", $fajlok[$i]['name']));
+			$finalfile = $feltoltesimappa . $fajlnev;
+			if(file_exists($finalfile))
+			{
+				$uzenet = "A feltölteni kívánt fájl már létezik: " . $fajlnev;
+			}
+			else
+			{
+				move_uploaded_file($fajlok[$i]['tmp_name'], $finalfile);
+				$uzenet = 'A fájl feltöltése sikeresen megtörtént: ' . $fajlnev;
+				$feltoltottfajlok[] = "$egyedimappa/" . "$fajlnev";
+			}
+		}
+	}
+
+	if(count($feltoltottfajlok) > 0)
+	{
+		foreach($feltoltottfajlok as $fajl)
+		{
+			$stmt = $con->prepare('INSERT INTO feltoltesek (fajl) VALUES (?)');
+			$stmt->bind_param('s', $fajl);
+			$stmt->execute();
+
+			$fajlid = mysqli_insert_id($con);
+			$uploadids[] = $fajlid;
+		}
+	}
+
+	return $uploadids;
 }

@@ -220,6 +220,17 @@ ol, ul {
     padding: 0.5em;
 }
 
+.twocolgrid3-1 {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    grid-gap: 1em;
+}
+
+.gridleft div {
+    justify-items: left;
+    margin: unset!important;
+}
+
 .szerkeszt {
     display: grid;
     grid-template-columns: 1fr auto;

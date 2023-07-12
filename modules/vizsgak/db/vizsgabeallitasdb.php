@@ -1,0 +1,68 @@
+<?php
+
+if(isset($irhat) && $irhat)
+{
+    $con = mySQLConnect(false);
+    foreach($_POST as $key => $value)
+    {
+        if ($value == "NULL")
+        {
+            $_POST[$key] = NULL;
+        }
+    }
+
+    if(isset($_FILES["fejleckep"]))
+    {        
+        $fajlok = $_FILES["fejleckep"];
+        $filetypes = array('.jpg', '.jpeg', '.png', '.bmp');
+        $mediatype = array('image/jpeg', 'image/png', 'image/bmp');
+        
+        $vizsgaazonosito = $_POST['url'];
+        $gyokermappa = "./uploads/";
+        $egyedimappa = "vizsgak/$vizsgaazonosito";
+
+        $fajllista = fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimappa);
+    }
+
+    if(isset($_GET['action']) && $_GET['action'] == "addnew")
+    {
+        $fajlid = null;
+        if(@$fajllista)
+        {
+            $fajlid = $fajllista[0];
+        }
+
+        $stmt = $con->prepare('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, fejleckep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('ssssssssss', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid);
+        $stmt->execute();
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>A változás beküldése sikertelen!<br></h2>";
+            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+    }
+
+    else
+    {
+        if(!isset($_POST["keptorol"]) && !@$fajllista)
+        {
+            $vizsgaid = $_POST['vizsgaid'];
+            $kep = mySQLConnect("SELECT fejleckep FROM vizsgak_vizsgak WHERE id = $vizsgaid");
+            
+            $fajlid = mysqli_fetch_assoc($kep)['fejleckep'];
+        }
+        elseif(@$fajllista)
+        {
+            $fajlid = $fajllista[0];
+        }
+
+        $stmt = $con->prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=? WHERE id=?');
+        $stmt->bind_param('ssssssssssi', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['vizsgaid']);
+        $stmt->execute();
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>A változás beküldése sikertelen!<br></h2>";
+            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+        }
+    }
+}

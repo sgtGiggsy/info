@@ -4,9 +4,13 @@ if(!$felhasznaloid)
 {
     echo "<h2>Az oldal kizárólag bejelentkezett felhasználók számára érhető el!</h2>";
 }
-elseif(!isset($_GET['subpage']) && !isset($_GET['id']))
+elseif(!isset($_GET['subpage']) && !isset($_GET['id']) && !(isset($_GET['action']) && $_GET['action'] == 'addnew'))
 {
     echo "<h2>Nincs kiválasztott vizsga!</h2>";
+}
+elseif(!isset($_GET['subpage']) && !isset($_GET['id']) && isset($_GET['action']) && $_GET['action'] == 'addnew')
+{
+    include("./modules/vizsgak/includes/vizsgabeallitasok.php");
 }
 else
 {
@@ -22,7 +26,20 @@ else
     $topmenuszoveges = true;
     $aloldal = false;
 
-    $kivalasztottvizsga = mySQLConnect("SELECT * FROM vizsgak_vizsgak WHERE url = '$vizsgaazonosito';");
+    $kivalasztottvizsga = mySQLConnect("SELECT vizsgak_vizsgak.id AS id,
+            nev,
+            url,
+            udvozloszoveg,
+            kerdesszam,
+            minimumhelyes,
+            vizsgaido,
+            ismetelheto,
+            maxismetles,
+            leiras,
+            feltoltesek.fajl AS fejleckep
+    FROM vizsgak_vizsgak
+        LEFT JOIN feltoltesek ON vizsgak_vizsgak.fejleckep = feltoltesek.id
+    WHERE url = '$vizsgaazonosito';");
 
     if(!$kivalasztottvizsga || mysqli_num_rows($kivalasztottvizsga) == 0)
     {
@@ -39,7 +56,7 @@ else
         {
             $contextmenujogok['vizsgabeallitasok'] = $contextmenujogok['kerdeslista'] = $contextmenujogok['vizsgalista'] = 
             $contextmenujogok['kerdesszerkeszt'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['adminlista'] =
-            $contextmenujogok['ujkornyitas'] = $contextmenujogok['admin'] = true;
+            $contextmenujogok['adminkijeloles'] = $contextmenujogok['ujkornyitas'] = $contextmenujogok['admin'] = true;
         }
         else
         {

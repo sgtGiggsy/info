@@ -86,7 +86,7 @@ if($menuterulet == 3 && isset($pagename) && isset($contextmenujogok))
 			{
 				if(@$contextmenujogok[$menupont['oldal']] || @$contextmenujogok[$menupont['gyujtooldal']])
 				{
-					?><li <?=($menupont['oldal'] == $aloldal || $menupont['gyujtooldal'] == $aloldal) ? 'class="topmenuitem-active"' : 'class="topmenuitem"' ?>>
+					?><li <?=($aloldal && ($menupont['oldal'] == $aloldal || $menupont['gyujtooldal'] == $aloldal)) ? 'class="topmenuitem-active"' : 'class="topmenuitem"' ?>>
 						<a href="<?=$RootPath?>/<?=$pagetofind?>/<?=$pagename?>/<?=$menupont['gyujtooldal']?>"><?=trim($menupont['menupont'])?></a>
 					<li><?php
 				}

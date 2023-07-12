@@ -127,11 +127,16 @@ else
 
     if($irhat)
     {
+        $telkonyvcsoport = null;
+        if(isset($telefonszam['csoport']))
+        {
+            $telkonyvcsoport = $telefonszam['csoport'];
+        }
         $tkonyvwherecsoport = array(
             'where' => false,
             'mezonev' => true,
             'and' => true,
-            'currcsopid' => $telefonszam['csoport']
+            'currcsopid' => $telkonyvcsoport
         );
 
         $wherecsoport = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwherecsoport);
@@ -248,7 +253,7 @@ else
                 WHERE $modwhere telefonkonyvvaltozasok.modid = (SELECT MAX(id) FROM telefonkonyvmodositaskorok)
                     AND telefonkonyvvaltozasok.allapot < 2;");
 
-        if(mysqli_num_rows($modositaskerelmek) > 0 && !isset($_GET['modid']))
+        if(mysqli_num_rows($modositaskerelmek) > 0 && !isset($_GET['modid']) && !isset($_GET['action']))
         {
             $modositasadatok = mysqli_fetch_assoc($modositaskerelmek);
 
