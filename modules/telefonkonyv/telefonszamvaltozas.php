@@ -260,7 +260,7 @@ else
             $onloadfelugro = "A kiválasztott felhasználóra, vagy beosztásra már küldött be elfogadásra váró módosítási kérelmet " . $modositasadatok['bejelento'] . " " . $modositasadatok['timestamp'] . "-kor. Biztosan szeretnél másik kérelmet beadni?";
         }
 
-        if(isset($csoportjogok) && !in_array($csoport, $csoportjogok))
+        if(isset($csoportjogok) && !in_array($csoport, $csoportjogok) && !(isset($_GET['action']) && $_GET['action'] == "addnew"))
         {
             $onloadfelugro = "A kiválasztott felhasználó, vagy beosztás nem egy általad kezelt alegységhez tartozik. Biztosan őt szeretnéd szerkeszteni?";
         }

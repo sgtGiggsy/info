@@ -1,6 +1,7 @@
 <?php
 
 $szamlalo = null;
+$csaksajat = false;
 $csoportfilter = "alegysegfilter";
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
 if(!$globaltelefonkonyvadmin && isset($felhasznaloid))
@@ -14,6 +15,10 @@ if(isset($_GET['kereses']))
     $szurt = " AND telefonkonyvfelhasznalok.nev LIKE '%$keres%' OR telefonkonyvcsoportok.nev LIKE '%$keres%' OR belsoszam LIKE '%$keres%' OR belsoszam2 LIKE '%$keres%' OR mobil LIKE '%$keres%'";
     $where .= $szurt;
     $where2 .= $szurt;
+}
+if(isset($_GET['csaksajat']))
+{
+    $csaksajat = true;
 }
 
 $alegysegek = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1;");
@@ -153,8 +158,23 @@ if(isset($_GET['kereses']))
 }
 
 ?><div class="szerkgombsor">
-    <button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv?action=exportexcel'">Telefonkönyv mentése Excel-be</button>
-</div>
+    <button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv?action=exportexcel'">Telefonkönyv mentése Excel-be</button><?php
+    if($globaltelefonkonyvadmin || (isset($csoportjogok) && count($csoportjogok) > 0))
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonszamvaltozas?action=addnew'">Új felhasználó felvétele új beosztásra</button><?php
+    }
+    if(!$globaltelefonkonyvadmin && (isset($csoportjogok) && count($csoportjogok) > 0))
+    {
+        if(isset($_GET['csaksajat']))
+        {
+            ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv'">A teljes telefonkönyv mutatása</button><?php
+        }
+        else
+        {
+            ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv?csaksajat'">Csak a saját kezelésű alegységek mutatása</button><?php
+        }
+    }
+?></div>
 <div class="PrintArea">
     <div class="oldalcim">Telefonkönyv
         <div class="szuresvalaszto">Alegységre szűrés
@@ -208,8 +228,8 @@ if(isset($_GET['kereses']))
                     $csoportnevalap = "csoport" . $csoportszamlalo . "-";
                     $csoportnev = $csoportnevalap . $szamlalo;
                     $elozocsoport = $telefonszam['csoport'];
-                    ?><tr id="<?=$csoportnev?>" class="<?=$elozocsoport?>">
-                        <td colspan=<?=count($oszlopok)?> style="cursor:pointer" class="telefonkonyvelvalaszto" onclick="showHideCsoport('<?=$csoportnevalap?>', '<?=$tipus?>')"><?=$telefonszam['csoport']?></td>
+                    ?><tr id="<?=$csoportnev?>" class="<?=$elozocsoport?>" style="<?=($csaksajat && !(isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok))) ? 'display: none;' :  '' ?>">
+                        <td colspan=<?=count($oszlopok)?> style="cursor:pointer;" class="telefonkonyvelvalaszto" onclick="showHideCsoport('<?=$csoportnevalap?>', '<?=$tipus?>')"><?=$telefonszam['csoport']?></td>
                     </tr><?php
                     
                     $csoportszamlalo++;
@@ -219,7 +239,9 @@ if(isset($_GET['kereses']))
                 $csoportnev = $csoportnevalap . $szamlalo;
                 ?><tr <?=($csoportir) ? "class='kattinthatotr $elozocsoport' data-href='$RootPath/telefonszamvaltozas" . (($telefonszam['allapot'] == 4) ? "?modid=" . $telefonszam['modid'] : "/" . $telszamid) . "'" : "" ?>
                         id="<?=$csoportnev?>"
-                        style="<?=($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) ? 'font-style: italic; font-weight: normal;' : ((!$globaltelefonkonyvadmin && isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok)) ? "font-style: italic; " : "font-weight: normal;" )?>">
+                        style="<?=($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) ? 'font-style: italic; font-weight: normal;' : ((!$globaltelefonkonyvadmin && isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok)) ? 'font-style: italic; ' : 'font-weight: normal; ' )?>
+                        <?=($csaksajat && !(isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok))) ? 'display: none;' :  '' ?>"
+                    >
                     <td></td>
                     <td><?=$telefonszam['beosztas']?></td>
                     <td style="width:4ch; text-align:right;"><?=$telefonszam['elotag']?></td>
