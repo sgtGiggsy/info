@@ -4,221 +4,317 @@ if(!$felhasznaloid)
     echo "<h2>Az oldal kizárólag bejelentkezett felhasználók számára érhető el!</h2>";
 }
 else
-{
-    ?><div class="oldalcim">Vizsgázás</div><?php
-    if(isset($felhasznaloid))
+{   
+    $vizsgafolytat = false;
+
+    $korabbikitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.id AS id,
+            vizsgak_kitoltesek.felhasznalo AS felhasznalo,
+            vizsgak_kitoltesek.befejezett AS befejezett,
+            vizsgak_kitoltesek.kitoltesideje AS kitoltesideje,
+            vizsgak_vizsgakorok.id AS vizsgakorid
+        FROM vizsgak_kitoltesek
+            INNER JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
+        WHERE felhasznalo = $felhasznaloid AND $korvizsgaszures
+        ORDER BY vizsgak_kitoltesek.id DESC;");
+    $kitoltesszam = mysqli_num_rows($korabbikitoltesek);
+
+    if($kitoltesszam > 0)
     {
-        $korabbikitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.id AS id,
-                vizsgak_kitoltesek.felhasznalo AS felhasznalo,
-                vizsgak_kitoltesek.befejezett AS befejezett,
-                vizsgak_kitoltesek.kitoltesideje AS kitoltesideje
-            FROM vizsgak_kitoltesek
-                INNER JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
-            WHERE felhasznalo = $felhasznaloid AND $korvizsgaszures
-            ORDER BY vizsgak_kitoltesek.id DESC;");
-    }
-    /*
-foreach($_SESSION as $key => $value)
-{
-    var_dump($key);
-    echo "<br>";
-}
-*/
-    if(!$vizsgasession)
-    {
-        if(mysqli_num_rows($korabbikitoltesek) > 0)
+        $legutobbikitoltes = mysqli_fetch_assoc($korabbikitoltesek);
+        
+        if(!$legutobbikitoltes['befejezett'])
         {
-            $vizsga = mysqli_fetch_assoc($korabbikitoltesek);
-            $_SESSION[getenv('SESSION_NAME').$vizsgaazonosito.'vizsga'] = $vizsga['id'];
-            $ujvizsga = false;
+            $kitoltesid = $legutobbikitoltes['id'];
+            $vizsgafolytat = true;
+        }
+    }
+
+    if(!$vizsgafolytat)
+    {
+        if(isset($_GET['action']) && $_GET['action'] == "startnew")
+        {
+            $irhat = true;
+            include("./modules/vizsgak/db/vizsgadb.php");
+
+            $targeturl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/vizsgazas";
+
+            $firstquestion = mySQLConnect("SELECT id FROM vizsgak_kerdesek WHERE vizsga = $vizsgaid ORDER BY RAND() LIMIT 1;");
+            $firstquestion = mysqli_fetch_assoc($firstquestion)['id'];
+
+            mySQLConnect("INSERT INTO vizsgak_kitoltesvalaszok (kitoltes, kerdes) VALUES ($lastinsert, $firstquestion);");
+
+            header("Location: $targeturl");
+        }
+
+        ?><div class="oldalcim">Vizsgázás</div><?php
+        if($kitoltesszam > 0)
+        {
+            ?><h2>Korábbi kitöltések</h2><?php
+            foreach($korabbikitoltesek as $x)
+            {
+                ?><a href= './vizsgareszletezo/<?=$x['id']?>'><?=$x['kitoltesideje']?></a><?php
+            }
+
+            if($vizsgaadatok['ismetelheto'])
+            {
+                if($kitoltesszam >= $vizsgaadatok['maxismetles'])
+                {
+                    ?><h2>Ön mind az <?=$vizsgaadatok['maxismetles']?> vizsgalehetőségét felhasználta. A vizsgateszt újabb kitöltése nem lehetséges.</h2><?php
+                }
+                else
+                {
+                    $lehetosegszam = $vizsgaadatok['maxismetles'] - $kitoltesszam;
+                    ?><h2>Újrapróbálhatja a vizsgát még <?=$lehetosegszam?> alkalommal</h2>
+                    <form action='./vizsgazas?action=startnew' method='POST'>
+                        <div class='submit'><input type='submit' value='Vizsga megismétlése'></div>
+                    </form><?php
+                }
+            }
         }
         else
         {
-            $ujvizsga = true;
-        }
-
-        if($ujvizsga)
-        {
-            echo "<form action='?page=vizsgadb&action=new' method='post'>";
-            echo "<div class='submit'><input type='submit' value='Vizsga megkezdése'></div>";
-            echo "</form>";
+            ?><form action='./vizsgazas?action=startnew' method='POST'>
+                <div class='submit'><input type='submit' value='Vizsga megkezdése'></div>
+            </form><?php
         }
     }
-
-    if($vizsgasession)
-    {   
-        if(isset($korabbikitoltesek))
+    else
+    {
+        // Ha volt válaszbeküldés, meghívjuk az adatbázis kezeléséért felelős fájlt
+        if(isset($_GET['action']))
         {
-            if(!isset($vizsga))
+            if($_GET['action'] == "answerquestion")
             {
-                $vizsga = mysqli_fetch_assoc($korabbikitoltesek);
+                $irhat = true;
+                include("./modules/vizsgak/db/vizsgadb.php");
             }
-            
-            if($vizsga['befejezett'] == 1)
+            elseif($_GET['action'] == "finalize")
             {
-                echo "<h2>Korábbi kitöltések</h2>";
-                foreach($korabbikitoltesek as $x)
-                {
-                    ?><a href= './vizsgareszletezo/<?=$x['id']?>'><?=$x['kitoltesideje']?></a><?php
-                }
+                $irhat = true;
+                include("./modules/vizsgak/db/vizsgadb.php");
+                header("Location: ./vizsgareszletezo/$kitid");
             }
         }
         
-        $con = mySQLConnect("SELECT * FROM kitoltesek WHERE id = $vizsgasession LIMIT 1");
-        $vizsgaallapot = mysqli_fetch_assoc($con);
-        if($vizsgaallapot['befejezett'] == 1)
-        {
-            if($_SESSION[getenv('SESSION_NAME').'ismetelheto'])
-            {
-                $con = mySQLConnect("SELECT felhasznalok.id
-                FROM kitoltesek LEFT JOIN felhasznalok ON kitoltesek.felhasznalo = felhasznalok.id
-                WHERE felhasznalok.id = $uid;");
-                if(mysqli_num_rows($con) >= $_SESSION[getenv('SESSION_NAME').'maxismetles'])
-                {
-                    echo "<h2>Ön mind az 5 vizsgalehetőségét felhasználta. A vizsgateszt újabb kitöltése nem lehetséges.</h2>";
-                }
-                else
-                {
-                    $lehetosegszam = $_SESSION[getenv('SESSION_NAME').'maxismetles'] - mysqli_num_rows($con);
-                    echo "<h2>Újrapróbálhatja a vizsgát még $lehetosegszam alkalommal</h2>";
-                    echo "<form action='?page=vizsgadb&action=new' method='post'>";
-                    echo "<div class='submit'><input type='submit' value='Vizsga megismétlése'></div>";
-                    echo "</form>";
-                }
-            }
-        }
-        else
-        {
-            if(!isset($_SESSION[getenv('SESSION_NAME').'kerdessorszam']))
-            {
-                $_SESSION[getenv('SESSION_NAME').'kerdessorszam'] = 1;
-            }
+        $loopcount = 0; // Ciklusszámláló a véletlen generátorhoz a végtelen ciklus elkerülése miatt.
+        $valaszelemsorszam = 1;
+        $voltvalasztas = false;
+        $kitoltesvalaszid = null; // A jelen kérdés ID-ja
+        $kovetkezokerdesid = null; // Változó az itt létrehozott új kérdés adatbázis ID-jával.
+        $viszgalezarhato = false; // A vizsga nem zárható le, amíg ez a bool érték false állásban van
+        $kerdeshezlep = null; // Ahhoz kell, hogy ha korábbi kérdést szerkesztünk, a rendszer az azt követőhöz lépjen, ne a legfrissebbhez
+        $ujkerdes = null; // Ahhoz kell, hogy egy oldal betöltésénél új kérdés jöjjön létre
+        $valasznelkul = 0; // Azon feltett kérdések száma, amire a felhasználó még nem adott választ
+        $megvalaszoltkerdesek = array(); // Tömb amiben a korábban már megjelent kérdéseket tároljuk az összevetéshez
+        $adottvalaszok = array(); // Tömb, hogy a válaszok szerkesztésénél az adott válaszok vizuálisan is ki legyenek jelölve
+        $tesztvalaszok = mySQLConnect("SELECT * FROM vizsgak_kitoltesvalaszok WHERE kitoltes = $kitoltesid ORDER BY id ASC");
+        $tesztvalaszlista = mysqliToArray($tesztvalaszok);
 
-            $nextout = false;
-            if(isset($_GET['kerdes']))
-            {
-                $megvalaszoltquery = mySQLConnect("SELECT * FROM tesztvalaszok WHERE kitoltes = $vizsgasession ORDER BY id ASC");
-                $sorsz = 0;
-                foreach($megvalaszoltquery as $x)
-                {
-                    if($nextout)
-                    {
-                        $kovetkezo = $x['id'];
-                        $nextout = false;
-                        break;
-                    }
-                    if($_GET['kerdes'] == $x['id'])
-                    {
-                        $nextout = true;
-                    }
-                    $sorsz++;
-                }
-                $_SESSION[getenv('SESSION_NAME').'kerdessorszam'] = $sorsz;
-            }
+        $kerdeslista = mySQLConnect("SELECT vizsgak_kerdesek.id AS id,
+                vizsgak_kerdesek.kerdes,
+                feltoltesek.fajl AS kepurl
+            FROM vizsgak_kerdesek
+                LEFT JOIN feltoltesek ON vizsgak_kerdesek.kep = feltoltesek.id
+            WHERE vizsga = $vizsgaid ORDER BY id DESC;");
+        $kerdeslista = mysqliToArray($kerdeslista);
 
-            $megvalaszoltquery = mySQLConnect("SELECT * FROM tesztvalaszok WHERE kitoltes = $vizsgasession ORDER BY id DESC");
-            $osszvalaszszam = mysqli_num_rows($megvalaszoltquery);
-            echo "<div>";
-            if($_SESSION[getenv('SESSION_NAME').'kerdessorszam'] > 1)
+        // Ha még csak az első kérdés lett feltéve, vagy még nem értük el a max kérdésszámot és egy új kérdés megválaszolása felől érkezünk
+        if(isset($_GET['ujkerdes']) && (mysqli_num_rows($tesztvalaszok) < $vizsgaadatok['kerdesszam']))
+        {
+            foreach($tesztvalaszok as $marvolt)
             {
-                if(!isset($_GET['kerdes']))
-                {
-                    $elozo = (mysqli_fetch_assoc($megvalaszoltquery))['id'];
-                }
-                else
-                {
-                    $nextbreak = false;
-                    foreach($megvalaszoltquery as $x)
-                    {
-                        if($nextbreak)
-                        {
-                            $elozo = $x['id'];
-                            break;
-                        }
-                        if($_GET['kerdes'] == $x['id'])
-                        {
-                            $nextbreak = true;
-                        }
-                    }
-                }
-                ?><div class='left'><a href= './vizsga?kerdes=<?=$elozo?>'>Előző kérdés</a></div><?php
+                $megvalaszoltkerdesek[] = $marvolt['kerdes']; // Kigyűjtjük a már megjelent kérdéseket tömbbe.
             }
             
-            if(isset($_GET['kerdes']))
-            {
-                echo "<div class='right'>";
-                if($nextout)
-                {
-                    ?><a href= './vizsga'>Következő kérdés</a><?php
-                }
-                else
-                {
-                    ?><a href= './vizsga?kerdes=<?=$kovetkezo?>'>Következő kérdés</a><?php
-                }
-                echo "</div>";
-            }
-            echo "</div>";
+            do {
+                $loopcount++;
+                $kerdesarrayid = array_rand($kerdeslista); // Véletlenszerűen kiveszünk egy elemet a tömbből
+                $kovetkezokerdesid = $kerdeslista[$kerdesarrayid]['id']; // Lekérdezzük az elem adatbázis ID-ját
+            } while(in_array($kovetkezokerdesid, $megvalaszoltkerdesek) && $loopcount < 50); // Ha az elem nem jelent még meg, továbblépünk
 
-            if(!isset($_GET['kerdes']))
+            if($loopcount < 50) // Ha a ciklus rendeltetésszerűen ért véget, a kérdés hozzáadása az adatbázishoz
             {
-                $_SESSION[getenv('SESSION_NAME').'kerdessorszam'] = $osszvalaszszam + 1;
-            }
-            
-            ?>
-            <h2><?=$_SESSION[getenv('SESSION_NAME').'kerdessorszam']?>/<?=$_SESSION[getenv('SESSION_NAME').'vizsgahossz']?> kérdés</h2>
-            <?php
-            if(isset($_SESSION[getenv('SESSION_NAME').'kerdesid']))
-            {
-                $kerdesid = $_SESSION[getenv('SESSION_NAME').'kerdesid'];
+                $con = mySQLConnect();
+                $stmt = $con->prepare('INSERT INTO vizsgak_kitoltesvalaszok (kitoltes, kerdes)  VALUES (?, ?)');
+                $stmt->bind_param('ss', $kitoltesid, $kovetkezokerdesid);
+                $stmt->execute();
+                if(mysqli_errno($con) != 0)
+                {
+                    echo "<h2>A kérdés hozzáadása sikertelen!<br></h2>";
+                    echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+                }
+                $kitoltesvalaszid = mysqli_insert_id($con);
             }
             else
             {
-                $tesztvalaszok = mySQLConnect("SELECT * FROM tesztvalaszok WHERE kitoltes = $vizsgasession ORDER BY kerdes ASC");
-                $_SESSION[getenv('SESSION_NAME').'kerdessorszam'] = $osszvalaszszam + 1;
-                $kerdesek = mySQLConnect("SELECT id FROM kerdesek");
-                $osszkerdesszam = mysqli_num_rows($kerdesek);
-                $randomize = $osszkerdesszam - $osszvalaszszam;
-                $rand = rand(1, $randomize);
-                $talalatszam = 1;
-
-                foreach($kerdesek as $x)
-                {
-                    $talalat = false;
-                    foreach($tesztvalaszok as $y)
-                    {
-                        if($y['kerdes'] == $x['id'])
-                        {
-                            $talalat = true;
-                            break;
-                        }
-                        elseif($y['kerdes'] > $x['id'])
-                        {
-                            break;
-                        }
-                    }
-                    if(!$talalat)
-                    {
-                        if($talalatszam == $rand)
-                        {
-                            $kerdesid = $x['id'];
-                            break;
-                        }
-                        else
-                        {
-                            $talalatszam++;
-                        }
-                    }
-                }
-                $_SESSION[getenv('SESSION_NAME').'kerdesid'] = $kerdesid;
+                echo "<h2>A következő kérdés kiválasztása sikertelen! Kérlek próbálkozz újra!</h2>
+                    <p>Ha második próbálkozásra sem sikerül az új kérdés betöltése,
+                    kérlek értesítsd a vizsga adminisztrátorait!</p>";
             }
+            //header("Location: ./vizsgazas");
+        }
+        elseif(mysqli_num_rows($tesztvalaszok) == $vizsgaadatok['kerdesszam']) // Ha elértük az elvárt kérdésszámot, a vizsga lezárható
+        {
+            $viszgalezarhato = true;
+        }
 
-            $utolso = false;
-            if($_SESSION[getenv('SESSION_NAME').'kerdessorszam'] == $_SESSION[getenv('SESSION_NAME').'vizsgahossz'])
+        $osszkerdesszam = count($tesztvalaszlista);
+        if(isset($_GET['kerdessorszam'])) // Amennyiben egy meglévő választ szerkesztenénk, itt választjuk ki a tömbből
+        {
+            $valaszelemsorszam = $_GET['kerdessorszam'];
+            $kivalasztottkerdesid = $tesztvalaszlista[$_GET['kerdessorszam']-1]['kerdes'] ?? false;
+            $kitoltesvalaszid = $tesztvalaszlista[$_GET['kerdessorszam']-1]['id'] ?? false;
+            if($valaszelemsorszam < $osszkerdesszam - 1) // A következő kérdés kiválasztása, amennyiben nem a legutolsó kérdés az
             {
-                $utolso = true;
+                $kerdeshezlep = "&kerdessorszam=" . $valaszelemsorszam + 1;
             }
-            
-            include("kerdes.php");
+        }
+        elseif($kitoltesvalaszid)
+        {
+            $valaszelemsorszam = array_key_last($tesztvalaszlista) + 2;
+            $osszkerdesszam++;
+            $kivalasztottkerdesid = $kovetkezokerdesid;
+            $ujkerdes = "&ujkerdes";
+        }
+        else // A legutolsó kérdés kiválasztása a tömbből
+        {
+            $valaszelemsorszam = array_key_last($tesztvalaszlista) + 1;
+            $kivalasztottkerdesid = $tesztvalaszlista[$valaszelemsorszam - 1]['kerdes'];
+            $kitoltesvalaszid = $tesztvalaszlista[$valaszelemsorszam - 1]['id'];
+            $ujkerdes = "&ujkerdes";
+        }
+
+
+        if(!$kivalasztottkerdesid)
+        {
+            ?><h2>A kiválasztott kérdés nem található az adatbázisban!</h2><?php
+        }
+        else
+        {
+            // Kikeressük a tömbből az utolsó kérdés ID-jának megfelelő elemet
+            $kivalasztottkerdesarrayid = array_search($kivalasztottkerdesid, array_column($kerdeslista, 'id'));
+            $kivalasztottkerdes = $kerdeslista[$kivalasztottkerdesarrayid];
+            if(isset($_GET['kerdessorszam']) || ($kivalasztottkerdesid && $viszgalezarhato))
+            {
+                if(isset($_GET['kerdessorszam']))
+                {
+                    $arrayid = $_GET['kerdessorszam'] - 1;
+                }
+                else
+                {
+                    $arrayid = array_key_last($tesztvalaszlista);
+                }
+                $adottvalaszok[] = $tesztvalaszlista[$arrayid]['valasz'];
+                $adottvalaszok[] = $tesztvalaszlista[$arrayid]['valasz2'];
+                $adottvalaszok[] = $tesztvalaszlista[$arrayid]['valasz3'];
+            }
+
+            // Lekérjük a kiválasztott kérdéshez tartozó válaszlehetőségeket
+            $valaszlehetosegek = mySQLConnect("SELECT id, helyes, valaszszoveg, kerdes,
+                    (SELECT SUM(vizsgak_valaszlehetosegek.helyes = 1) FROM vizsgak_valaszlehetosegek WHERE kerdes = $kivalasztottkerdesid) AS helyesvalaszszam
+                FROM vizsgak_valaszlehetosegek
+                WHERE kerdes = $kivalasztottkerdesid;");
+
+            // Kérdés megjelenítés rész
+            ?><div class="contentcenter">
+                <div class="vizsgacard">
+                    <div class="szerkcardtitle">
+                        <div><?=$valaszelemsorszam?>/<?=$osszkerdesszam?> kérdés</div>
+                        <div class="buttondropdown">
+                            <span style="cursor: pointer;" onclick="showPopup('korabbikorok')">⮟</span>
+                            <div id="korabbikorok" onmouseleave="hidePopup('korabbikorok')"><?php
+                                $sorszam = 1;
+                                foreach($tesztvalaszlista as $tesztvalasz)
+                                {
+                                    ?><p <?=(!$tesztvalasz['valasz']) ? "style='font-style: italic;'" : "" ?>><a href='./vizsgazas<?=($osszkerdesszam != $sorszam) ? "?kerdessorszam=$sorszam" : "" ?>'><?=$sorszam?>. kérdés</a></p><?php
+                                    if(!$tesztvalasz['valasz'])
+                                    {
+                                        $valasznelkul++;
+                                    }
+                                    $sorszam++;
+                                }
+                            ?></div>
+                        </div>
+                    </div>
+                    <div class="vizsgakerdesbody">
+                        <div class="backforward">
+                            <div><?php
+                            if($valaszelemsorszam > 1)
+                            {
+                                ?><a href="./vizsgazas?kerdessorszam=<?=$valaszelemsorszam-1?>"><< Előző kérdés</a><?php
+                            }
+                            ?></div><div><?php
+                            if($valaszelemsorszam == array_key_last($tesztvalaszlista) && $osszkerdesszam > 1)
+                            {
+                                ?><a href="./vizsgazas">Következő kérdés >></a><?php
+                            }
+                            elseif($osszkerdesszam > 1 && isset($_GET['kerdessorszam']))
+                            {
+                                ?><a href="./vizsgazas?kerdessorszam=<?=$valaszelemsorszam+1?>">Következő kérdés >></a><?php
+                            }
+                            ?></div><?php
+                            //if(array_key_last($tesztvalaszlista))
+                        ?></div>
+                        <div class="vizsgakerdeskep"><?=($kivalasztottkerdes['kepurl']) ? "<img scr='" . $kivalasztottkerdes['kepurl'] . "'>" : "" ?></div>
+                        <div class="vizsgakerdesszoveg"><?=$kivalasztottkerdes['kerdes']?></div>
+                        <form action='./vizsgazas?action=answerquestion<?=$kerdeshezlep?><?=$ujkerdes?>' method='POST' onsubmit="beKuld.disabled = true; return true;">
+                            <input type ="hidden" id="kitoltesvalaszid" name="kitoltesvalaszid" value=<?=$kitoltesvalaszid?> />
+                            <input type ="hidden" id="kitoltesid" name="kitoltesid" value=<?=$kitoltesid?> />
+                            <input type ="hidden" id="kerdesid" name="kerdesid" value=<?=$kivalasztottkerdesid?> />
+                            <div class="vizsgavalaszlista">
+                                <?php
+                                    foreach($valaszlehetosegek as $valasz)
+                                    {
+                                        $inptype = "radio";
+                                        if($valasz['helyesvalaszszam'] > 1)
+                                        {
+                                            $inptype = "checkbox";
+                                        }
+                                        if(in_array($valasz['id'], $adottvalaszok))
+                                        {
+                                            $kivalaszt = "checked";
+                                            $voltvalasztas = true;
+                                        }
+                                        else
+                                        {
+                                            $kivalaszt = "";
+                                        }
+                                        ?><div><label><input type="<?=$inptype?>" name="valaszok[]" id="valaszok" onclick="halasztKuldSwitch();" value="<?=$valasz['id']?>" <?=$kivalaszt?>><?=$valasz['valaszszoveg']?></label></div><?php
+                                        
+                                    }
+                                ?><div class="submit"><input type="submit" name="beKuld" id="valaszkuld" value='<?=($voltvalasztas) ? "Válasz beküldése" : "Kérdés későbbre halasztása" ?>'></div>
+                            </div>
+                        </form><?php
+                        if($viszgalezarhato)
+                        {
+                            ?><form action='./vizsgazas?action=finalize' method='POST'>
+                                <input type ="hidden" id="kitoltesid" name="kitoltesid" value=<?=$kitoltesid?> />
+                                <div class="submit"><input type="submit" value="Válaszok véglegesítése, vizsga befejezése" onclick="return confirm('Biztosan szeretnéd véglegesíteni a válaszaidat?\nEzt követően már nem fogod tudni módosítani őket.')"></div>
+                            </form><?php
+                            if((!isset($_GET['kerdessorszam']) && $valasznelkul != 1) || (!isset($_GET['kerdessorszam']) && $valasznelkul > 1) || isset($_GET['kerdessorszam']))
+                            {
+                                ?><div class="vizsgabottommessage"><?php
+                                    if($valasznelkul > 0)
+                                    {
+                                        ?>Még maradt <?=$valasznelkul?> megválaszolatlan, későbbre halasztott kérdés<?php
+                                    }
+                                    else
+                                    {
+                                        ?>Nem maradt megválaszolatlan kérdés<?php
+                                    }
+                                ?></div><?php
+                            }
+                        }
+                    ?></div>
+                </div>
+            </div>
+            <script>
+                function halasztKuldSwitch()
+                {
+                    var kuldgomb = document.getElementById('valaszkuld');
+                    kuldgomb.value = 'Válasz beküldése';
+                }
+            </script><?php
         }
     }
 }

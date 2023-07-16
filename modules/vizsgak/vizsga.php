@@ -48,7 +48,7 @@ else
     else
     {
         $vizsgaadatok = mysqli_fetch_assoc($kivalasztottvizsga);
-        $vizsgaid = $vizsgaadatok['id'] ;
+        $vizsgaid = $vizsgaadatok['id'];
         
         // Felhasználó jogosultságainak bekérése
         $contextmenujogok = array('admin' => false, 'vizsgazas' => true, 'ismerteto' => true);
@@ -78,6 +78,7 @@ else
                 if($vizsgaadmin['adminkijeloles'])
                 {
                     $contextmenujogok['adminlista'] = true;
+                    $contextmenujogok['adminkijeloles'] = true;
                 }
 
                 if($vizsgaadmin['ujkornyitas'])
@@ -102,9 +103,9 @@ else
             {
                 
                 $vizsgasession = false;
-                if(isset($_SESSION[getenv('SESSION_NAME').$vizsgaazonosito.'vizsga']))
+                if(isset($_SESSION[getenv('SESSION_NAME').'_'.$vizsgaazonosito.'_'.'vizsga']))
                 {
-                    $vizsgasession = $_SESSION[getenv('SESSION_NAME').$vizsgaazonosito.'vizsga'];
+                    $vizsgasession = $_SESSION[getenv('SESSION_NAME').'_'.$vizsgaazonosito.'_'.'vizsga'];
                 }
 
                 $korvizsgaszures = "vizsgak_vizsgakorok.vizsga = '" . $vizsgaadatok['id'] . "' AND ";

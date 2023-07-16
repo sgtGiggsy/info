@@ -199,7 +199,7 @@ ol, ul {
 }
 
 .contentcenter div {
-    padding: 1em 0 0 0;
+    /*padding: 1em 0 0 0;*/
     margin: 0 auto;
 }
 
@@ -469,20 +469,29 @@ div[id^=kep-].shrink img {
 
 /* Felületek megjelenése */
 /* Szerkesztő felület */
-.szerkcard {
+.szerkcard, .vizsgacard {
     border: 2px var(--midborder) solid;
     background-color: var(--cardbase);
     border-radius: 15px;
-    overflow: hidden;
+    padding: unset;
+    /*overflow: hidden;*/
 }
 
 .szerkcardtitle {
+    display: flex;
+    border-radius: 13px 13px 0 0;
     background-color: var(--cardtitle);
     border-bottom: 1px var(--lightborder) solid;
     font-size: 1.3em;
     font-weight: bold;
     padding: 1em;
     position: relative;
+    align-items: start;
+    background-clip: border-box;
+}
+
+.szerkcardtitle div {
+    margin: 0 0.3em 0 0;
 }
 
 .szerkcardoptions {
@@ -522,6 +531,67 @@ div[id^=kep-].shrink img {
 
 .szerkcardbody {
     padding: 0.7em 2em 1.5em 2em;
+}
+
+.backforward {
+    display: block;
+    position: relative;
+    font-size: 1.1em;
+    height: 1.1em;
+    margin: 0.5em 0!important;
+}
+
+.backforward div:nth-child(odd), .backforward div:nth-child(even) {
+    position: absolute;
+    padding: 0 0.5em;
+    top: 0;
+}
+
+.backforward div:nth-child(odd) {
+    left: 0;
+}
+
+.backforward div:nth-child(even) {
+    right: 0;
+}
+
+.vizsgacard {
+    width: 50vw;
+}
+
+.vizsgakerdesbody {
+    padding: 0;
+}
+
+.vizsgakerdesszoveg {
+    font-size: 1.4em;
+    font-weight: bold;
+    text-align: justify;
+    padding: 0.5em 1em;
+}
+
+.vizsgavalaszlista {
+    display: flex;
+    flex-direction: column;
+    padding: 0 2em;
+    text-align: left;
+    align-items: start;
+}
+
+.vizsgavalaszlista div {
+    margin: 0;
+    padding: 0.5em 0;
+}
+
+.vizsgavalaszlista input {
+    width: unset;
+    margin: 0 0.5em 0 0;
+    font-size: 1.2em;
+}
+
+.vizsgabottommessage {
+    padding: 1.5em 0.5em 0.5em 0.5em;
+    font-size: 1.1em;
 }
 
 .menucard, .menucard-child {
@@ -1248,7 +1318,7 @@ td img {
     color: var(--fontlight);
     border-radius: 5px;
     position: absolute;
-    z-index: 1;
+    z-index: 99;
     top: 50px;
 }
 

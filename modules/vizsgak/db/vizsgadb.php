@@ -1,71 +1,102 @@
 <?php
 
-if(!isset($_SESSION[getenv('SESSION_NAME').'id']))
+if(!$irhat && count($_POST) == 0)
 {
-    echo "<h2>Nincs bejelentkezett felhasználó!</h2>" ?>
-    <head><meta http-equiv="refresh" content="1; URL='<?=$RootPath?>'" /></head><?php
+    getPermissionError();
 }
 else
 {
     $con = mySQLConnect(false);
-    foreach($_POST as $key => $value)
-    {
-        if ($value == "NULL")
-        {
-            $_POST[$key] = NULL;
-        }
-    }
 
-    if($_GET["action"] == "new")
+    purifyPost();
+
+    if($_GET['action'] == "startnew")
     {
-        if ($stmt = $con->prepare('INSERT INTO kitoltesek (felhasznalo) VALUES (?)'))
-        {
-            $stmt->bind_param('s', $_SESSION[getenv('SESSION_NAME').'id']);
-            $stmt->execute();
-            if(mysqli_errno($con) != 0)
-            {
-                echo "<h2>Vizsga elindítása sikertelen!<br></h2>";
-                echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
-            }
-            else
-            {
-                $con = mySQLConnect("SELECT * FROM kitoltesek ORDER BY id DESC LIMIT 1");
-                $vizsga = mysqli_fetch_assoc($con);
-                $_SESSION[getenv('SESSION_NAME').'vizsga'] = $vizsga['id'];
-                echo "<h2>Vizsga sikeresen elindítva</h2>";
-                ?><head><meta http-equiv="refresh" content="1; URL='<?=$RootPath?>/vizsga'" /></head><?php
-            }
-        }
-        else
+        $jelenkor = mySQLConnect("SELECT MAX(id) AS maxid FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid;");
+        $jelenkor = mysqli_fetch_assoc($jelenkor)['maxid'];
+        
+        $stmt = $con->prepare('INSERT INTO vizsgak_kitoltesek (vizsgakor, felhasznalo) VALUES (?, ?)');
+        $stmt->bind_param('ss', $jelenkor, $felhasznaloid);
+        $stmt->execute();
+        if(mysqli_errno($con) != 0)
         {
             echo "<h2>Vizsga elindítása sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
+        $lastinsert = mysqli_insert_id($con);
     }
-    elseif($_GET["action"] == "update")
+
+    elseif($_GET['action'] == "answerquestion")
     {
-        if ($stmt = $con->prepare('UPDATE kitoltesek SET felhasznalo=? WHERE id=?'))
+        if(isset($_POST['valaszok'][0]) && $_POST['valaszok'][0])
         {
-            $stmt->bind_param('si', $_SESSION[getenv('SESSION_NAME').'id'], $_POST['id']);
+            $kitoltesvalaszid = $_POST['kitoltesvalaszid'];
+            $valasz = $_POST['valaszok'][0];
+            $valasz2 = $_POST['valaszok'][1] ?? null;
+            $valasz3 = $_POST['valaszok'][2] ?? null;
+
+            /*var_dump($valasz);
+            var_dump($kitoltesvalaszid);
+            echo "<br><br>";*/
+            $stmt = $con->prepare('UPDATE vizsgak_kitoltesvalaszok SET valasz=?, valasz2=?, valasz3=? WHERE id =?');
+            $stmt->bind_param('sssi', $valasz, $valasz2, $valasz3, $kitoltesvalaszid);
             $stmt->execute();
             if(mysqli_errno($con) != 0)
             {
-                echo "<h2>A vizsga szerkesztése sikertelen!<br></h2>";
+                echo "<h2>Válasz beküldése sikertelen!<br></h2>";
                 echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
             }
-            else
-            {
-                echo "<h2>A vizsga szerkesztése sikeres</h2>";
-                ?><head><meta http-equiv="refresh" content="1; URL='<?=$RootPath?>/vizsga'" /></head><?php
-            }
         }
-        else
+        
+        /*
+        foreach($_POST as $p => $v)
         {
-            echo "<h2>A vizsga szerkesztése sikertelen!<br></h2>";
+            var_dump($p);
+            echo " - ";
+            var_dump($v);
+            echo "<br>";
+        }*/
+    }
+
+    elseif($_GET['action'] == "finalize")
+    {
+        $befejez = 1;
+        $kitid = $_POST['kitoltesid'];
+        $hashalap = null;
+
+        $stmt = $con->prepare('UPDATE vizsgak_kitoltesek SET befejezett=? WHERE id =?');
+        $stmt->bind_param('si', $befejez, $kitid);
+        $stmt->execute();
+        if(mysqli_errno($con) != 0)
+        {
+            echo "<h2>Válasz beküldése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
-    }
-    elseif($_GET["action"] == "delete")
-    {
+
+        // hashgyártás
+        $hashgyart = mySQLConnect("SELECT kerdes, kitoltes, valasz, felhasznalonev, kitoltesideje
+        FROM vizsgak_kitoltesvalaszok
+            INNER JOIN vizsgak_kitoltesek ON vizsgak_kitoltesvalaszok.kitoltes = vizsgak_kitoltesek.id
+            INNER JOIN felhasznalok ON vizsgak_kitoltesek.felhasznalo = felhasznalok.id
+        WHERE vizsgak_kitoltesek.id = $kitid
+        ORDER BY vizsgak_kitoltesvalaszok.id;");
+
+        foreach($hashgyart as $x)
+        {
+            if(!$hashalap)
+            {
+                $hashalap .= $x['felhasznalonev'];
+                $hashalap .= $x['kitoltesideje'];
+                $hashalap .= "|";
+                $hashalap .= $x['kitoltes'];
+            }
+            $hashalap .= "|";
+            $hashalap .= $x['kerdes'];
+            $hashalap .= "/";
+            $hashalap .= $x['valasz'];
+        }
+        $hash = hash('md5', $hashalap);
+        
+        mySQLConnect("UPDATE vizsgak_kitoltesek SET vizsgakod = '$hashalap', hash = '$hash' WHERE id = $kitid");
     }
 }
