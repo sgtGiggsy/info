@@ -29,12 +29,17 @@ else
         foreach ($kerdeseklistaja as $x)
         {
             $id = $x['kerdid'];
+            $helyesszazalek = 0;
+            if($x['helyes'] > 0 && $x['kerdesszam'] > 0)
+            {
+                $helyesszazalek = round($x['helyes']/$x['kerdesszam']*100, 2);
+            }
             ?><tr class='kattinthatotr' data-href='./kerdesszerkeszt/<?=$id?>'>
                 <td><?=$id?></td>
                 <td><?=$x['kerdes']?></td>
                 <td><?=$x['kerdesszam']?></td>
                 <td><?=$x['helyes']?></td>
-                <td><?=round($x['helyes']/$x['kerdesszam']*100, 2)?></td>
+                <td><?=$helyesszazalek?></td>
               </tr><?php
         }
         ?></tbody>

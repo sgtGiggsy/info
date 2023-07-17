@@ -255,7 +255,7 @@ else
                             ?></div><?php
                             //if(array_key_last($tesztvalaszlista))
                         ?></div>
-                        <div class="vizsgakerdeskep"><?=($kivalasztottkerdes['kepurl']) ? "<img scr='" . $kivalasztottkerdes['kepurl'] . "'>" : "" ?></div>
+                        <div class="vizsgakerdeskep"><?=($kivalasztottkerdes['kepurl']) ? "<img src='$RootPath" . '/uploads/' . $kivalasztottkerdes['kepurl'] . "'>" : "" ?></div>
                         <div class="vizsgakerdesszoveg"><?=$kivalasztottkerdes['kerdes']?></div>
                         <form action='./vizsgazas?action=answerquestion<?=$kerdeshezlep?><?=$ujkerdes?>' method='POST' onsubmit="beKuld.disabled = true; return true;">
                             <input type ="hidden" id="kitoltesvalaszid" name="kitoltesvalaszid" value=<?=$kitoltesvalaszid?> />

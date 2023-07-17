@@ -5,11 +5,21 @@ if(@!$contextmenujogok['kerdesszerkeszt'])
 }
 else
 {
+    if(count($_POST) > 0 && isset($_GET['action']))
+    {
+        $irhat = true;
+        include("./modules/vizsgak/db/kerdesdb.php");
+        $targeturl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/kerdeslista";
+
+        header("Location: $targeturl");
+    }
+
     $button = "Mentés";
     $irhat = true;
     $form = "modules/vizsgak/forms/kerdesszerkesztform";
     $oldalcim = "Kérdés hozzáadása";
-    $magyarazat = null;
+    $kerdesszoveg = $kep = $magyarazat = null;
+    $valaszlehetosegek = array();
     
     $kep = null;
     if(isset($_GET['id']))
@@ -19,10 +29,9 @@ else
         {
             $jogszukit = "AND vizsgak_kerdesek.vizsga IN (SELECT vizsga FROM vizsgak_adminok WHERE felhasznalo = $felhasznaloid)";
         }
-        $id = $_GET["id"];
         $kerdesadat = mySQLConnect("SELECT vizsgak_kerdesek.id AS kerdesid,
                     vizsgak_kerdesek.kerdes AS kerdes,
-                    kep,
+                    feltoltesek.fajl AS kep,
                     valaszszoveg,
                     vizsgak_valaszlehetosegek.id AS valaszid,
                     vizsgak_valaszlehetosegek.helyes AS helyes,
@@ -36,6 +45,7 @@ else
                 INNER JOIN vizsgak_valaszlehetosegek ON vizsgak_kerdesek.id = vizsgak_valaszlehetosegek.kerdes
                 INNER JOIN felhasznalok letrehoz ON vizsgak_kerdesek.letrehozo = letrehoz.id
                 LEFT JOIN felhasznalok modosit ON vizsgak_kerdesek.modosito = modosit.id
+                LEFT JOIN feltoltesek ON vizsgak_kerdesek.kep = feltoltesek.id
             WHERE vizsgak_kerdesek.id = $id $jogszukit;");
 
         if(mysqli_num_rows($kerdesadat) == 0)
@@ -46,7 +56,18 @@ else
         else
         {
             $kerdes = mysqli_fetch_assoc($kerdesadat);
-            $kep = $RootPath . "/images/vizsgakepek/" . $kerdes['kep'];
+            foreach($kerdesadat as $valaszlehetoseg)
+            {
+                $temp = array(
+                    'valaszid' => $valaszlehetoseg['valaszid'],
+                    'valaszszoveg' => $valaszlehetoseg['valaszszoveg'],
+                    'helyes' => $valaszlehetoseg['helyes']
+                );
+                $valaszlehetosegek[] = $temp;
+            }
+            
+            $kerdesszoveg = $kerdes['kerdes'];
+            $kep = $RootPath . "/uploads/" . $kerdes['kep'];
             $oldalcim = "Kérdés: " . $id;
             $button = "Szerkesztés";
             
