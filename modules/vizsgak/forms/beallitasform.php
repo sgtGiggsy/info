@@ -66,27 +66,55 @@ if(@$irhat)
                 cancelForm();
                 if(isset($contextmenujogok))
                 {
-                    if($contextmenujogok['ujkornyitas'] && isset($_GET['torlomod']))
+                    if($contextmenujogok['ujkornyitas'])
                     {
-                        ?><div><a href="?vizsgareset" style="color: red" onclick="return confirm('Biztos vagy benne, hogy törölni akarod az ÖSSZES VISZGÁT?')">Korábbi vizsgák törlése</a></div><?php
+                        ?><div class="submit"><input type="submit" name="ujornyitas" value="Jelen vizsgakör lezárása, új kör indítása" onclick="return confirm('Biztos vagy benne, hogy lezárnád a jelenleg futó vizsgakört, és újat indítanál?');"></div><?php
+                        if(isset($_GET['torlomod']))
+                        {
+                            ?><div><a href="?vizsgareset" style="color: red" onclick="return confirm('Biztos vagy benne, hogy törölni akarod az ÖSSZES VISZGÁT?')">Korábbi vizsgák törlése</a></div><?php
+                        }
+                        elseif(!isset($_GET['torlomod']))
+                        {
+                            ?><div class="submit"><button onclick="return confirm('Biztos vagy benne, hogy bekapcsolod a törlő módot?'); return false;" style="background: #990000; border: #660000;">Törlőmód bekapcsolása</button></div><?php
+                        }
                     }
-                    elseif($contextmenujogok['ujkornyitas'] && !isset($_GET['torlomod']))
-                    {
-                        ?><div class="submit"><button href="?torlomod" style="background: #990000; border: #660000;" onclick="return confirm('Biztos vagy benne, hogy bekapcsolod a törlő módot?')">Törlőmód bekapcsolása</button></div><?php
-                    }
+                    
                 }
             ?></div>
         </div>
     </form>
-    <script type="text/javascript">
-        tinymce.init({
-            selector: '#udvozloszoveg',
-            plugins : 'advlist autolink link image lists charmap print preview code'
-        });
+    <script type="text/javascript"><?php
+        if($szemelyes['szinsema'] == "dark")
+        {
+            ?>
+            tinymce.init({
+                selector: '#udvozloszoveg',
+                plugins : 'advlist autolink link image lists charmap print preview emoticons code',
+                skin: "tinymce-5-dark",
+                content_css: "tinymce-5-dark"
+            });
 
-        tinymce.init({
-            selector: '#leiras',
-            plugins : 'advlist autolink link image lists charmap print preview code'
-        })
-    </script><?php
+            tinymce.init({
+                selector: '#leiras',
+                plugins : 'advlist autolink link image lists charmap print preview emoticons code',
+                skin: "tinymce-5-dark",
+                content_css: "tinymce-5-dark"
+            });
+            <?php
+        }
+        else
+        {
+            ?>
+            tinymce.init({
+                selector: '#udvozloszoveg',
+                plugins : 'advlist autolink link image lists charmap print preview emoticons code'
+            });
+
+            tinymce.init({
+                selector: '#leiras',
+                plugins : 'advlist autolink link image lists charmap print preview emoticons code'
+            });
+            <?php
+        }
+    ?></script><?php
 }

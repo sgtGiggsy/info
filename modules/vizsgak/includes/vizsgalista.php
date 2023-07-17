@@ -6,14 +6,20 @@ if(!$contextmenujogok['admin'])
 }
 else
 {
-    $where = "WHERE vizsgak_kitoltesek.befejezett = 1 AND vizsgak_vizsgakorok.vizsga = $vizsgaid";
+    $kereses = null;
+    $enablekeres = true;
+    $vizsgakorok = mySQLConnect("SELECT * FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid ORDER BY id DESC");
+    if(!isset($vizsgakorsorszam))
+    {
+        $vizsgakorsorszam = mysqli_fetch_assoc($vizsgakorok)['sorszam'];
+    }
     if(isset($_GET['kereses']))
     {
         $keres = $_GET['kereses'];
-        $where = "WHERE vizsgak_kitoltesek.befejezett = 1 AND nev LIKE '%$keres%'";
+        $kereses = " AND nev LIKE '%$keres%'";
     }
-    
-    ?><div class="oldalcim">Vizsgák</div><?php
+
+    $where = "WHERE vizsgak_kitoltesek.befejezett = 1 AND $korvizsgaszures $kereses";
     $kitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.id as sorszam,
             COUNT(IF(vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes, 1, null)) AS helyes,
             COUNT(IF(vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id, 1, null)) AS ossz,
@@ -27,59 +33,58 @@ else
         $where
         GROUP BY vizsgak_kitoltesek.id
         ORDER BY vizsgak_kitoltesek.id DESC;");
-    ?>
 
-    <form action="vizsgalista" method="GET">
-        <label for="kereses">Vizsgázó keresése</label>
-        <input type="text" name="kereses">
-        <button>Keres</button>
-    </form>
+    $vizsgalistaurl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/vizsgalista";
 
-    <table id='vizsgalista'>
-        <thead style="font-size: 1.3em; font-weight: bold">
-            <tr>
-                <th class="tsorth" onclick="sortTable(0, 'i', 'vizsgalista')">Sorszám</th>
-                <th class="tsorth" onclick="sortTable(1, 's', 'vizsgalista')">Vizsgázó</th>
-                <th class="tsorth" onclick="sortTable(2, 'i', 'vizsgalista')">Megválaszolt kérdések</th>
-                <th class="tsorth" onclick="sortTable(3, 'i', 'vizsgalista')">Helyes válaszok</th>
-                <th class="tsorth" onclick="sortTable(4, 'i', 'vizsgalista')">Helyes százalék</th>
-            </tr>
-        </thead>
-        <tbody>
-    <?php
-    foreach($kitoltesek as $x)
-    {
-        if( $x['helyes'] == 0)
-        {
-            $szazalek = 0;
-        }
-        else
-        {
-            $szazalek = round($x['helyes']/$x['ossz']*100, 2);
-        }
+    ?><div class="szerkgombsor">
+        <button type="button" onclick="location.href='<?=$vizsgalistaurl?>?action=exportexcel'">Exportálás Excel fájlba</button>
+    </div>
+    <div class="PrintArea">
+        <div class="oldalcim">Vizsgák
+            <div class="szuresvalaszto">
+                <form action="<?=$vizsgalistaurl?>" method="GET">
+                    <label for="vizsgakor" style="font-size: 14px">Vizsgakör kiválasztása</label>
+                    <select id="vizsgakor" name="vizsgakor" onchange="this.form.submit()"><?php
+                        foreach($vizsgakorok as $x)
+                        {
+                            ?><option value="<?=$x['sorszam']?>" <?=($vizsgakorsorszam == $x['sorszam']) ? "selected" : "" ?>><?=$x['kezdet']?> - <?=$x['veg']?></option><?php
+                        }
+                    ?></select>
+                </form>
+            </div>
+        </div><?php
         
-        if($x['helyes'] < $vizsgaadatok['minimumhelyes'])
-        {
-            ?><tr style="color:red" class='kattinthatotr' data-href='./vizsgareszletezo/<?=$x['sorszam']?>'><?php
-        }
-        else
-        {
-            ?><tr style="color:green" class='kattinthatotr' data-href='./vizsgareszletezo/<?=$x['sorszam']?>'><?php
-        }
-            ?>
-                <td><?=$x['sorszam']?></td>
-                <td><?=$x['nev']?></td>
-                <td><?=$x['ossz']?></td>
-                <td><?=$x['helyes']?></td>
-                <td><?=$szazalek?></td>
-            </tr>
-    <?php
-    }
-    $_SESSION[getenv('SESSION_NAME').'excel'] = $kitoltesek;
-    ?>
-        </tbody>
-    </table>
-    <a href="?page=exportexcel">Exportálás Excel fájlba</a>
-    <?php
+        ?><table id='vizsgalista'>
+            <thead>
+                <tr>
+                    <th class="tsorth" onclick="sortTable(0, 'i', 'vizsgalista')">Sorszám</th>
+                    <th class="tsorth" onclick="sortTable(1, 's', 'vizsgalista')">Vizsgázó</th>
+                    <th class="tsorth" onclick="sortTable(2, 'i', 'vizsgalista')">Megválaszolt kérdések</th>
+                    <th class="tsorth" onclick="sortTable(3, 'i', 'vizsgalista')">Helyes válaszok</th>
+                    <th class="tsorth" onclick="sortTable(4, 'i', 'vizsgalista')">Helyes százalék</th>
+                </tr>
+            </thead>
+            <tbody><?php
+                foreach($kitoltesek as $x)
+                {
+                    if( $x['helyes'] == 0)
+                    {
+                        $szazalek = 0;
+                    }
+                    else
+                    {
+                        $szazalek = round($x['helyes']/$x['ossz']*100, 2);
+                    }
+                    
+                    ?><tr style="<?=($x['helyes'] < $vizsgaadatok['minimumhelyes']) ? 'color:red' : 'color:green' ?>" class='kattinthatotr' data-href='./vizsgareszletezo/<?=$x['sorszam']?>'>
+                        <td><?=$x['sorszam']?></td>
+                        <td><?=$x['nev']?></td>
+                        <td><?=$x['ossz']?></td>
+                        <td><?=$x['helyes']?></td>
+                        <td><?=$szazalek?></td>
+                    </tr><?php
+                }
+            ?></tbody>
+        </table>
+    </div><?php
 }
-?>

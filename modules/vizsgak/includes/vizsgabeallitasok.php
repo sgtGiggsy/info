@@ -23,7 +23,8 @@ else
             }
         }
         
-        $vizsgaid = $nev = $url = $udvozloszoveg = $kerdesszam = $minimumhelyes = $vizsgaido = $ismetelheto = $maxismetles = $leiras = $fejleckep = null;
+        $vizsgaid = $nev = $url = $udvozloszoveg = $kerdesszam = $minimumhelyes = $vizsgaido =
+        $ismetelheto = $maxismetles = $leiras = $fejleckep = $ujkorurl = null;
         $vizsgabeallitasurl = "$RootPath/vizsga?action=addnew";
 
         if(isset($vizsgaadatok))
@@ -39,23 +40,19 @@ else
             $maxismetles =  $vizsgaadatok['maxismetles'];
             $leiras =  $vizsgaadatok['leiras'];
             $fejleckep =  $vizsgaadatok['fejleckep'];
-            $vizsgabeallitasurl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/vizsgabeallitasok";
+            $vizsgabeallitasurl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/vizsgabeallitasok?action=update";
+            if($contextmenujogok['ujkornyitas'])
+            {
+                $ujkorurl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/vizsgabeallitasok?action=newround";
+            }
         }
         $button = "Beállítások mentése";
         $irhat = true;
         $form = "modules/vizsgak/forms/beallitasform";
         $oldalcim = "Vizsga beállításai";
         $magyarazat = null;
+
         include('././templates/edit.tpl.php');
-        
-        if(isset($_GET['vizsgareset']))
-        {
-            mySQLConnect("DELETE FROM `tesztvalaszok`;");
-            mySQLConnect("DELETE FROM `kitoltesek`;");
-            mySQLConnect("ALTER TABLE `kitoltesek` AUTO_INCREMENT = 1;");
-            mySQLConnect("ALTER TABLE `tesztvalaszok` AUTO_INCREMENT = 1");
-            //header("Location: $RootPath/beallitasok");
-        }
     }
 }
 ?>

@@ -12,36 +12,40 @@ else
         WHERE vizsga = $vizsgaid
         ORDER BY id DESC;");
 
-    ?><div class="oldalcim">Kérdések</div>
-    <a href='./kerdesszerkeszt'>Új kérdés felvitele</a>
-    <table>
-        <thead>
-            <tr style="font-size: 1.3em; font-weight: bold">
-                <th>Azonosító</th>
-                <th>Kérdés</th>
-                <th>Megválaszolva</th>
-                <th>Helyes</th>
-                <th>%</th>
-            </tr>
-        </thead>
-        <tbody>
-    <?php
-        foreach ($kerdeseklistaja as $x)
-        {
-            $id = $x['kerdid'];
-            $helyesszazalek = 0;
-            if($x['helyes'] > 0 && $x['kerdesszam'] > 0)
+    ?><div class="szerkgombsor">
+        <button type="button" onclick="location.href='./kerdesszerkeszt'">Új kérdés felvitele</button>
+    </div>
+    <div class="PrintArea">
+        <div class="oldalcim">Kérdések</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Azonosító</th>
+                    <th>Kérdés</th>
+                    <th>Megválaszolva</th>
+                    <th>Helyes</th>
+                    <th>%</th>
+                </tr>
+            </thead>
+            <tbody>
+        <?php
+            foreach ($kerdeseklistaja as $x)
             {
-                $helyesszazalek = round($x['helyes']/$x['kerdesszam']*100, 2);
+                $id = $x['kerdid'];
+                $helyesszazalek = 0;
+                if($x['helyes'] > 0 && $x['kerdesszam'] > 0)
+                {
+                    $helyesszazalek = round($x['helyes']/$x['kerdesszam']*100, 2);
+                }
+                ?><tr class='kattinthatotr' data-href='./kerdesszerkeszt/<?=$id?>'>
+                    <td><?=$id?></td>
+                    <td><?=$x['kerdes']?></td>
+                    <td><?=$x['kerdesszam']?></td>
+                    <td><?=$x['helyes']?></td>
+                    <td><?=$helyesszazalek?></td>
+                </tr><?php
             }
-            ?><tr class='kattinthatotr' data-href='./kerdesszerkeszt/<?=$id?>'>
-                <td><?=$id?></td>
-                <td><?=$x['kerdes']?></td>
-                <td><?=$x['kerdesszam']?></td>
-                <td><?=$x['helyes']?></td>
-                <td><?=$helyesszazalek?></td>
-              </tr><?php
-        }
-        ?></tbody>
-    </table><?php
+            ?></tbody>
+        </table>
+    </div><?php
 }

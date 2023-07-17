@@ -112,6 +112,7 @@ else
                 if(isset($_GET['vizsgakor']))
                 {
                     $korvizsgaszures .= "vizsgak_vizsgakorok.sorszam = '" . $_GET['vizsgakor'] . "'";
+                    $vizsgakorsorszam = $_GET['vizsgakor'];
                 }
                 else
                 {

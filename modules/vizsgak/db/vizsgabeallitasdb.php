@@ -42,7 +42,7 @@ if(isset($irhat) && $irhat)
         }
     }
 
-    else
+    elseif(isset($_GET['action']) && $_GET['action'] == "update")
     {
         if(!isset($_POST["keptorol"]) && !@$fajllista)
         {
@@ -61,8 +61,30 @@ if(isset($irhat) && $irhat)
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
-            echo "<h2>A változás beküldése sikertelen!<br></h2>";
+            echo "<h2>A viszga szerkesztése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
+
+        if(isset($_POST['ujornyitas']))
+        {
+            $jelenkor = mySQLConnect("SELECT * FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid ORDER BY id DESC;");
+            $jelenkor = mysqli_fetch_assoc($jelenkor);
+
+            $lezardate = timeStampForSQL();
+            $jelenkorid = $jelenkor['id'];
+            $ujkorsorszam = $jelenkor['sorszam'] + 1;
+
+            mySQLConnect("UPDATE vizsgak_vizsgakorok SET veg = '$lezardate' WHERE id = $jelenkorid;");
+            mySQLConnect("INSERT INTO vizsgak_vizsgakorok (vizsga, sorszam) VALUES($vizsgaid, $ujkorsorszam);");
+        }
+    }
+
+    elseif(isset($_GET['action']) && $_GET['action'] == 'vizsgareset')
+    {
+        /*mySQLConnect("DELETE FROM `tesztvalaszok`;");
+        mySQLConnect("DELETE FROM `kitoltesek`;");
+        mySQLConnect("ALTER TABLE `kitoltesek` AUTO_INCREMENT = 1;");
+        mySQLConnect("ALTER TABLE `tesztvalaszok` AUTO_INCREMENT = 1");*/
+        //header("Location: $RootPath/beallitasok");
     }
 }
