@@ -2,7 +2,7 @@
 <div class="kozlemenyek">
     <div class='szovegtartalom'>
         <div class='kozlemenyszoveg'>
-            <?=$vizsgaadatok['udvozloszoveg']?>
+            <?=(@$felhasznaloid) ? $vizsgaadatok['udvozloszoveg'] : $vizsgaadatok['vendegudvozlo']?>
         </div>
     </div>
 </div>

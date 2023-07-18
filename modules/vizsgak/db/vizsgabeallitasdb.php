@@ -3,13 +3,7 @@
 if(isset($irhat) && $irhat)
 {
     $con = mySQLConnect(false);
-    foreach($_POST as $key => $value)
-    {
-        if ($value == "NULL")
-        {
-            $_POST[$key] = NULL;
-        }
-    }
+    purifyPost(true);
 
     if(isset($_FILES["fejleckep"]))
     {        
@@ -32,8 +26,8 @@ if(isset($irhat) && $irhat)
             $fajlid = $fajllista[0];
         }
 
-        $stmt = $con->prepare('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, fejleckep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('ssssssssss', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid);
+        $stmt = $con->prepare('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, vendegudvozlo, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, fejleckep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssssssssss', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
@@ -56,8 +50,8 @@ if(isset($irhat) && $irhat)
             $fajlid = $fajllista[0];
         }
 
-        $stmt = $con->prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=? WHERE id=?');
-        $stmt->bind_param('ssssssssssi', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['vizsgaid']);
+        $stmt = $con->prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=? WHERE id=?');
+        $stmt->bind_param('sssssssssssi', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['vizsgaid']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

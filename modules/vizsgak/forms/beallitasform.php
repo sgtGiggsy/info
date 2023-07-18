@@ -8,6 +8,9 @@ if(@$irhat)
                 <div>
                     <label for="udvozloszoveg">Üdvözlőszöveg:
                     <textarea name="udvozloszoveg" id="udvozloszoveg"><?=$udvozloszoveg?></textarea></label>
+                </div><div>
+                    <label for="vendegudvozlo">Üdvözlőszöveg be nem jelentkezett felhasználók részére:
+                    <textarea name="vendegudvozlo" id="vendegudvozlo"><?=$vendegudvozlo?></textarea></label>
                 </div>
                 <div>
                     <label for="leiras">Infó rész a láblécben:
@@ -95,6 +98,13 @@ if(@$irhat)
             });
 
             tinymce.init({
+                selector: '#vendegudvozlo',
+                plugins : 'advlist autolink link image lists charmap print preview emoticons code',
+                skin: "tinymce-5-dark",
+                content_css: "tinymce-5-dark"
+            });
+
+            tinymce.init({
                 selector: '#leiras',
                 plugins : 'advlist autolink link image lists charmap print preview emoticons code',
                 skin: "tinymce-5-dark",
@@ -107,6 +117,11 @@ if(@$irhat)
             ?>
             tinymce.init({
                 selector: '#udvozloszoveg',
+                plugins : 'advlist autolink link image lists charmap print preview emoticons code'
+            });
+
+            tinymce.init({
+                selector: '#vendegudvozlo',
                 plugins : 'advlist autolink link image lists charmap print preview emoticons code'
             });
 

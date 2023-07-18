@@ -563,6 +563,13 @@ div[id^=kep-].shrink img {
     padding: 0;
 }
 
+.vizsgakerdeskep img {
+    max-width: 48vw;
+    max-height: 500px;
+    margin: 0 auto;
+    padding: 0.2em 1em;
+}
+
 .vizsgakerdesszoveg {
     font-size: 1.4em;
     font-weight: bold;
@@ -592,6 +599,18 @@ div[id^=kep-].shrink img {
 .vizsgabottommessage {
     padding: 1.5em 0.5em 0.5em 0.5em;
     font-size: 1.1em;
+}
+
+.talalat, .helyes {
+    color: green;
+}
+
+.talalat {
+    font-weight: bold;
+}
+
+.hibastipp {
+    color: red;
 }
 
 .menucard, .menucard-child {
@@ -1192,7 +1211,7 @@ td img {
 /* ------------------------------- Fejléc ------------------------------- */
 .topmenubase {
     display: grid;
-    grid-template-columns: 200px 1fr max-content 1fr max-content;
+    grid-template-columns: 200px  minmax(min-content, 350px) max-content minmax(0px, 1fr) max-content;
     top: 0;
     height: 50px;
     width: 100%;

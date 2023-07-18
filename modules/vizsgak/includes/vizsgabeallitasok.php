@@ -5,7 +5,7 @@ if(!$felhasznaloid)
 }
 else
 {
-    if(!$mindir && !$contextmenujogok['vizsgabeallitasok'])
+    if(!$mindir && !@$contextmenujogok['vizsgabeallitasok'])
     {
         echo "<h2>Nincs jogosultságod az oldal megtekintésére!</h2>";
     }
@@ -23,8 +23,8 @@ else
             }
         }
         
-        $vizsgaid = $nev = $url = $udvozloszoveg = $kerdesszam = $minimumhelyes = $vizsgaido =
-        $ismetelheto = $maxismetles = $leiras = $fejleckep = $ujkorurl = null;
+        $vizsgaid = $nev = $url = $udvozloszoveg = $vendegudvozlo = $kerdesszam = $minimumhelyes =
+        $vizsgaido = $ismetelheto = $maxismetles = $leiras = $fejleckep = $ujkorurl = null;
         $vizsgabeallitasurl = "$RootPath/vizsga?action=addnew";
 
         if(isset($vizsgaadatok))
@@ -33,6 +33,7 @@ else
             $nev = $vizsgaadatok['nev'];
             $url = $vizsgaadatok['url'];
             $udvozloszoveg = $vizsgaadatok['udvozloszoveg'];
+            $vendegudvozlo = $vizsgaadatok['vendegudvozlo'];
             $kerdesszam = $vizsgaadatok['kerdesszam'];
             $minimumhelyes = $vizsgaadatok['minimumhelyes'];
             $vizsgaido = $vizsgaadatok['vizsgaido'];

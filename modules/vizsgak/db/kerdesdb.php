@@ -22,6 +22,9 @@ else
         $fajllista = fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimappa);
     }
 
+    $helyesdb = count($_POST['helyes']);
+    $helyesertek = 1 / $helyesdb;
+
     if($_GET["action"] == "addnew")
     {
         if(isset($_POST["keptorol"]) || !@$fajllista)
@@ -51,7 +54,7 @@ else
                 $helyes = null;
                 if(isset($_POST['helyes'][$i]) && $_POST['helyes'][$i] == $i)
                 {
-                    $helyes = 1;
+                    $helyes = $helyesertek;
                 }
                 
                 $stmt = $con->prepare('INSERT INTO vizsgak_valaszlehetosegek (kerdes, valaszszoveg, helyes) VALUES (?, ?, ?)');
@@ -95,7 +98,7 @@ else
             $helyes = null;
             if(isset($_POST['helyes'][$i]))
             {
-                $helyes = 1;
+                $helyes = $helyesertek;
             }
             
             $stmt = $con->prepare('UPDATE vizsgak_valaszlehetosegek SET valaszszoveg=?, helyes=? WHERE id=?');

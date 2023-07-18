@@ -1917,3 +1917,16 @@ function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimap
 
 	return $uploadids;
 }
+
+function roundUp99($value)
+{
+	$tizedes = $value - floor($value);
+	if($tizedes > 0.95)
+	{
+		return ceil($value);
+	}
+	else
+	{
+		return $value;
+	}
+}

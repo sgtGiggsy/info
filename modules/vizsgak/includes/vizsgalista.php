@@ -21,9 +21,15 @@ else
 
     $where = "WHERE vizsgak_kitoltesek.befejezett = 1 AND $korvizsgaszures $kereses";
     $kitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.id as sorszam,
-            COUNT(IF(vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes, 1, null)) AS helyes,
+            ROUND(SUM(
+                IF((vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes)
+                    OR (vizsgak_kitoltesvalaszok.valasz2 = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes)
+                    OR (vizsgak_kitoltesvalaszok.valasz3 = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes), helyes, null)), 2) AS helyes,
             COUNT(IF(vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id, 1, null)) AS ossz,
-            felhasznalok.nev as nev
+            felhasznalok.nev as nev,
+            felhasznalonev,
+            kitoltesideje,
+            osztaly
         FROM vizsgak_kitoltesek
             LEFT JOIN vizsgak_kitoltesvalaszok ON vizsgak_kitoltesek.id = vizsgak_kitoltesvalaszok.kitoltes
             LEFT JOIN vizsgak_kerdesek ON vizsgak_kitoltesvalaszok.kerdes = vizsgak_kerdesek.id
@@ -34,10 +40,15 @@ else
         GROUP BY vizsgak_kitoltesek.id
         ORDER BY vizsgak_kitoltesek.id DESC;");
 
+    if(isset($_GET['action']) && $_GET['action'] == 'exportexcel')
+    {
+        include("./modules/vizsgak/includes/exportexcel.php");
+    }
+
     $vizsgalistaurl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/vizsgalista";
 
     ?><div class="szerkgombsor">
-        <button type="button" onclick="location.href='<?=$vizsgalistaurl?>?action=exportexcel'">Exportálás Excel fájlba</button>
+        <button type="button" onclick="location.href='<?=$vizsgalistaurl?>?action=exportexcel&vizsgakor=<?=$vizsgakorsorszam?>'">Exportálás Excel fájlba</button>
     </div>
     <div class="PrintArea">
         <div class="oldalcim">Vizsgák

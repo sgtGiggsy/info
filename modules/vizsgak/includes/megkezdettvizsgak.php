@@ -7,9 +7,15 @@ if(!$contextmenujogok['admin'])
 else
 {
     $kitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.id as sorszam,
-            COUNT(IF(vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes, 1, null)) AS helyes,
+            ROUND(SUM(
+                IF((vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes)
+                    OR (vizsgak_kitoltesvalaszok.valasz2 = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes)
+                    OR (vizsgak_kitoltesvalaszok.valasz3 = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes), helyes, null)), 2) AS helyes,
             COUNT(IF(vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id, 1, null)) AS ossz,
-            felhasznalok.nev as nev
+            felhasznalok.nev as nev,
+            felhasznalonev,
+            kitoltesideje,
+            osztaly
         FROM vizsgak_kitoltesek
             LEFT JOIN vizsgak_kitoltesvalaszok ON vizsgak_kitoltesek.id = vizsgak_kitoltesvalaszok.kitoltes
             LEFT JOIN vizsgak_kerdesek ON vizsgak_kitoltesvalaszok.kerdes = vizsgak_kerdesek.id
@@ -19,6 +25,11 @@ else
         WHERE vizsgak_kitoltesek.befejezett IS NULL AND vizsgak_vizsgakorok.vizsga = $vizsgaid AND vizsgak_vizsgakorok.sorszam = (SELECT MAX(sorszam) FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid)
         GROUP BY vizsgak_kitoltesek.id
         ORDER BY vizsgak_kitoltesek.id DESC;");
+
+    if(isset($_GET['action']) && $_GET['action'] == 'exportexcel')
+    {
+        include("./modules/vizsgak/includes/exportexcel.php");
+    }
 
     $vizsgalistaurl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/megkezdettvizsgak";
 

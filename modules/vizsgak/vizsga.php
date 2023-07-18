@@ -1,10 +1,6 @@
 ﻿<?php
 
-if(!$felhasznaloid)
-{
-    echo "<h2>Az oldal kizárólag bejelentkezett felhasználók számára érhető el!</h2>";
-}
-elseif(!isset($_GET['subpage']) && !isset($_GET['id']) && !(isset($_GET['action']) && $_GET['action'] == 'addnew'))
+if(!isset($_GET['subpage']) && !isset($_GET['id']) && !(isset($_GET['action']) && $_GET['action'] == 'addnew'))
 {
     echo "<h2>Nincs kiválasztott vizsga!</h2>";
 }
@@ -30,6 +26,7 @@ else
             nev,
             url,
             udvozloszoveg,
+            vendegudvozlo,
             kerdesszam,
             minimumhelyes,
             vizsgaido,
@@ -49,44 +46,47 @@ else
     {
         $vizsgaadatok = mysqli_fetch_assoc($kivalasztottvizsga);
         $vizsgaid = $vizsgaadatok['id'];
-        
-        // Felhasználó jogosultságainak bekérése
-        $contextmenujogok = array('admin' => false, 'vizsgazas' => true, 'ismerteto' => true);
-        if($mindir)
+
+        if(@$felhasznaloid)
         {
-            $contextmenujogok['vizsgabeallitasok'] = $contextmenujogok['kerdeslista'] = $contextmenujogok['vizsgalista'] = 
-            $contextmenujogok['kerdesszerkeszt'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['adminlista'] =
-            $contextmenujogok['adminkijeloles'] = $contextmenujogok['ujkornyitas'] = $contextmenujogok['admin'] = true;
-        }
-        else
-        {
-            $vizsgaadmin = mySQLConnect("SELECT * FROM vizsgak_adminok WHERE felhasznalo = $felhasznaloid AND vizsga = $vizsgaid;");
-            if(mysqli_num_rows($vizsgaadmin) > 0)
+            // Felhasználó jogosultságainak bekérése
+            $contextmenujogok = array('admin' => false, 'vizsgazas' => true, 'ismerteto' => true);
+            if($mindir)
             {
-                $vizsgaadmin = mysqli_fetch_assoc($vizsgaadmin);
+                $contextmenujogok['vizsgabeallitasok'] = $contextmenujogok['kerdeslista'] = $contextmenujogok['vizsgalista'] = 
+                $contextmenujogok['kerdesszerkeszt'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['adminlista'] =
+                $contextmenujogok['adminkijeloles'] = $contextmenujogok['ujkornyitas'] = $contextmenujogok['admin'] = true;
+            }
+            else
+            {
+                $vizsgaadmin = mySQLConnect("SELECT * FROM vizsgak_adminok WHERE felhasznalo = $felhasznaloid AND vizsga = $vizsgaid;");
+                if(mysqli_num_rows($vizsgaadmin) > 0)
+                {
+                    $vizsgaadmin = mysqli_fetch_assoc($vizsgaadmin);
 
-                if($vizsgaadmin['beallitasok'])
-                {
-                    $contextmenujogok['vizsgabeallitasok'] = true;
-                }
-                
-                if($vizsgaadmin['kerdesek'])
-                {
-                    $contextmenujogok['kerdeslista'] = $contextmenujogok['kerdesszerkeszt'] = true;
-                }
+                    if($vizsgaadmin['beallitasok'])
+                    {
+                        $contextmenujogok['vizsgabeallitasok'] = true;
+                    }
+                    
+                    if($vizsgaadmin['kerdesek'])
+                    {
+                        $contextmenujogok['kerdeslista'] = $contextmenujogok['kerdesszerkeszt'] = true;
+                    }
 
-                if($vizsgaadmin['adminkijeloles'])
-                {
-                    $contextmenujogok['adminlista'] = true;
-                    $contextmenujogok['adminkijeloles'] = true;
-                }
+                    if($vizsgaadmin['adminkijeloles'])
+                    {
+                        $contextmenujogok['adminlista'] = true;
+                        $contextmenujogok['adminkijeloles'] = true;
+                    }
 
-                if($vizsgaadmin['ujkornyitas'])
-                {
-                    $contextmenujogok['ujkornyitas'] = true;
+                    if($vizsgaadmin['ujkornyitas'])
+                    {
+                        $contextmenujogok['ujkornyitas'] = true;
+                    }
+                    
+                    $contextmenujogok['vizsgalista'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['admin'] = true;
                 }
-                
-                $contextmenujogok['vizsgalista'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['admin'] = true;
             }
         }
    
@@ -101,13 +101,6 @@ else
             }
             else
             {
-                
-                $vizsgasession = false;
-                if(isset($_SESSION[getenv('SESSION_NAME').'_'.$vizsgaazonosito.'_'.'vizsga']))
-                {
-                    $vizsgasession = $_SESSION[getenv('SESSION_NAME').'_'.$vizsgaazonosito.'_'.'vizsga'];
-                }
-
                 $korvizsgaszures = "vizsgak_vizsgakorok.vizsga = '" . $vizsgaadatok['id'] . "' AND ";
                 if(isset($_GET['vizsgakor']))
                 {
@@ -126,40 +119,5 @@ else
         {
             include("./modules/vizsgak/includes/ismerteto.php");
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*        switch($_GET['param'])
-        {
-            case 'ismerteto' : include("./modules/vizsgak/includes/ismerteto.php"); break;
-            case 'vizsgazas' : include("./modules/vizsgak/includes/vizsgazas.php"); break;
-            case 'megkezdettvizsgak' : include("./modules/vizsgak/includes/ismerteto.php"); break;
-            case 'vizsgalista' : include("./modules/vizsgak/includes/ismerteto.php"); break;
-            case 'kerdeslista' : include("./modules/vizsgak/includes/ismerteto.php"); break;
-            case 'vizsgareszletezo' : include("./modules/vizsgak/includes/ismerteto.php"); break;
-            case 'vizsgaszerkesztese' : include("./modules/vizsgak/includes/ismerteto.php"); break;
-            case 'kerdesszerkesztese' : include("./modules/vizsgak/includes/ismerteto.php"); break;
-        }
-*/
     }
 }
