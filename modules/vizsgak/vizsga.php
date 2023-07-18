@@ -46,7 +46,10 @@ else
     {
         $vizsgaadatok = mysqli_fetch_assoc($kivalasztottvizsga);
         $vizsgaid = $vizsgaadatok['id'];
-        $contextheader = $RootPath . "/uploads/" . $vizsgaadatok['fejleckep'];
+        if($vizsgaadatok['fejleckep'])
+        {
+            $contextheader = $RootPath . "/uploads/" . $vizsgaadatok['fejleckep'];
+        }
 
         if(@$felhasznaloid)
         {

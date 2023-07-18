@@ -211,7 +211,7 @@ else
 
             // Lekérjük a kiválasztott kérdéshez tartozó válaszlehetőségeket
             $valaszlehetosegek = mySQLConnect("SELECT id, helyes, valaszszoveg, kerdes,
-                    (SELECT SUM(vizsgak_valaszlehetosegek.helyes = 1) FROM vizsgak_valaszlehetosegek WHERE kerdes = $kivalasztottkerdesid) AS helyesvalaszszam
+                    (SELECT COUNT(vizsgak_valaszlehetosegek.helyes = 1) FROM vizsgak_valaszlehetosegek WHERE kerdes = $kivalasztottkerdesid) AS helyesvalaszszam
                 FROM vizsgak_valaszlehetosegek
                 WHERE kerdes = $kivalasztottkerdesid;");
 
