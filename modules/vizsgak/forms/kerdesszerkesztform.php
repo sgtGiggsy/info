@@ -1,7 +1,7 @@
 <?php
 if(@$irhat)
 {
-    ?><div class="contentcenter">
+    ?><div class="contentcenter contentcenterpadding">
         <div>
             <form action="<?=$RootPath?>/vizsga/<?=$vizsgaadatok['url']?>/kerdesszerkeszt&action=<?=(isset($_GET['id'])) ? "update" : "addnew" ?>" method="post" enctype="multipart/form-data" onsubmit="return checkKivalasztas();"><?php
                 if(isset($_GET['id']))
@@ -33,27 +33,48 @@ if(@$irhat)
                     $valaszlehetosegszam = count($valaszlehetosegek);
                 }
 
-                for($i = 1; $i <= $valaszlehetosegszam; $i++)
-                {
-                    ?><div>
-                        <label for="valasz-<?=$i?>">Válasz <?=$i?>:<br></label>
-                        <textarea name="valasz[]" id="valasz-<?=$i?>"><?=(count($valaszlehetosegek) > 0) ? $valaszlehetosegek[$i-1]['valaszszoveg'] : "" ?></textarea>
-                        <input type="checkbox"
-                                name="helyes[<?=$i?>]"
-                                id="helyes-<?=$i?>"
-                                value="<?=(count($valaszlehetosegek) > 0) ? $valaszlehetosegek[$i-1]['valaszid'] : $i ?>"
-                                <?=(count($valaszlehetosegek) > 0 && $valaszlehetosegek[$i-1]['helyes']) ? "checked" : "" ?>><?php
-                                if(count($valaszlehetosegek) > 0)
-                                {
-                                    ?><input type ="hidden" id="vid-<?=$i?>" name="vid[<?=$i?>]" value=<?=$valaszlehetosegek[$i-1]['valaszid']?> /><?php
-                                }
-                      ?></div><?php
-                }
+                ?><div class="kerdesthreecol">
+                    <div><h2>Válasz szövege</h2></div>
+                    <div><h2>Helyes válasz</h2></div>
+                    <div><h2>Válasz törlése</h2></div><?php
+
+                    for($i = 1; $i <= $valaszlehetosegszam; $i++)
+                    {
+                        ?><div>
+                            <label for="valasz-<?=$i?>">Válasz <?=$i?>:<br></label>
+                            <textarea name="valasz[]" id="valasz-<?=$i?>"><?=(count($valaszlehetosegek) > 0) ? $valaszlehetosegek[$i-1]['valaszszoveg'] : "" ?></textarea>
+                        </div>
+                        <div>
+                            <label class="customcb cbcenter">
+                                <input type="checkbox"
+                                        name="helyes[<?=$i?>]"
+                                        id="helyes-<?=$i?>"
+                                        value="<?=(count($valaszlehetosegek) > 0) ? $valaszlehetosegek[$i-1]['valaszid'] : $i ?>"
+                                        <?=(count($valaszlehetosegek) > 0 && $valaszlehetosegek[$i-1]['helyes']) ? "checked" : "" ?>><?php
+                                        if(count($valaszlehetosegek) > 0)
+                                        {
+                                            ?><input type ="hidden" id="vid-<?=$i?>" name="vid[<?=$i?>]" value=<?=$valaszlehetosegek[$i-1]['valaszid']?> /><?php
+                                        }
+                                ?><span class="customcbjelolo"></span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="customcb cbcenter">
+                                <input type="checkbox"
+                                        name="torol[<?=$i?>]"
+                                        id="torol-<?=$i?>"
+                                        value="<?=(count($valaszlehetosegek) > 0) ? $valaszlehetosegek[$i-1]['valaszid'] : $i ?>">
+                                <span class="customcbjelolo"></span>
+                            </label>
+                        </div><?php
+                    }
                 for($divid = 1; $divid < 5; $divid++)
                 {
-                    ?><div id="pluszkerdes-<?=$divid?>"></div><?php
+                    ?><div id="pluszkerdes-<?=$divid?>" style="display: none;"></div>
+                    <div id="pluszhelyes-<?=$divid?>" style="display: none;"></div>
+                    <div id="plusztorles-<?=$divid?>" style="display: none;"></div><?php
                 }
-                
+                ?></div><?php
                 ?><div class="submit"><input type="submit" value="<?=$button?>"></div>
                 <div class="submit"><button id="button-valasz" type="button" onclick="addUjValasz(); return false;">Újabb válaszlehetőség hozzáadása</button></div>
                 <?php cancelForm(); ?>
@@ -62,13 +83,22 @@ if(@$irhat)
     </div>
         
     <div id="kerdestoadd" style="display: none">
-        <label id="label-<?=$i?>" for="valasz-<?=$i?>">Válasz <?=$i?>:<br></label>
-        <textarea name="valasz[]" id="valasz-<?=$i?>"></textarea>
-        <input type="checkbox"
-                name="helyes[<?=$i?>]"
-                id="helyes-<?=$i?>"
-                value="<?=$i?>" />
+        <div id='pluszlabel'>
+            <label id="label-<?=$i?>" for="valasz-<?=$i?>">Válasz <?=$i?>:<br></label>
+            <textarea name="valasz[]" id="valasz-<?=$i?>"></textarea>
+        </div>
+        <div id='pluszcheckbox'>
+            <label class="customcb cbcenter">
+                <input type="checkbox"
+                        name="helyes[<?=$i?>]"
+                        id="helyes-<?=$i?>"
+                        value="<?=$i?>" />
+                <span class="customcbjelolo"></span>
+            </label>
+        </div>
+        <div id='pluszcbdel'></div>
     </div>
+
     <script type="text/javascript"><?php
         if($szemelyes['szinsema'] == "dark")
         {
@@ -100,13 +130,24 @@ if(@$irhat)
             var textarea = document.getElementById('valasz-' + kovetkezokerdes);
             var checkbox = document.getElementById('helyes-' + kovetkezokerdes);
 
-            var origselect = document.querySelector('#kerdestoadd');
-            var clone = origselect.cloneNode(true);
+            var origlabel = document.querySelector('#pluszlabel');
+            var clonelabel = origlabel.cloneNode(true);
+            var origcheckbox = document.querySelector('#pluszcheckbox');
+            var clonecheckbox = origcheckbox.cloneNode(true);
+            var origcbdel = document.querySelector('#pluszcbdel');
+            var clonecbdel = origcbdel.cloneNode(true);
             //var label = clone.getElementById('ujvalaszlabel');
             
             //console.log(clone);
             var elem = document.getElementById('pluszkerdes-' + kovetkezopluszkerdes);
-            elem.innerHTML = clone.innerHTML;
+            elem.innerHTML = clonelabel.innerHTML;
+            elem.style.display = 'unset';
+            var elem2 = document.getElementById('pluszhelyes-' + kovetkezopluszkerdes);
+            elem2.innerHTML = clonecheckbox.innerHTML;
+            elem2.style.display = 'unset';
+            var elem3 = document.getElementById('plusztorles-' + kovetkezopluszkerdes);
+            elem3.innerHTML = clonecbdel.innerHTML;
+            elem3.style.display = 'unset';
 
             kovetkezokerdes++;
             kovetkezopluszkerdes++;

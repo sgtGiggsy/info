@@ -109,13 +109,21 @@ else
             }
             if(isset($_POST['vid'][$i]))
             {
-                $stmt = $con->prepare('UPDATE vizsgak_valaszlehetosegek SET valaszszoveg=?, helyes=? WHERE id=?');
-                $stmt->bind_param('ssi', $_POST['valasz'][$i-1], $helyes, $_POST['vid'][$i]);
-                $stmt->execute();
-                if(mysqli_errno($con) != 0)
+                if(isset($_POST['torol'][$i]))
                 {
-                    echo "<h2>A válasz hozzáadása sikertelen!<br></h2>";
-                    echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+                    $torolid = $_POST['torol'][$i];
+                    mySQLConnect("DELETE FROM vizsgak_valaszlehetosegek WHERE id = $torolid;");
+                }
+                else
+                {
+                    $stmt = $con->prepare('UPDATE vizsgak_valaszlehetosegek SET valaszszoveg=?, helyes=? WHERE id=?');
+                    $stmt->bind_param('ssi', $_POST['valasz'][$i-1], $helyes, $_POST['vid'][$i]);
+                    $stmt->execute();
+                    if(mysqli_errno($con) != 0)
+                    {
+                        echo "<h2>A válasz hozzáadása sikertelen!<br></h2>";
+                        echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+                    }
                 }
             }
             else
