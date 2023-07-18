@@ -200,8 +200,11 @@ ol, ul {
 }
 
 .contentcenter div {
-    /*padding: 1em 0 0 0;*/
     margin: 0 auto;
+}
+
+.contentcenterpadding div {
+    padding: 1em 0 0 0;
 }
 
 .contentleft {
@@ -624,6 +627,27 @@ div[id^=kep-].shrink img {
 
 .hibastipp {
     color: red;
+}
+
+.kerdesthreecol {
+    display: grid;
+    grid-template-columns: 40vw 150px 150px;
+    grid-gap: 1em;
+    padding: 1em;
+}
+
+.kerdesthreecol div {
+    width: 100%;
+    
+}
+
+.kerdesthreecol input[type="text"] {
+    width: 100%;
+    margin: 1em;
+}
+
+.cbcenter {
+    margin: 30% 40%;
 }
 
 .menucard, .menucard-child {
