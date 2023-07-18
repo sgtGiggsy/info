@@ -103,7 +103,7 @@ body {
     justify-content: center;
     background-color: var(--menu);
     grid-template-columns: minmax(50px, 200px) 1fr 1fr;
-    grid-template-rows: 50px minmax(500px, 1fr) minmax(0px, 200px) 30px;
+    grid-template-rows: 50px minmax(0, max-content) minmax(500px, 2fr) minmax(0px, 200px) 30px;
     min-height: 100vh;
     margin: 0;
 }
@@ -171,6 +171,7 @@ ol, ul {
 .content {
     display: flex;
     flex-direction: column;
+    flex: 1;
     padding: 1em;
     background-color: var(--contentbg);
     /*justify-content: center;*/
@@ -178,8 +179,8 @@ ol, ul {
     box-shadow: 2px 2px 5px var(--shadow);
     grid-column-start: 2;
     grid-column-end: 4;
-    grid-row-start: 2;
-    grid-row-end: 4;
+    grid-row-start: 3;
+    grid-row-end: 5;
 }
 
 .contentcenter {
@@ -601,6 +602,18 @@ div[id^=kep-].shrink img {
     font-size: 1.1em;
 }
 
+.vizsgalablec {
+    align-self: flex-end;
+    display: block;
+    margin: auto auto 0 auto;
+    padding-top: 1em;
+}
+
+.vizsgalablec div {
+    width: 80vw;
+    margin: 0 auto;
+}
+
 .talalat, .helyes {
     color: green;
 }
@@ -690,8 +703,8 @@ div[id^=kep-].shrink img {
     overflow-wrap: break-word;
     text-align: justify;
     min-width: 40ch;
-    max-width: 600px;
-    max-width: fit-content;
+    max-width: 60vw;
+    /*max-width: fit-content;*/
 }
 
 .szovegtartalom ul {
@@ -1477,6 +1490,23 @@ td img {
     color: var(--linkhover);
 }
 
+.contextheader {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 2;
+    grid-row-end: 3;
+}
+
+.contextheader img {
+    position: absolute;
+    top: 150px;
+    bottom: 0;
+    margin: auto;
+}
+
 /* ------------------------------- Lábléc ------------------------------- */
 .bottom-line, .bottom-line a {
     height: 30px;
@@ -1487,8 +1517,8 @@ td img {
     background-color: var(--footerbg);
     grid-column-start: 1;
     grid-column-end: 4;
-    grid-row-start: 4;
-    grid-row-end: 5;
+    grid-row-start: 5;
+    grid-row-end: 6;
 }
 
 /* ------------------------------- Főmenü ------------------------------- */
@@ -1502,7 +1532,7 @@ td img {
     grid-column-start: 1;
     grid-column-end: 2;
     grid-row-start: 2;
-    grid-row-end: 4;
+    grid-row-end: 5;
 }
 
 .leftmenuarea {
@@ -1731,6 +1761,10 @@ td img {
 }
 
 /* Közlemények */
+.kozlemenyek {
+    margin: 0 auto;
+}
+
 .kozlemenyfej, .kozlemenyfej a {
     text-decoration: none;
     font-weight: bold;

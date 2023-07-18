@@ -24,9 +24,15 @@
 		?></div>
 
 		<!-- Fejléc -->
-		<div class="topmenubase" id="topmenuelement"><?php include('./templates/header.tpl.php'); ?></div>
+		<div class="topmenubase" id="topmenuelement"><?php include('./templates/header.tpl.php'); ?></div><?php
 
-		<!-- Menürész -->
+		if(@$contextheader)
+		{
+			?><!-- Kontextus fejléc -->
+			<div class="contextheader" id="contextheader"><img src="<?=$contextheader?>"></div><?php
+		}
+
+		?><!-- Menürész -->
 		<?php $menuterulet = 1; include('./includes/menu.inc.php'); ?>		
 
 		<!-- Lábléc -->

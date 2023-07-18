@@ -8,7 +8,8 @@ if(@$irhat)
                 <div>
                     <label for="udvozloszoveg">Üdvözlőszöveg:
                     <textarea name="udvozloszoveg" id="udvozloszoveg"><?=$udvozloszoveg?></textarea></label>
-                </div><div>
+                </div>
+                <div>
                     <label for="vendegudvozlo">Üdvözlőszöveg be nem jelentkezett felhasználók részére:
                     <textarea name="vendegudvozlo" id="vendegudvozlo"><?=$vendegudvozlo?></textarea></label>
                 </div>

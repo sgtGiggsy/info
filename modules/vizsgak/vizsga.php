@@ -46,6 +46,7 @@ else
     {
         $vizsgaadatok = mysqli_fetch_assoc($kivalasztottvizsga);
         $vizsgaid = $vizsgaadatok['id'];
+        $contextheader = $RootPath . "/uploads/" . $vizsgaadatok['fejleckep'];
 
         if(@$felhasznaloid)
         {
@@ -89,7 +90,7 @@ else
                 }
             }
         }
-   
+
         if(isset($_GET['param']))
         {
             $aloldal = $_GET['param'];
@@ -119,5 +120,8 @@ else
         {
             include("./modules/vizsgak/includes/ismerteto.php");
         }
+        ?><div class="vizsgalablec">
+            <div><?=$vizsgaadatok['leiras']?></div>
+        </div><?php
     }
 }
