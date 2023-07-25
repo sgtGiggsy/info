@@ -18,7 +18,16 @@ header('Pragma: no-cache');
 //header("Content-Security-Policy-Report-Only: script-src 'nonce-{RANDOM}' 'strict-dynamic';");
 
 // Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
-$page = null; $id = null; $current = null; $loginsuccess = false;
+$page = $id = $current = $felhasznaloid = null; $loginsuccess = false;
+
+foreach($_GET as $key => $value)
+{
+    $value = trim($value);
+    $value = strip_tags($value);
+    $value = str_replace(array("\r\n", "\r", "\n", "'", "\"", "<", ">", ";", ":", "(", ")"), "", $value);
+    $_GET[$key] = $value;
+}
+
 if(isset($_GET['page']))
 {
     $page = $_GET['page'];
@@ -26,11 +35,8 @@ if(isset($_GET['page']))
 
 	if($page == "kilep")
 	{
-        $kerdesid = $_SESSION[getenv('SESSION_NAME').'kerdesid'];
         session_destroy();
         session_start();
-        $_SESSION[getenv('SESSION_NAME')."id"] = false;
-        $_SESSION[getenv('SESSION_NAME').'kerdesid'] = $kerdesid;
 		header("Location: $RootPath/index.php");
 		die();
 	}
