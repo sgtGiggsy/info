@@ -1317,8 +1317,55 @@ td img {
     grid-column-end: 3;
 }
 
-.kereses button {
-    max-width: 7ch;
+.felkormezo {
+    position: relative;
+    align-items: center;
+    overflow: hidden;
+    background-color: var(--cardbase);
+    border: 1px solid var(--toasterbg);
+    border-radius: 40px;
+    box-shadow: inset 0 1px 2px var(--shadow);
+    color: var(--fontlight2);
+    padding: 0 0 0 1em;
+    height: 2.2em;
+    margin-left: 0.5em;
+    display: flex;
+    flex-direction: row;
+}
+
+.felkormezo input {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    font-size: 1.1em;
+}
+
+.felkormezo input:focus {
+    outline: none;
+}
+
+.felkormezo input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px var(--cardbase) inset;
+    -webkit-text-fill-color: var(--fontlight2);
+}
+
+.felkormezo button {
+    background-color: var(--thead);
+    border: none;
+    border-left: 1px solid var(--toasterbg);
+    border-radius: 0 40px 40px 0;
+    color: var(--fontlight2);
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.felkormezo svg {
+    pointer-events: none;
+    display: block;
+    width: 1.2em;
+    height: 1.2em;
+    margin: 0 0.3em 0 0.3em;
+    fill: var(--basefont);
 }
 
 .topmenuszoveges {

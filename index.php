@@ -380,6 +380,8 @@ if(!isset($currentpage))
     $currentpage['url'] = $_GET['page'];
     $currentpage['oldal'] = $_GET['page'];
     $currentpage['cimszoveg'] = "Oldal";
+    $currentpage['gyujtocimszoveg'] = "Oldal";
+    $currentpage['aktiv'] = 3;
 }
 
 // Szükség esetén 404-es hibaoldal generálása
