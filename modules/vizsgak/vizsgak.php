@@ -6,7 +6,8 @@ $csoportfilter = "csoportfilter";
 $vizsgak = mySQLConnect("SELECT felhasznalok.id AS szerkesztoid,
         vizsgak_vizsgak.url AS vizsgaurl,
         felhasznalok.nev AS vizsgaadmin,
-        vizsgak_vizsgak.nev AS vizsganev
+        vizsgak_vizsgak.nev AS vizsganev,
+        eles
     FROM vizsgak_vizsgak
         LEFT JOIN vizsgak_adminok ON vizsgak_adminok.vizsga = vizsgak_vizsgak.id
         LEFT JOIN felhasznalok ON vizsgak_adminok.felhasznalo = felhasznalok.id
@@ -64,12 +65,16 @@ if(@$mindir)
 
             foreach($vizsgak as $vizsga)
             {
-                if($elozovizsga != $vizsga['vizsganev'])
+                if($mindir || $vizsga['eles'] || $vizsga['szerkesztoid'] == $felhasznaloid)
                 {
-                    $elozovizsga = $vizsga['vizsganev'];
-                    ?><tr>
-                        <td colspan=<?=count($oszlopok)?> class="telefonkonyvelvalaszto"><a href="<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/ismerteto" style="width: 100%; height: 100%; display: block;"><?=$vizsga['vizsganev']?></a></td>
-                    </tr><?php
+                    if($elozovizsga != $vizsga['vizsganev'])
+                    {
+                        $elozovizsga = $vizsga['vizsganev'];
+                    
+                        ?><tr>
+                            <td colspan=<?=count($oszlopok)?> class="telefonkonyvelvalaszto"><a href="<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/ismerteto" style="width: 100%; height: 100%; display: block;"><?=$vizsga['vizsganev']?></a></td>
+                        </tr><?php
+                    }
                 }
                 if($mindir)
                 {

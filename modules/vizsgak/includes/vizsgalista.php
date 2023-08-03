@@ -19,8 +19,9 @@ else
         $kereses = " AND nev LIKE '%$keres%'";
     }
 
-    $where = "WHERE vizsgak_kitoltesek.befejezett = 1 AND $korvizsgaszures $kereses";
-    $kitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.id as sorszam,
+    $where = "WHERE vizsgak_kitoltesek.befejezett = 1 AND $korvizsgaszures $kereses $vizsgaelszures";
+    $kitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.folyoszam as sorszam,
+            vizsgak_kitoltesek.id as id,
             ROUND(SUM(
                 IF((vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes)
                     OR (vizsgak_kitoltesvalaszok.valasz2 = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes)
@@ -68,7 +69,7 @@ else
         ?><table id='vizsgalista'>
             <thead>
                 <tr>
-                    <th class="tsorth" onclick="sortTable(0, 'i', 'vizsgalista')">Sorszám</th>
+                    <th class="tsorth" onclick="sortTable(0, 'i', 'vizsgalista')">Folyószám</th>
                     <th class="tsorth" onclick="sortTable(1, 's', 'vizsgalista')">Vizsgázó</th>
                     <th class="tsorth" onclick="sortTable(2, 'i', 'vizsgalista')">Megválaszolt kérdések</th>
                     <th class="tsorth" onclick="sortTable(3, 'i', 'vizsgalista')">Helyes válaszok</th>
@@ -87,7 +88,7 @@ else
                         $szazalek = round($x['helyes']/$x['ossz']*100, 2);
                     }
                     
-                    ?><tr style="<?=($x['helyes'] < $vizsgaadatok['minimumhelyes']) ? 'color:red' : 'color:green' ?>" class='kattinthatotr' data-href='./vizsgareszletezo/<?=$x['sorszam']?>'>
+                    ?><tr style="<?=($x['helyes'] < $vizsgaadatok['minimumhelyes']) ? 'color:red' : 'color:green' ?>" class='kattinthatotr' data-href='./vizsgareszletezo/<?=$x['id']?>'>
                         <td><?=$x['sorszam']?></td>
                         <td><?=$x['nev']?></td>
                         <td><?=$x['ossz']?></td>

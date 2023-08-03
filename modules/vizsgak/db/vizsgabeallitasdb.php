@@ -50,8 +50,8 @@ if(isset($irhat) && $irhat)
             $fajlid = $fajllista[0];
         }
 
-        $stmt = $con->prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=? WHERE id=?');
-        $stmt->bind_param('sssssssssssi', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['vizsgaid']);
+        $stmt = $con->prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=?, eles=? WHERE id=?');
+        $stmt->bind_param('ssssssssssssi', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['vizsgaid']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

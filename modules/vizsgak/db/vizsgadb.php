@@ -14,9 +14,22 @@ else
     {
         $jelenkor = mySQLConnect("SELECT MAX(id) AS maxid FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid;");
         $jelenkor = mysqli_fetch_assoc($jelenkor)['maxid'];
+        if($vizsgaeles)
+        {
+            $utolsovizsga = mySQLConnect("SELECT folyoszam FROM vizsgak_kitoltesek WHERE vizsgakor = $jelenkor ORDER BY id DESC LIMIT 1;");
+            $utolsovizsga = mysqli_fetch_assoc($utolsovizsga)['folyoszam'];
+            $segments = explode("/", $utolsovizsga);
+            $lastfolyoszam = $segments[2];
+            $lastfolyoszam++;
+            $folyoszam = date('Y') . "/" . $vizsgaid . "/" . $lastfolyoszam;
+        }
+        else
+        {
+            $folyoszam = null;
+        }
         
-        $stmt = $con->prepare('INSERT INTO vizsgak_kitoltesek (vizsgakor, felhasznalo) VALUES (?, ?)');
-        $stmt->bind_param('ss', $jelenkor, $felhasznaloid);
+        $stmt = $con->prepare('INSERT INTO vizsgak_kitoltesek (vizsgakor, felhasznalo, folyoszam) VALUES (?, ?, ?)');
+        $stmt->bind_param('sss', $jelenkor, $felhasznaloid, $folyoszam);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

@@ -14,7 +14,7 @@ else
             vizsgak_vizsgakorok.id AS vizsgakorid
         FROM vizsgak_kitoltesek
             INNER JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
-        WHERE felhasznalo = $felhasznaloid AND $korvizsgaszures
+        WHERE felhasznalo = $felhasznaloid AND $korvizsgaszures $vizsgaelszures
         ORDER BY vizsgak_kitoltesek.id DESC;");
     $kitoltesszam = mysqli_num_rows($korabbikitoltesek);
 

@@ -20,7 +20,7 @@ else
         <table>
             <thead>
                 <tr>
-                    <th>Azonosító</th>
+                    <th>Sorszam</th>
                     <th>Kérdés</th>
                     <th>Megválaszolva</th>
                     <th>Helyes</th>
@@ -29,6 +29,7 @@ else
             </thead>
             <tbody>
         <?php
+            $kerdessorszam = mysqli_num_rows($kerdeseklistaja);
             foreach ($kerdeseklistaja as $x)
             {
                 $id = $x['kerdid'];
@@ -38,12 +39,13 @@ else
                     $helyesszazalek = round($x['helyes']/$x['kerdesszam']*100, 2);
                 }
                 ?><tr class='kattinthatotr' data-href='./kerdesszerkeszt/<?=$id?>'>
-                    <td><?=$id?></td>
+                    <td><?=$kerdessorszam?></td>
                     <td><?=$x['kerdes']?></td>
                     <td><?=$x['kerdesszam']?></td>
                     <td><?=$x['helyes']?></td>
                     <td><?=$helyesszazalek?></td>
                 </tr><?php
+                $kerdessorszam--;
             }
             ?></tbody>
         </table>

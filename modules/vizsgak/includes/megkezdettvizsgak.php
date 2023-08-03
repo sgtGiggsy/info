@@ -6,7 +6,8 @@ if(!$contextmenujogok['admin'])
 }
 else
 {
-    $kitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.id as sorszam,
+    $kitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.folyoszam as sorszam,
+            vizsgak_kitoltesek.id as id,
             ROUND(SUM(
                 IF((vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes)
                     OR (vizsgak_kitoltesvalaszok.valasz2 = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes)
@@ -22,7 +23,7 @@ else
             LEFT JOIN vizsgak_valaszlehetosegek ON vizsgak_valaszlehetosegek.kerdes = vizsgak_kerdesek.id
             LEFT JOIN felhasznalok ON vizsgak_kitoltesek.felhasznalo = felhasznalok.id
             LEFT JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
-        WHERE vizsgak_kitoltesek.befejezett IS NULL AND vizsgak_vizsgakorok.vizsga = $vizsgaid AND vizsgak_vizsgakorok.sorszam = (SELECT MAX(sorszam) FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid)
+        WHERE vizsgak_kitoltesek.befejezett IS NULL AND vizsgak_vizsgakorok.vizsga = $vizsgaid AND vizsgak_vizsgakorok.sorszam = (SELECT MAX(sorszam) FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid) $vizsgaelszures
         GROUP BY vizsgak_kitoltesek.id
         ORDER BY vizsgak_kitoltesek.id DESC;");
 
@@ -41,7 +42,7 @@ else
         <table id='vizsgalista'>
             <thead>
                 <tr>
-                    <th class="tsorth" onclick="sortTable(0, 'i', 'vizsgalista')">Sorszám</th>
+                    <th class="tsorth" onclick="sortTable(0, 'i', 'vizsgalista')">Folyószám</th>
                     <th class="tsorth" onclick="sortTable(1, 's', 'vizsgalista')">Vizsgázó</th>
                     <th class="tsorth" onclick="sortTable(2, 'i', 'vizsgalista')">Megválaszolt kérdések</th>
                     <th class="tsorth" onclick="sortTable(3, 'i', 'vizsgalista')">Helyes válaszok</th>
@@ -60,7 +61,7 @@ else
                         $szazalek = round($x['helyes']/$x['ossz']*100, 2);
                     }
                     
-                    ?><tr style="<?=($x['helyes'] < $vizsgaadatok['minimumhelyes']) ? 'color:red' : 'color:green' ?>" class='kattinthatotr' data-href='./vizsgareszletezo/<?=$x['sorszam']?>'>
+                    ?><tr style="<?=($x['helyes'] < $vizsgaadatok['minimumhelyes']) ? 'color:red' : 'color:green' ?>" class='kattinthatotr' data-href='./vizsgareszletezo/<?=$x['id']?>'>
                         <td><?=$x['sorszam']?></td>
                         <td><?=$x['nev']?></td>
                         <td><?=$x['ossz']?></td>

@@ -33,6 +33,7 @@ else
             ismetelheto,
             maxismetles,
             leiras,
+            eles,
             feltoltesek.fajl AS fejleckep
     FROM vizsgak_vizsgak
         LEFT JOIN feltoltesek ON vizsgak_vizsgak.fejleckep = feltoltesek.id
@@ -46,9 +47,19 @@ else
     {
         $vizsgaadatok = mysqli_fetch_assoc($kivalasztottvizsga);
         $vizsgaid = $vizsgaadatok['id'];
+        $vizsgaeles = $vizsgaadatok['eles'];
         if($vizsgaadatok['fejleckep'])
         {
             $contextheader = $RootPath . "/uploads/" . $vizsgaadatok['fejleckep'];
+        }
+
+        if($vizsgaeles)
+        {
+            $vizsgaelszures = "AND vizsgak_kitoltesek.folyoszam IS NOT NULL";
+        }
+        else
+        {
+            $vizsgaelszures = "AND vizsgak_kitoltesek.folyoszam IS NULL";
         }
 
         if(@$felhasznaloid)
@@ -94,7 +105,11 @@ else
             }
         }
 
-        if(isset($_GET['param']))
+        if(!$vizsgaeles && !@$contextmenujogok['vizsgalista'])
+        {
+            echo "<h2>Nincs jogosultságod ennek a vizsgának a megtekintéséhez!</h2>";
+        }
+        elseif(isset($_GET['param']))
         {
             $aloldal = $_GET['param'];
             $page = @fopen("./modules/vizsgak/includes/$aloldal.php", "r");
