@@ -106,7 +106,7 @@ else
     }
 
     ?><div class="oldalcim">Munkalista
-    <div class="right">
+    <div class="szuresvalaszto">
         <form method="POST">
             <label for="oldalankent" style="font-size: 14px">Oldalanként</label>
                 <select id="oldalankent" name="oldalankent" onchange="this.form.submit()">

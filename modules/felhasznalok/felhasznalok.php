@@ -88,7 +88,7 @@ else
         </div><?php
     }
     ?><div class='oldalcim'>Felhasználók listája
-        <div class="right">
+        <div class="szuresvalaszto">
             <form action="felhasznalok" method="POST">
                 <label for="oldalankent" style="font-size: 14px">Oldalanként</label>
                     <select id="oldalankent" name="oldalankent" onchange="this.form.submit()">

@@ -27,15 +27,34 @@ if(@$irhat)
 
                 ?><div>
                     <label>Színséma</label><br>
-                    <select name="szinsema">
-                        <option value="">Alapértelmezett</option>
-                        <option value="dark" <?=(isset($szemelyes['szinsema']) && $szemelyes['szinsema'] == "dark") ? "selected" : "" ?>>Sötét</option>
-                    </select>
+                    <div class="kapcsolo toggle <?=(isset($szemelyes['szinsema']) && $szemelyes['szinsema'] == "dark") ? "on" : "off" ?>" onclick="this.classList.toggle(`off`);this.classList.toggle(`on`);switchNightMode();">
+                        <input type="hidden" name="szinsema" id="szinsemahidden" value="">
+                        <input type="checkbox" name="szinsema" id="szinsema" value="dark" <?=(isset($szemelyes['szinsema']) && $szemelyes['szinsema'] == "dark") ? "checked" : "" ?>>
+                    </div>
                 </div>
+
+                
 
                 <div class="submit"><input type="submit" value='<?=$button?>'></div>
             </form>
             <?= cancelForm() ?>
         </div>
-    </div><?php
+    </div>
+    
+    <script>
+        function switchNightMode()
+        {
+            var nightmode = document.getElementById('szinsema').checked;
+            if(nightmode)
+            {
+                document.getElementById('szinsema').checked = false;
+            }
+            else
+            {
+                document.getElementById('szinsema').checked = true;
+            }
+        }
+    </script>
+    
+    <?php
 }
