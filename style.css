@@ -617,6 +617,53 @@ div[id^=kep-].shrink img {
     margin: 0 auto;
 }
 
+#hatralevoido {
+    background-color: var(--toasterbg);
+    box-shadow: 0px 0px 10px 1px var(--shadow);
+    padding: 0.3em 1em;
+    color: var(--fontlight2);
+    font-size: 2em;
+    font-weight: bold;
+    position: fixed;
+    bottom: 2em;
+    right: 2em;
+}
+
+#lejartido {
+    visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1000px;
+    height: 600px;
+    background-color: var(--toasterbg);
+    opacity: 0.9;
+    color: var(--fontlight2);
+    text-align: center;
+    border-radius: 2px;
+    position: fixed;
+    margin: auto;
+    z-index: 1;
+    left: calc(50% - 500px);
+    bottom: calc(50% - 300px);
+}
+  
+#lejartido.show {
+    visibility: visible;
+    -webkit-animation: lejartfadein 1s;
+    animation: lejartfadein 1s;
+}
+
+  @-webkit-keyframes lejartfadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: calc(50% - 300px); opacity: 0.9;}
+  }
+  
+  @keyframes lejartfadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: calc(50% - 300px); opacity: 0.9;}
+  }
+
 .talalat, .helyes {
     color: green;
 }
@@ -1646,11 +1693,9 @@ td img {
 }
 
 /* Fejléc lenyíló elemei */
-#profilpopup, #notifpopup, #korabbikorok {
+#profilpopup, #notifpopup, #korabbikorok, #megvalaszoltkerdesek {
     background-color: var(--headpopupbg);
     box-shadow: -3px 3px 5px var(--shadow);
-    display: flex;
-    flex-direction: column;
     visibility: hidden;
     font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
     color: var(--fontlight);
@@ -1658,6 +1703,11 @@ td img {
     position: absolute;
     z-index: 99;
     top: 50px;
+}
+
+#profilpopup, #notifpopup, #korabbikorok {
+    display: flex;
+    flex-direction: column;
 }
 
 #profilpopup {
@@ -1694,7 +1744,7 @@ td img {
     border-radius: 100px;
 }
 
-#profilpopup a, #korabbikorok a {
+#profilpopup a, #korabbikorok a, #megvalaszoltkerdesek a {
     padding: 12px 20px 12px 20px;
     background-color: var(--headpopupbg);
     text-decoration: none;
@@ -1725,12 +1775,12 @@ td img {
     color: var(--fontlight);
 }
 
-#profilpopup a:hover, #korabbikorok a:hover {
+#profilpopup a:hover, #korabbikorok a:hover, #megvalaszoltkerdesek a:hover {
     color: var(--linkhover);
     background-color: var(--menuhover);
 }
 
-#profilpopup.show, #notifpopup.show, #korabbikorok.show {
+#profilpopup.show, #notifpopup.show, #korabbikorok.show, #megvalaszoltkerdesek.show {
     visibility: visible;
 }
 
@@ -2042,8 +2092,26 @@ td img {
 
 .buttondropdown div {
     position: absolute;
-    right: 0;
     top: 1.6em;
+}
+
+#megvalaszoltkerdesek {
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+}
+
+#megvalaszoltkerdesek div {
+    position: unset;
+    padding: 10px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#megvalaszoltkerdesek a {
+    padding: 10px 20px 10px 20px;
 }
 
 /* Szerkesztő gombok */

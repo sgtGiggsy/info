@@ -80,6 +80,26 @@ else
     }
     else
     {
+        if($vizsgaadatok['vizsgaido'] && $vizsgaadatok['vizsgaido'] > 0)
+        {
+            $hatralevoido = $vizsgaadatok['vizsgaido'] * 60;
+            $hatralevoido -= time() - strtotime($legutobbikitoltes['kitoltesideje']);
+
+            if($hatralevoido <= 0)
+            {
+                $_GET['action'] = "finalize";
+                $_POST['kitoltesid'] = $kitoltesid;
+                $irhat = true;
+                
+                include("./modules/vizsgak/db/vizsgadb.php");
+                header("Location: ./vizsgareszletezo/$kitoltesid");
+            }
+        }
+        else
+        {
+            $hatralevoido = false;
+        }
+        
         // Ha volt válaszbeküldés, meghívjuk az adatbázis kezeléséért felelős fájlt
         if(isset($_GET['action']))
         {
@@ -219,14 +239,14 @@ else
             ?><div class="contentcenter">
                 <div class="vizsgacard">
                     <div class="szerkcardtitle">
-                        <div><?=$valaszelemsorszam?>/<?=$osszkerdesszam?> kérdés</div>
+                        <div><?=$valaszelemsorszam?>/<?=$vizsgaadatok['kerdesszam']?> kérdés</div>
                         <div class="buttondropdown">
-                            <span style="cursor: pointer;" onclick="showPopup('korabbikorok')">⮟</span>
-                            <div id="korabbikorok" onmouseleave="hidePopup('korabbikorok')"><?php
+                            <span style="cursor: pointer;" onclick="showPopup('megvalaszoltkerdesek')">⮟</span>
+                            <div id="megvalaszoltkerdesek" onmouseleave="hidePopup('megvalaszoltkerdesek')"><?php
                                 $sorszam = 1;
                                 foreach($tesztvalaszlista as $tesztvalasz)
                                 {
-                                    ?><p <?=(!$tesztvalasz['valasz']) ? "style='font-style: italic;'" : "" ?>><a href='./vizsgazas<?=($osszkerdesszam != $sorszam) ? "?kerdessorszam=$sorszam" : "" ?>'><?=$sorszam?>. kérdés</a></p><?php
+                                    ?><div <?=(!$tesztvalasz['valasz']) ? "style='font-style: italic;'" : "" ?>><a href='./vizsgazas<?=($osszkerdesszam != $sorszam) ? "?kerdessorszam=$sorszam" : "" ?>'><?=$sorszam?>. kérdés</a></div><?php
                                     if(!$tesztvalasz['valasz'])
                                     {
                                         $valasznelkul++;
@@ -252,9 +272,8 @@ else
                             {
                                 ?><a href="./vizsgazas?kerdessorszam=<?=$valaszelemsorszam+1?>">Következő kérdés >></a><?php
                             }
-                            ?></div><?php
-                            //if(array_key_last($tesztvalaszlista))
-                        ?></div>
+                            ?></div>
+                        </div>
                         <div class="vizsgakerdeskep"><?=($kivalasztottkerdes['kepurl']) ? "<img src='$RootPath" . '/uploads/' . $kivalasztottkerdes['kepurl'] . "'>" : "" ?></div>
                         <div class="vizsgakerdesszoveg"><?=$kivalasztottkerdes['kerdes']?></div>
                         <form action='./vizsgazas?action=answerquestion<?=$kerdeshezlep?><?=$ujkerdes?>' method='POST' onsubmit="beKuld.disabled = true; return true;">
@@ -288,7 +307,7 @@ else
                         if($viszgalezarhato)
                         {
                             ?><form action='./vizsgazas?action=finalize' method='POST'>
-                                <input type ="hidden" id="kitoltesid" name="kitoltesid" value=<?=$kitoltesid?> />
+                                <input type ="hidden" id="kitoltesid" name="kitoltesid" value='<?=$kitoltesid?>' />
                                 <div class="submit"><input type="submit" value="Válaszok véglegesítése, vizsga befejezése" onclick="return confirm('Biztosan szeretnéd véglegesíteni a válaszaidat?\nEzt követően már nem fogod tudni módosítani őket.')"></div>
                             </form><?php
                             if((!isset($_GET['kerdessorszam']) && $valasznelkul != 1) || (!isset($_GET['kerdessorszam']) && $valasznelkul > 1) || isset($_GET['kerdessorszam']))
@@ -307,12 +326,78 @@ else
                         }
                     ?></div>
                 </div>
-            </div>
-            <script>
+            </div><?php
+            if($hatralevoido)
+            {
+                ?><div id="hatralevoido" class="hatralevoido"></div>
+                <div id="lejartido">
+                    <div>
+                        <h2>Lejárt a vizsgára kapott idő!</h2><br>
+                        <p>További kérdések megválaszolására nincs lehetőség.</p>
+                        <p>Átirányítunk a vizsga kiértékelése oldalra.</p>
+                    </div>
+                </div><?php
+            }
+            
+            ?><script><?php
+
+                if($hatralevoido)
+                {
+                    ?>
+                        document.addEventListener("DOMContentLoaded", visszaSzamlalo);
+                    <?php
+                }
+                ?>
+
                 function halasztKuldSwitch()
                 {
                     var kuldgomb = document.getElementById('valaszkuld');
                     kuldgomb.value = 'Válasz beküldése';
+                }
+
+                var ido = <?=$hatralevoido?>;
+                function visszaSzamlalo()
+                {
+                    var perc = Math.floor(ido / 60);
+                    var masodperc = ido % 60;
+                    var idoString = String(perc).padStart(2, 0) + ":" + String(masodperc).padStart(2, 0);
+                    document.getElementById('hatralevoido').innerHTML = idoString;
+                    if(ido > 0)
+                    {
+                        if(ido < 60)
+                        {
+                            document.getElementById('hatralevoido').style.background = "var(--offline)";
+                        }
+                        ido--;
+                        setTimeout("visszaSzamlalo()", 1000);
+                    }
+                    else
+                    {
+                        document.getElementById('valaszkuld').disabled = true;
+                        document.getElementById('valaszkuld').value = 'Válasz beküldése';
+                        document.getElementById('hatralevoido').style.visibility = 'hidden';
+                        var x = document.getElementById("lejartido");
+                        x.className = "show";
+                        vizsgaVeglegesit();
+                    }
+                }
+
+                function vizsgaVeglegesit()
+                {
+                    console.log("Vizsga véglegesítése");
+                    var data = new FormData();
+                    data.append('kitoltesid', '<?=$kitoltesid?>');
+
+                    let xhr = new XMLHttpRequest();
+                    xhr.open("POST", "./vizsgazas?action=finalize", true);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                    xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        setTimeout("window.location.replace('./vizsgareszletezo/<?=$kitoltesid?>')", 5000);
+                    }};
+
+                    xhr.send(data);
                 }
             </script><?php
         }

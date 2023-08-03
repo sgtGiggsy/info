@@ -55,7 +55,7 @@ else
         <div class="oldalcim">Vizsgák
             <div class="szuresvalaszto">
                 <form action="<?=$vizsgalistaurl?>" method="GET">
-                    <label for="vizsgakor" style="font-size: 14px">Vizsgakör kiválasztása</label>
+                    <label for="vizsgakor" style="font-size: 14px">Vizsgaperiódus kiválasztása</label>
                     <select id="vizsgakor" name="vizsgakor" onchange="this.form.submit()"><?php
                         foreach($vizsgakorok as $x)
                         {
