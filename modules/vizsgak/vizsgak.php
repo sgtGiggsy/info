@@ -7,7 +7,8 @@ $vizsgak = mySQLConnect("SELECT felhasznalok.id AS szerkesztoid,
         vizsgak_vizsgak.url AS vizsgaurl,
         felhasznalok.nev AS vizsgaadmin,
         vizsgak_vizsgak.nev AS vizsganev,
-        eles
+        eles,
+        vizsgak_vizsgak.leiras AS leiras
     FROM vizsgak_vizsgak
         LEFT JOIN vizsgak_adminok ON vizsgak_adminok.vizsga = vizsgak_vizsgak.id
         LEFT JOIN felhasznalok ON vizsgak_adminok.felhasznalo = felhasznalok.id
@@ -16,7 +17,7 @@ $vizsgak = mySQLConnect("SELECT felhasznalok.id AS szerkesztoid,
 
 $oszlopok = array(
     array('nev' => '', 'tipus' => 's'),
-    array('nev' => 'Vizsgák és szerkesztőik', 'tipus' => 's'),
+    array('nev' => 'Az elérhető vizsgák listája', 'tipus' => 's'),
     array('nev' => '', 'tipus' => 's')
 );
 
@@ -39,17 +40,8 @@ if(@$mindir)
                 {
                     if($oszlop['nev'])
                     {
-                        ?><th class="tsorth"><p><span class="dontprint">
-                            <input
-                                size="1"
-                                type="search"
-                                id="f<?=$oszlopszam?>"
-                                onkeyup="filterTable('f<?=$oszlopszam?>', '<?=$tipus?>', <?=$oszlopszam?>)"
-                                placeholder="<?=$oszlop['nev']?>"
-                                title="<?=$oszlop['nev']?>">
-                            <br></span>
+                        ?><th class="tsorth">
                             <span onclick="sortTable(<?=$oszlopszam?>, '<?=$oszlop['tipus']?>', '<?=$tipus?>')"><?=$oszlop['nev']?></span>
-                            </p>
                         </th><?php
                     }
                     else
@@ -72,8 +64,15 @@ if(@$mindir)
                         $elozovizsga = $vizsga['vizsganev'];
                     
                         ?><tr>
-                            <td colspan=<?=count($oszlopok)?> class="telefonkonyvelvalaszto"><a href="<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/ismerteto" style="width: 100%; height: 100%; display: block;"><?=$vizsga['vizsganev']?></a></td>
+                            <td colspan=<?=count($oszlopok)?> class="telefonkonyvelvalaszto">
+                                <a href="<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/ismerteto" style="width: 100%; height: 100%; display: block;"><?=$vizsga['vizsganev']?><?php
+                                if($vizsga['leiras'])
+                                {
+                                    ?><br>&nbsp;&nbsp;<small style="padding-top: 0; font-weight: normal"><?=$vizsga['leiras']?></small></a><?php
+                                }
+                            ?></td>
                         </tr><?php
+                        
                     }
                 }
                 if($mindir)

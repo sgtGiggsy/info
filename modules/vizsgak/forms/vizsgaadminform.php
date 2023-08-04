@@ -1,12 +1,14 @@
 <?php
 if(@$irhat)
 {
+    $nyithelp = true;
     ?><div class="contentcenter">
         <div>
             <form action="<?=$RootPath?>/vizsga/<?=$vizsgaadatok['url']?>/adminszerkeszt" method="POST"><?php
                 if(!$id)
                 {
-                    ?><div><?php
+                    ?><div>
+                        <label for="felhasznalo">Felhasználó kiválasztása:</label><br><?php
                         felhasznaloPicker(null, 'felhasznalo');
                     ?></div><?php
                 }
@@ -48,7 +50,7 @@ if(@$irhat)
                     <?php $magyarazat .= "<strong>Beállítások szerkesztése</strong><p>A vizsga beállításainak szerkesztéséhez szükséges jogosultság.
                         Enélkül a felhasználó képes lesz kérdéseket szerkeszteni, de új vizsgakört nyitni, a vizsga előzetes kitöltéseit törölni nem.</p>"; ?>
 
-                    <div><label for="ujkornyitas">Új kör nyitása:</label></div>
+                    <div><label for="ujkornyitas">Új vizsgaperiódus nyitása:</label></div>
                     <div>
                         <label class="customcb">
                             <input type="checkbox" name="ujkornyitas" id="ujkornyitas" value="1" <?=($ujkornyitas) ? "checked" : "" ?>>
@@ -56,7 +58,7 @@ if(@$irhat)
                         </label>
                     </div>
 
-                    <?php $magyarazat .= "<strong>Új kör nyitása</strong><p>Erre a jogosultságra van szükség új vizsgakör nyitásához és az előzetes kitöltések törléséhez.</p>"; ?>
+                    <?php $magyarazat .= "<strong>Új vizsgaperiódus nyitása</strong><p>Erre a jogosultságra van szükség új vizsgaperiódus nyitásához és az előzetes kitöltések törléséhez.</p>"; ?>
 
                     <div><label for="adminkijeloles">Adminisztrátorok szerkesztése:</label></div>
                     <div>

@@ -1,6 +1,7 @@
 <?php
 if(@$irhat)
 {
+    $nyithelp = true;
     ?><form action="<?=$vizsgabeallitasurl?>" enctype="multipart/form-data" method="post">
         <div class="ketharmad">
             <input type ="hidden" id="vizsgaid" name="vizsgaid" value=<?=$vizsgaid?>>
@@ -22,8 +23,8 @@ if(@$irhat)
                             érkeznek a vizsga főoldalára. Olyan üzenetet éri meg ideírni, ami segíti a bejelentkezésüket.</p>"; ?>
 
                 <div>
-                    <label for="leiras">Infó rész a láblécben</label><br>
-                    <textarea name="leiras" id="leiras"><?=$leiras?></textarea>
+                    <label for="lablec">Infó rész a láblécben</label><br>
+                    <textarea name="lablec" id="lablec"><?=$lablecszoveg?></textarea>
                 </div>
 
                 <?php $magyarazat .= "<strong>Infó rész a láblécben</strong><p>Ide rövid ismertetőt írhatunk, amit a felhasználók a vizsga miden oldalán látni fognak.
@@ -71,6 +72,13 @@ if(@$irhat)
 
                 <?php $magyarazat .= "<strong>A vizsga neve</strong><p>A vizsga általános megnevezése. Szabadon választható, lehet benne ékezet, és nem szükséges egyedinek lennie
                             (bár azért természetesen erősen ajánlott).</p>"; ?>
+                <div>
+                    <label for="leiras">Leírás</label><br>
+                    <textarea name="leiras" id="leiras"><?=$leiras?></textarea>
+                </div>
+
+                <?php $magyarazat .= "<strong>Leírás</strong><p>A vizsga rövid leírása. Ez jelenik meg a <i>Vizsgák</i> menüpont főoldalán, ahol az összes élesített vizsga listázásra kerül.
+                            Segítséget adhat a felhasználóknak a vizsga beazonosításában, de nem kötelező megadni.</p>"; ?>
                 
                 <div>
                     <label for="vizsgahossz">A vizsga kérdésszáma</label><br>
@@ -180,7 +188,7 @@ if(@$irhat)
             });
 
             tinymce.init({
-                selector: '#leiras',
+                selector: '#lablec',
                 plugins : 'advlist autolink link image lists charmap print preview emoticons code',
                 skin: "tinymce-5-dark",
                 content_css: "tinymce-5-dark"
@@ -201,7 +209,7 @@ if(@$irhat)
             });
 
             tinymce.init({
-                selector: '#leiras',
+                selector: '#lablec',
                 plugins : 'advlist autolink link image lists charmap print preview emoticons code'
             });
             <?php

@@ -1,6 +1,7 @@
 <?php
 if(@$irhat)
 {
+    $nyithelp = true;
     ?><div class="contentcenter contentcenterpadding">
         <div>
             <form action="<?=$RootPath?>/vizsga/<?=$vizsgaadatok['url']?>/kerdesszerkeszt&action=<?=(isset($_GET['id'])) ? "update" : "addnew" ?>" method="post" enctype="multipart/form-data" onsubmit="return checkKivalasztas();"><?php
@@ -9,14 +10,22 @@ if(@$irhat)
                     ?><input type ="hidden" id="id" name="id" value=<?=$id?> /><?php
                 }
                 ?><div>
-                    <label for="kerdes">Kérdés szövege:</label><br>
+                    <label for="kerdes">Kérdés szövege</label><br>
                     <textarea name="kerdes" id="kerdes"><?=$kerdesszoveg?></textarea>
                 </div>
 
+                <?php $magyarazat .= "<strong>Kérdés szövege</strong><p>Itt adhatjuk meg a kérdés szövegét.</p>"; ?>
+
                 <div>
-                    <label for="kerdeskep">Kép csatolása a kérdéshez:</label><br>
+                    <label for="kerdeskep">Kép csatolása a kérdéshez</label><br>
                     <input type="file" name="kerdeskep" id="kerdeskep" accept="image/jpeg, image/png, image/bmp">
-                </div><?php
+                </div>
+                
+                <?php $magyarazat .= "<strong>Kép csatolása a kérdéshez</strong><p>Itt tallózhatjuk ki a kérdéshez csatolni kívánt képet. Használhatunk jpg, png és bmp formátumú fájlokat.
+                            A feltöltött képre vonatkozóan nincsenek megkötések, de a vizsgázás során a megjelenítése 500 pixel magasságban és/vagy
+                            a képernyő felének szélességében lesz maximálva.</p>"; ?>
+
+                <?php
 
                 if(isset($_GET['id']) && $kerdes['kep'])
                 {
@@ -24,7 +33,12 @@ if(@$irhat)
                         <img src="<?=$kep?>" width="500px">
                         <label for="keptorol">Feltöltött kép eltávolítása</label>
                         <input type="checkbox" name="keptorol" />
-                    </div><?php
+                    </div>
+                    
+                    <?php $magyarazat .= "<strong>Feltöltött kép eltávolítása</strong><p>Ha nem akarunk más képet hozzáadni a kérdéshez, ezzel törölhetjük a már meglévőt.
+                            Ha <b>cserélni</b> szeretnénk a képet, úgy ezzel a jelölővel nem kell foglalkoznunk.</p>"; ?>
+
+                    <?php
                 }
 
                 $valaszlehetosegszam = 4;
@@ -36,7 +50,24 @@ if(@$irhat)
                 ?><div class="kerdesthreecol">
                     <div><h2>Válasz szövege</h2></div>
                     <div><h2>Helyes válasz</h2></div>
-                    <div><h2>Válasz törlése</h2></div><?php
+                    <div><h2>Válasz törlése</h2></div>
+                    <?php $magyarazat .= "<strong>Válasz szövege</strong><p>A válaszlehetőség szövege. A vizsgában csak azok a válaszlehetőségek jelennek meg, amelyekhez megadtunk válasszöveget.
+                            Új kérdés hozzáadásánál alapértelmezetten 4 válaszlehetőséget kínál fel a rendszer. Ha a négy közül mondjuk csak az első kettőhöz írunk szöveget,
+                            úgy a vizsgában csak két válaszlehetőség fog megjelenni. Amennyiben akár új kérdés felvételénél, akár később szeretnénk új válaszlehetőséget hozzáadni,
+                            úgy azt az <b><i>Újabb válaszlehetőség hozzáadása</i></b> gombra kattintva tehetjük meg.</p>";
+                    $magyarazat .= "<strong>Helyes válasz</strong><p>A jelölőt bepipálva állíthatunk be egy válaszlehetőséget helyesként. Amennyiben csak egy válaszlehetőséget állítunk be helyesként,
+                            úgy a kérdés egyválasztós lesz, ha ennél többet, akkor többválasztós. A rendszer jelenleg legfeljebb 3 helyes választ tud kezelni. Többválasztós kérdések esetén,
+                            a kérdés pontozása a következőképp alakul:
+                            <ul style='padding: 0 1em!important; list-style: unset!important; font-size: 0.8em'>
+                                <strong>Kétválasztós</strong>
+                                    <li>Egy jó válasz: 0.5</li>
+                                <strong>Háromválasztós</strong>
+                                    <li>Egy jó válasz: 0.33</li>
+                                    <li>Két jó válasz: 0.66</li>
+                            </ul></p>"; 
+                    $magyarazat .= "<strong>Válasz törlése</strong><p>Ezt a jelölőt <b>KIZÁRÓLAG</b> akkor kell használnunk, ha egy már korábban hozzáadott,
+                            szöveggel rendelkező válaszlehetőséget szeretnénk eltávolítani. Tehát például ha korábban elmentettük a kérdést négy válaszlehetőséggel,
+                            de később úgy ítéljük meg, hogy valamelyik válaszlehetőségre nincs szükségünk, akkor tegyünk jelölőt a kérdés mellett ebbe a rubrikába.</p>";
 
                     for($i = 1; $i <= $valaszlehetosegszam; $i++)
                     {
@@ -44,6 +75,7 @@ if(@$irhat)
                             <label for="valasz-<?=$i?>">Válasz <?=$i?>:<br></label>
                             <textarea name="valasz[]" id="valasz-<?=$i?>"><?=(count($valaszlehetosegek) > 0) ? $valaszlehetosegek[$i-1]['valaszszoveg'] : "" ?></textarea>
                         </div>
+
                         <div>
                             <label class="customcb cbcenter">
                                 <input type="checkbox"
@@ -58,6 +90,7 @@ if(@$irhat)
                                 ?><span class="customcbjelolo"></span>
                             </label>
                         </div>
+
                         <div>
                             <label class="customcb cbcenter">
                                 <input type="checkbox"
@@ -77,6 +110,9 @@ if(@$irhat)
                 ?></div><?php
                 ?><div class="submit"><input type="submit" value="<?=$button?>"></div>
                 <div class="submit"><button id="button-valasz" type="button" onclick="addUjValasz(); return false;">Újabb válaszlehetőség hozzáadása</button></div>
+                <?php $magyarazat .= "<strong>Újabb válaszlehetőség hozzáadása</strong><p>Ezzel a gombbal adhatunk új válaszlehetőséget a kérdéshez, amennyiben az alapból felkínált
+                        lehetőség kevés lenne. Használhatjuk új kérdés létrehozásakor is, ha négynél több válaszlehetőséget szeretnénk megadni, vagy kérdés szerkesztésekor is,
+                        ha mondjuk egy két válaszlehetőséges kérdést szeretnénk több válaszlehetőségre bővíteni.</p>"; ?>
                 <?php cancelForm(); ?>
             </form>
         </div>

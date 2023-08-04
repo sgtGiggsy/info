@@ -33,6 +33,7 @@ else
             ismetelheto,
             maxismetles,
             leiras,
+            lablec,
             eles,
             feltoltesek.fajl AS fejleckep
     FROM vizsgak_vizsgak
@@ -66,6 +67,10 @@ else
         {
             // Felhasználó jogosultságainak bekérése
             $contextmenujogok = array('admin' => false, 'vizsgazas' => true, 'ismerteto' => true);
+            $contextmenujogok['vizsgabeallitasok'] = $contextmenujogok['kerdeslista'] = $contextmenujogok['vizsgalista'] = 
+            $contextmenujogok['kerdesszerkeszt'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['adminlista'] =
+            $contextmenujogok['adminkijeloles'] = $contextmenujogok['ujkornyitas'] = $contextmenujogok['admin'] = false;
+
             if($mindir)
             {
                 $contextmenujogok['vizsgabeallitasok'] = $contextmenujogok['kerdeslista'] = $contextmenujogok['vizsgalista'] = 
@@ -139,7 +144,7 @@ else
             include("./modules/vizsgak/includes/ismerteto.php");
         }
         ?><div class="vizsgalablec">
-            <div><?=$vizsgaadatok['leiras']?></div>
+            <div><?=$vizsgaadatok['lablec']?></div>
         </div><?php
     }
 }

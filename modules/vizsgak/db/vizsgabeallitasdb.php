@@ -11,7 +11,6 @@ if(isset($irhat) && $irhat)
         $filetypes = array('.jpg', '.jpeg', '.png', '.bmp');
         $mediatype = array('image/jpeg', 'image/png', 'image/bmp');
         
-        $vizsgaazonosito = $_POST['url'];
         $gyokermappa = "./uploads/";
         $egyedimappa = "vizsgak/$vizsgaazonosito";
 
@@ -26,8 +25,8 @@ if(isset($irhat) && $irhat)
             $fajlid = $fajllista[0];
         }
 
-        $stmt = $con->prepare('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, vendegudvozlo, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, fejleckep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssssssssss', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid);
+        $stmt = $con->prepare('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, vendegudvozlo, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, fejleckep, lablec) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('ssssssssssss', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $_POST['lablec'], $fajlid);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
@@ -38,20 +37,30 @@ if(isset($irhat) && $irhat)
 
     elseif(isset($_GET['action']) && $_GET['action'] == "update")
     {
+        $vizsgaorig = mySQLConnect("SELECT fejleckep FROM vizsgak_vizsgak WHERE id = $vizsgaid");
         if(!isset($_POST["keptorol"]) && !@$fajllista)
         {
             $vizsgaid = $_POST['vizsgaid'];
-            $kep = mySQLConnect("SELECT fejleckep FROM vizsgak_vizsgak WHERE id = $vizsgaid");
-            
-            $fajlid = mysqli_fetch_assoc($kep)['fejleckep'];
+            $fajlid = mysqli_fetch_assoc($vizsgaorig)['fejleckep'];
         }
         elseif(@$fajllista)
         {
             $fajlid = $fajllista[0];
         }
 
-        $stmt = $con->prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=?, eles=? WHERE id=?');
-        $stmt->bind_param('ssssssssssssi', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['vizsgaid']);
+        if(isset($_POST['url']) && $_POST['url'] != "")
+        {
+            if($_POST['url'] != $vizsgaazonosito)
+            {
+                $vizsgaazonosito = $_POST['url'];
+                $gyokermappa = "./uploads/";
+                $egyedimappa = "vizsgak/$vizsgaazonosito";
+                rename($gyokermappa . $vizsgaazonosito, $gyokermappa . $egyedimappa);
+            }
+        }
+
+        $stmt = $con->prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=?, eles=?, lablec=? WHERE id=?');
+        $stmt->bind_param('sssssssssssssi', $_POST['nev'], $vizsgaazonosito, $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['lablec'], $_POST['vizsgaid']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
