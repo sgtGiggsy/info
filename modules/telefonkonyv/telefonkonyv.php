@@ -191,29 +191,7 @@ if(isset($_GET['kereses']))
     <table id="<?=$tipus?>" class="telefonkonyvtabla">
         <thead>
             <tr><?php
-                foreach($oszlopok as $oszlop)
-                {
-                    if($oszlop['nev'])
-                    {
-                        ?><th class="tsorth"><p><span class="dontprint">
-                            <input
-                                size="1"
-                                type="search"
-                                id="f<?=$oszlopszam?>"
-                                onkeyup="filterTable('f<?=$oszlopszam?>', '<?=$tipus?>', <?=$oszlopszam?>, true)"
-                                placeholder="<?=$oszlop['nev']?>"
-                                title="<?=$oszlop['nev']?>">
-                            <br></span>
-                            <span onclick="sortTable(<?=$oszlopszam?>, '<?=$oszlop['tipus']?>', '<?=$tipus?>')"><?=$oszlop['nev']?></span>
-                            </p>
-                        </th><?php
-                    }
-                    else
-                    {
-                        ?><th style="width:2ch"></th><?php
-                    }
-                    $oszlopszam++;
-                }
+                sortTableHeader($oszlopok, $tipus, true);
             ?></tr>
         </thead>
         <tbody><?php

@@ -48,6 +48,16 @@ else
 
     $vizsgalistaurl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/vizsgalista";
 
+    $oszlopok = array(
+        array('nev' => 'Folyószám', 'tipus' => 's'),
+        array('nev' => 'Vizsgázó', 'tipus' => 's'),
+        array('nev' => 'Megválaszolt kérdések', 'tipus' => 'i'),
+        array('nev' => 'Helyes válaszok', 'tipus' => 'i'),
+        array('nev' => 'Eredmény', 'tipus' => 'i')
+    );
+
+    $tablazatnev = "vizsgalista";
+
     ?><div class="szerkgombsor">
         <button type="button" onclick="location.href='<?=$vizsgalistaurl?>?action=exportexcel&vizsgakor=<?=$vizsgakorsorszam?>'">Exportálás Excel fájlba</button>
     </div>
@@ -66,14 +76,10 @@ else
             </div>
         </div><?php
         
-        ?><table id='vizsgalista'>
+        ?><table id='<?=$tablazatnev?>'>
             <thead>
                 <tr>
-                    <th class="tsorth" onclick="sortTable(0, 'i', 'vizsgalista')">Folyószám</th>
-                    <th class="tsorth" onclick="sortTable(1, 's', 'vizsgalista')">Vizsgázó</th>
-                    <th class="tsorth" onclick="sortTable(2, 'i', 'vizsgalista')">Megválaszolt kérdések</th>
-                    <th class="tsorth" onclick="sortTable(3, 'i', 'vizsgalista')">Helyes válaszok</th>
-                    <th class="tsorth" onclick="sortTable(4, 'i', 'vizsgalista')">Helyes százalék</th>
+                    <?php sortTableHeader($oszlopok, $tablazatnev) ?>
                 </tr>
             </thead>
             <tbody><?php

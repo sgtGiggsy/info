@@ -235,6 +235,38 @@ function alakulatValaszto($ldapres)
 	}
 }
 
+function sortTableHeader($oszlopok, $tablazatnev, $filterinput = false)
+{
+	$oszlopszam = 0;
+	foreach($oszlopok as $oszlop)
+	{
+		if($oszlop['nev'])
+		{
+			?><th class="tsorth"><?php
+				if($filterinput) {
+					?><span class="dontprint">
+					<input
+						size="1"
+						type="search"
+						id="f<?=$oszlopszam?>"
+						onkeyup="filterTable('f<?=$oszlopszam?>', '<?=$tablazatnev?>', <?=$oszlopszam?>, true)"
+						placeholder="<?=$oszlop['nev']?>"
+						title="<?=$oszlop['nev']?>">
+					<br></span>	<?php
+				}
+				?><span onclick="sortTable(<?=$oszlopszam?>, '<?=$oszlop['tipus']?>', '<?=$tablazatnev?>')"><?=$oszlop['nev']?></span>
+			</th><?php
+		}
+		else
+		{
+			?><th style="width:2ch"></th><?php
+		}
+		$oszlopszam++;
+	}
+
+	return $oszlopszam;
+}
+
 function eszkozTipusValaszto($tipusid)
 {
 	if($tipusid < 6)

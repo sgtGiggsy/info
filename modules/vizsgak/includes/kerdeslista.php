@@ -12,19 +12,25 @@ else
         WHERE vizsga = $vizsgaid
         ORDER BY id DESC;");
 
+    $oszlopok = array(
+        array('nev' => 'Sorszam', 'tipus' => 'i'),
+        array('nev' => 'Kérdés', 'tipus' => 's'),
+        array('nev' => 'Megválaszolva', 'tipus' => 'i'),
+        array('nev' => 'Helyes', 'tipus' => 'i'),
+        array('nev' => '%', 'tipus' => 'i')
+    );
+
+    $tablazatnev = "kerdeslista";
+
     ?><div class="szerkgombsor">
         <button type="button" onclick="location.href='./kerdesszerkeszt'">Új kérdés felvitele</button>
     </div>
     <div class="PrintArea">
         <div class="oldalcim">Kérdések</div>
-        <table>
+        <table id="<?=$tablazatnev?>">
             <thead>
                 <tr>
-                    <th>Sorszam</th>
-                    <th>Kérdés</th>
-                    <th>Megválaszolva</th>
-                    <th>Helyes</th>
-                    <th>%</th>
+                    <?php sortTableHeader($oszlopok, $tablazatnev) ?>
                 </tr>
             </thead>
             <tbody>
