@@ -29,9 +29,17 @@ if(@$irhat)
                     </div><?php
                     $magyarazat .= "<strong>Modell variáns</strong><p>A modell alverziója, ami részletesen leírja az eszköz paramétereit. (Például a portok számát.)</p>";
                 }
-                ?><div>
+                ?>
+                <datalist id="sorozatszamok"><?php
+                    foreach($sorozatszamok as $x)
+					{
+						?><option><?=$x['sorozatszam']?></option><?php
+					}
+                ?></datalist>
+                <div class="ttipcontainer">
                     <label for="sorozatszam"><?=($eszkoztipus != "simkartya") ? "Sorozatszám:" : "IMEI szám" ?></label><br>
-                    <input type="text" onkeyup="checkSorozatszam()" accept-charset="utf-8" name="sorozatszam" id="sorozatszam" value="<?=$sorozatszam?>"></input>
+                    <div class="tooltip" id="sorozatszamcheck">A megadott <?=($eszkoztipus != "simkartya") ? "sorozatszám" : "IMEI szám" ?> már létezik az adatbázisban!</div>
+                    <input type="text" onkeyup="verifyExist('sorozatszamok', 'sorozatszam', 'sorozatszamcheck')" accept-charset="utf-8" name="sorozatszam" id="sorozatszam" value="<?=$sorozatszam?>"></input>
                 </div><?php
                 $magyarazat .= "<strong>Sorozatszám</strong><p>Az eszköz sorozatszáma. <b>Egyedinek kell lennie!</b> Amennyiben a sorozatszám nem ismert,
                     valami olyat kell ide beírni, ami egyértelműen beazonosíthatóvá teszi az eszközt.</p>";
@@ -82,12 +90,19 @@ if(@$irhat)
 
                     <?php $magyarazat .= "<strong>WiFi</strong><p>Az eszköz által ismert legfrisebb WiFi szabvány.</p>"; ?>
 
+                    <datalist id="firmwarelist"><?php
+                    foreach($firmwarelista as $firmware)
+                    {
+                        ?><option><?=$firmware['nev']?></option><?php
+                    }
+                    ?></datalist>
+
                     <div>
-                        <label for="szoftver">Szoftver:</label><br>
-                        <input type="text" accept-charset="utf-8" name="szoftver" id="szoftver" value="<?=$szoftver?>"></input>
+                        <label for="szoftver">Firmware:</label><br>
+                        <input type="text" accept-charset="utf-8" name="szoftver" id="szoftver" value="<?=$szoftver?>" list="firmwarelist"></input>
                     </div><?php
 
-                    $magyarazat .= "<strong>Szoftver</strong><p>Az eszközön futó szoftver verziószáma.</p>";
+                    $magyarazat .= "<strong>Firmware</strong><p>Az eszközön futó szoftver verziószáma.</p>";
                 }
 
                 if($eszkoztipus == "mediakonverter")

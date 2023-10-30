@@ -403,6 +403,8 @@ else
             if($eszkoztipus == "aktiveszkoz" || $eszkoztipus == "sohoeszkoz")
             {
                 $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
+                $modell = $eszkoz['modell'];
+                $firmwarelista = mySQLConnect("SELECT * FROM firmwarelist WHERE eszkoztipus = $modell ORDER BY nev DESC, kiadasideje DESC;");
                 if($eszkoztipus == "aktiveszkoz")
                 {
                     $aktiveszkoz = mySQLConnect("SELECT * FROM aktiveszkozok WHERE eszkoz = $id;");
@@ -466,8 +468,3 @@ else
         include('././templates/edit.tpl.php');
     }
 }
-
-
-
-
-
