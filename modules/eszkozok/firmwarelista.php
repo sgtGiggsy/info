@@ -26,7 +26,9 @@ else
             eszkozok.modell AS modell,
             modellek.modell AS modellnev,
             gyartok.nev AS gyarto,
-            eszkozok.varians AS varians
+            eszkozok.varians AS varians,
+            eszkozok.leadva AS leadva,
+            eszkozok.hibas AS hibas
         FROM eszkozok
             LEFT JOIN aktiveszkozok ON aktiveszkozok.eszkoz = eszkozok.id
             LEFT JOIN sohoeszkozok ON sohoeszkozok.eszkoz = eszkozok.id
@@ -50,7 +52,14 @@ else
         array('nev' => 'Végső verzió', 'tipus' => 's')
     );
 
-    ?><div class="oldalcim">Firmware-ek listája</div>
+    ?><div class="oldalcim">Firmware-ek listája
+        <div class="szuresvalaszto">
+            <select id="szures" onchange="firmwareSzur()">
+                <option value="mindmutat">Minden eszköz mutatása</option>
+                <option value="legfrissebbrejt">Csak a frissítendő eszközök mutatása</option>
+            </select>
+        </div>
+    </div>
     <table id="<?$tipus?>">
     <thead>
         <tr>
@@ -75,27 +84,30 @@ else
         $tempeszklist = array();
         foreach($eszkozlista as $eszkoz)
         {
-            if($firmware['modellid'] == $eszkoz['modell'] && ($eszkoz['szoftver'] == $firmware['nev'] || $eszkoz['sohoszoftver'] == $firmware['nev']))
+            if(!$eszkoz['leadva'] && $eszkoz['hibas'] < 2)
             {
-                if(!$volteszkoz)
+                if($firmware['modellid'] == $eszkoz['modell'] && ($eszkoz['szoftver'] == $firmware['nev'] || $eszkoz['sohoszoftver'] == $firmware['nev']))
                 {
-                    $volteszkoz = true;
-                    ?><tr><td></td><td colspan="3"><table style='margin-left: 2em; width: 25vw'><?php
-                }
+                    if(!$volteszkoz)
+                    {
+                        $volteszkoz = true;
+                        ?><tr><td></td><td colspan="3"><table style='margin-left: 2em; width: 25vw'><?php
+                    }
 
-                if(!in_array($eszkoz['sorozatszam'], $sorozatszamok))
-                {
-                    $sorozatszamok[] = $eszkoz['sorozatszam'];
-                    ?><tr>
-                        <td style="width: 20%"><?=$eszkoz['ipcim']?></td>
-                        <td style="width: 60%"><?=$eszkoz['beepitesnev']?></td>
-                        <td><?=$eszkoz['sorozatszam']?></td>
-                    </tr><?php
+                    if(!in_array($eszkoz['sorozatszam'], $sorozatszamok))
+                    {
+                        $sorozatszamok[] = $eszkoz['sorozatszam'];
+                        ?><tr <?=($elozomodell != $firmware['modell'] || $firmware['vegsoverzio']) ? 'class="legfrissebb"' : '' ?>>
+                            <td style="width: 20%"><?=$eszkoz['ipcim']?></td>
+                            <td style="width: 60%"><?=$eszkoz['beepitesnev']?></td>
+                            <td><?=$eszkoz['sorozatszam']?></td>
+                        </tr><?php
+                    }
                 }
-            }
-            else
-            {
-                $tempeszklist[] = $eszkoz;
+                else
+                {
+                    $tempeszklist[] = $eszkoz;
+                }
             }
         }
         if($volteszkoz)
@@ -131,5 +143,28 @@ else
             </tr><?php
         }
         ?></tbody>
-    </table><?php
+    </table>
+    <script>
+        function firmwareSzur()
+        {
+            let szures = document.getElementById('szures');
+            let rejtendo = document.getElementsByClassName('legfrissebb');
+            let rejtendodb = rejtendo.length;
+
+            if(szures.value == "legfrissebbrejt")
+            {
+                for(let i = 0; i < rejtendodb; i++)
+                {
+                    rejtendo[i].style.display = "none";
+                }
+            }
+            else
+            {
+                for(let i = 0; i < rejtendodb; i++)
+                {
+                    rejtendo[i].style.display = "";
+                }
+            }
+        }
+    </script><?php
 }
