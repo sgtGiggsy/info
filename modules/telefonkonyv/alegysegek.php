@@ -6,6 +6,8 @@ if(!$csoportolvas)
 }
 else
 {
+    $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
+
     $alegysegek = mySQLConnect("SELECT telefonkonyvcsoportok.id AS telcsopid,
             telefonkonyvcsoportok.nev AS nev,
             telefonkonyvcsoportok.sorrend AS sorrend,
@@ -14,7 +16,7 @@ else
         WHERE telefonkonyvcsoportok.torolve IS NULL AND telefonkonyvcsoportok.id > 1
         ORDER BY telefonkonyvcsoportok.sorrend;");
 
-    if($mindir) 
+    if($globaltelefonkonyvadmin) 
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyvalegyseg?action=addnew'">Új alegység</button><?php
     }
@@ -38,7 +40,7 @@ else
                     <td><?=$alegyseg['nev']?></td>
                     <td><?=($csoportir) ? "<a href='$RootPath/telefonkonyvalegyseg/$alegysegid?action=edit'><img src='$RootPath/images/edit.png' alt='Alegység szerkesztése' title='Alegység szerkesztése'/></a>" : "" ?></td>
                     <td><?php
-                        if($mindir)
+                        if($globaltelefonkonyvadmin)
                         {
                             ?><form action="<?=$RootPath?>/telefonkonyvalegyseg?action=delete" method="post" onsubmit="return confirm('FIGYELEM!\n\nA törölni kívánt alegységhez <?=$alegyseg['beosztasok']?> beosztás tartozik!\nBiztosan törölni szeretnéd ezt az alegységet?'); beKuld.disabled = true; return true;">
                                 <input type ="hidden" id="id" name="id" value=<?=$alegysegid?>>

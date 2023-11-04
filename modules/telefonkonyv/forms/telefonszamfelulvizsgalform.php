@@ -296,8 +296,8 @@ if(@$irhat)
                     Nem kötelező mező.</p>" ?>
 
                 <div>
-                    <label for="adminmegjegyzes">Adminisztrátori megjegyzés</label>
-                    <textarea name="adminmegjegyzes"><?=$adminmegjegyzes?></textarea>
+                    <label for="adminmegjegyzes" id="admincommentlabel">Adminisztrátori megjegyzés</label>
+                    <textarea name="adminmegjegyzes" id="adminmegjegyzes"><?=$adminmegjegyzes?></textarea>
                 </div>
 
                 <?php $magyarazat .= "<strong>Módosítás oka</strong><p>Itt a telefonkönyv adminja részére lehet jelezni
@@ -318,15 +318,28 @@ if(@$irhat)
         {
             allapotvaltozas = document.getElementById("allapot");
             allapotvaltozas.value = 2;
+            admincomment = document.getElementById("adminmegjegyzes");
+            admincomment.required = true;
+            admincommentlabel = document.getElementById("admincommentlabel");
+            admincommentlabel.innerHTML = "Adminisztrátori megjegyzés*";
         }
 
         function confirmDiscard()
         {
-            var x = confirm("Biztosan el akarod vetni a móodításokat?");
-            if (x)
-                window.location.href="<?=$RootPath?>/valtozasfelulvizsgalat&action=discard&discardid=<?=$id?>"
-            else
+            admincomment = document.getElementById("adminmegjegyzes");
+            if(!admincomment.value)
+            {
+                window.alert("Nem adtál magyarázatot az elvetés okáról!");
                 return false;
+            }
+            else
+            {
+                var x = confirm("Biztosan el akarod vetni a móodításokat?");
+                if (x)
+                    window.location.href="<?=$RootPath?>/valtozasfelulvizsgalat&action=discard&discardid=<?=$id?>&adminmegjegyzes="+admincomment.value
+                else
+                    return false;
+            }
         }
 
         function refreshList() {

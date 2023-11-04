@@ -9,6 +9,7 @@ else
     $magyarazat = $beosztas = $modid = $felhid = $beosztasnev = $elotag = $nev = $titulus = $rendfokozat = $belsoszam = $belsoszam2 = $kozcelu = $fax = $kozcelufax = $currbeoid =
     $mobil = $csoport = $csoportid = $felhasznalo = $megjegyzes = $modositasoka = $felhid = $adminmegjegyzes = $admintimestamp = $modwhere = $meglevobeo = $addnew = $zarozar = null;
     $sorrend = 9999;
+    $allapot = 0;
     
     $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
     
@@ -52,6 +53,8 @@ else
 
     if(isset($_GET['id']))
     {
+        $oldalcim = "Telefonszám szerkesztése";
+        
         $telszamid = $_GET['id'];
         $telefonszam = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS beosztas,
             telefonkonyvbeosztasok.nev AS beosztasnev,
@@ -88,6 +91,8 @@ else
     {
         $modid = $_GET['modid'];
 
+        $oldalcim = "Beküldött módosítás állapota: ";
+
         $modositasok = mySQLConnect("SELECT telefonkonyvvaltozasok.origbeoid AS beosztas,
                 telefonkonyvbeosztasok_mod.nev AS beosztasnev,
                 telefonkonyvfelhasznalok.id AS felhid,
@@ -105,6 +110,7 @@ else
                 sorrend,
                 csoport,
                 megjegyzes,
+                adminmegjegyzes,
                 telefonkonyvvaltozasok.allapot AS allapot
             FROM telefonkonyvbeosztasok_mod
                 LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok_mod.felhid = telefonkonyvfelhasznalok.id
@@ -112,12 +118,22 @@ else
             WHERE telefonkonyvvaltozasok.id = $modid
                 $wheremod;");
         $telefonszam = mysqli_fetch_assoc($modositasok);
+        $allapot = $telefonszam['allapot'];
 
-        if(!@$telefonszam['beosztas'] || (!$globaltelefonkonyvadmin && !in_array($telefonszam['csoport'], $csoportjogok)))
+        if((!@$telefonszam['beosztas'] && $telefonszam['beosztas'] != 0) || (!$globaltelefonkonyvadmin && !in_array($telefonszam['csoport'], $csoportjogok)))
         {
             echo "<h2>Erre a számra ebben a hónapban már lett leadva véglegesített módosítási kérelem,
                 nem létezik, vagy nincs jogosultsága a szerkesztéséhez!</h2>";
             $irhat = false;
+        }
+
+        switch($allapot)
+        {
+            case 1: $oldalcim .= "Beküldve, még nem került ellenőrzésre"; break;
+            case 2: $oldalcim .= "Változtatásokkal elfogadásra került"; break;
+            case 3: $oldalcim .= "Elfogadásra került"; break;
+            case 4: $oldalcim .= "Véglegesen rögzítve"; break;
+            default: $oldalcim .= "Adminisztrátor által elvetve";
         }
     }
     elseif(isset($_GET['action']) && $_GET['action'] == "addnew")
@@ -228,8 +244,6 @@ else
         }
 
         $beosztasok = getBeosztasList($where, $beosztas, $modid);
-
-        $oldalcim = "Telefonszám szerkesztése";
 
         ?><datalist id="tkonyvfelhasznalok"><?php
             foreach($tkonyvfelhasznalok as $felhasznalo)

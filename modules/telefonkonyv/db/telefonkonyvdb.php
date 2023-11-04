@@ -209,8 +209,8 @@ if(isset($irhat) && $irhat)
             mySQLConnect("UPDATE telefonkonyvbeosztasok_mod SET allapot = NULL WHERE id = $ujbeoid");
             mySQLConnect("UPDATE telefonkonyvfelhasznalok SET allapot = NULL WHERE id = $ujfelhid");
 
-            $stmt = $con->prepare('UPDATE telefonkonyvvaltozasok SET allapot=? WHERE id=?');
-            $stmt->bind_param('si', $allapot, $_GET['discardid']);
+            $stmt = $con->prepare('UPDATE telefonkonyvvaltozasok SET allapot=?, adminmegjegyzes=? WHERE id=?');
+            $stmt->bind_param('ssi', $allapot, $_GET['adminmegjegyzes'], $_GET['discardid']);
             $stmt->execute();
             if(mysqli_errno($con) != 0)
             {
