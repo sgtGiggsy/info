@@ -1,5 +1,5 @@
 
-<script>
+<script type="text/javascript">
     const urlParams = new URLSearchParams(window.location.search);
     <?php foreach($PHPvarsToJS as $var)
     {
@@ -10,7 +10,7 @@ foreach($javascriptfiles as $js)
 {
 	?><script src="<?=$RootPath?>/<?=$js?>"></script><?php
 }
-?><script><?php
+?><script type="text/javascript"><?php
 	if(isset($ujoldalcim))
 	{
 		?>document.title = '<?=$ujoldalcim?>'<?php

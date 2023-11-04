@@ -1,14 +1,3 @@
-var szamlalo = 1;
-
-document.getElementById('rovid').onkeyup = function () {
-    if(80 - this.value.length > -1) {
-        document.getElementById('szamlalo').innerHTML = "Felhasználható karakterek száma: " + (80 - this.value.length);
-    }
-    else {
-        document.getElementById('szamlalo').innerHTML = "<span class='warning'>A megengedett karakterlimit fölött jár: " + (80 - this.value.length) + "</span>";
-    }
-};
-
 function addNewFelelos()
 {
     szamlalo++;
@@ -37,39 +26,59 @@ function nullFelelosok()
     }
 }
 
-document.getElementById('felelos_sel-' + szamlalo).onchange = function() {
-    var ujelem = document.getElementById('felelos_sel-' + szamlalo);
-    if(ujelem.value) {
-        addNewFelelos();
-    }
-};
+var szamlalo = 1;
 
-document.getElementById('allapottipus').onchange = function() {
-    nullFelelosok();
-    if(this.value == '26') {
-        document.getElementById('felelos').style.display = 'none';
-        document.getElementById('halasztas').style.display = 'none';
-        document.getElementById('hatarido').style.display = 'none';
-        document.getElementById('fajlok').style.display = 'block';
-    } else if(this.value == '27') {
-        document.getElementById('felelos').style.display = 'none';
-        document.getElementById('halasztas').style.display = 'none';
-        document.getElementById('fajlok').style.display = 'none';
-        document.getElementById('hatarido').style.display = 'block';
-    } else if (this.value == '28') {
-        document.getElementById('felelos').style.display = 'none';
-        document.getElementById('hatarido').style.display = 'none';
-        document.getElementById('fajlok').style.display = 'none';
-        document.getElementById('halasztas').style.display = 'block';
-    } else if (this.value == '29') {
-        document.getElementById('hatarido').style.display = 'none';
-        document.getElementById('fajlok').style.display = 'none';
-        document.getElementById('halasztas').style.display = 'none';
-        document.getElementById('felelos').style.display = 'block';
-    } else {
-        document.getElementById('felelos').style.display = 'none';
-        document.getElementById('hatarido').style.display = 'none';
-        document.getElementById('halasztas').style.display = 'none';
-        document.getElementById('fajlok').style.display = 'none';
+if(document.getElementById('felelos_sel-' + szamlalo))
+{
+    document.getElementById('felelos_sel-' + szamlalo).onchange = function() {
+        var ujelem = document.getElementById('felelos_sel-' + szamlalo);
+        if(ujelem.value) {
+            addNewFelelos();
+        }
     }
-};
+}
+
+if(document.getElementById('allapottipus'))
+{
+    document.getElementById('allapottipus').onchange = function() {
+        nullFelelosok();
+        if(this.value == '26') {
+            document.getElementById('felelos').style.display = 'none';
+            document.getElementById('halasztas').style.display = 'none';
+            document.getElementById('hatarido').style.display = 'none';
+            document.getElementById('fajlok').style.display = 'block';
+        } else if(this.value == '27') {
+            document.getElementById('felelos').style.display = 'none';
+            document.getElementById('halasztas').style.display = 'none';
+            document.getElementById('fajlok').style.display = 'none';
+            document.getElementById('hatarido').style.display = 'block';
+        } else if (this.value == '28') {
+            document.getElementById('felelos').style.display = 'none';
+            document.getElementById('hatarido').style.display = 'none';
+            document.getElementById('fajlok').style.display = 'none';
+            document.getElementById('halasztas').style.display = 'block';
+        } else if (this.value == '29') {
+            document.getElementById('hatarido').style.display = 'none';
+            document.getElementById('fajlok').style.display = 'none';
+            document.getElementById('halasztas').style.display = 'none';
+            document.getElementById('felelos').style.display = 'block';
+        } else {
+            document.getElementById('felelos').style.display = 'none';
+            document.getElementById('hatarido').style.display = 'none';
+            document.getElementById('halasztas').style.display = 'none';
+            document.getElementById('fajlok').style.display = 'none';
+        }
+    }
+}
+
+if(document.getElementById("rovid"))
+{
+    document.getElementById("rovid").onkeyup = function () {
+        if(80 - this.value.length > -1) {
+            document.getElementById('szamlalo').innerHTML = "Felhasználható karakterek száma: " + (80 - this.value.length);
+        }
+        else {
+            document.getElementById('szamlalo').innerHTML = "<span class='warning'>A megengedett karakterlimit fölött jár: " + (80 - this.value.length) + "</span>";
+        }
+    };
+}
