@@ -2,6 +2,8 @@
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
 if($globaltelefonkonyvadmin || $csoportir)
 {   
+    $javascriptfiles[] = "modules/telefonkonyv/includes/telefonkonyv.js";
+    $javascriptfiles[] = "includes/js/csoportFilter.js";
     $valtozaskorok = mySQLConnect("SELECT * FROM telefonkonyvmodositaskorok ORDER BY id DESC;");
     $modositasikor = mysqli_fetch_assoc($valtozaskorok);
     $modkorid = $modositasikor['id'];
@@ -233,28 +235,7 @@ if($globaltelefonkonyvadmin || $csoportir)
                 }
             ?></tbody>
         </table>
-    </div>
-    
-    <script>
-        function confirmDiscard()
-        {
-            var x = confirm("Biztosan rögzíteni akarod a módosításokat?\nA rögzítést követően nem lehet már a változásjelentési exportot megcsinálni!");
-            if (x)
-            {
-                window.location.href="<?=$RootPath?>/telefonkonyvvaltozasok?action=confirmchanges"
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        function openKorabbi()
-        {
-            korabbi = document.getElementById('korabbikorok');
-            korabbi.style.display = "block";
-        }
-    </script><?php
+    </div><?php
 }
 else
 {

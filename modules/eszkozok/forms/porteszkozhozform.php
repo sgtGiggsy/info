@@ -6,7 +6,7 @@ if(@$irhat)
             <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$id?>>
             
             <div>
-                <label for="accportpre">Access port előtag<small> (pl Fa0/)</small>:</label><br>
+                <label for="accportpre">Access port előtag<small> (pl Fa0/, vagy, ha nincs: - )</small>:</label><br>
                 <input type="text" accept-charset="utf-8" name="accportpre" id="accportpre"></input>
             </div>
 
@@ -32,7 +32,7 @@ if(@$irhat)
             </div>
 
             <div>
-                <label for="uplportpre">Uplink port előtag<small> (pl Gi0/)</small>:</label><br>
+                <label for="uplportpre">Uplink port előtag<small> (pl Gi0/, vagy, ha nincs: - )</small>:</label><br>
                 <input type="text" accept-charset="utf-8" name="uplportpre" id="uplportpre"></input>
             </div>
 

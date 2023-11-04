@@ -4,6 +4,7 @@ $szamlalo = null;
 $csaksajat = false;
 $csoportfilter = "alegysegfilter";
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
+$javascriptfiles[] = "includes/js/csoportFilter.js";
 if(!$globaltelefonkonyvadmin && isset($felhasznaloid))
     $csoportjogok = telefonKonyvCsoportjogok();
 

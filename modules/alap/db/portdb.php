@@ -184,7 +184,12 @@ if(isset($csoportir) && $csoportir)
             for($i = $_POST['kezdoacc']; $i <= $_POST['zaroacc']; $i++)
             {
                 //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
-                $port = $_POST['accportpre'] . $i; //$portsorszam;
+                $portpre = "";
+                if($_POST['accportpre'] != "-")
+                {
+                    $portpre = $_POST['accportpre'];
+                }
+                $port =  $portpre . $i; //$portsorszam;
 
                 $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
                 $stmt->bind_param('ss', $port, $csatlakozo);
@@ -206,7 +211,12 @@ if(isset($csoportir) && $csoportir)
             for($i = $_POST['kezdoupl']; $i <= $_POST['zaroupl']; $i++)
             {
                 //$portsorszam = str_pad($i, 2, "0", STR_PAD_LEFT);
-                $port = $_POST['uplportpre'] . $i; //$portsorszam;
+                $portpre = "";
+                if($_POST['uplportpre'] != "-")
+                {
+                    $portpre = $_POST['uplportpre'];
+                }
+                $port = $portpre . $i; //$portsorszam;
 
                 $stmt = $con->prepare('INSERT INTO portok (port, csatlakozo) VALUES (?, ?)');
                 $stmt->bind_param('ss', $port, $csatlakozo);

@@ -100,7 +100,7 @@ if($kinyit)
 	?><script>
 		window.onload = function()
 		{
-			document.getElementById("<?=$kinyit?>").style.display = "block";
+			document.getElementById("<?=$kinyit?>").style.display = "";
 		}
 	</script><?php
 }

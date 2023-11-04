@@ -88,18 +88,7 @@ if(@$irhat)
         </div>
         <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div><?php
         cancelForm();
-    ?></form>
-
-    <script>
-        document.getElementById('rovid').onkeyup = function () {
-            if(80 - this.value.length > -1) {
-                document.getElementById('szamlalo').innerHTML = "Felhasználható karakterek száma: " + (80 - this.value.length);
-            }
-            else {
-                document.getElementById('szamlalo').innerHTML = "<span class='warning'>A megengedett karakterlimit fölött jár: " + (80 - this.value.length) + "</span>";
-            }
-        };
-    </script><?php
+    ?></form><?php
 
     if(!$csoportir)
     {

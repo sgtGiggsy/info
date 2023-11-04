@@ -12,6 +12,7 @@ else
     $allapot = 0;
     
     $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
+    $javascriptfiles[] = "modules/telefonkonyv/includes/telefonkonyv.js";
     
     if(!$globaltelefonkonyvadmin)
         $csoportjogok = telefonKonyvCsoportjogok();
@@ -277,6 +278,22 @@ else
         if(isset($csoportjogok) && !in_array($csoport, $csoportjogok) && !(isset($_GET['action']) && $_GET['action'] == "addnew"))
         {
             $onloadfelugro = "A kiválasztott felhasználó, vagy beosztás nem egy általad kezelt alegységhez tartozik. Biztosan őt szeretnéd szerkeszteni?";
+        }
+
+        if(@$onloadfelugro)
+        {
+            $PHPvarsToJS[] = array(
+                    'name' => 'onloadfelugro',
+                    'val' => $onloadfelugro
+                );
+        }
+
+        if(@$beosztas)
+        {
+            $PHPvarsToJS[] = array(
+                'name' => 'beosztas',
+                'val' => $beosztas
+            );
         }
 
         include('././templates/edit.tpl.php');

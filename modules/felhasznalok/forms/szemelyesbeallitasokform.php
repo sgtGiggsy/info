@@ -1,6 +1,7 @@
 <?php
 if(@$irhat)
 {
+    $javascriptfiles[] = "modules/felhasznalok/includes/felhasznalok.js";
     ?><div class="contentleft">
         <div>
             <form action="<?=$RootPath?>/felhasznalo?beallitasok" method="post"><?php
@@ -39,22 +40,5 @@ if(@$irhat)
             </form>
             <?= cancelForm() ?>
         </div>
-    </div>
-    
-    <script>
-        function switchNightMode()
-        {
-            var nightmode = document.getElementById('szinsema').checked;
-            if(nightmode)
-            {
-                document.getElementById('szinsema').checked = false;
-            }
-            else
-            {
-                document.getElementById('szinsema').checked = true;
-            }
-        }
-    </script>
-    
-    <?php
+    </div><?php
 }

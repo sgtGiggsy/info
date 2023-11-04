@@ -306,63 +306,10 @@ if(@$irhat)
                 
                 <div><input type="submit" name="beKuld" value='<?=$button?>'></div>
                 <div class="submit">
-                    <button type='button' onclick='confirmDiscard()'>Minden módosítás elvetése</button>
+                    <button type='button' onclick='confirmDiscard("<?=$id?>")'>Minden módosítás elvetése</button>
                 </div>
                 <?php cancelForm(); ?>
             </div>
         </div>
-    </form>
-    
-    <script>
-        function setAllapotPartial()
-        {
-            allapotvaltozas = document.getElementById("allapot");
-            allapotvaltozas.value = 2;
-            admincomment = document.getElementById("adminmegjegyzes");
-            admincomment.required = true;
-            admincommentlabel = document.getElementById("admincommentlabel");
-            admincommentlabel.innerHTML = "Adminisztrátori megjegyzés*";
-        }
-
-        function confirmDiscard()
-        {
-            admincomment = document.getElementById("adminmegjegyzes");
-            if(!admincomment.value)
-            {
-                window.alert("Nem adtál magyarázatot az elvetés okáról!");
-                return false;
-            }
-            else
-            {
-                var x = confirm("Biztosan el akarod vetni a móodításokat?");
-                if (x)
-                    window.location.href="<?=$RootPath?>/valtozasfelulvizsgalat&action=discard&discardid=<?=$id?>&adminmegjegyzes="+admincomment.value
-                else
-                    return false;
-            }
-        }
-
-        function refreshList() {
-            let xhttp = new XMLHttpRequest();
-            let csopid, eredeti;
-            csopid = document.getElementById("csoport").value;
-            eredetielem = document.getElementById("eredetisor");
-            eredeti = eredetielem.value;
-            console.log(eredetielem.value);
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    document.getElementById("sorrend").innerHTML = this.responseText;
-                }
-            };
-            xhttp.open("GET", "<?=$RootPath?>/modules/telefonkonyv/includes/beosztaslist.php?csoport=" + csopid + "&eredeti=" + eredeti + "&novaltozatlan", true);
-            xhttp.send();
-        }
-
-        function restoreOriginal(inputid, origvalue)
-        {
-            input = document.getElementById(inputid);
-            input.value = origvalue;
-        }
-    </script>
-    <?php
+    </form><?php
 }

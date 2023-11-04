@@ -1,6 +1,7 @@
 <?php
 if(@$irhat)
 {
+    $javascriptfiles[] = "modules/felhasznalok/includes/felhasznalok.js";
     ?><div class="contentleft">
         <div>
             <form action="<?=$RootPath?>/csoport?action=addresponsibility<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
@@ -35,14 +36,6 @@ if(@$irhat)
     </div>
     
     <script>
-        document.getElementById('telephely').onchange = function() {
-            select = document.getElementById('alakulat');
-            select.value = '';
-        };
-
-        document.getElementById('alakulat').onchange = function() {
-            select = document.getElementById('telephely');
-            select.value = '';
-        };
+        
     </script><?php
 }

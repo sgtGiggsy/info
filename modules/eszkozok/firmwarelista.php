@@ -6,6 +6,7 @@ if(!@$mindolvas)
 }
 else
 {
+    $javascriptfiles[] = "modules/eszkozok/includes/firmwarelista.js";
     $firmwarelista = mySQLConnect("SELECT firmwarelist.id AS id,
             firmwarelist.nev AS nev,
             kiadasideje,
@@ -143,28 +144,5 @@ else
             </tr><?php
         }
         ?></tbody>
-    </table>
-    <script>
-        function firmwareSzur()
-        {
-            let szures = document.getElementById('szures');
-            let rejtendo = document.getElementsByClassName('legfrissebb');
-            let rejtendodb = rejtendo.length;
-
-            if(szures.value == "legfrissebbrejt")
-            {
-                for(let i = 0; i < rejtendodb; i++)
-                {
-                    rejtendo[i].style.display = "none";
-                }
-            }
-            else
-            {
-                for(let i = 0; i < rejtendodb; i++)
-                {
-                    rejtendo[i].style.display = "";
-                }
-            }
-        }
-    </script><?php
+    </table><?php
 }

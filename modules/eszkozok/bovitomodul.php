@@ -368,7 +368,6 @@ else
                 ?></tbody>
             </table><?php
         }
-        ?><?php
     }
 }
 ?>

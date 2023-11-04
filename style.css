@@ -139,6 +139,31 @@ ol, ul {
     padding-left: 0px;
 }
 
+svg {
+    fill: var(--basefont);
+}
+
+fieldset {
+    border: 0px;
+}
+
+.buttonininput {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.buttonininput input {
+    width: 100%;
+    padding-right: 35px;
+}
+
+.buttonininput a {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
+
 /* Görgetősáv */
 ::-webkit-scrollbar {
     width: 10px;
@@ -308,6 +333,12 @@ ol, ul {
 .dyntripplecol {
     display: grid;
     grid-template-columns: minmax(0px, 1fr) minmax(0px, max-content) minmax(max-content, 0.5fr);
+    grid-gap: 1em;
+}
+
+.contentcards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 400px));
     grid-gap: 1em;
 }
 
@@ -698,7 +729,7 @@ div[id^=kep-].shrink img {
     margin: 30% 40%;
 }
 
-.menucard, .menucard-child {
+.menucard, .menucard-child, .apicard {
     padding: 0 !important;
     background-color: var(--cardbase);
     border: 1px var(--midborder) solid;
@@ -720,7 +751,7 @@ div[id^=kep-].shrink img {
     padding: 0.5em !important;
 }
 
-.menucardbody {
+.menucardbody, .apicardbody {
     padding: 0.7em 1em 0.7em 1em !important;
 }
 

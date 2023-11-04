@@ -1,6 +1,7 @@
 <?php
 if(@$irhat)
 {
+    $javascriptfiles[] = "modules/epuletek/includes/portmuveletek.js";
     ?><div class="contentcenter">
         <form action="<?=$RootPath?>/epulet?action=vegponthurkolas<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
             <div class="portparositas"><?php
@@ -37,41 +38,5 @@ if(@$irhat)
             <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
         </form>
         <?= cancelForm(); ?>
-    </div>
-    
-    <script>
-        function atHurkolas(port) {
-            // Nullázás, törölni kell minden korábbi társítást mielőtt az újat felvesszük
-            var torlendo = document.getElementsByClassName("hurkok");
-            var select = document.getElementById("hurok-" + port);
-            var value = select.value;
-            
-            l = torlendo.length;
-            for (i = 0; i < l; i++) {
-                var selElmnt = torlendo[i];
-                // Töröljük a jelenleg társítani próbált port társításait, illetve az összes portról
-                // töröljük a jelenleg társítani próbált portot
-                if(selElmnt.value == port || (select != selElmnt && selElmnt.value == value)) {
-                    selElmnt.value = "";
-                }
-            }
-
-            var tulold = document.getElementById("hurok-" + value);
-            if(tulold) {
-                // Ha VAN a kiválasztott porton másik, a felhasználó figyelmeztetése, hogy az a hurok törlésre kerül
-                if(tulold.value)
-                {
-                    alert("Port hurkolás eltávolítva a(z) " + tulold.options[tulold.selectedIndex].text + " portról");
-                }
-                tulold.value = port;
-            }
-
-            // Mivel a port önmagával való hurkolásának nincs értelme, így ha ilyesmivel próbálkoznánk,
-            // a rendszer azt törli
-            if(value == port)
-            {
-                select.value = "";
-            }
-        }
-    </script><?php
+    </div><?php
 }

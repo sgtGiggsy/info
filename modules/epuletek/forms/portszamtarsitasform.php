@@ -1,6 +1,7 @@
 <?php
 if(@$irhat)
 {
+    $javascriptfiles[] = "modules/epuletek/includes/portmuveletek.js";
     ?><div class="contentcenter">
         <form action="<?=$RootPath?>/epulet?action=szamtarsitas<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
             <div class="portparositas"><?php
@@ -110,19 +111,6 @@ if(@$irhat)
     </div>
     
     <script>
-        function addSelect(azonosito, sorszam) {
-            if(sorszam < 5) {
-                var origselect = document.querySelector('#selecttoadd');
-                var clone = origselect.cloneNode(true);
-                var elem = document.getElementById('telefondiv-' + azonosito + '-' + sorszam);
-                elem.style = "display: block;";
-                elem.innerHTML += '<select name="telefonszam-' + azonosito + '-' + sorszam + '">' + clone.innerHTML;
-                
-                var button = document.getElementById('button-' + azonosito);
-                var sorsz = sorszam + 1;
-                var funct = 'addSelect(' + azonosito + ", " + sorsz + ")";
-                button.setAttribute('onClick', funct);
-            }
-        }
+        
     </script><?php
 }

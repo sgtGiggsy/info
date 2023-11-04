@@ -32,5 +32,3 @@ else
     </div><?php
 }
 ?>
-</body>
-</html>

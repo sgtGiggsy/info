@@ -8,7 +8,7 @@ if(@!$mindir)
 else
 {
     // Amíg nem tudjuk, hogy a folyamat jár-e tényleges írással, a változót false-ra állítjuk
-    $dbir = false;
+    $dbir = $beallitasful = false;
 
     // Amíg nem tudjuk, hogy a felhasználó valós műveletet akar végezni, a változót false-ra állítjuk
     $irhat = true;
@@ -23,6 +23,11 @@ else
         }
     }
 
+    if(isset($_GET['id']))
+    {
+        $beallitasful = $_GET['id'];
+    }
+
     // Ha a kért művelet jár adatbázisművelettel, az adatbázis műveletekért felelős oldal meghívása
     if($irhat && $dbir && count($_POST) > 0)
     {
@@ -32,7 +37,7 @@ else
     }
 
     // Ha a kért művelet nem jár adatbázisművelettel, a szerkesztési felület meghívása
-    elseif($irhat && !$dbir)
+    if($irhat || $beallitasful)
     {
         $sugo = array();
         $magyarazat = null;
@@ -50,12 +55,13 @@ else
 
         $beallitasfelol = true;
         $beallitasfulek = array();
-        $beallitasfulek[] = array('cimszoveg' => 'Főoldal beállítások', 'formnev' => 'modules/beallitasok/forms/fooldalbeallitasform');
-        $beallitasfulek[] = array('cimszoveg' => 'Menü beállításai', 'formnev' => 'modules/beallitasok/menu');
-        $beallitasfulek[] = array('cimszoveg' => 'Új menüpont', 'formnev' => 'modules/beallitasok/menu');
-        $beallitasfulek[] = array('cimszoveg' => 'Mail beállítások', 'formnev' => 'modules/beallitasok/forms/mailbeallitasform');
-        $beallitasfulek[] = array('cimszoveg' => 'Munkalap beállítások', 'formnev' => 'modules/beallitasok/forms/munkalapbeallitasform');
-        $beallitasfulek[] = array('cimszoveg' => 'Switch ellenőrző beállítások', 'formnev' => 'modules/beallitasok/forms/switchcheckbeallitasform');
+        $beallitasfulek[] = array('cimszoveg' => 'Főoldal beállítások', 'formnev' => 'modules/beallitasok/forms/fooldalbeallitasform', 'getnev' => 'fooldal');
+        $beallitasfulek[] = array('cimszoveg' => 'Menü beállításai', 'formnev' => 'modules/beallitasok/menu', 'getnev' => 'menu');
+        $beallitasfulek[] = array('cimszoveg' => 'Új menüpont', 'formnev' => 'modules/beallitasok/menu', 'getnev' => 'ujmenu');
+        $beallitasfulek[] = array('cimszoveg' => 'API beállítások', 'formnev' => 'modules/beallitasok/api', 'getnev' => 'api');
+        $beallitasfulek[] = array('cimszoveg' => 'Mail beállítások', 'formnev' => 'modules/beallitasok/forms/mailbeallitasform', 'getnev' => 'mailkuldes');
+        $beallitasfulek[] = array('cimszoveg' => 'Munkalap beállítások', 'formnev' => 'modules/beallitasok/forms/munkalapbeallitasform', 'getnev' => 'munkalapok');
+        $beallitasfulek[] = array('cimszoveg' => 'Switch ellenőrző beállítások', 'formnev' => 'modules/beallitasok/forms/switchcheckbeallitasform', 'getnev' => 'switchcheckbeallitasa');
 
         // A beállítások fő oldala
         ?><div class="szerkcard">
@@ -65,6 +71,11 @@ else
                     foreach($beallitasfulek as $ful)
                     {
                         ?><div class="szerkcardoptionelement" id="szerkcard-<?=$i?>" <?=($i == 1) ? "style='background-color: var(--infoboxtitle)'" : "" ?>><span onclick="changeTitle('beallitastitle', '<?=$ful['cimszoveg']?>'); showOnlyOne('beallitas-', '<?=$i?>'); showOnlyOne('sugo-', '<?=$i?>')"><?=$ful['cimszoveg']?></span></div><?php
+                        if($beallitasful == $ful['getnev'])
+                        {
+                            $kinyit = $i;
+                            $fulszoveg = $ful['cimszoveg'];
+                        }
                         $i++;
                     }
                 ?></div>
@@ -94,12 +105,21 @@ else
                             </div><?php
                             $s++;
                         }
-                        
                     ?></div>
-
                 </div>
             </div>
         </div><?php
+        
+        if(isset($kinyit))
+        {
+            $PHPvarsToJS[] = array(
+                'name' => 'fulszoveg',
+                'val' => $fulszoveg
+            );
+            $PHPvarsToJS[] = array(
+                'name' => 'kinyit',
+                'val' => $kinyit
+            );
+        }
     }
-    
 }

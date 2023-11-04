@@ -31,7 +31,8 @@ else
             $irhat = true;
         }
     }
-    elseif(isset($beallitasfelol) && $beallitasfelol)
+    
+    if((isset($beallitasfelol) && $beallitasfelol) || (isset($beallitasful) && $beallitasful))
     {
         $irhat = true;
     }

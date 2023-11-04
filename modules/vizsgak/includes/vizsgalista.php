@@ -50,6 +50,7 @@ else
 
     $oszlopok = array(
         array('nev' => 'Folyószám', 'tipus' => 's'),
+        array('nev' => 'Kitöltés ideje', 'tipus' => 's'),
         array('nev' => 'Vizsgázó', 'tipus' => 's'),
         array('nev' => 'Megválaszolt kérdések', 'tipus' => 'i'),
         array('nev' => 'Helyes válaszok', 'tipus' => 'i'),
@@ -96,6 +97,7 @@ else
                     
                     ?><tr style="<?=($x['helyes'] < $vizsgaadatok['minimumhelyes']) ? 'color:red' : 'color:green' ?>" class='kattinthatotr' data-href='./vizsgareszletezo/<?=$x['id']?>'>
                         <td><?=$x['sorszam']?></td>
+                        <td><?=$x['kitoltesideje']?></td>
                         <td><?=$x['nev']?></td>
                         <td><?=$x['ossz']?></td>
                         <td><?=$x['helyes']?></td>

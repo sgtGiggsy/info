@@ -174,7 +174,7 @@ else
                 <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?>'><?=$ipcim['vlan']?></td>
                 <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?> <?=($ipcim['leadva']) ? "mukodeskeptelen" : "" ?>' ><?=$eszkoz?></td>
                 <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?> <?=($ipcim['leadva']) ? "mukodeskeptelen" : "" ?>' ><?=$ipcim['megjegyzes']?></td>
-                <td><?=($ipcim['szulo']) ? "<a style='cursor: pointer' onclick=\"ipHistory('elozmeny-$elozmenyid')\">+</a>" : "" ?></td>
+                <td><?=($ipcim['szulo']) ? "<a style='cursor: pointer' onclick=\"rejtMutat('elozmeny-$elozmenyid')\">+</a>" : "" ?></td>
                 <td><?=($csoportir) ? "<a href='$RootPath/ipszerkeszt/$ipid'><img src='$RootPath/images/edit.png' alt='IP cím szerkesztése' title='IP cím szerkesztése'/></a>" : "" ?></td>
             </tr><?php
             if($ipcim['szulo'])

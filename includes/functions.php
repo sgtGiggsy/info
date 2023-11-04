@@ -141,7 +141,6 @@ function csvToArray($csv)
 	$fejlec = array_shift($rows);
 
 	$array = array();
-
 	foreach($rows as $row)
 	{
 		$array[] = array_combine($fejlec, $row);

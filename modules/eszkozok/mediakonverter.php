@@ -96,7 +96,8 @@ else
     }
     else
     {
-		$eszkoz = mysqli_fetch_assoc($mindeneszkoz);
+		$javascriptfiles[] = "modules/eszkozok/includes/mediakonverter.js";
+        $eszkoz = mysqli_fetch_assoc($mindeneszkoz);
 
         $epuletid = $eszkoz['epuletid'];
         $helyisegid = $eszkoz['helyisegid'];
@@ -297,22 +298,6 @@ else
                     </tr><?php
                 }
             ?></tbody>
-        </table>
-
-        <script>
-            $("form").on("submit", function (e) {
-                var dataString = $(this).serialize();
-
-                $.ajax({
-                type: "POST",
-                data: dataString,
-                url: "<?=$RootPath?>/portdb?action=update&tipus=mediakonverter",
-                success: function () {
-                    showToaster("Port szerkesztése sikeres...");
-                }
-            });
-            e.preventDefault();
-            });
-        </script><?php
+        </table><?php
 	}
 }

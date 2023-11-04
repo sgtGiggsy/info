@@ -123,8 +123,5 @@ else
             </div>
         </div>
     </div>
-<script>
-    
-</script>
 <?php
 }

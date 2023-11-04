@@ -1,7 +1,6 @@
 <?php
 $szamlalo = null;
 $oldalcimsor = "Vizsgák listája";
-$csoportfilter = "csoportfilter";
 
 $vizsgak = mySQLConnect("SELECT felhasznalok.id AS szerkesztoid,
         vizsgak_vizsgak.url AS vizsgaurl,

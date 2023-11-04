@@ -71,6 +71,7 @@ else
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/hibajegy?action=addnew'">Hiba bejelentése</button><?php
     }
+    $javascriptfiles[] = "modules/feladatok/includes/hibajegy.js";
     $tipus = "hibajegyek";
     $oszlopok = array(
         array('nev' => 'ID', 'tipus' => 'i'),

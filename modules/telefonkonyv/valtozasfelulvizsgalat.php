@@ -94,6 +94,7 @@ else
         }
         else
         {
+            $javascriptfiles[] = "modules/telefonkonyv/includes/telefonkonyv.js";
             $valtozas = mysqli_fetch_assoc($valtozas);
 
             if($valtozas['origbeoid'])

@@ -1,12 +1,12 @@
 <?php
 
-
 if(!($globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir)))
 {
     getPermissionError();
 }
 else
 {
+    $javascriptfiles[] = "includes/js/csoportFilter.js";
     $szamlalo = null;
     $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
     $oldalcimsor = "Telefonkönyv szerkesztők - ";
