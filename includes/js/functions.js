@@ -232,29 +232,6 @@ function enlargeImage(id) {
     };
 }
 
-function updateNotif() {
-        $.ajax({
-        type: "POST",
-        url: RootPath + "/ertesites?action=checkednotif",
-    });
-}
-
-function seenAllNotif() {
-    $.ajax({
-        type: "POST",
-        url: RootPath + "/ertesites?action=seenallnotif",
-    });
-
-    document.getElementById("notifcount").style.display = "none"
-}
-
-function seenNotif(notifid) {
-    $.ajax({
-        type: "POST",
-        url: RootPath + "/ertesites?action=seennotif&notifid=" + notifid,	
-    });
-}
-
 function reloadPageDelay(delaytime) {
     setTimeout(() => { location.reload(); }, delaytime);
 }

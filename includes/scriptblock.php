@@ -1,4 +1,5 @@
 
+<script src="<?=$RootPath?>/includes/jquery.min.js"></script>
 <script type="text/javascript">
     const urlParams = new URLSearchParams(window.location.search);
     <?php foreach($PHPvarsToJS as $var)
@@ -23,8 +24,7 @@ foreach($javascriptfiles as $js)
 {
 	?><script src="<?=$RootPath?>/<?=$js?>"></script><?php
 }
-?><script src="<?=$RootPath?>/includes/jquery.min.js"></script>
-<script type="text/javascript"><?php
+?><script type="text/javascript"><?php
 	if(isset($ujoldalcim))
 	{
 		?>document.title = '<?=$ujoldalcim?>'<?php

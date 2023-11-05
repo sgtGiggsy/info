@@ -1,6 +1,7 @@
 <?php
 
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
+$nyithelp = true;
 if(!$globaltelefonkonyvadmin)
 {
     header("Location: $RootPath/telefonszamvaltozas?modid=$id");

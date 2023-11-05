@@ -223,15 +223,16 @@ function refreshSelections() {
 }
 
 window.addEventListener("load", (event) => {
-    rejtMutat('magyarazat');
-    if(document.getElementById('sorrend').value != 999)
+    let sorrend = document.getElementById('sorrend');
+    if(sorrend != null && sorrend.value != 999)
     {
         refreshList();
     }
 
     if(typeof beosztaskapcs === 'undefined')
     {
-        switchBeosztas()
+        if(document.getElementById("beosztasreszletes") != null)
+            switchBeosztas();
     }
 });
 

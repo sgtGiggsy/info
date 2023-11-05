@@ -10,6 +10,7 @@ else
     $mobil = $csoport = $csoportid = $felhasznalo = $megjegyzes = $modositasoka = $felhid = $adminmegjegyzes = $admintimestamp = $modwhere = $meglevobeo = $addnew = $zarozar = null;
     $sorrend = 9999;
     $allapot = 0;
+    $nyithelp = true;
     
     $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
     $javascriptfiles[] = "modules/telefonkonyv/includes/telefonkonyv.js";
