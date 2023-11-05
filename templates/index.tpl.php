@@ -4,8 +4,6 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=0.85">
 	<meta name="description" content="<?=$ablakcim?>">
-	<script src="<?=$RootPath?>/includes/jquery.min.js"></script>
-	<script src="<?=$RootPath?>/includes/tinymce/tinymce.min.js"></script>
 	<link rel="shortcut icon" href="<?=$RootPath?>/favicon.ico"><?php
 	if(isset($szemelyes['szinsema']) && $szemelyes['szinsema'])
 	{

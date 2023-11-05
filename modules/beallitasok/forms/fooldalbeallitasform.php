@@ -1,41 +1,14 @@
 <?php
 if(@$irhat)
 {
-    ?><script type ="text/javascript"><?php
-        if(@$szemelyes['szinsema'] == "dark")
-	    {
-            ?>
-            tinymce.init({
-                selector: '#udvozloszoveg',
-                plugins : 'advlist autolink link image lists charmap print preview code',
-                skin: "tinymce-5-dark",
-                content_css: "tinymce-5-dark"
-            });
-
-            tinymce.init({
-                selector: '#udvozloszovegbelepve',
-                plugins : 'advlist autolink link image lists charmap print preview code',
-                skin: "tinymce-5-dark",
-                content_css: "tinymce-5-dark"
-            });
-            <?php
-        }
-        else
-        {
-            ?>
-            tinymce.init({
-                selector: '#udvozloszoveg',
-                plugins : 'advlist autolink link image lists charmap print preview code'
-            });
-
-            tinymce.init({
-                selector: '#udvozloszovegbelepve',
-                plugins : 'advlist autolink link image lists charmap print preview code'
-            });
-            <?php
-        }
-    ?></script>
-    <div class="contentleft">
+    $PHPvarsToJS[] = array(
+            'name' => 'selectors',
+            'val' => array('udvozloszoveg', 'udvozloszovegbelepve')
+        );
+    $javascriptfiles[] = "includes/tinymce/tinymce.min.js";
+	$javascriptfiles[] = "includes/js/tinyMCEinitializer.js";
+    
+    ?><div class="contentleft">
         <div>
             <form action="<?=$RootPath?>/beallitasok&action=update<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
                 <?php $magyarazat = "<h2>Főoldal beállításai</h2>

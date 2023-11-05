@@ -7,7 +7,7 @@ if(!@$mindolvas)
 else
 {
 	$portid = $_GET['id'];
-	if($_GET['tipus'] = "lage")
+	if(@$_GET['tipus'] == "lage")
 	{
 
 	}

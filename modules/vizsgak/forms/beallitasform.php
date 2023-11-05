@@ -1,6 +1,12 @@
 <?php
 if(@$irhat)
 {
+    $PHPvarsToJS[] = array(
+            'name' => 'selectors',
+            'val' => array('udvozloszoveg', 'vendegudvozlo', 'lablec')
+        );
+    $javascriptfiles[] = "includes/tinymce/tinymce.min.js";
+	$javascriptfiles[] = "includes/js/tinyMCEinitializer.js";
     $nyithelp = true;
     ?><form action="<?=$vizsgabeallitasurl?>" enctype="multipart/form-data" method="post">
         <div class="ketharmad">
@@ -168,51 +174,5 @@ if(@$irhat)
                 }
             ?></div>
         </div>
-    </form>
-    <script type="text/javascript"><?php
-        if($szemelyes['szinsema'] == "dark")
-        {
-            ?>
-            tinymce.init({
-                selector: '#udvozloszoveg',
-                plugins : 'advlist autolink link image lists charmap print preview emoticons code',
-                skin: "tinymce-5-dark",
-                content_css: "tinymce-5-dark"
-            });
-
-            tinymce.init({
-                selector: '#vendegudvozlo',
-                plugins : 'advlist autolink link image lists charmap print preview emoticons code',
-                skin: "tinymce-5-dark",
-                content_css: "tinymce-5-dark"
-            });
-
-            tinymce.init({
-                selector: '#lablec',
-                plugins : 'advlist autolink link image lists charmap print preview emoticons code',
-                skin: "tinymce-5-dark",
-                content_css: "tinymce-5-dark"
-            });
-            <?php
-        }
-        else
-        {
-            ?>
-            tinymce.init({
-                selector: '#udvozloszoveg',
-                plugins : 'advlist autolink link image lists charmap print preview emoticons code'
-            });
-
-            tinymce.init({
-                selector: '#vendegudvozlo',
-                plugins : 'advlist autolink link image lists charmap print preview emoticons code'
-            });
-
-            tinymce.init({
-                selector: '#lablec',
-                plugins : 'advlist autolink link image lists charmap print preview emoticons code'
-            });
-            <?php
-        }
-    ?></script><?php
+    </form><?php
 }

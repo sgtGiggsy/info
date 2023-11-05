@@ -1,42 +1,13 @@
 <?php
 if(@$irhat)
 {
-    ?><script type="text/javascript"><?php
-        if($szemelyes['szinsema'] == "dark")
-        {
-            ?>
-            tinymce.init({
-                selector: '#bevezetes',
-                plugins : 'advlist autolink link image lists charmap print preview emoticons code',
-                skin: "tinymce-5-dark",
-                content_css: "tinymce-5-dark"
-            });
-
-            tinymce.init({
-                selector: '#szovegtorzs',
-                plugins : 'advlist autolink link image lists charmap print preview emoticons code',
-                skin: "tinymce-5-dark",
-                content_css: "tinymce-5-dark"
-            });
-            <?php
-        }
-        else
-        {
-            ?>
-            tinymce.init({
-                selector: '#bevezetes',
-                plugins : 'advlist autolink link image lists charmap print preview emoticons code'
-            });
-
-            tinymce.init({
-                selector: '#szovegtorzs',
-                plugins : 'advlist autolink link image lists charmap print preview emoticons code'
-            });
-            <?php
-        }
-
-    ?></script>
-    <form action="<?=$RootPath?>/kozlemeny&action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?><?=$kuldooldal?>" method="post">
+    $PHPvarsToJS[] = array(
+            'name' => 'selectors',
+            'val' => array('bevezetes', 'szovegtorzs')
+        );
+    $javascriptfiles[] = "includes/tinymce/tinymce.min.js";
+	$javascriptfiles[] = "includes/js/tinyMCEinitializer.js";
+    ?><form action="<?=$RootPath?>/kozlemeny&action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?><?=$kuldooldal?>" method="post">
         <div class="ketharmad"><?php
             if(isset($_GET['id']))
             {

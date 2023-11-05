@@ -34,7 +34,7 @@ if(isset($beuszok) && $beuszok)
 
             <?php include("./" . $form . ".php") ?>
 
-            <div id="magyarazat">
+            <div id="magyarazat" style="display: none">
                 <h2 style="text-align: center">Súgó</h2>
                 <?=$magyarazat?>
             </div>

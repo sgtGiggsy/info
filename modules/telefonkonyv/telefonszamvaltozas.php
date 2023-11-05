@@ -291,7 +291,7 @@ else
         if(@$beosztas)
         {
             $PHPvarsToJS[] = array(
-                'name' => 'beosztas',
+                'name' => 'beosztaskapcs',
                 'val' => $beosztas
             );
         }

@@ -1,12 +1,3 @@
-if(typeof onloadfelugro !== 'undefined')
-{
-    window.addEventListener("load", (event) => {
-        var x = confirm(onloadfelugro);
-        if(!x)
-            window.location.href = RootPath + "/telefonkonyvvaltozasok";
-    })
-}
-
 function confirmDiscard()
 {
     var x = confirm("Biztosan rögzíteni akarod a módosításokat?\nA rögzítést követően nem lehet már a változásjelentési exportot megcsinálni!");
@@ -138,7 +129,7 @@ function checkIfNew(felhasznaloid)
     else
     {
         let xhttp = new XMLHttpRequest();
-        beosztas = document.getElementById('beosztas');
+        let beosztas = document.getElementById('beosztas');
         elem = beosztas.selectedIndex;
         beoid = beosztas.value;
         beosztasnev = document.getElementById('beosztasnev');
@@ -208,6 +199,28 @@ function requireModositasOka() {
     modositascimke.textContent = "Módosítás oka*";
 }
 
+function refreshSelections() {
+    let xhttp = new XMLHttpRequest();
+    let beoid, eredeti;
+    beoid = document.getElementById("beosztas").value;
+    if(beoid != 0)
+    {
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var jsonObj = JSON.parse(this.responseText);
+                //console.log(jsonObj[0].sorrend);
+                document.getElementById("sorrend").value = jsonObj[0].sorrend;
+                document.getElementById("belsoszam").value = jsonObj[0].belsoszam;
+                document.getElementById("belsoszam2").value = jsonObj[0].belsoszam2;
+                document.getElementById("fax").value = jsonObj[0].fax;
+                document.getElementById("kozcelu").value = jsonObj[0].kozcelu;
+                document.getElementById("kozcelufax").value = jsonObj[0].kozcelufax;
+            }
+        };
+        xhttp.open("GET", RootPath + "/modules/telefonkonyv/includes/refreshselections.php?beoid=" + beoid, true);
+        xhttp.send();
+    }
+}
 
 window.addEventListener("load", (event) => {
     rejtMutat('magyarazat');
@@ -216,28 +229,17 @@ window.addEventListener("load", (event) => {
         refreshList();
     }
 
-    if(beosztas)
+    if(typeof beosztaskapcs === 'undefined')
     {
         switchBeosztas()
     }
 });
 
-function refreshSelections() {
-    let xhttp = new XMLHttpRequest();
-    let beoid, eredeti;
-    beoid = document.getElementById("beosztas").value;
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var jsonObj = JSON.parse(this.responseText);
-            //console.log(jsonObj[0].sorrend);
-            document.getElementById("sorrend").value = jsonObj[0].sorrend;
-            document.getElementById("belsoszam").value = jsonObj[0].belsoszam;
-            document.getElementById("belsoszam2").value = jsonObj[0].belsoszam2;
-            document.getElementById("fax").value = jsonObj[0].fax;
-            document.getElementById("kozcelu").value = jsonObj[0].kozcelu;
-            document.getElementById("kozcelufax").value = jsonObj[0].kozcelufax;
-        }
-    };
-    xhttp.open("GET", RootPath + "/modules/telefonkonyv/includes/refreshselections.php?beoid=" + beoid, true);
-    xhttp.send();
+if(typeof onloadfelugro !== 'undefined')
+{
+    window.addEventListener("load", (event) => {
+        var x = confirm(onloadfelugro);
+        if(!x)
+            window.location.href = RootPath + "/telefonkonyvvaltozasok";
+    })
 }
