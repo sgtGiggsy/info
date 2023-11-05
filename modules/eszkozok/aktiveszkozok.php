@@ -89,6 +89,7 @@ else
         ?><button type="button" onclick="location.href='<?=$RootPath?>/aktiveszkoz?action=addnew'">Új aktív eszköz</button><?php
     }
 
+    $tipus = 'eszkozok';
     $oszlopok = array(
         array('nev' => 'IP cím', 'tipus' => 's'),
         array('nev' => 'Eszköznév', 'tipus' => 's'),
@@ -103,14 +104,18 @@ else
         array('nev' => 'Rack', 'tipus' => 's'),
         array('nev' => 'Megjegyzés', 'tipus' => 's')
     );
+    if($csoportir)
+    {
+        $oszlopok[] = array('nev' => 'Megjegyzés', 'tipus' => 's');
+    }
 
-    $tipus = 'eszkozok';
+
     ?><div class="PrintArea">
         <div class="oldalcim">Aktív eszközök <?=$szuresek['szures']?> <?=keszletFilter($_GET['page'], $szuresek['filter'])?></div>
         <table id="<?=$tipus?>">
             <thead>
-                <tr>
-                    <?php sortTableHeader($oszlopok, $tipus, true) ?><?php
+                <tr><?php
+                    sortTableHeader($oszlopok, $tipus, true);
                     if($csoportir)
                     {
                         ?><th class="dontprint"></th>
@@ -131,27 +136,28 @@ else
                     }
                     else
                     {
-                        ?><tr class='kattinthatotr<?=($eszkoz['hibas'] == 1) ? " reszhibas" : "" ?><?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && $eszkoz['online'] == 0 && $eszkoz['online'] != null && $szemelyes['switchstateshow'] == 1) ? " offline" : "" ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
-                            <td><?=$eszkoz['ipcim']?></td>
-                            <td><?=$eszkoz['beepitesinev']?></td>
-                            <td><?=$eszkoz['gyarto']?></td>
-                            <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
-                            <td><?=$eszkoz['portszam']?><?=($eszkoz['uplinkportok']) ? ' + ' . $eszkoz['uplinkportok'] : "" ?></td>
-                            <td><?=$eszkoz['sorozatszam']?></td>
-                            <td><?=$eszkoz['tipus']?></td>
-                            <td><?=$eszkoz['szoftver']?></td>
-                            <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
-                            <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
-                            <td><?=$eszkoz['rack']?></td>
-                            <td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
+                        $kattinthatolink = './aktiveszkoz/' . $eszkoz['id'];
+                        ?><tr class='trlink<?=($eszkoz['hibas'] == 1) ? " reszhibas" : "" ?><?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && $eszkoz['online'] == 0 && $eszkoz['online'] != null && $szemelyes['switchstateshow'] == 1) ? " offline" : "" ?>'>
+                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['ipcim']?></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['beepitesinev']?></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['gyarto']?></a></td>
+                            <td nowrap><a href="<?=$kattinthatolink?>"><?=$eszkoz['modell']?><?=$eszkoz['varians']?></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['portszam']?><?=($eszkoz['uplinkportok']) ? ' + ' . $eszkoz['uplinkportok'] : "" ?></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['sorozatszam']?></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['tipus']?></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['szoftver']?></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['rack']?></a></td><?php
                             if($csoportir)
                             {
+                                ?><td><a href="<?=$kattinthatolink?>"><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></a></td><?php
                                 szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiveszkoz"); ?>
                                 <td class="dontprint"><a href="telnet://<?=$eszkoz['ipcim']?>"><img src='<?=$RootPath?>/images/ssh.png' alt='Eszköz adminisztrálása' title='Eszköz adminisztrálása'/></a></td>
                                 <td class="dontprint"><?php
                                 if($eszkoz['web'])
                                 {
-                                    ?><a href="" onclick='window.open("http://<?=$eszkoz['ipcim']?>");'><img src='<?=$RootPath?>/images/webmanage.png' alt='Webes adminisztráció' title='Webes adminisztráció'/></a><?php
+                                    ?><a href="http://<?=$eszkoz['ipcim']?>" target="_blank"><img src='<?=$RootPath?>/images/webmanage.png' alt='Webes adminisztráció' title='Webes adminisztráció'/></a><?php
                                 }
                                 ?></td><?php
                             }
@@ -160,21 +166,22 @@ else
                 }
                 foreach($nembeepitett as $eszkoz)
                 {
-                    ?><tr class='kattinthatotr kiepitett<?=($eszkoz['hibas'] == 2) ? " mukodeskeptelen" : (($eszkoz['hibas'] == 1) ? " reszhibas" : "") ?>' data-href='./aktiveszkoz/<?=$eszkoz['id']?>'>
-                        <td><?=$eszkoz['ipcim']?></td>
-                        <td><?=$eszkoz['beepitesinev']?></td>
-                        <td><?=$eszkoz['gyarto']?></td>
-                        <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
-                        <td><?=$eszkoz['portszam']?></td>
-                        <td><?=$eszkoz['sorozatszam']?></td>
-                        <td><?=$eszkoz['tipus']?></td>
-                        <td><?=$eszkoz['szoftver']?></td>
-                        <td><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></td>
-                        <td><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></td>
-                        <td><?=$eszkoz['rack']?></td>
-                        <td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
+                    $kattinthatolink = './aktiveszkoz/' . $eszkoz['id'];
+                    ?><tr class='trlink kiepitett<?=($eszkoz['hibas'] == 2) ? " mukodeskeptelen" : (($eszkoz['hibas'] == 1) ? " reszhibas" : "") ?>'>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['ipcim']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['beepitesinev']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['gyarto']?></a></td>
+                        <td nowrap><a href="<?=$kattinthatolink?>"><?=$eszkoz['modell']?><?=$eszkoz['varians']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['portszam']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['sorozatszam']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['tipus']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['szoftver']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['epuletszam']?> <?=($eszkoz['epuletnev']) ? "(" . $eszkoz['epuletnev'] . ")" : "" ?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['helyisegszam']?> <?=($eszkoz['helyisegnev']) ? "(" . $eszkoz['helyisegnev'] . ")" : "" ?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['rack']?></a></td><?php
                         if($csoportir)
                         {
+                            ?><td><a href="<?=$kattinthatolink?>"><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></a></td><?php
                             szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiveszkoz");
                             ?><td class="dontprint"></td>
                             <td class="dontprint"></td><?php

@@ -247,7 +247,7 @@ else
                                 {
                                     $PHPvarsToJS[] = array(
                                         'name' => 'webeszkoz',
-                                        'val' => $true
+                                        'val' => true
                                     );
                                     ?><div><a style="cursor: pointer;" id="manage"><?=$eszkoz['ipcim']?></a></div><?php
                                 }

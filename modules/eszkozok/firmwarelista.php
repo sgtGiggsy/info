@@ -74,13 +74,38 @@ else
     foreach($firmwarelista as $firmware)
     {
         $firmwareid = $firmware['id'];
+        $kattinthatolink = './firmware/' . $firmware['id'];
+        $adatoszlopok = array();
+        if($elozomodell != $firmware['modell'])
+        {
+            $adatoszlopok[] = $firmware['gyarto'] . " " . $firmware['modell'];
+        }
+        else
+        {
+            $adatoszlopok[] = "";
+        }
+        $adatoszlopok[] = $firmware['nev'];
+        $adatoszlopok[] = $firmware['kiadasideje'];
+        if($firmware['vegsoverzio'])
+        {
+            $adatoszlopok[] = "Igen";
+        }
+        else
+        {
+            $adatoszlopok[] = "";
+        }
         
-        ?><tr style="font-size: 1.2em;" <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/firmware/$firmwareid'" : "" ?>>
-            <td style="font-size: 1.3em;"><?=($elozomodell != $firmware['modell']) ? $firmware['gyarto'] . " " . $firmware['modell'] : "" ?></td>
-            <td><?=$firmware['nev']?></td>
-            <td><?=$firmware['kiadasideje']?></td>
-            <td><?=($firmware['vegsoverzio']) ? "Igen" : "" ?></td>
-        </tr><?php
+        ?><tr style="font-size: 1.2em;" class="trlink"><?php
+            $elso = true;
+            foreach($adatoszlopok as $adatoszlop)
+            {
+                ?><td <?=($elso) ? "style='font-size: 1.3em;'" : "" ?>>
+                    <?=($mindir) ? "<a href='" . $kattinthatolink . "'>" : "" ?>
+                        <?=$adatoszlop?>
+                    <?=($mindir) ? "</a>" : "" ?>
+                </td><?php
+                $elso = false;
+            }
         $volteszkoz = false;
         $tempeszklist = array();
         foreach($eszkozlista as $eszkoz)

@@ -1506,8 +1506,24 @@ td img {
     margin-bottom: 5px;
 }
 
+.trlink {
+    font-weight: bold;
+}
+
+.trlink td {
+    padding: unset;
+    height: 3em;
+}
+
+.trlink td a {
+    padding: 0.4em 0.3em 0.4em 0.3em;
+    display: flex;
+    height: 100%;
+    align-items: center;
+}
+
 .kattinthatotr {
-    cursor:pointer;
+    cursor: pointer;
     font-weight: bold;
 }
 
@@ -2404,7 +2420,7 @@ div[id^=tennivalobody-].close {
     text-decoration: line-through;
 }
 
-.kiepitett {
+.kiepitett, .kiepitett a {
     font-weight: normal;
 }
 

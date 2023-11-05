@@ -35,23 +35,30 @@ else
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/simkartya?action=addnew'">Új SIMkártya</button><?php
     }
+    $oszlopok = array(
+        array('nev' => 'IMEI szám', 'tipus' => 's'),
+        array('nev' => 'Telefonszám', 'tipus' => 's'),
+        array('nev' => 'Típus', 'tipus' => 's'),
+        array('nev' => 'Felhasználószám', 'tipus' => 's'),
+        array('nev' => 'PIN kód', 'tipus' => 's'),
+        array('nev' => 'PUK kód', 'tipus' => 's'),
+        array('nev' => 'Raktár', 'tipus' => 's')
+    );
+    if($csoportir)
+    {
+        $oszlopok[] = array('nev' => 'Megjegyzés', 'tipus' => 's');
+    }
+
 
     ?><div class="PrintArea">
         <div class="oldalcim">SIM kártyák <?=$szuresek['szures']?> <?=keszletFilter($_GET['page'], $szuresek['filter'])?></div>
         <table id="<?=$tipus?>">
             <thead>
-                <tr>
-                    <th class="tsorth"><p><span class="dontprint"><input type="text" id="f0" onkeyup="filterTable('f0', '<?=$tipus?>', 0)" placeholder="IMEI szám" title="IMEI szám"><br></span><span onclick="sortTable(0, 's', '<?=$tipus?>')">IMEI szám</span></p></th>
-                    <th class="tsorth"><p><span class="dontprint"><input type="text" id="f1" onkeyup="filterTable('f1', '<?=$tipus?>', 1)" placeholder="Telefonszám" title="Telefonszám"><br></span><span onclick="sortTable(1, 's', '<?=$tipus?>')">Telefonszám</span></p></th>
-                    <th class="tsorth"><p><span class="dontprint"><input type="text" id="f2" onkeyup="filterTable('f2', '<?=$tipus?>', 2)" placeholder="Típus" title="Típus"><br></span><span onclick="sortTable(2, 's', '<?=$tipus?>')">Típus</span></p></th>
-                    <th class="tsorth"><p><span class="dontprint"><input type="text" id="f3" onkeyup="filterTable('f3', '<?=$tipus?>', 3)" placeholder="Felhasználószám" title="Felhasználószám"><br></span><span onclick="sortTable(3, 's', '<?=$tipus?>')">Felhasználószám</span></p></th>
-                    <th class="tsorth"><p><span class="dontprint"><input type="text" id="f4" onkeyup="filterTable('f4', '<?=$tipus?>', 4)" placeholder="PIN kód" title="PIN kód"><br></span><span onclick="sortTable(4, 's', '<?=$tipus?>')">PIN kód</span></p></th>
-                    <th class="tsorth"><p><span class="dontprint"><input type="text" id="f5" onkeyup="filterTable('f5', '<?=$tipus?>', 5)" placeholder="PUK kód" title="PUK kód"><br></span><span onclick="sortTable(5, 's', '<?=$tipus?>')">PUK kód</span></p></th>
-                    <th class="tsorth"><p><span class="dontprint"><input type="text" id="f6" onkeyup="filterTable('f6', '<?=$tipus?>', 6)" placeholder="Raktár" title="Raktár"><br></span><span onclick="sortTable(6, 's', '<?=$tipus?>')">Raktár</span></p></th><?php
+                <tr><?php
+                    sortTableHeader($oszlopok, $tipus, true);
                     if($csoportir)
                     {
-                        ?><th class="tsorth"><p><span class="dontprint"><input type="text" id="f7" onkeyup="filterTable('f7', '<?=$tipus?>', 7)" placeholder="Megjegyzés" title="Megjegyzés"><br></span><span onclick="sortTable(7, 's', '<?=$tipus?>')">Megjegyzés</span></p></th>
-                        <th class="dontprint"></th>
+                        ?><th class="dontprint"></th>
                         <th class="dontprint"></th>
                         <th class="dontprint"></th><?php
                     }
@@ -61,19 +68,20 @@ else
                 $nembeepitett = array();
                 foreach($mindeneszkoz as $sim)
                 {
-                    ?><tr class='kattinthatotr' data-href='./eszkozszerkeszt/<?=$sim['id']?>?tipus=simkartya'>
-                        <td><?=$sim['sorozatszam']?></td>
-                        <td><?=$sim['telefonszam']?></td>
-                        <td><?=$sim['tipus']?></td>
-                        <td><?=$sim['felhasznaloszam']?></td>
-                        <td><?=$sim['pinkod']?></td>
-                        <td><?=$sim['pukkod']?></td>
-                        <td><?=$sim['raktar']?></td><?php
+                    $kattinthatolink = './eszkozszerkeszt/' . $eszkoz['id'] . '?tipus=simkartya';
+                    ?><tr class='trlink'>
+                        <td><a href="<?=$kattinthatolink?>"><?=$sim['sorozatszam']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$sim['telefonszam']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$sim['tipus']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$sim['felhasznaloszam']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$sim['pinkod']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$sim['pukkod']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$sim['raktar']?></a></td><?php
                         if($csoportir)
                         {
-                            ?><td><?=$sim['megjegyzes']?></td>
-                            <td><!-- Szerződés szerkesztése placeholder --></td>
-                            <td><!-- Új szerződés placeholder --></td>
+                            ?><td><a href="<?=$kattinthatolink?>"><?=$sim['megjegyzes']?></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><!-- Szerződés szerkesztése placeholder --></a></td>
+                            <td><a href="<?=$kattinthatolink?>"><!-- Új szerződés placeholder --></a></td>
                             <td><a href='<?=$RootPath?>/eszkozszerkeszt/<?=$sim['id']?>?tipus=simkartya'><img src='<?=$RootPath?>/images/edit.png' alt='SIM kártya szerkesztése' title='SIM kártya szerkesztése'/></a></td><?php
                         }
                     ?></tr><?php

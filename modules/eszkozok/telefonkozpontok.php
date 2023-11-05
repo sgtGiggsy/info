@@ -56,28 +56,34 @@ else
         WHERE modellek.tipus = 40 $csoportwhere
         GROUP BY eszkozok.id
         ORDER BY epuletek.szam + 0, helyisegszam + 0, helyisegnev;");
+    $tipus = "telefonkozpontok";
+    $oszlopok = array(
+        array('nev' => 'Eszköznév', 'tipus' => 's'),
+        array('nev' => 'Gyártó', 'tipus' => 's'),
+        array('nev' => 'Modell', 'tipus' => 's'),
+        array('nev' => 'Sorozatszám', 'tipus' => 's'),
+        array('nev' => 'Épület', 'tipus' => 's'),
+        array('nev' => 'Helyiség', 'tipus' => 's')
+    );
+    if($csoportir)
+    {
+        $oszlopok[] = array('nev' => 'Megjegyzés', 'tipus' => 's');
+    }
+
     if($mindir) 
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkozpont?action=addnew'">Új telefonközpont</button><?php
     }
     ?><div class="oldalcim">Telefonközpontok</div>
 
-    <?php
-    $tipus = "telefonkozpontok";
-    ?><div class="PrintArea">
+    <div class="PrintArea">
         <table id="<?=$tipus?>">
         <thead>
-            <tr>
-                <th class="tsorth" onclick="sortTable(0, 's', '<?=$tipus?>')">Eszköznév</th>
-                <th class="tsorth" onclick="sortTable(1, 's', '<?=$tipus?>')">Gyártó</th>
-                <th class="tsorth" onclick="sortTable(2, 's', '<?=$tipus?>')">Modell</th>
-                <th class="tsorth" onclick="sortTable(3, 's', '<?=$tipus?>')">Sorozatszám</th>
-                <th class="tsorth" onclick="sortTable(4, 's', '<?=$tipus?>')">Épület</th>
-                <th class="tsorth" onclick="sortTable(5, 's', '<?=$tipus?>')">Helyiség</th><?php
+            <tr><?php
+                sortTableHeader($oszlopok, $tipus, true);
                 if($csoportir)
                 {
-                    ?><th class="tsorth" onclick="sortTable(6, 's', '<?=$tipus?>')">Megjegyzés</th>
-                    <th class="dontprint"></th>
+                    ?><th class="dontprint"></th>
                     <th class="dontprint"></th>
                     <th class="dontprint"></th><?php
                 }
@@ -86,16 +92,17 @@ else
         <tbody><?php
             foreach($telefonkozpontok as $kozpont)
             {
-                ?><tr <?=(!($kozpont['beepitesideje'] && !$kozpont['kiepitesideje'])) ? "style='font-weight: normal'" : "" ?> class='kattinthatotr' data-href='./telefonkozpont/<?=$kozpont['id']?>'>
-                    <td><?=$kozpont['beepitesinev']?></td>
-                    <td nowrap><?=$kozpont['gyarto']?></td>
-                    <td nowrap><?=$kozpont['modell']?><?=$kozpont['varians']?></td>
-                    <td><?=$kozpont['sorozatszam']?></td>
-                    <td><?=$kozpont['epuletszam']?> <?=($kozpont['epuletnev']) ? "(" . $kozpont['epuletnev'] . ")" : "" ?></td>
-                    <td><?=$kozpont['helyisegszam']?> <?=($kozpont['helyisegnev']) ? "(" . $kozpont['helyisegnev'] . ")" : "" ?></td><?php
+                $kattinthatolink = './telefonkozpont/' . $kozpont['id'];
+                ?><tr class='trlink'>
+                    <td><a href="<?=$kattinthatolink?>"><?=$kozpont['beepitesinev']?></a></td>
+                    <td nowrap><a href="<?=$kattinthatolink?>"><?=$kozpont['gyarto']?></a></td>
+                    <td nowrap><a href="<?=$kattinthatolink?>"><?=$kozpont['modell']?><?=$kozpont['varians']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$kozpont['sorozatszam']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$kozpont['epuletszam']?> <?=($kozpont['epuletnev']) ? "(" . $kozpont['epuletnev'] . ")" : "" ?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$kozpont['helyisegszam']?> <?=($kozpont['helyisegnev']) ? "(" . $kozpont['helyisegnev'] . ")" : "" ?></a></td><?php
                     if($csoportir)
                     {
-                        ?><td><?=$kozpont['megjegyzes']?></td><?php
+                        ?><td><a href="<?=$kattinthatolink?>"><?=$kozpont['megjegyzes']?></a></td><?php
                         szerkSor($kozpont['beepid'], $kozpont['id'], "telefonkozpont");
                     }
                 ?></tr><?php
