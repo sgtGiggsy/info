@@ -695,7 +695,7 @@ div[id^=kep-].shrink img {
     to {bottom: calc(50% - 300px); opacity: 0.9;}
   }
 
-.talalat, .helyes {
+.talalat, .helyes, .talalat a, .helyes a {
     color: green;
 }
 
@@ -703,7 +703,7 @@ div[id^=kep-].shrink img {
     font-weight: bold;
 }
 
-.hibastipp {
+.hibastipp, .hibastipp a {
     color: red;
 }
 
@@ -1441,7 +1441,7 @@ table {
     font-family: "roboto", "bench";
     font-size: 0.9em;
     display: table;
-    table-layout: fixed;
+    /*table-layout: fixed;*/
     border: 0px;
     border-collapse: collapse;
     width: auto;
@@ -2407,17 +2407,17 @@ div[id^=tennivalobody-].close {
 }
 
 /* --- Aktív eszköz --- */
-.reszhibas, .mukodeskeptelen {
+.reszhibas, .mukodeskeptelen, .reszhibas a, .mukodeskeptelen a {
     font-style: italic;
     color: var(--hibas);
 }
 
-.reszhibas.offline {
+.reszhibas.offline, .reszhibas.offline a {
     color: var(--hibasoffline);
 }
 
-.mukodeskeptelen {
-    text-decoration: line-through;
+.mukodeskeptelen td {
+    background-image: linear-gradient(to bottom,  transparent calc(50% - 1px), var(--hibas), transparent calc(50% + 1px));
 }
 
 .kiepitett, .kiepitett a {
@@ -2438,7 +2438,7 @@ div[id^=tennivalobody-].close {
     grid-gap: 2em;
 }
 
-.szintlist div, .szintlist table {
+.szintlist div, .szintlist table, .raktarak table {
     width: 100%;
     max-width: unset;
 }

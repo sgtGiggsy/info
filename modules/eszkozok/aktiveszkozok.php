@@ -101,8 +101,7 @@ else
         array('nev' => 'Szoftver', 'tipus' => 's'),
         array('nev' => 'Épület', 'tipus' => 's'),
         array('nev' => 'Helyiség', 'tipus' => 's'),
-        array('nev' => 'Rack', 'tipus' => 's'),
-        array('nev' => 'Megjegyzés', 'tipus' => 's')
+        array('nev' => 'Rack', 'tipus' => 's')
     );
     if($csoportir)
     {

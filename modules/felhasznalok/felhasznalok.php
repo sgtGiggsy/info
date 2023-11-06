@@ -122,16 +122,17 @@ else
         <tbody><?php
         foreach($lista as $x)
         {
-            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/felhasznalo/<?=$x['felhasznaloid']?>'>
-                <td><?=$x['felhasznaloid']?></td>
-                <td><?=$x['nev']?></td>
-                <td><?=$x['felhasznalonev']?></td>
-                <td><?=$x['email']?></td>
-                <td><?=$x['telefon']?></td>
-                <td><?=$x['alakulat']?></td>
-                <td><?=$x['osztaly']?></td>
-                <td><?=$x['beosztas']?></td>
-                <td><?=$x['elsobelepes']?></td>
+            $kattinthatolink = $RootPath . '/felhasznalo/' . $x['felhasznaloid'];
+            ?><tr class="trlink">
+                <td><a href="<?=$kattinthatolink?>"><?=$x['felhasznaloid']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$x['nev']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$x['felhasznalonev']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$x['email']?></a></td>
+                <td nowrap><a href="<?=$kattinthatolink?>"><?=$x['telefon']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$x['alakulat']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$x['osztaly']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$x['beosztas']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$x['elsobelepes']?></a></td>
             </tr><?php
         }
         ?></tbody>

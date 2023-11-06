@@ -134,6 +134,23 @@ else
                     INNER JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
                 WHERE raktarak.id = $id");
         $raktar = mysqli_fetch_assoc($raktar);
+        $oszlopok = array(
+            array('nev' => 'IP cím', 'tipus' => 's'),
+            array('nev' => 'Eszköznév', 'tipus' => 's'),
+            array('nev' => 'Gyártó', 'tipus' => 's'),
+            array('nev' => 'Modell', 'tipus' => 's'),
+            array('nev' => 'Sorozatszám', 'tipus' => 's'),
+            array('nev' => 'Tulajdonos', 'tipus' => 's'),
+            array('nev' => 'Beépítve', 'tipus' => 's'),
+            array('nev' => 'Kiépítve', 'tipus' => 's')
+        );
+        if($csoportir)
+        {
+            $oszlopok[] = array('nev' => 'Megjegyzés', 'tipus' => 's');
+            $oszlopok[] = array('nev' => '&nbsp;', 'tipus' => 's');
+            $oszlopok[] = array('nev' => '&nbsp;', 'tipus' => 's');
+            $oszlopok[] = array('nev' => '&nbsp;', 'tipus' => 's');
+        }
 
         ?><div class="breadcumblist">
             <ol vocab="https://schema.org/" typeof="BreadcrumbList">
@@ -174,68 +191,52 @@ else
 
         <?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/raktar/$id?action=edit'\">Raktár szerkesztése</button>" : "" ?>
         <div class="PrintArea">
-            <div class="oldalcim"><?=$raktar['raktar']?> raktár <?=$szuresek['szures']?> <?=raktarKeszlet(null, $szuresek['filter'])?></div><?php
-            $zar = false;
-            foreach($mindeneszkoz as $eszkoz)
-            {
-                if(@$tipus != $eszkoz['tipus'])
+            <div class="oldalcim"><?=$raktar['raktar']?> raktár <?=$szuresek['szures']?> <?=raktarKeszlet(null, $szuresek['filter'])?></div>
+            <div class="raktarak"><?php
+                $zar = false;
+                foreach($mindeneszkoz as $eszkoz)
                 {
-                    if($zar)
+                    if(@$tipus != $eszkoz['tipus'])
                     {
-                        ?></tbody>
-                        </table><?php
+                        if($zar)
+                        {
+                            ?></tbody>
+                            </table><?php
+                        }
+
+                        $tipus = $eszkoz['tipus']
+                        ?><h1 style="text-transform: capitalize;"><?=$tipus?></h1>
+                        <table id="<?=$tipus?>">
+                        <thead><?php
+                            sortTableHeader($oszlopok, $tipus);
+                            ?></tr>
+                        </thead>
+                        <tbody><?php
+                        $zar = true;
                     }
 
-                    $tipus = $eszkoz['tipus']
-                    ?><h1 style="text-transform: capitalize;"><?=$tipus?></h1>
-                    <table id="<?=$tipus?>">
-                    <thead>
-                        <tr>
-                            <th class="tsorth" onclick="sortTable(0, 's', '<?=$tipus?>')">IP cím</th>
-                            <th class="tsorth" onclick="sortTable(1, 's', '<?=$tipus?>')">Eszköznév</th>
-                            <th class="tsorth" onclick="sortTable(2, 's', '<?=$tipus?>')">Gyártó</th>
-                            <th class="tsorth" onclick="sortTable(3, 's', '<?=$tipus?>')">Modell</th>
-                            <th class="tsorth" onclick="sortTable(4, 's', '<?=$tipus?>')">Sorozatszám</th>
-                            <th class="tsorth" onclick="sortTable(5, 's', '<?=$tipus?>')">Tulajdonos</th>
-                            <th class="tsorth" onclick="sortTable(6, 's', '<?=$tipus?>')">Beépítve</th>
-                            <th class="tsorth" onclick="sortTable(7, 's', '<?=$tipus?>')">Kiépítve</th><?php
-                            if($csoportir)
-                            {
-                                ?><th class="tsorth" onclick="sortTable(8, 's', '<?=$tipus?>')">Megjegyzés</th>
-                                <th class="dontprint"></th>
-                                <th class="dontprint"></th>
-                                <th class="dontprint"></th><?php
-                            }
-                        ?></tr>
-                    </thead>
-                    <tbody><?php
-                    $zar = true;
-                }
-
-                $eszkid = $eszkoz['id'];
-                $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
-
-                ?><tr style='font-weight: normal <?= ($eszkoz['hibas'] == 2) ? "; text-decoration: line-through; color: grey" : (($eszkoz['hibas'] == 1) ? "; font-style: italic; color: grey" : "") ?>' class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
-                    <td><?=$eszkoz['ipcim']?></td>
-                    <td><?=$eszkoz['beepitesinev']?></td>
-                    <td><?=$eszkoz['gyarto']?></td>
-                    <td nowrap><?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
-                    <td><?=$eszkoz['sorozatszam']?></td>
-                    <td><?=$eszkoz['tulajdonos']?></td>
-                    <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td>
-                    <td nowrap><?=timeStampToDate($eszkoz['kiepitesideje'])?></td><?php
-                    if($csoportir)
-                    {
-                        ?><td><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></td><?php
+                    $eszkid = $eszkoz['id'];
+                    $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
+                    $kattinthatolink = $RootPath . '/' . $eszktip . '/' . $eszkoz['id'];
+                    ?><tr class='trlink <?=($eszkoz['hibas'] == 2) ? " mukodeskeptelen" : (($eszkoz['hibas'] == 1) ? " reszhibas" : "") ?>'>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['ipcim']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['beepitesinev']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['gyarto']?></a></td>
+                        <td nowrap><a href="<?=$kattinthatolink?>"><?=$eszkoz['modell']?><?=$eszkoz['varians']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['sorozatszam']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['tulajdonos']?></a></td>
+                        <td nowrap><a href="<?=$kattinthatolink?>"><?=timeStampToDate($eszkoz['beepitesideje'])?></a></td>
+                        <td nowrap><a href="<?=$kattinthatolink?>"><?=timeStampToDate($eszkoz['kiepitesideje'])?></a></td><?php
                         if($csoportir)
                         {
+                            ?><td><a href="<?=$kattinthatolink?>"><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></a></td><?php
                             szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
                         }
-                    }
-                ?></tr><?php
-            }
-            ?></tbody>
-            </table>
+                    ?></tr><?php
+                }
+                ?></tbody>
+                </table>
+            </div>
         </div><?php
     }
 }

@@ -95,13 +95,14 @@ else
                         $szazalek = round($x['helyes']/$x['ossz']*100, 2);
                     }
                     
-                    ?><tr style="<?=($x['helyes'] < $vizsgaadatok['minimumhelyes']) ? 'color:red' : 'color:green' ?>" class='kattinthatotr' data-href='./vizsgareszletezo/<?=$x['id']?>'>
-                        <td><?=$x['sorszam']?></td>
-                        <td><?=$x['kitoltesideje']?></td>
-                        <td><?=$x['nev']?></td>
-                        <td><?=$x['ossz']?></td>
-                        <td><?=$x['helyes']?></td>
-                        <td><?=$szazalek?></td>
+                    $kattinthatolink = './vizsgareszletezo/' . $x['id'];
+                    ?><tr class="trlink<?=($x['helyes'] < $vizsgaadatok['minimumhelyes']) ? ' hibastipp' : ' helyes' ?>">
+                        <td><a href="<?=$kattinthatolink?>"><?=$x['sorszam']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$x['kitoltesideje']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$x['nev']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$x['ossz']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$x['helyes']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$szazalek?></a></td>
                     </tr><?php
                 }
             ?></tbody>
