@@ -89,6 +89,7 @@ else
         array('nev' => 'Legutóbbi megjegyzés', 'tipus' => 's'),
         array('nev' => 'Módosítás ideje', 'tipus' => 's')
     );
+
     ?><div class='oldalcim'>Bejelentett hibák listája</div>
     <table id="<?=$tipus?>">
         <thead>
@@ -96,18 +97,8 @@ else
                 if($csoportir)
                 {
                     ?><th class="prioritas"></th><?php
-                    $i = 1;
                 }
-                else
-                {
-                    $i = 0;
-                }
-                
-                foreach($oszlopok as $oszlop)
-                {
-                    ?><th class="tsorth"><p><span class="dontprint"><input size="1" type="text" id="f<?=$i?>" onkeyup="filterTable('f<?=$i?>', '<?=$tipus?>', <?=$i?>)" placeholder="<?=$oszlop['nev']?>" title="<?=$oszlop['nev']?>"><br></span><span onclick="sortTable(<?=$i?>, '<?=$oszlop['tipus']?>', '<?=$tipus?>')"><?=$oszlop['nev']?></span></p></th><?php
-                    $i++;
-                }
+                sortTableHeader($oszlopok, $tipus, true)
             ?></tr>
         </thead>
         <tbody><?php
@@ -143,27 +134,28 @@ else
                     $szint = "kesz";
                 }
 
-                $hibid = $hibajegy['pubid']
+                $hibid = $hibajegy['pubid'];
+                $kattinthatolink = './hibajegy/' . $hibid;
 
-                ?><tr class='kattinthatotr' data-href='./hibajegy/<?=$hibid?>'><?php
+                ?><tr class='trlink'><?php
                     if($csoportir)
                     {
-                        ?><td class="prioritas <?=$szint?>"></td><?php
+                        ?><td class="prioritas <?=$szint?>"><a href="<?=$kattinthatolink?>"></a></td><?php
                     }
-                    ?><td><?=$hibid?></td>
-                    <td><?=$hibajegy['bejelento']?></td>
-                    <td><?=$hibajegy['alakulatnev']?></td>
-                    <td><?=$hibajegy['bejelentesideje']?></td>
-                    <td><?=$hibajegy['eszkozneve']?></td>
-                    <td><?=$hibajegy['rovid']?></td>
-                    <td style="text-transform: capitalize"><?=$hibajegy['tipus']?></td>
-                    <td><?=$allapot?></td>
-                    <td><?=($hibajegy['csatolmanyok'] > 0) ? "Van" : "Nincs" ?></td>
-                    <td><?=($hibajegy['epuletszam']) ? $hibajegy['epuletszam'] : "" ?> <?=($hibajegy['epuletnev']) ? "(" . $hibajegy['epuletnev'] . ")" : "" ?></td>
-                    <td><?=($hibajegy['helyisegszam']) ? $hibajegy['helyisegszam'] : "" ?> <?=($hibajegy['helyisegnev']) ? "(" . $hibajegy['helyisegnev'] . ")" : "" ?></td>
-                    <td><?=$hibajegy['modosito']?></td>
-                    <td><?=$hibajegy['megjegyzes']?></td>
-                    <td><?=$hibajegy['timestamp']?></td>
+                    ?><td><a href="<?=$kattinthatolink?>"><?=$hibid?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['bejelento']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['alakulatnev']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['bejelentesideje']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['eszkozneve']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['rovid']?></a></td>
+                    <td style="text-transform: capitalize"><a href="<?=$kattinthatolink?>"><?=$hibajegy['tipus']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$allapot?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=($hibajegy['csatolmanyok'] > 0) ? "Van" : "Nincs" ?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=($hibajegy['epuletszam']) ? $hibajegy['epuletszam'] : "" ?> <?=($hibajegy['epuletnev']) ? "(" . $hibajegy['epuletnev'] . ")" : "" ?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=($hibajegy['helyisegszam']) ? $hibajegy['helyisegszam'] : "" ?> <?=($hibajegy['helyisegnev']) ? "(" . $hibajegy['helyisegnev'] . ")" : "" ?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['modosito']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['megjegyzes']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['timestamp']?></a></td>
                 </tr><?php
             }
         ?></tbody>

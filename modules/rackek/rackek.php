@@ -40,6 +40,15 @@ else
         $where
         ORDER BY epuletszam, helyisegszam, helyisegnev, rack;");
 
+    $oszlopokrack = array(
+        array('nev' => 'Rackszekrény', 'tipus' => 's'),
+        array('nev' => 'Gyártó', 'tipus' => 's'),
+        array('nev' => 'Unitszám', 'tipus' => 's'),
+        array('nev' => 'Épület', 'tipus' => 's'),
+        array('nev' => 'Helyiség', 'tipus' => 's'),
+        array('nev' => '', 'tipus' => 's')
+    );
+
     if($mindir) 
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/rack?action=addnew'">Új rackszekrény</button><?php
@@ -48,27 +57,21 @@ else
     ?><div class="oldalcim">Rackszekrények</div>
     <table id="rackek">
         <thead>
-            <tr>
-                <th class="tsorth" onclick="sortTable(0, 'i', 'rackek')">Sorszám</th>
-                <th class="tsorth" onclick="sortTable(1, 's', 'rackek')">Rackszekrény</th>
-                <th class="tsorth" onclick="sortTable(2, 's', 'rackek')">Gyártó</th>
-                <th class="tsorth" onclick="sortTable(3, 'i', 'rackek')">Unitszám</th>
-                <th class="tsorth" onclick="sortTable(4, 's', 'rackek')">Helyiség</th>
-                <th class="tsorth" onclick="sortTable(5, 's', 'rackek')">Épület</th>
-                <th></th>
-            </tr>
+            <tr><?php
+                sortTableHeader($oszlopokrack, "rackek");
+            ?></tr>
         </thead>
         <tbody><?php
             foreach($rackek as $rack)
             {
                 $rackid = $rack['id'];
-                ?><tr class='kattinthatotr' data-href='./rack/<?=$rack['id']?>'>
-                    <td><?=$rack['id']?></td>
-                    <td><?=$rack['rack']?></td>
-                    <td><?=$rack['gyarto']?></td>
-                    <td><?=$rack['unitszam']?></td>
-                    <td><?=$rack['helyisegszam']?> (<?=$rack['helyisegnev']?>)</td>
-                    <td><?=$rack['epuletszam']?> (<?=$rack['epuletnev']?>)</td>
+                $kattinthatolink = $RootPath . "/rack/" . $rackid;
+                ?><tr class="trlink">
+                    <td><a href="<?=$kattinthatolink?>"><?=$rack['rack']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$rack['gyarto']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$rack['unitszam']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$rack['epuletszam']?> (<?=$rack['epuletnev']?>)</a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$rack['helyisegszam']?> (<?=$rack['helyisegnev']?>)</a></td>
                     <td><?=($csoportir) ? "<a href='$RootPath/rack/$rackid?action=edit'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td>
                 </tr><?php
             }

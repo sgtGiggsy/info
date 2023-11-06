@@ -42,6 +42,18 @@ else
         $where $csoportwhere
         ORDER BY telephelyek.id, szam + 0;");
 
+    $oszlopok = array(
+        array('nev' => '&nbsp;&nbsp;', 'tipus' => 's'),
+        array('nev' => 'Épületszám', 'tipus' => 'i'),
+        array('nev' => 'Épület megnevezése', 'tipus' => 's'),
+        array('nev' => 'Típus', 'tipus' => 's'),
+        array('nev' => 'Megjegyzés', 'tipus' => 's')
+    );
+    if($csoportir)
+    {
+        $oszlopok[] = array('nev' => '', 'tipus' => 's');
+    }
+
     if($mindir) 
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/epulet?action=addnew'">Új épület</button><?php
@@ -63,28 +75,21 @@ else
             ?><h1><?=$epulet['telephely']?></h1>
             <table id="<?=$telephely?>">
             <thead>
-                <tr>
-                    <th class="tsorth">&nbsp;&nbsp;</th>                    
-                    <th class="tsorth" onclick="sortTable(1, 'i', '<?=$telephely?>')">Épületszám</th>
-                    <th class="tsorth" onclick="sortTable(2, 's', '<?=$telephely?>')">Épület megnevezése</th>
-                    <th class="tsorth" onclick="sortTable(3, 's', '<?=$telephely?>')">Típus</th>
-                    <th class="tsorth">Megjegyzés</th><?php
-                    if($mindir)
-                    {
-                        ?><th></th><?php
-                    }
+                <tr><?php
+                    sortTableHeader($oszlopok, $telephely);
                 ?></tr>
             </thead>
             <tbody><?php
             $zar = true;
         }
 
-        ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/epulet/<?=$epulet['id']?>'>
-            <td><?=($epulet['naprakesz']) ? "&check;" : "" ?></td>
-            <td><?=$epulet['szam']?></td>
-            <td><?=$epulet['nev']?></td>
-            <td><?=$epulet['tipus']?></td>
-            <td><?=$epulet['megjegyzes']?></td><?php
+        $kattinthatolink = $RootPath . "/epulet/" . $epulet['id'];
+        ?><tr class="trlink">
+            <td><a href="<?=$kattinthatolink?>"><?=($epulet['naprakesz']) ? "&check;" : "" ?></a></td>
+            <td><a href="<?=$kattinthatolink?>"><?=$epulet['szam']?></a></td>
+            <td><a href="<?=$kattinthatolink?>"><?=$epulet['nev']?></a></td>
+            <td><a href="<?=$kattinthatolink?>"><?=$epulet['tipus']?></a></td>
+            <td><a href="<?=$kattinthatolink?>"><?=$epulet['megjegyzes']?></a></td><?php
             if($mindir)
             {
                 ?><td><a href='<?=$RootPath?>/epulet/<?=$epulet['id']?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Épület szerkesztése' title='Épület szerkesztése'/></a></td><?php

@@ -23,13 +23,13 @@ function sortTable(n, t, tname)
             if(t == "s")
             {
                 if (dir == "asc") {
-                    if((x.innerHTML.toLowerCase().localeCompare(y.innerHTML.toLowerCase(), navigator.languages[0] || navigator.language, {numeric: true, ignorePunctuation: true})) > 0)
+                    if((x.textContent.toLowerCase().localeCompare(y.textContent.toLowerCase(), navigator.languages[0] || navigator.language, {numeric: true, ignorePunctuation: true})) > 0)
                     {
                         shouldSwitch = true;
                         break;
                     }
                 } else if (dir == "desc") {
-                    if((x.innerHTML.toLowerCase().localeCompare(y.innerHTML.toLowerCase(), navigator.languages[0] || navigator.language, {numeric: true, ignorePunctuation: true})) < 0)
+                    if((x.textContent.toLowerCase().localeCompare(y.textContent.toLowerCase(), navigator.languages[0] || navigator.language, {numeric: true, ignorePunctuation: true})) < 0)
                     {
                         shouldSwitch = true;
                         break;
@@ -39,12 +39,12 @@ function sortTable(n, t, tname)
             else if(t == "i")
             {
                 if (dir == "asc") {
-                    if (Number(x.innerHTML) < Number(y.innerHTML)) {
+                    if (Number(x.textContent) < Number(y.innerHTML)) {
                     shouldSwitch = true;
                     break;
                     }
                 } else if (dir == "desc") {
-                    if (Number(x.innerHTML) > Number(y.innerHTML)) {
+                    if (Number(x.textContent) > Number(y.innerHTML)) {
                     shouldSwitch = true;
                     break;
                     }

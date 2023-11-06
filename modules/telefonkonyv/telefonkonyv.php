@@ -192,7 +192,7 @@ if(isset($_GET['kereses']))
     <table id="<?=$tipus?>" class="telefonkonyvtabla">
         <thead>
             <tr><?php
-                sortTableHeader($oszlopok, $tipus, true);
+                sortTableHeader($oszlopok, $tipus, true, false);
             ?></tr>
         </thead>
         <tbody><?php
@@ -216,23 +216,41 @@ if(isset($_GET['kereses']))
                 }
                 $telszamid = $telefonszam['telszamid'];
                 $csoportnev = $csoportnevalap . $szamlalo;
-                ?><tr <?=($csoportir) ? "class='kattinthatotr $elozocsoport' data-href='$RootPath/telefonszamvaltozas" . (($telefonszam['allapot'] == 4) ? "?modid=" . $telefonszam['modid'] : "/" . $telszamid) . "'" : "" ?>
+                $kattinthatolink = './telefonszamvaltozas';
+                $szerklink = $szerklinkzar = "";
+
+                if($telefonszam['allapot'] == 4)
+                {
+                    $kattinthatolink .= "?modid=" . $telefonszam['modid'];
+                }
+                else
+                {
+                    $kattinthatolink .= "/" . $telszamid;
+                }
+                if($csoportir)
+                {
+                    $szerklink = "<a href='$kattinthatolink'>";
+                    $szerklinkr = "<a href='$kattinthatolink' style='justify-content: right;'>";
+                    $szerklinkzar = "</a>";
+                }
+
+                ?><tr class="trlink"
                         id="<?=$csoportnev?>"
                         style="<?=($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) ? 'font-style: italic; font-weight: normal;' : ((!$globaltelefonkonyvadmin && isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok)) ? 'font-style: italic; ' : 'font-weight: normal; ' )?>
                         <?=($csaksajat && !(isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok))) ? 'display: none;' :  '' ?>"
                     >
-                    <td></td>
-                    <td><?=$telefonszam['beosztas']?></td>
-                    <td style="width:4ch; text-align:right;"><?=$telefonszam['elotag']?></td>
-                    <td><?=$telefonszam['nev']?></td>
-                    <td style="width:5ch; text-align:right;"><?=$telefonszam['titulus']?></td>
-                    <td style="width:8ch"><?=$telefonszam['rendfokozat']?></td>
-                    <td><?=$telefonszam['belsoszam']?><?=($telefonszam['belsoszam2']) ? "<br>" . $telefonszam['belsoszam2'] : "" ?></td>
-                    <td><?=$telefonszam['kozcelu']?></td>
-                    <td><?=$telefonszam['fax']?></td>
-                    <td><?=$telefonszam['kozcelufax']?></td>
-                    <td><?=$telefonszam['mobil']?></td>
-                    <td><?=$telefonszam['megjegyzes']?></td>
+                    <td><?=$szerklink?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=$telefonszam['beosztas']?><?=$szerklinkzar?></td>
+                    <td style="width:4ch;"><?=$szerklinkr?><?=$telefonszam['elotag']?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=$telefonszam['nev']?><?=$szerklinkzar?></td>
+                    <td style="width:5ch;"><?=$szerklink?><?=$telefonszam['titulus']?><?=$szerklinkzar?></td>
+                    <td style="width:8ch"><?=$szerklink?><?=$telefonszam['rendfokozat']?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=$telefonszam['belsoszam']?><?=($telefonszam['belsoszam2']) ? "<br>" . $telefonszam['belsoszam2'] : "" ?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=$telefonszam['kozcelu']?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=$telefonszam['fax']?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=$telefonszam['kozcelufax']?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=$telefonszam['mobil']?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=$telefonszam['megjegyzes']?><?=$szerklinkzar?></td>
                 </tr><?php
                 $szamlalo++;
             }

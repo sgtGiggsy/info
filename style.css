@@ -2440,6 +2440,15 @@ div[id^=tennivalobody-].close {
 
 .szintlist div, .szintlist table {
     width: 100%;
+    max-width: unset;
+}
+
+.szintlist table tr td:nth-child(1), .szintlist table tr th:nth-child(1) {
+    width: 15%;
+}
+
+.szintlist table tr td:nth-child(3), .szintlist table tr th:nth-child(3) {
+    width: 45px;
 }
 
 /* --- Végpontok, transzport portok listája --- */

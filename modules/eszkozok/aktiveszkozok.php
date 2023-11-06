@@ -109,7 +109,6 @@ else
         $oszlopok[] = array('nev' => 'Megjegyzés', 'tipus' => 's');
     }
 
-
     ?><div class="PrintArea">
         <div class="oldalcim">Aktív eszközök <?=$szuresek['szures']?> <?=keszletFilter($_GET['page'], $szuresek['filter'])?></div>
         <table id="<?=$tipus?>">

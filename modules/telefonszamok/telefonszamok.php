@@ -25,9 +25,14 @@ else
     }
 
     $orderby = "ORDER BY szam";
-    if(isset($_GET['rendez']) && $_GET['rendez'] != 'kozpontport' && $_GET['rendez'] != 'cimke')
+    if(isset($_GET['rendez']) && $_GET['rendez'] != 'kozpontport' && $_GET['rendez'] != 'cimke' && $_GET['rendez'] != 'szam' && $_GET['rendez'] != 'tipus')
     {
         $rendez = $_GET['rendez'];
+        $orderby = "ORDER BY ISNULL($rendez), $rendez ASC";
+    }
+    elseif(isset($_GET['rendez']) && $_GET['rendez'] == 'tipus')
+    {
+        $rendez = 'telefonkeszulektipusok.nev';
         $orderby = "ORDER BY ISNULL($rendez), $rendez ASC";
     }
 
@@ -67,8 +72,18 @@ else
     {
         $telefonszamok = mysqliNaturalSort($telefonszamok, 'cimke');
     }
-
     $tipus = "telefonszamok";
+    $oszlopok = array(
+        array('nev' => 'Telefonszám', 'tipus' => 's', 'onclick' => './telefonszamok?rendez=szam'),
+        array('nev' => 'Cimke', 'tipus' => 's', 'onclick' => './telefonszamok?rendez=cimke'),
+        array('nev' => 'Jog', 'tipus' => 's', 'onclick' => './telefonszamok?rendez=jog'),
+        array('nev' => 'Végpont', 'tipus' => 's', 'onclick' => './telefonszamok?rendez=faliport'),
+        array('nev' => 'Központ', 'tipus' => 'i', 'onclick' => './telefonszamok?rendez=kozpont'),
+        array('nev' => 'Lage', 'tipus' => 's', 'onclick' => './telefonszamok?rendez=kozpontport'),
+        array('nev' => 'Szám megjegyzés', 'tipus' => 's', 'onclick' => './telefonszamok?rendez=szammegjegyzes'),
+        array('nev' => 'Port megjegyzés', 'tipus' => 's', 'onclick' => './telefonszamok?rendez=portmegjegyzes'),
+        array('nev' => 'Tipus', 'tipus' => 's', 'onclick' => './telefonszamok?rendez=tipus')
+    );
 
     if($mindir)
     {
@@ -78,34 +93,27 @@ else
     <table id="<?=$tipus?>">
         <thead>
             <tr>
-                <th><button type="button" id="f0" onclick="filterTable('f0', '<?=$tipus?>', 0)" value='!' placeholder="" title="">!</button></th>
-                <th class='tsorth'><p><input type="text" id="f1" onchange="filterTable('f1', '<?=$tipus?>', 1)" placeholder="Telefonszám" title="Telefonszám"><br><span onclick="location.href='./telefonszamok?rendez=szam'">Telefonszám</th>
-                <th class='tsorth'><p><input type="text" id="f2" onchange="filterTable('f2', '<?=$tipus?>', 2)" placeholder="Cimke" title="Cimke"><br><span onclick="location.href='./telefonszamok?rendez=cimke'">Cimke</th>
-                <th class='tsorth'><p><input type="text" id="f3" onchange="filterTable('f3', '<?=$tipus?>', 3)" placeholder="Jog" title="Jog"><br><span onclick="location.href='./telefonszamok?rendez=jog'">Jog</th>
-                <th class='tsorth'><p><input type="text" id="f4" onchange="filterTable('f4', '<?=$tipus?>', 4)" placeholder="Végpont" title="Végpont"><br><span onclick="location.href='./telefonszamok?rendez=faliport'">Végpont</th>
-                <th class='tsorth'><p><input type="text" id="f5" onchange="filterTable('f5', '<?=$tipus?>', 5)" placeholder="Központ" title="Központ"><br><span onclick="location.href='./telefonszamok?rendez=kozpont'">Központ</th>
-                <th class='tsorth'><p><input type="text" id="f6" onchange="filterTable('f6', '<?=$tipus?>', 6)" placeholder="Lage" title="Lage"><br><span onclick="location.href='./telefonszamok?rendez=kozpontport'">Lage</th>
-                <th class='tsorth'><p><input type="text" id="f7" onchange="filterTable('f7', '<?=$tipus?>', 7)" placeholder="Szám megjegyzés" title="Szám megjegyzés"><br><span onclick="location.href='./telefonszamok?rendez=szammegjegyzes'">Szám megjegyzés</th>
-                <th class='tsorth'><p><input type="text" id="f8" onchange="filterTable('f8', '<?=$tipus?>', 8)" placeholder="Port megjegyzés" title="Port megjegyzés"><br><span onclick="location.href='./telefonszamok?rendez=portmegjegyzes'">Port megjegyzés</th>
-                <th class='tsorth'><p><input type="text" id="f9" onchange="filterTable('f9', '<?=$tipus?>', 9)" placeholder="Tipus" title="Tipus"><br><span onclick="location.href='./telefonszamok?rendez=tipus'">Tipus</th>
-                <th></th>
+                <th><button type="button" id="f0" onclick="filterTable('f0', '<?=$tipus?>', 0)" value='!' placeholder="" title="">!</button></th><?php
+                    sortTableHeader($oszlopok, $tipus, true, true, false, true, true, 1); 
+                ?><th></th>
             </tr>
         </thead>
         <tbody><?php
         foreach($telefonszamok as $telefonszam)
         {
             $telszamid = $telefonszam['id'];
-            ?><tr class='kattinthatotr' <?=($telefonszam['manualis']) ? 'style="font-style: italic"' : "" ?> data-href='./telefonszam/<?=$telefonszam['id']?>'>
-                <td><?=($telefonszam['manualis']) ? '!' : "" ?></td>
-                <td><?=$telefonszam['szam']?></td>
-                <td><?=$telefonszam['cimke']?></td>
-                <td title="<?=$telefonszam['jognev']?>"><?=$telefonszam['jog']?></td>
-                <td><?=$telefonszam['epuletszam']?><?=($telefonszam['epuletszam']) ? ". épület," : "" ?> <?=$telefonszam['faliport']?></td>
-                <td><?=$telefonszam['kozpont']?></td>
-                <td><?=$telefonszam['kozpontport']?></td>
-                <td><?=$telefonszam['szammegjegyzes']?></td>
-                <td><?=$telefonszam['portmegjegyzes']?></td>
-                <td><?=$telefonszam['tipus']?></td>
+            $kattinthatolink = $RootPath . "/telefonszam/" . $telszamid;
+            ?><tr class="trlink" <?=($telefonszam['manualis']) ? 'style="font-style: italic"' : "" ?>>
+                <td><a href="<?=$kattinthatolink?>"><?=($telefonszam['manualis']) ? '!' : "" ?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['szam']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['cimke']?></a></td>
+                <td title="<?=$telefonszam['jognev']?>"><a href="<?=$kattinthatolink?>"><?=$telefonszam['jog']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['epuletszam']?><?=($telefonszam['epuletszam']) ? ". épület," : "" ?> <?=$telefonszam['faliport']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['kozpont']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['kozpontport']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['szammegjegyzes']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['portmegjegyzes']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['tipus']?></a></td>
                 <td><?=($csoportir) ? "<a href='$RootPath/telefonszam/$telszamid?action=edit'><img src='$RootPath/images/edit.png' alt='Telefonszám szerkesztése' title='Telefonszám szerkesztése'/></a>" : "" ?></td>
             </tr><?php
         }

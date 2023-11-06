@@ -72,52 +72,60 @@ else
 			$helyisegid = $port['rackhelyiseg'];
 		}
 		
-		$helyiseg = mySQLConnect("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
-			FROM helyisegek
-				INNER JOIN epuletek ON helyisegek.epulet = epuletek.id
-				INNER JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
-				INNER JOIN telephelyek ON epuletek.telephely = telephelyek.id
-			WHERE helyisegek.id = $helyisegid;");
-		$helyiseg = mysqli_fetch_assoc($helyiseg);
+		if($helyisegid)
+		{
+			$helyiseg = mySQLConnect("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
+				FROM helyisegek
+					INNER JOIN epuletek ON helyisegek.epulet = epuletek.id
+					INNER JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
+					INNER JOIN telephelyek ON epuletek.telephely = telephelyek.id
+				WHERE helyisegek.id = $helyisegid;");
+			$helyiseg = mysqli_fetch_assoc($helyiseg);
 
-		?><div class="breadcumblist">
-			<ol vocab="https://schema.org/" typeof="BreadcrumbList">
-				<li property="itemListElement" typeof="ListItem">
-					<a property="item" typeof="WebPage"
-						href="<?=$RootPath?>/">
-					<span property="name">Kecskemét Informatika</span></a>
-					<meta property="position" content="1">
-				</li>
-				<li><b>></b></li>
-				<li property="itemListElement" typeof="ListItem">
-					<a property="item" typeof="WebPage"
-						href="<?=$RootPath?>/epuletek/<?=$helyiseg['thelyid']?>">
-					<span property="name"><?=$helyiseg['telephely']?></span></a>
-					<meta property="position" content="2">
-				</li>
-				<li><b>></b></li>
-				<li property="itemListElement" typeof="ListItem">
-					<a property="item" typeof="WebPage"
-						href="<?=$RootPath?>/epulet/<?=$helyiseg['epid']?>">
-					<span property="name"><?=$helyiseg['epuletszam']?>. <?=$helyiseg['tipus']?></span></a>
-					<meta property="position" content="3">
-				</li>
-				<li><b>></b></li>
-				<li property="itemListElement" typeof="ListItem">
-					<a property="item" typeof="WebPage"
-						href="<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>">
-					<span property="name"><?=$helyiseg['helyisegszam']?>. helyiség (<?=$helyiseg['helyisegnev']?>)</span></a>
-					<meta property="position" content="4">
-				</li>
-				<li><b>></b></li>
-				<li property="itemListElement" typeof="ListItem">
-					<span property="name"><?=$port['port']?></span>
-					<meta property="position" content="4">
-				</li>
-			</ol>
-		</div>
+			?><div class="breadcumblist">
+				<ol vocab="https://schema.org/" typeof="BreadcrumbList">
+					<li property="itemListElement" typeof="ListItem">
+						<a property="item" typeof="WebPage"
+							href="<?=$RootPath?>/">
+						<span property="name">Kecskemét Informatika</span></a>
+						<meta property="position" content="1">
+					</li>
+					<li><b>></b></li>
+					<li property="itemListElement" typeof="ListItem">
+						<a property="item" typeof="WebPage"
+							href="<?=$RootPath?>/epuletek/<?=$helyiseg['thelyid']?>">
+						<span property="name"><?=$helyiseg['telephely']?></span></a>
+						<meta property="position" content="2">
+					</li>
+					<li><b>></b></li>
+					<li property="itemListElement" typeof="ListItem">
+						<a property="item" typeof="WebPage"
+							href="<?=$RootPath?>/epulet/<?=$helyiseg['epid']?>">
+						<span property="name"><?=$helyiseg['epuletszam']?>. <?=$helyiseg['tipus']?></span></a>
+						<meta property="position" content="3">
+					</li>
+					<li><b>></b></li>
+					<li property="itemListElement" typeof="ListItem">
+						<a property="item" typeof="WebPage"
+							href="<?=$RootPath?>/helyiseg/<?=$helyiseg['id']?>">
+						<span property="name"><?=$helyiseg['helyisegszam']?>. helyiség (<?=$helyiseg['helyisegnev']?>)</span></a>
+						<meta property="position" content="4">
+					</li>
+					<li><b>></b></li>
+					<li property="itemListElement" typeof="ListItem">
+						<span property="name"><?=$port['port']?></span>
+						<meta property="position" content="4">
+					</li>
+				</ol>
+			</div><?php
+		}
+		else
+		{
+			?><div class="breadcumblist"><a>A port helyiséghez, vagy rackszekrényhez kötése még nem történt meg</a></div><?php
+		}
 
-		<div class="oldalcim">A(z) <?=$port['epuletnev']?> <?=$port['port']?> portjának adatai</div>
+
+		?><div class="oldalcim">A(z) <?=$port['epuletnev']?> <?=$port['port']?> portjának adatai</div>
 		<div class="infobox">
 			<div class="infoboxtitle"><?=(isset($_GET['beepites'])) ? "Korábbi csatlakoztatás adatai" : "Csatlakozás adatai" ?></div>
 			<div class="infoboxbody">

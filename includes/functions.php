@@ -234,9 +234,8 @@ function alakulatValaszto($ldapres)
 	}
 }
 
-function sortTableHeader($oszlopok, $tablazatnev, $filterinput = false)
+function sortTableHeader($oszlopok, $tablazatnev, $filterinput = false, $sortinput = true, $szuloszur = true, $sortbyurl = false, $onchange = false, $oszlopszam = 0)
 {
-	$oszlopszam = 0;
 	foreach($oszlopok as $oszlop)
 	{
 		if($oszlop['nev'])
@@ -248,13 +247,27 @@ function sortTableHeader($oszlopok, $tablazatnev, $filterinput = false)
 						size="1"
 						type="search"
 						id="f<?=$oszlopszam?>"
-						onkeyup="filterTable('f<?=$oszlopszam?>', '<?=$tablazatnev?>', <?=$oszlopszam?>, true)"
+						<?=($onchange) ? 'onchange' : 'onkeyup' ?>="filterTable('f<?=$oszlopszam?>', '<?=$tablazatnev?>', <?=$oszlopszam?>, <?=($szuloszur) ? 'true' : 'false' ?>)"
 						placeholder="<?=$oszlop['nev']?>"
 						title="<?=$oszlop['nev']?>">
-					<br></span>	<?php
+					<br></span><?php
 				}
-				?><span onclick="sortTable(<?=$oszlopszam?>, '<?=$oszlop['tipus']?>', '<?=$tablazatnev?>')"><?=$oszlop['nev']?></span>
-			</th><?php
+				if($sortinput)
+				{
+					if(!$sortbyurl)
+					{
+						?><span onclick="sortTable(<?=$oszlopszam?>, '<?=$oszlop['tipus']?>', '<?=$tablazatnev?>')"><?=$oszlop['nev']?></span><?php
+					}
+					else
+					{
+						?><a href="<?=$oszlop['onclick']?>"><?=$oszlop['nev']?></a><?php
+					}
+				}
+				else
+				{
+					?><span style="cursor: auto; width: 100%; display: block;"><?=$oszlop['nev']?></span><?php
+				}
+			?></th><?php
 		}
 		else
 		{

@@ -231,7 +231,33 @@ else
         else
         {
             $rackszam = null;
-        }            
+        }
+
+        $oszlopokeszk = array(
+            array('nev' => 'IP cím', 'tipus' => 's'),
+            array('nev' => 'Eszköznév', 'tipus' => 's'),
+            array('nev' => 'Modell', 'tipus' => 's'),
+            array('nev' => 'Eszköztípus', 'tipus' => 's'),
+            array('nev' => 'Tulajdonos', 'tipus' => 's'),
+            array('nev' => 'Beépítve', 'tipus' => 's')
+        );
+
+        if(mysqli_num_rows($rackek) > 0)
+        {
+            $oszlopokeszk[] = array('nev' => 'Rackszekrény', 'tipus' => 's');
+            $oszlopokeszk[] = array('nev' => 'Pozíció', 'tipus' => 'i');
+
+            $oszlopokrack = array(
+                array('nev' => 'Azonosító', 'tipus' => 's'),
+                array('nev' => 'Gyártó', 'tipus' => 's'),
+                array('nev' => 'Unitszám', 'tipus' => 's')
+            );
+        }
+
+        $oszlopokhelyis = array(
+            array('nev' => 'Szám', 'tipus' => 'i'),
+            array('nev' => 'Helyiségnév', 'tipus' => 's')
+        );
 
         ?><?=($mindir) ? "<button type='button' onclick=\"location.href='$RootPath/helyiseg/$helyisegid?action=edit'\">Helyiség szerkesztése</button>" : "" ?>
         <div class="oldalcim"><?=$helyiseg['helyisegszam']?> (<?=$helyiseg['helyisegnev']?>)</div>
@@ -243,18 +269,8 @@ else
             ?><div>
                 <table id="eszkozok">
                     <thead>
-                        <tr>
-                            <th class="tsorth" onclick="sortTable(0, 's', 'eszkozok')">IP cím</th>
-                            <th class="tsorth" onclick="sortTable(1, 's', 'eszkozok')">Eszköznév</th>
-                            <th class="tsorth" onclick="sortTable(2, 's', 'eszkozok')">Modell</th>
-                            <th class="tsorth" onclick="sortTable(3, 's', 'eszkozok')">Eszköztípus</th>
-                            <th class="tsorth" onclick="sortTable(4, 's', 'eszkozok')">Tulajdonos</th>
-                            <th class="tsorth" onclick="sortTable(5, 's', 'eszkozok')">Beépítve</th><?php
-                            if($rackszam > 0)
-                            {
-                                ?><th class="tsorth" onclick="sortTable(6, 's', 'eszkozok')">Rackszekrény</th>
-                                <th class="tsorth" onclick="sortTable(7, 'i', 'eszkozok')">Pozíció</th><?php
-                            }
+                        <tr><?php
+                            sortTableHeader($oszlopokeszk, "eszkozok");
                             if($csoportir)
                             {
                                 ?><th></th>
@@ -268,19 +284,20 @@ else
                         {
                             $beepid = $eszkoz['beepid'];
                             $eszkid = $eszkoz['id'];
-                            $eszktip = eszkozTipusValaszto($eszkoz['tipusid'])
-                            
-                            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
-                                <td><?=$eszkoz['ipcim']?></td>
-                                <td nowrap><?=$eszkoz['beepitesinev']?></td>
-                                <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
-                                <td><?=$eszkoz['tipus']?></td>
-                                <td><?=$eszkoz['tulajdonos']?></td>
-                                <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td><?php
+                            $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
+                            $kattinthatolink = $RootPath . "/" . $eszktip . "/" . $eszkoz['id'];
+
+                            ?><tr class="trlink">
+                                <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['ipcim']?></a></td>
+                                <td nowrap><a href="<?=$kattinthatolink?>"><?=$eszkoz['beepitesinev']?></a></td>
+                                <td nowrap><a href="<?=$kattinthatolink?>"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></a></td>
+                                <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['tipus']?></a></td>
+                                <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['tulajdonos']?></a></td>
+                                <td nowrap><a href="<?=$kattinthatolink?>"><?=timeStampToDate($eszkoz['beepitesideje'])?></a></td><?php
                                 if($rackszam > 0)
                                 {
-                                    ?><td><?=$eszkoz['rack']?></td>
-                                    <td><?=$eszkoz['pozicio']?></td><?php
+                                    ?><td><a href="<?=$kattinthatolink?>"><?=$eszkoz['rack']?></a></td>
+                                    <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['pozicio']?></a></td><?php
                                 }
                                 if($csoportir)
                                 {
@@ -300,10 +317,8 @@ else
             <div>
                 <table id="rackek">
                     <thead>
-                        <tr>
-                            <th class="tsorth" onclick="sortTable(0, 's', 'rackek')">Azonosító</th>
-                            <th class="tsorth" onclick="sortTable(1, 's', 'rackek')">Gyártó</th>
-                            <th class="tsorth" onclick="sortTable(2, 'i', 'rackek')">Unitszám</th><?php
+                        <tr><?php
+                            sortTableHeader($oszlopokrack, "rackek");
                             if($mindir)
                             {
                                 ?><th></th><?php
@@ -313,11 +328,12 @@ else
                     <tbody><?php
                         foreach($rackek as $rack)
                         {
-                            $rackid = $rack['id']
-                            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/rack/<?=$rack['id']?>'>
-                                <td><?=$rack['nev']?></td>
-                                <td><?=$rack['gyarto']?></td>
-                                <td><?=$rack['unitszam']?></td><?php
+                            $rackid = $rack['id'];
+                            $kattinthatolink = $RootPath . "/rack/" . $rackid;
+                            ?><tr class="trlink">
+                                <td><a href="<?=$kattinthatolink?>"><?=$rack['nev']?></a></td>
+                                <td><a href="<?=$kattinthatolink?>"><?=$rack['gyarto']?></a></td>
+                                <td><a href="<?=$kattinthatolink?>"><?=$rack['unitszam']?></a></td><?php
                                 if($mindir)
                                 {
                                     ?><td><?=($csoportir) ? "<a href='$RootPath/rack/$rackid?action=edit'><img src='$RootPath/images/edit.png' alt='Rack szerkesztése' title='Rack szerkesztése'/></a>" : "" ?></td><?php

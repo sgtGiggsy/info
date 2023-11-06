@@ -135,6 +135,16 @@ elseif(!isset($_GET['action']))
         WHERE rackszekrenyek.id = $id AND kiepitesideje IS NULL
         ORDER BY pozicio;");
 
+    $oszlopokeszk = array(
+        array('nev' => 'IP cím', 'tipus' => 's'),
+        array('nev' => 'Eszköznév', 'tipus' => 's'),
+        array('nev' => 'Modell', 'tipus' => 's'),
+        array('nev' => 'Eszköztípus', 'tipus' => 's'),
+        array('nev' => 'Pozíció', 'tipus' => 'i'),
+        array('nev' => 'Tulajdonos', 'tipus' => 's'),
+        array('nev' => 'Beépítve', 'tipus' => 's')
+    );
+
     if(mysqli_num_rows($rackek) != 1)
     {
         getPermissionError();
@@ -186,15 +196,9 @@ elseif(!isset($_GET['action']))
             <div>
                 <table id="eszkozok">
                     <thead>
-                        <tr>
-                            <th class="tsorth" onclick="sortTable(0, 's', 'eszkozok')">IP cím</th>
-                            <th class="tsorth" onclick="sortTable(1, 's', 'eszkozok')">Eszköznév</th>
-                            <th class="tsorth" onclick="sortTable(2, 's', 'eszkozok')">Modell</th>
-                            <th class="tsorth" onclick="sortTable(3, 's', 'eszkozok')">Eszköztípus</th>
-                            <th class="tsorth" onclick="sortTable(4, 'i', 'eszkozok')">Pozíció</th>
-                            <th class="tsorth" onclick="sortTable(5, 's', 'eszkozok')">Tulajdonos</th>
-                            <th class="tsorth" onclick="sortTable(6, 's', 'eszkozok')">Beépítve</th>
-                            <th></th>
+                        <tr><?php
+                            sortTableHeader($oszlopokeszk, "eszkozok");
+                            ?><th></th>
                             <th></th>
                             <th></th>
                         </tr>
@@ -205,19 +209,19 @@ elseif(!isset($_GET['action']))
                             $beepid = $eszkoz['beepid'];
                             $eszkid = $eszkoz['id'];
                             $eszktip = eszkozTipusValaszto($eszkoz['tipusid']);
+                            $kattinthatolink = $RootPath . "/" . $eszktip . "/" . $eszkoz['id'];
 
-                            ?><tr class='kattinthatotr' data-href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkoz['id']?>'>
-                                <td><?=$eszkoz['ipcim']?></td>
-                                <td nowrap><?=$eszkoz['beepitesinev']?></td>
-                                <td nowrap><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
-                                <td><?=$eszkoz['tipus']?></td>
-                                <td><?=$eszkoz['pozicio']?></td>
-                                <td><?=$eszkoz['tulajdonos']?></td>
-                                <td nowrap><?=timeStampToDate($eszkoz['beepitesideje'])?></td><?php
+                            ?><tr class="trlink">
+                                <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['ipcim']?></a></td>
+                                <td nowrap><a href="<?=$kattinthatolink?>"><?=$eszkoz['beepitesinev']?></a></td>
+                                <td nowrap><a href="<?=$kattinthatolink?>"><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></a></td>
+                                <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['tipus']?></a></td>
+                                <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['pozicio']?></a></td>
+                                <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['tulajdonos']?></a></td>
+                                <td nowrap><a href="<?=$kattinthatolink?>"><?=timeStampToDate($eszkoz['beepitesideje'])?></a></td><?php
                                 if($csoportir)
                                 {
                                     szerkSor($eszkoz['beepid'], $eszkoz['id'], $eszktip);
-                                    
                                 }
                                 else
                                 {
