@@ -3,6 +3,18 @@
 $szamlalo = null;
 $csaksajat = false;
 $csoportfilter = "alegysegfilter";
+if(!isset($_GET['nevszerinti']))
+{
+    $nevszerint = false;
+    $orderby = "telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend";
+    $orderbymod = "telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok_mod.sorrend";
+}
+else
+{
+    $nevszerint = true;
+    $orderby = $orderbymod = "telefonkonyvfelhasznalok.nev";
+}
+
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
 $javascriptfiles[] = "includes/js/csoportFilter.js";
 if(!$globaltelefonkonyvadmin && isset($felhasznaloid))
@@ -20,6 +32,11 @@ if(isset($_GET['kereses']))
 if(isset($_GET['csaksajat']))
 {
     $csaksajat = true;
+}
+if($nevszerint)
+{
+    $where .= " AND telefonkonyvfelhasznalok.nev IS NOT NULL";
+    $where2 .= " AND telefonkonyvfelhasznalok.nev IS NOT NULL";;
 }
 
 $alegysegek = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1;");
@@ -53,7 +70,7 @@ $telefonkonyvorig = mySQLConnect("SELECT NULL AS modid,
         LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
         LEFT JOIN telefonkonyvvaltozasok ON telefonkonyvbeosztasok.id = telefonkonyvvaltozasok.ujbeoid
     $where
-    ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");
+    ORDER BY $orderby;");
 
 $telefonkonyvuj = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS modid,
         telefonkonyvvaltozasok.origbeoid AS telszamid,
@@ -84,7 +101,7 @@ $telefonkonyvuj = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS modid,
         LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok_mod.csoport = telefonkonyvcsoportok.id
         LEFT JOIN telefonkonyvvaltozasok ON telefonkonyvbeosztasok_mod.id = telefonkonyvvaltozasok.ujbeoid
     $where2
-    ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok_mod.sorrend;");
+    ORDER BY $orderbymod;");
 
 $telefonkonyv = array();
 
@@ -119,24 +136,41 @@ foreach($telefonkonyvuj as $ujbejegyzes)
     }
 }
 
-$csoportsorrend  = array_column($telefonkonyv, 'csoportsorrend');
-$beosorrend = array_column($telefonkonyv, 'beosorrend');
-array_multisort($csoportsorrend, SORT_ASC, $beosorrend, SORT_ASC, $telefonkonyv);
+if(!$nevszerint)
+{
+    $csoportsorrend  = array_column($telefonkonyv, 'csoportsorrend');
+    $beosorrend = array_column($telefonkonyv, 'beosorrend');
+    array_multisort($csoportsorrend, SORT_ASC, $beosorrend, SORT_ASC, $telefonkonyv);
 
-$oszlopok = array(
-    array('nev' => '', 'tipus' => 's', 'adatmezo' => 'csoport'),
-    array('nev' => 'Beosztás', 'tipus' => 's', 'adatmezo' => 'beosztas'),
-    array('nev' => 'Előtag', 'tipus' => 's', 'adatmezo' => 'elotag'),
-    array('nev' => 'Név', 'tipus' => 's', 'adatmezo' => 'nev'),
-    array('nev' => 'Titulus', 'tipus' => 's', 'adatmezo' => 'titulus'),
-    array('nev' => 'Rendfokozat', 'tipus' => 's', 'adatmezo' => 'rendfokozat'),
-    array('nev' => 'Belső szám', 'tipus' => 's', 'adatmezo' => 'belsoszam'),
-    array('nev' => 'Közcélú', 'tipus' => 's', 'adatmezo' => 'kozcelu'),
-    array('nev' => 'Fax', 'tipus' => 's', 'adatmezo' => 'fax'),
-    array('nev' => 'Közcélú fax', 'tipus' => 's', 'adatmezo' => 'kozcelufax'),
-    array('nev' => 'Szolgálati mobil', 'tipus' => 's', 'adatmezo' => 'mobil'),
-    array('nev' => 'Megjegyzés', 'tipus' => 's', 'adatmezo' => 'megjegyzes')
-);
+    $oszlopok = array(
+        array('nev' => '', 'tipus' => 's', 'adatmezo' => 'csoport'),
+        array('nev' => 'Beosztás', 'tipus' => 's', 'adatmezo' => 'beosztas'),
+        array('nev' => 'Előtag', 'tipus' => 's', 'adatmezo' => 'elotag'),
+        array('nev' => 'Név', 'tipus' => 's', 'adatmezo' => 'nev'),
+        array('nev' => 'Titulus', 'tipus' => 's', 'adatmezo' => 'titulus'),
+        array('nev' => 'Rendfokozat', 'tipus' => 's', 'adatmezo' => 'rendfokozat'),
+        array('nev' => 'Belső szám', 'tipus' => 's', 'adatmezo' => 'belsoszam'),
+        array('nev' => 'Közcélú', 'tipus' => 's', 'adatmezo' => 'kozcelu'),
+        array('nev' => 'Fax', 'tipus' => 's', 'adatmezo' => 'fax'),
+        array('nev' => 'Közcélú fax', 'tipus' => 's', 'adatmezo' => 'kozcelufax'),
+        array('nev' => 'Szolgálati mobil', 'tipus' => 's', 'adatmezo' => 'mobil'),
+        array('nev' => 'Megjegyzés', 'tipus' => 's', 'adatmezo' => 'megjegyzes')
+    );
+}
+else
+{
+    $oszlopok = array(
+        array('nev' => 'Előtag', 'tipus' => 's', 'adatmezo' => 'elotag'),
+        array('nev' => 'Név', 'tipus' => 's', 'adatmezo' => 'nev'),
+        array('nev' => 'Titulus', 'tipus' => 's', 'adatmezo' => 'titulus'),
+        array('nev' => 'Rendfokozat', 'tipus' => 's', 'adatmezo' => 'rendfokozat'),
+        array('nev' => 'Beosztás', 'tipus' => 's', 'adatmezo' => 'beosztas'),
+        array('nev' => 'Belső szám', 'tipus' => 's', 'adatmezo' => 'belsoszam'),
+        array('nev' => 'Közcélú', 'tipus' => 's', 'adatmezo' => 'kozcelu'),
+        array('nev' => 'Szolgálati mobil', 'tipus' => 's', 'adatmezo' => 'mobil'),
+        array('nev' => 'Alegység', 'tipus' => 's', 'adatmezo' => 'alegyseg')
+    );
+}
 
 if(isset($_GET['action']) && $_GET['action'] == "exportexcel")
 {
@@ -177,7 +211,7 @@ if(isset($_GET['kereses']))
     }
 ?></div>
 <div class="PrintArea">
-    <div class="oldalcim">Telefonkönyv
+    <div class="oldalcim nomargbottom">Telefonkönyv
         <div class="szuresvalaszto">Alegységre szűrés
             <input style="width: 40ch"
                     size="1"
@@ -189,10 +223,21 @@ if(isset($_GET['kereses']))
                     title="Alegység">
         </div>
     </div>
+    <div class="szerkcardoptions">
+        <div class="szerkcardoptionelement" id="alegyegenkent"><span onclick="location.href='./telefonkonyv'">Alegységekre bontott</span></div>
+        <div class="szerkcardoptionelement" id="nevszerint"><span onclick="location.href='?nevszerinti'">Név szerinti</span></div>
+    </div>
     <table id="<?=$tipus?>" class="telefonkonyvtabla">
         <thead>
             <tr><?php
+            if(!$nevszerint)
+            {
                 sortTableHeader($oszlopok, $tipus, true, false);
+            }
+            else
+            {
+                sortTableHeader($oszlopok, $tipus, true, false, false);
+            }
             ?></tr>
         </thead>
         <tbody><?php
@@ -207,9 +252,12 @@ if(isset($_GET['kereses']))
                     $csoportnevalap = "csoport" . $csoportszamlalo . "-";
                     $csoportnev = $csoportnevalap . $szamlalo;
                     $elozocsoport = $telefonszam['csoport'];
-                    ?><tr id="<?=$csoportnev?>" class="<?=$elozocsoport?>" style="<?=($csaksajat && !(isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok))) ? 'display: none;' :  '' ?>">
-                        <td colspan=<?=count($oszlopok)?> style="cursor:pointer;" class="telefonkonyvelvalaszto" onclick="showHideCsoport('<?=$csoportnevalap?>', '<?=$tipus?>')"><?=$telefonszam['csoport']?></td>
-                    </tr><?php
+                    if(!$nevszerint)
+                    {
+                        ?><tr id="<?=$csoportnev?>" class="<?=$elozocsoport?>" style="<?=($csaksajat && !(isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok))) ? 'display: none;' :  '' ?>">
+                            <td colspan=<?=count($oszlopok)?> style="cursor:pointer;" class="telefonkonyvelvalaszto" onclick="showHideCsoport('<?=$csoportnevalap?>', '<?=$tipus?>')"><?=$telefonszam['csoport']?></td>
+                        </tr><?php
+                    }
                     
                     $csoportszamlalo++;
                     $szamlalo++;
@@ -238,19 +286,29 @@ if(isset($_GET['kereses']))
                         id="<?=$csoportnev?>"
                         style="<?=($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) ? 'font-style: italic; font-weight: normal;' : ((!$globaltelefonkonyvadmin && isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok)) ? 'font-style: italic; ' : 'font-weight: normal; ' )?>
                         <?=($csaksajat && !(isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok))) ? 'display: none;' :  '' ?>"
-                    >
-                    <td><?=$szerklink?><?=$szerklinkzar?></td>
-                    <td><?=$szerklink?><?=$telefonszam['beosztas']?><?=$szerklinkzar?></td>
-                    <td style="width:4ch;"><?=$szerklinkr?><?=$telefonszam['elotag']?><?=$szerklinkzar?></td>
+                    ><?php
+                    if(!$nevszerint)
+                    {
+                        ?><td><?=$szerklink?><?=$szerklinkzar?></td>
+                        <td><?=$szerklink?><?=$telefonszam['beosztas']?><?=$szerklinkzar?></td><?php
+                    }
+                    ?><td class="linkjobbra" style="width:4ch;"><?=$szerklink?><?=$telefonszam['elotag']?><?=$szerklinkzar?></td>
                     <td><?=$szerklink?><?=$telefonszam['nev']?><?=$szerklinkzar?></td>
-                    <td style="width:5ch;"><?=$szerklink?><?=$telefonszam['titulus']?><?=$szerklinkzar?></td>
-                    <td style="width:8ch"><?=$szerklink?><?=$telefonszam['rendfokozat']?><?=$szerklinkzar?></td>
-                    <td><?=$szerklink?><?=$telefonszam['belsoszam']?><?=($telefonszam['belsoszam2']) ? "<br>" . $telefonszam['belsoszam2'] : "" ?><?=$szerklinkzar?></td>
-                    <td><?=$szerklink?><?=$telefonszam['kozcelu']?><?=$szerklinkzar?></td>
-                    <td><?=$szerklink?><?=$telefonszam['fax']?><?=$szerklinkzar?></td>
-                    <td><?=$szerklink?><?=$telefonszam['kozcelufax']?><?=$szerklinkzar?></td>
-                    <td><?=$szerklink?><?=$telefonszam['mobil']?><?=$szerklinkzar?></td>
-                    <td><?=$szerklink?><?=$telefonszam['megjegyzes']?><?=$szerklinkzar?></td>
+                    <td class="linkjobbra" style="width:5ch;"><?=$szerklink?><?=$telefonszam['titulus']?><?=$szerklinkzar?></td>
+                    <td style="width:8ch"><?=$szerklink?><?=$telefonszam['rendfokozat']?><?=$szerklinkzar?></td><?php
+                    if($nevszerint)
+                    {
+                        ?><td><?=$szerklink?><?=$telefonszam['beosztas']?><?=$szerklinkzar?></td><?php
+                    }
+                    ?><td nowrap><?=$szerklink?><?=$telefonszam['belsoszam']?><?=($telefonszam['belsoszam2']) ? "<br>" . $telefonszam['belsoszam2'] : "" ?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=$telefonszam['kozcelu']?><?=$szerklinkzar?></td><?php
+                    if(!$nevszerint)
+                    {
+                        ?><td nowrap><?=$szerklink?><?=$telefonszam['fax']?><?=$szerklinkzar?></td>
+                        <td><?=$szerklink?><?=$telefonszam['kozcelufax']?><?=$szerklinkzar?></td><?php
+                    }
+                    ?><td><?=$szerklink?><?=$telefonszam['mobil']?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=($nevszerint) ? $telefonszam['csoport'] : $telefonszam['megjegyzes'] ?><?=$szerklinkzar?></td>
                 </tr><?php
                 $szamlalo++;
             }

@@ -211,24 +211,33 @@ if($globaltelefonkonyvadmin || $csoportir)
                     }
                     $valtozasid = $telefonszam['valtozasid'];
                     $csoportnev = $csoportnevalap . $szamlalo;
-                    ?><tr class='kattinthatotr <?=$elozocsoport?>' <?=($globaltelefonkonyvadmin) ?  "data-href='$RootPath/valtozasfelulvizsgalat/$valtozasid'" : "data-href='$RootPath/telefonszamvaltozas?modid=$valtozasid'" ?>
+                    if($globaltelefonkonyvadmin)
+                    {
+                        $kattinthatolink = $RootPath . "/valtozasfelulvizsgalat/" . $valtozasid;
+                    }
+                    else
+                    {
+                        $kattinthatolink = $RootPath . "/telefonszamvaltozas?modid=" . $valtozasid;
+                    } 
+
+                    ?><tr class="trlink"
                             id="<?=$csoportnev?>"
                             style="font-weight: normal;">
-                        <td class="prioritas <?=$allapot?>"></td>
-                        <td><?=$telefonszam['beosztas']?></td>
-                        <td style="width:4ch; text-align:right;"><?=$telefonszam['elotag']?></td>
-                        <td><?=$telefonszam['nev']?></td>
-                        <td style="width:5ch; text-align:right;"><?=$telefonszam['titulus']?></td>
-                        <td style="width:8ch;"><?=$telefonszam['rendfokozat']?></td>
-                        <td><?=$telefonszam['belsoszam']?><?=($telefonszam['belsoszam2']) ? "<br>" . $telefonszam['belsoszam2'] : "" ?></td>
-                        <td><?=$telefonszam['kozcelu']?></td>
-                        <td><?=$telefonszam['fax']?></td>
-                        <td><?=$telefonszam['kozcelufax']?></td>
-                        <td><?=$telefonszam['mobil']?></td>
-                        <td><?=$telefonszam['megjegyzes']?></td><?php
+                        <td class="prioritas <?=$allapot?>"><a href="<?=$kattinthatolink?>"></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['beosztas']?></a></td>
+                        <td style="width:4ch; text-align:right;"><a href="<?=$kattinthatolink?>"><?=$telefonszam['elotag']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['nev']?></a></td>
+                        <td style="width:5ch; text-align:right;"><a href="<?=$kattinthatolink?>"><?=$telefonszam['titulus']?></a></td>
+                        <td style="width:8ch;"><a href="<?=$kattinthatolink?>"><?=$telefonszam['rendfokozat']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['belsoszam']?><?=($telefonszam['belsoszam2']) ? "<br>" . $telefonszam['belsoszam2'] : "" ?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['kozcelu']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['fax']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['kozcelufax']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['mobil']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['megjegyzes']?></a></td><?php
                         if($globaltelefonkonyvadmin)
                         {
-                            ?><td><?=$telefonszam['modosito']?> (<?=$telefonszam['felhasznalonev']?>)</td><?php
+                            ?><td><a href="<?=$kattinthatolink?>"><?=$telefonszam['modosito']?> (<?=$telefonszam['felhasznalonev']?>)</a></td><?php
                         }
                     ?></tr><?php
                     $szamlalo++;

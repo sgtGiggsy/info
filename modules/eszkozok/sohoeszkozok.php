@@ -140,7 +140,7 @@ else
                                 if($eszkoz['eszktip'] == 7)
                                 {
                                     ?><td class="dontprint"><a href="telnet://<?=$eszkoz['ipcim']?>"><img src='<?=$RootPath?>/images/ssh.png' alt='Eszköz adminisztrálása' title='Eszköz adminisztrálása'/></a></td>
-                                    <td class="dontprint"><a href="http://<?=$eszkoz['ipcim']?>"><img src='<?=$RootPath?>/images/webmanage.png' alt='Webes adminisztráció' title='Webes adminisztráció'/></a></td><?php
+                                    <td class="dontprint"><a href="http://<?=$eszkoz['ipcim']?>" target="_blank"><img src='<?=$RootPath?>/images/webmanage.png' alt='Webes adminisztráció' title='Webes adminisztráció'/></a></td><?php
                                 }
                                 else
                                 {

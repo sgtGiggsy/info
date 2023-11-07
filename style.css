@@ -1522,6 +1522,10 @@ td img {
     align-items: center;
 }
 
+.linkjobbra a {
+    justify-content: right;
+}
+
 .kattinthatotr {
     cursor: pointer;
     font-weight: bold;
@@ -2120,6 +2124,10 @@ td img {
     background: var(--tsoro);
     margin: 5px 0px 10px 0px;
     box-shadow: 2px 2px 5px var(--shadow);
+}
+
+.nomargbottom {
+    margin-bottom: 0!important;
 }
 
 .oldalcim p {

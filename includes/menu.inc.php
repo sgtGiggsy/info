@@ -97,10 +97,8 @@ if($menuterulet == 3 && isset($pagename) && isset($contextmenujogok))
 
 if($kinyit)
 {
-	?><script>
-		window.onload = function()
-		{
-			document.getElementById("<?=$kinyit?>").style.display = "";
-		}
-	</script><?php
+	$PHPvarsToJS[] = array(
+			'name' => 'menunyit',
+			'val' => $kinyit
+		);
 }

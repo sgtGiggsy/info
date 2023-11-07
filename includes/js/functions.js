@@ -33,11 +33,16 @@ function verifyExist(datalist, field, tooltipid)
 
     for (i = 0; i < listlength; i++)
     {
-        if(filter == list.options[i].value)
+        var popup = document.getElementById(tooltipid);
+        if(filter == list.options[i].value && filter != "")
         {
-            var popup = document.getElementById(tooltipid);
             popup.classList.add("show");
-            setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 6000);
+            //setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 6000);
+            break;
+        }
+        else
+        {
+            popup.className = popup.className.replace("show", "");
         }
     }
 }

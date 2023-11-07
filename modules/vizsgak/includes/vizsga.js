@@ -1,5 +1,5 @@
 let ido = 0;
-if(hatralevoido)
+if(typeof hatralevoido !== 'undefined' && hatralevoido)
 {
     document.addEventListener("DOMContentLoaded", visszaSzamlalo);
     ido = hatralevoido;

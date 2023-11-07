@@ -10,3 +10,9 @@ window.addEventListener('offline', (e) => {
 window.addEventListener('online', (e) => {
     console.log('online');
 });
+
+window.onload = function()
+{
+    if(typeof menunyit !== 'undefined' && document.getElementById(menunyit) != null)
+        document.getElementById(menunyit).style.display = "";
+}
