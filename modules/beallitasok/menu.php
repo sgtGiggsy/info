@@ -87,6 +87,9 @@ else
             a website gyökerének címe után. Például: szervercim/oldal</p>";
         $magyarazat .= "<strong>Tényleges elérési út</strong>
             <p>Az oldal tényleges elérési útja a website gyökeréhez képest.</p>";
+        $magyarazat .= "<strong>API elérési útja</strong>
+            <p>A menüpont által nyilvántartott adatok eléréshez és módosításához használható
+            API elérési útja. Ha nem tudjuk mi ez, ne piszkáljuk!</p>";
         
         $form = $alapform . "menuszerkesztesform";
         $button = "Menük szerkesztése";

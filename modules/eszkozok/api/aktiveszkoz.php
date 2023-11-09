@@ -32,7 +32,7 @@ Class API_Call implements API
         return $eredmeny;
     }
 
-    static function GetOne($objid)
+    static function GetItem($objid)
     {
         $aktiveszkoz = mySQLConnect("SELECT
             eszkozok.id AS eszkid,
@@ -143,7 +143,7 @@ Class API_Call implements API
 
     static function Update($object, $tabla)
     {
-        // Nem implementáltam, egyelőre nem hiszem, hogy lehet rá szükség bármiért. Ha lesz, majd foglalkozom vele akkor
+        // Nem implementáltam. Egyelőre nem hiszem, hogy lehet rá szükség bármiért. Ha lesz, majd foglalkozom vele akkor
         return 501;
     }
 

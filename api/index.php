@@ -8,7 +8,7 @@ header('Content-Type: application/json');
 interface API
 {
 	static function GetList($mezo, $ertek) : array;
-	static function GetOne($objid);
+	static function GetItem($objid);
 	static function Post($object, $filter);
 	static function Update($object, $filter);
 	static function Delete($objid, $filter);
@@ -138,7 +138,7 @@ if($statuscode < 400 && $apikey)
 	{	
 		if($egyedioldal)
 		{
-			$valasz = API_Call::GetOne($filter);
+			$valasz = API_Call::GetItem($filter);
 		}
 		else
 		{

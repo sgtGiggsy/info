@@ -95,6 +95,15 @@ if(@$irhat)
                                 </div>
                             </div>
                         </div>
+                        <div>
+                            <div><strong>API</strong></div>
+                            <div class="menuszerksor">
+                                <div>
+                                    <label>API elérési útja</label>    
+                                    <input type="text" style="width:60ch" name="apiurl">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>

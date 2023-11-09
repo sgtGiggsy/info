@@ -99,6 +99,15 @@ if(@$irhat)
                                     </div>
                                 </div>
                             </div>
+                            <div>
+                                <div><strong>API</strong></div>
+                                <div class="menuszerksor">
+                                    <div>
+                                        <label>API elérési útja</label>    
+                                        <input type="text" style="width:60ch" name="apiurl-<?=$i?>" value="<?=$menupont['apiurl']?>">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div><?php
                     $i++;
