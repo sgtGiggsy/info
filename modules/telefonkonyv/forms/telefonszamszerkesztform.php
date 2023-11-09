@@ -33,9 +33,11 @@ if(@$irhat)
                 <input type ="hidden" id="eredetisor" name="eredetisor" value="<?=$sorrend?>">
                 <input type ="hidden" id="origbeoid" name="origbeoid" value="<?=$beosztas?>">
                 <input type ="hidden" id="origfelhid" name="origfelhid" value="<?=$felhid?>">
+                <input type ="hidden" id="removebeo" name="removebeo" value="0">
                 <div>
                     <div id="beosztasalap">
-                        <button onclick="switchBeosztas(); return false;">Beosztás szerkesztése</button><br>
+                        <button onclick="switchBeosztas(); return false;">Beosztás szerkesztése</button>
+                        <div class="right"><button onclick="delBeosztas(); return false;" class="redbutton" id="beodelbutton">Beosztás törlése</button></div><br>
                         <label for="beosztas">Beosztás*</label>
                         <select name="beosztas" id="beosztas" onchange="checkIfNew(<?=$felhasznaloid?>);refreshSelections()" required>
                             <option></option>
@@ -182,7 +184,7 @@ if(@$irhat)
 
                     <div>
                         <label for="megjegyzes">Megjegyzés</label>
-                        <textarea name="megjegyzes" value="<?=$megjegyzes?>"></textarea>
+                        <textarea name="megjegyzes" id="megjegyzes" value="<?=$megjegyzes?>"></textarea>
                     </div>
 
                     <?php $magyarazat .= "<strong>Megjegyzés</strong><p>Itt lehet feltüntetni bármi olyan közhasznú
@@ -279,9 +281,5 @@ if(@$irhat)
                 </div>
             </fieldset>
         </div>
-    </form>
-
-    <script>
-        
-    </script><?php
+    </form><?php
 }

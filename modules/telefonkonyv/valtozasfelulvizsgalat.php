@@ -65,6 +65,7 @@ else
                 telefonkonyvbeosztasok_mod.kozcelu AS kozcelu,
                 telefonkonyvbeosztasok_mod.fax AS fax,
                 telefonkonyvbeosztasok_mod.kozcelufax AS kozcelufax,
+                telefonkonyvbeosztasok_mod.torolve AS torolve,
                 telefonkonyvfelhasznalok.mobil AS mobil,
                 telefonkonyvcsoportok.id AS csoportid,
                 telefonkonyvcsoportok.nev AS csoport,
@@ -207,6 +208,11 @@ else
                 $origallapot =  $telefonszam['allapot'];
                 
                 $beowhere =  "OR telefonkonyvbeosztasok.id = $origbeoid";
+            }
+
+            if($valtozas['torolve'] == 1)
+            {
+                $oldalcim = "A(z) $csoport alegység $beosztas beosztásának törlése";
             }
 
             $beosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS id,

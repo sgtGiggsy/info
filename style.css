@@ -897,7 +897,14 @@ textarea:focus, input:focus, select:focus {
     border-bottom: 1px solid var(--lightborder);
 }
 
+.redbutton {
+    background-color: #990000;
+    border-color: #700000;
+}
 
+.redbutton:hover {
+    background-color: #600000;
+}
 
 /* A .tox a TinyMCE beviteli mezőjének wrapperje */
 .tox {

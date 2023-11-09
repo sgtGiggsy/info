@@ -1,4 +1,4 @@
-function confirmDiscard()
+function confirmFinalize()
 {
     var x = confirm("Biztosan rögzíteni akarod a módosításokat?\nA rögzítést követően nem lehet már a változásjelentési exportot megcsinálni!");
     if (x)
@@ -191,6 +191,31 @@ function delUser() {
     mobil.value = null;
 }
 
+
+function delBeosztas(){
+    var x = confirm("Biztosan törölni akarod a beosztást?");
+        if (x)
+        {
+            let remove = document.getElementById("removebeo");
+            let button = document.getElementById("beodelbutton")
+            remove.value = "1";
+            button.textContent = "!!! BEOSZTÁS TÖRLÉSRE KIJELÖLVE !!!";
+            let notrequired =  [
+                document.getElementById('nev'),
+                document.getElementById('titulus'),
+                document.getElementById('rendfokozat'),
+                document.getElementById('belsoszam')
+            ];
+            for(let i = 0; i < notrequired.length; i++)
+            {
+                notrequired[i].required = false;
+            }
+            requireModositasOka();
+        }
+        else
+            return false;
+}
+
 function requireModositasOka() {
     modositasoka = document.getElementById('modositasoka');
     modositasoka.required = true;
@@ -224,7 +249,8 @@ function refreshSelections() {
 
 window.addEventListener("load", (event) => {
     let sorrend = document.getElementById('sorrend');
-    if(sorrend != null && sorrend.value != 999)
+    // A sorrend.title csak a változás felülvizsgálatnál létezik, ahol NEM szabad betöltéskor listát frissíteni
+    if(sorrend != null && sorrend.value != 999 && sorrend.title != null)
     {
         refreshList();
     }

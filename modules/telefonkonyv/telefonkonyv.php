@@ -60,7 +60,8 @@ $telefonkonyvorig = mySQLConnect("SELECT NULL AS modid,
         telefonkonyvbeosztasok.megjegyzes AS megjegyzes,
         telefonkonyvcsoportok.sorrend AS csoportsorrend,
         telefonkonyvbeosztasok.sorrend AS beosorrend,
-        telefonkonyvcsoportok.id AS csopid
+        telefonkonyvcsoportok.id AS csopid,
+        telefonkonyvbeosztasok.torolve AS torolve
     FROM telefonkonyvbeosztasok
         LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
         LEFT JOIN nevelotagok ON telefonkonyvfelhasznalok.elotag = nevelotagok.id
@@ -91,7 +92,8 @@ $telefonkonyvuj = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS modid,
         telefonkonyvbeosztasok_mod.megjegyzes AS megjegyzes,
         telefonkonyvcsoportok.sorrend AS csoportsorrend,
         telefonkonyvbeosztasok_mod.sorrend AS beosorrend,
-        telefonkonyvcsoportok.id AS csopid
+        telefonkonyvcsoportok.id AS csopid,
+        telefonkonyvbeosztasok_mod.torolve AS torolve
     FROM telefonkonyvbeosztasok_mod
         LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok_mod.felhid = telefonkonyvfelhasznalok.id
         LEFT JOIN nevelotagok ON telefonkonyvfelhasznalok.elotag = nevelotagok.id
@@ -105,6 +107,7 @@ $telefonkonyvuj = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS modid,
 
 $telefonkonyv = array();
 
+// Először összevetjük a már meglévő, mentett telefonkönyv bejegyzéseket a beküldött, elfogadott, de nem véglegesített módosításokkal
 $uj = false;
 foreach($telefonkonyvorig as $fixbejegyzes)
 {
@@ -113,14 +116,18 @@ foreach($telefonkonyvorig as $fixbejegyzes)
         $uj = false;
         if($fixbejegyzes['telszamid'] == $ujbejegyzes['telszamid'])
         {
-            //echo $ujbejegyzes['nev'] . "<br>";
-            $ujbejegyzes['uj'] = true;
-            $telefonkonyv[] = $ujbejegyzes;
             $uj = true;
+            // Ha a módosítás a beosztás törlése, nem adjuk hozzá a megjelenő telefonkönyvhöz
+            if($ujbejegyzes['torolve'] != 1)
+            {
+                $ujbejegyzes['uj'] = true;
+                $telefonkonyv[] = $ujbejegyzes;
+            }
             break;
         }
     }
-    if(!$uj)
+    // Ha nem volt a meglévő beosztással egyező módosítás, a régi bejegyzés megjelenítése
+    if(!$uj && $fixbejegyzes['torolve'] != 1)
     {
         $fixbejegyzes['uj'] = false;
         $telefonkonyv[] = $fixbejegyzes;

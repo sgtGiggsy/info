@@ -41,8 +41,8 @@ $telkonyvbeosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.nev AS beoszta
 $telkonyvbeosztasok = mysqliToArray($telkonyvbeosztasok);
 
 $csoportsorrend  = array_column($telkonyvbeosztasok, 'csoportsorrend');
-$sorrend = array_column($telkonyvbeosztasok, 'sorrend');
-array_multisort($csoportsorrend, SORT_ASC, $sorrend, SORT_ASC, $telkonyvbeosztasok);
+$sorrendszerint = array_column($telkonyvbeosztasok, 'sorrend');
+array_multisort($csoportsorrend, SORT_ASC, $sorrendszerint, SORT_ASC, $telkonyvbeosztasok);
 
     $sorrendszamlalo = 0;
     

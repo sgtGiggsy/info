@@ -55,7 +55,9 @@ if($globaltelefonkonyvadmin || $csoportir)
             felhasznalok.felhasznalonev AS felhasznalonev,
             felhasznalok.nev AS modosito,
             telefonkonyvbeosztasok_mod.megjegyzes AS megjegyzes,
-            telefonkonyvvaltozasok.allapot AS allapot
+            telefonkonyvvaltozasok.allapot AS allapot,
+            telefonkonyvbeosztasok_mod.torolve AS torolve,
+            telefonkonyvvaltozasok.timestamp AS bekuldesideje
         FROM telefonkonyvvaltozasok
             LEFT JOIN telefonkonyvbeosztasok_mod ON telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok_mod.id
             LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvvaltozasok.ujfelhid = telefonkonyvfelhasznalok.id
@@ -127,7 +129,7 @@ if($globaltelefonkonyvadmin || $csoportir)
             }
             if($modositasikor['excelexport'])
             {
-                ?><button type="button" onclick="confirmDiscard()">Jóváhagyott módosítások rögzítése</button><?php
+                ?><button type="button" onclick="confirmFinalize()">Jóváhagyott módosítások rögzítése</button><?php
             }
         ?></div><?php
     }
@@ -220,7 +222,7 @@ if($globaltelefonkonyvadmin || $csoportir)
                         $kattinthatolink = $RootPath . "/telefonszamvaltozas?modid=" . $valtozasid;
                     } 
 
-                    ?><tr class="trlink"
+                    ?><tr class="trlink<?=($telefonszam['torolve']) ? ' mukodeskeptelen' : '' ?>"
                             id="<?=$csoportnev?>"
                             style="font-weight: normal;">
                         <td class="prioritas <?=$allapot?>"><a href="<?=$kattinthatolink?>"></a></td>
@@ -237,7 +239,7 @@ if($globaltelefonkonyvadmin || $csoportir)
                         <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['megjegyzes']?></a></td><?php
                         if($globaltelefonkonyvadmin)
                         {
-                            ?><td><a href="<?=$kattinthatolink?>"><?=$telefonszam['modosito']?> (<?=$telefonszam['felhasznalonev']?>)</a></td><?php
+                            ?><td><a href="<?=$kattinthatolink?>"><?=$telefonszam['modosito']?> (<?=$telefonszam['felhasznalonev']?>)<br><?=$telefonszam['bekuldesideje']?></a></td><?php
                         }
                     ?></tr><?php
                     $szamlalo++;
