@@ -270,6 +270,7 @@ function valtozasokSzurese() {
 function gyorsJovahagyas(id, action) {
     let allapotinp = document.getElementById('allapot-' + id);
     let priority = document.getElementById('prioritylevel-' + id);
+    let beonev = document.getElementById('beosztas-' + id).value;
     let uzenet;
     let csoportdata = document.getElementById("csoport-" + id).value;
     allapotinp.value = action;
@@ -291,7 +292,8 @@ function gyorsJovahagyas(id, action) {
         {
             id: id,
             csoport: csoportdata,
-            allapot: action
+            allapot: action,
+            beosztasnev: beonev
         },
         function(data, status){
             if(status == "success")

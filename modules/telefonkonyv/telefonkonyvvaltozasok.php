@@ -244,6 +244,7 @@ if($globaltelefonkonyvadmin || $csoportir)
                                     <form>
                                         <input type ="hidden" id="id" name="id" value="<?=$valtozasid?>">
                                         <input type ="hidden" id="csoport-<?=$valtozasid?>" name="csoport" value="<?=$telefonszam['csoportid']?>">
+                                        <input type ="hidden" id="beosztas-<?=$valtozasid?>" name="beosztasnev" value="<?=$telefonszam['beosztas']?>">
                                         <input type ="hidden" id="allapot-<?=$valtozasid?>" name="allapot" value="0">
                                     </form>
                                     <div><a style="background-color: var(--online)" onclick="gyorsJovahagyas('<?=$valtozasid?>', 1)">Jóváhagy</a></div>

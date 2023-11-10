@@ -232,6 +232,7 @@ if(isset($irhat) && $irhat)
     elseif($_GET["action"] == "quickapprove" && $globaltelefonkonyvadmin)
     {
         $allapot = null;
+        $beosztasnev = mb_strtoupper($_POST['beosztasnev']);
         if($_POST['allapot'] == 1)
         {
             $allapot = 3;
@@ -281,8 +282,8 @@ if(isset($irhat) && $irhat)
 
         switch($_POST['allapot'] && $success)
         {
-            case '2': $adminesemeny = "elvetette"; break;
-            case '3': $adminesemeny = "elfogadta"; break;
+            case '0': $adminesemeny = "elvetette"; break;
+            case '1': $adminesemeny = "elfogadta"; break;
         }
         if(!$success)
             http_response_code(304);

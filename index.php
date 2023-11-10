@@ -440,7 +440,8 @@ else
 $javascriptfiles = [
     "includes/js/pageload.js",
     "includes/js/functions.js",
-    "includes/js/tableActions.js"
+    "includes/js/tableActions.js",
+    "includes/js/ertesites.js"
 ];
 
 if(isset($_GET['page']) && $_GET['page'] != "aktiveszkoz" && $_GET['page'] != "sohoeszkoz" && $_GET['page'] != "mediakonverter" || ($_GET['page'] == "aktiveszkoz" && isset($_GET['action'])))
@@ -451,11 +452,6 @@ if(isset($_GET['page']) && $_GET['page'] != "aktiveszkoz" && $_GET['page'] != "s
 if(isset($cselect) && $cselect)
 {
     $javascriptfiles[] = "includes/js/customSelect.js";
-}
-
-if(isset($_GET['ertesites']))
-{
-    $javascriptfiles[] = "includes/js/ertesites.js";
 }
 
 // PHP változók átadni a JavaScriptnek

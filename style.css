@@ -1549,6 +1549,14 @@ td img {
     align-items: center;
 }
 
+.normalweightlink a {
+    font-weight: normal;
+}
+
+.linkitalic a {
+    font-style: italic;
+}
+
 .linkjobbra a {
     justify-content: right;
 }
@@ -1706,7 +1714,7 @@ td img {
 
 .felkormezo input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 30px var(--cardbase) inset;
-    -webkit-text-fill-color: var(--fontlight2);
+    -webkit-text-fill-color: var(--basefont);
 }
 
 .felkormezo button {

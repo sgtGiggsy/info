@@ -1,7 +1,7 @@
 <?php
 
-$szamlalo = null;
-$csaksajat = false;
+$szamlalo = $csaksajat = false;
+$sajatcsoportmodmutat = ")";
 $csoportfilter = "alegysegfilter";
 if(!isset($_GET['nevszerinti']))
 {
@@ -18,10 +18,24 @@ else
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
 $javascriptfiles[] = "includes/js/csoportFilter.js";
 if(!$globaltelefonkonyvadmin && isset($felhasznaloid))
+{
     $csoportjogok = telefonKonyvCsoportjogok();
+    $elsoelem = true;
+    $sajatcsoportmodmutat = "OR (telefonkonyvvaltozasok.allapot = 1 AND (";
+    foreach($csoportjogok as $jog)
+    {
+        if(!$elsoelem)
+        {
+            $sajatcsoportmodmutat .= " OR ";
+        }
+        $elsoelem = false;
+        $sajatcsoportmodmutat .= "telefonkonyvcsoportok.id = $jog";
+    }
+    $sajatcsoportmodmutat .= ")))";
+}
 
 $where = "WHERE telefonkonyvbeosztasok.allapot > 1";
-$where2 = "WHERE telefonkonyvvaltozasok.allapot > 1 AND  telefonkonyvvaltozasok.allapot < 4";
+$where2 = "WHERE (telefonkonyvvaltozasok.allapot > 1 AND telefonkonyvvaltozasok.allapot < 4 $sajatcsoportmodmutat";
 if(isset($_GET['kereses']))
 {
     $keres = $_GET['kereses'];
@@ -282,17 +296,29 @@ if(isset($_GET['kereses']))
                 {
                     $kattinthatolink .= "/" . $telszamid;
                 }
+
+                $linkstyle = null;
+                $megjegyzes = $telefonszam['megjegyzes'];
                 if($csoportir)
                 {
-                    $szerklink = "<a href='$kattinthatolink'>";
-                    $szerklinkr = "<a href='$kattinthatolink' style='justify-content: right;'>";
+                    $szerklink = "<a href='$kattinthatolink' style='$linkstyle'>";
+                    $szerklinkr = "<a href='$kattinthatolink' style='justify-content: right; $linkstyle'>";
                     $szerklinkzar = "</a>";
                 }
+                $style = " normalweightlink";
+                if(($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) || (!$globaltelefonkonyvadmin && isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok)))
+                {
+                    $style = "";
+                }
+                if(!$globaltelefonkonyvadmin && isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok) && $telefonszam['allapot'] == 1)
+                {
+                    $style = " linkitalic";
+                    $megjegyzes = "Változás beküldve, admin még nem hagyta jóvá";
+                }
 
-                ?><tr class="trlink"
+                ?><tr class="trlink<?=$style?>"
                         id="<?=$csoportnev?>"
-                        style="<?=($telefonszam['allapot'] == 4 && $globaltelefonkonyvadmin) ? 'font-style: italic; font-weight: normal;' : ((!$globaltelefonkonyvadmin && isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok)) ? 'font-style: italic; ' : 'font-weight: normal; ' )?>
-                        <?=($csaksajat && !(isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok))) ? 'display: none;' :  '' ?>"
+                        style="<?=($csaksajat && !(isset($csoportjogok) && in_array($telefonszam['csopid'], $csoportjogok))) ? ' display: none;' :  '' ?>"
                     ><?php
                     if(!$nevszerint)
                     {
@@ -315,7 +341,7 @@ if(isset($_GET['kereses']))
                         <td><?=$szerklink?><?=$telefonszam['kozcelufax']?><?=$szerklinkzar?></td><?php
                     }
                     ?><td><?=$szerklink?><?=$telefonszam['mobil']?><?=$szerklinkzar?></td>
-                    <td><?=$szerklink?><?=($nevszerint) ? $telefonszam['csoport'] : $telefonszam['megjegyzes'] ?><?=$szerklinkzar?></td>
+                    <td><?=$szerklink?><?=($nevszerint) ? $telefonszam['csoport'] : $megjegyzes ?><?=$szerklinkzar?></td>
                 </tr><?php
                 $szamlalo++;
             }

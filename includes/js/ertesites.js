@@ -30,5 +30,8 @@ window.addEventListener("load", (event) => {
     {
         document.getElementById("notifcount").style.display = "none";
     }
-    document.getElementById("notif-" + urlParams.get('ertesites')).className.replace("notifitem", "notifitem-latta");
+    if(document.getElementById("notif-" + urlParams.get('ertesites')))
+    {
+        document.getElementById("notif-" + urlParams.get('ertesites')).className.replace("notifitem", "notifitem-latta");
+    }
 });

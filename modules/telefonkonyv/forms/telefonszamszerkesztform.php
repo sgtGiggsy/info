@@ -2,7 +2,7 @@
 if(@$irhat)
 {
     $fieldsetstate = "";
-    if(!$globaltelefonkonyvadmin && ($allapot === null || $allapot > 0))
+    if(!$globaltelefonkonyvadmin && ($allapot === null || ($allapot > 0 && $allapot < 3)))
     {
         $fieldsetstate = "disabled";
     }
