@@ -1,4 +1,14 @@
 <?php
+// Erre a quickapprove miatt van szükség, mert olyankor direktben kerül meghívásra
+// ez az állomány, és a módosításhoz szükséges ellenőrzések nem történnek meg
+if(!isset($irhat))
+{
+    $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
+    if($globaltelefonkonyvadmin)
+    {
+        $irhat = true;
+    }
+}
 
 if(isset($irhat) && $irhat)
 {
@@ -70,7 +80,7 @@ if(isset($irhat) && $irhat)
 
             $valtallapot = 1;
             $elemallapot = 1;
-            $ujtorolve = null;
+            $ujtorolve = $felhid = null;
             $regitorolve = "NULL";
             if($_POST['removebeo'] == 1)
             {
@@ -83,13 +93,17 @@ if(isset($irhat) && $irhat)
                     $ujtorolve = 1;
                 }
             }
-            
 
-            $stmt = $con->prepare('INSERT INTO telefonkonyvfelhasznalok (elotag, nev, titulus, rendfokozat, mobil, felhasznalo, allapot) VALUES (?, ?, ?, ?, ?, ?, ?)');
-            $stmt->bind_param('sssssss', $_POST['elotag'], $nev, $_POST['titulus'], $_POST['rendfokozat'], $mobil, $_POST['felhasznalo'], $elemallapot);
-            $stmt->execute();
+            // Ha nincs $nev, azt jelenti, hogy a felhasználó törölve lett.
+            // Ezesetben nincs szükség felhasználó adatbáziobjektum létrehozására
+            if($nev)
+            {
+                $stmt = $con->prepare('INSERT INTO telefonkonyvfelhasznalok (elotag, nev, titulus, rendfokozat, mobil, felhasznalo, allapot) VALUES (?, ?, ?, ?, ?, ?, ?)');
+                $stmt->bind_param('sssssss', $_POST['elotag'], $nev, $_POST['titulus'], $_POST['rendfokozat'], $mobil, $_POST['felhasznalo'], $elemallapot);
+                $stmt->execute();
 
-            $felhid = mysqli_insert_id($con);
+                $felhid = mysqli_insert_id($con);
+            }
 
             $stmt = $con->prepare('INSERT INTO telefonkonyvbeosztasok_mod (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, felhid, megjegyzes, allapot, torolve) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
             $stmt->bind_param('ssssssssssss', $_POST['csoport'], $beosztasnev, $_POST['sorrend'], $belsoszam, $belsoszam2, $fax, $kozcelu, $kozcelufax, $felhid, $_POST['megjegyzes'], $elemallapot, $ujtorolve);
@@ -213,6 +227,65 @@ if(isset($irhat) && $irhat)
                 case '3': $adminesemeny = "elfogadta"; break;
             }
         }
+    }
+
+    elseif($_GET["action"] == "quickapprove" && $globaltelefonkonyvadmin)
+    {
+        $allapot = null;
+        if($_POST['allapot'] == 1)
+        {
+            $allapot = 3;
+        }
+        $timestamp = timeStampForSQL();
+        $modositasid = $_POST['id'];
+        $success = true;
+        $idstomod = mySQLConnect("SELECT ujbeoid, ujfelhid, origbeoid, origfelhid FROM telefonkonyvvaltozasok WHERE id = $modositasid");
+        $idstomod = mysqli_fetch_assoc($idstomod);
+
+        $felhid = $idstomod['ujfelhid'];
+        $beoid = $idstomod['ujbeoid'];
+        $origbeoid = $idstomod['origbeoid'];
+        $origfelhid = $idstomod['origfelhid'];
+        $csoportid = $_POST['csoport'];
+
+        $stmt = $con->prepare('UPDATE telefonkonyvvaltozasok SET admintimestamp=?, allapot=? WHERE id=?');
+        $stmt->bind_param('ssi', $timestamp, $allapot, $_POST['id']);
+        $stmt->execute();
+        if(mysqli_errno($con) != 0)
+            $success = false;
+
+        if($allapot == 3)
+        {
+            $elemallapot = 4;
+            mySQLConnect("UPDATE telefonkonyvfelhasznalok SET allapot = 2 WHERE id = $origfelhid");
+            mySQLConnect("UPDATE telefonkonyvbeosztasok SET allapot = 2 WHERE id = $origbeoid");
+        }
+        else
+        {
+            $elemallapot = null;
+            mySQLConnect("UPDATE telefonkonyvfelhasznalok SET allapot = 3 WHERE id = $origfelhid");
+            mySQLConnect("UPDATE telefonkonyvbeosztasok SET allapot = 3 WHERE id = $origbeoid");
+        }
+
+        $stmt = $con->prepare('UPDATE telefonkonyvfelhasznalok SET allapot=? WHERE id=?');
+        $stmt->bind_param('si', $elemallapot, $felhid);
+        $stmt->execute();
+        if(mysqli_errno($con) != 0)
+            $success = false;
+
+        $stmt = $con->prepare('UPDATE telefonkonyvbeosztasok_mod SET allapot=? WHERE id=?');
+        $stmt->bind_param('si', $elemallapot, $idstomod['ujbeoid']);
+        $stmt->execute();
+        if(mysqli_errno($con) != 0)
+            $success = false;
+
+        switch($_POST['allapot'] && $success)
+        {
+            case '2': $adminesemeny = "elvetette"; break;
+            case '3': $adminesemeny = "elfogadta"; break;
+        }
+        if(!$success)
+            http_response_code(304);
     }
 
     elseif($_GET["action"] == "discard")

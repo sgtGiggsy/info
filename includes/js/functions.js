@@ -104,11 +104,13 @@ function changeTitle(id, szoveg) {
     elem.textContent = szoveg;
 }
 
-function showToaster(message) {
+function showToaster(message, success = true) {
     $("#snackbar").html(message)
-    var x = document.getElementById("snackbar");
-    x.className = "show";
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    let snackbar = document.getElementById("snackbar");
+    if(!success)
+        snackbar.style.backgroundColor = "var(--offline)";
+    snackbar.className = "show";
+    setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 3000);
 }
 
 function showPopup(id) {

@@ -2,8 +2,18 @@
 $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
 if($globaltelefonkonyvadmin || $csoportir)
 {   
+    $valtozasszures = "minden";
+    if(isset($_GET['valtozasszures']))
+    {
+        $valtozasszures = $_GET['valtozasszures'];
+        $_SESSION[getenv('SESSION_NAME').'valtozasszures'] = $valtozasszures;
+    }
+    elseif(isset($_SESSION[getenv('SESSION_NAME').'valtozasszures']))
+    {
+        $valtozasszures = $_SESSION[getenv('SESSION_NAME').'valtozasszures'];
+    }
+
     $javascriptfiles[] = "modules/telefonkonyv/includes/telefonkonyv.js";
-    $javascriptfiles[] = "includes/js/csoportFilter.js";
     $valtozaskorok = mySQLConnect("SELECT * FROM telefonkonyvmodositaskorok ORDER BY id DESC;");
     $modositasikor = mysqli_fetch_assoc($valtozaskorok);
     $modkorid = $modositasikor['id'];
@@ -26,7 +36,6 @@ if($globaltelefonkonyvadmin || $csoportir)
     }
 
     $szamlalo = null;
-    $csoportfilter = "alegysegfilter";
 
     $tkonyvwheresettings = array(
         'where' => true,
@@ -36,7 +45,18 @@ if($globaltelefonkonyvadmin || $csoportir)
         'modid' => $modkorid
     );
     $where = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwheresettings);
-    $alegysegek = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1;");
+    $allapotszur = null;
+    if($valtozasszures != "minden")
+    {
+        $allapotszur = " AND ";
+        switch($valtozasszures)
+        {
+            case "jovahagyasravarok" : $allapotszur .= "telefonkonyvvaltozasok.allapot = 1"; break;
+            case "jovahagyottak" : $allapotszur .= "telefonkonyvvaltozasok.allapot > 1"; break;
+            case "jovahagyottvagyelutasitott" : $allapotszur .= "(telefonkonyvvaltozasok.allapot > 1 OR telefonkonyvvaltozasok.allapot IS NULL)"; break;
+            case "elutasitottak" : $allapotszur .= "telefonkonyvvaltozasok.allapot IS NULL"; break;
+        }
+    }
 
     $telefonkonyv = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS valtozasid,
             telefonkonyvbeosztasok_mod.id AS telszamid,
@@ -52,6 +72,7 @@ if($globaltelefonkonyvadmin || $csoportir)
             telefonkonyvbeosztasok_mod.kozcelufax AS kozcelufax,
             telefonkonyvfelhasznalok.mobil AS mobil,
             telefonkonyvcsoportok.nev AS csoport,
+            telefonkonyvcsoportok.id AS csoportid,
             felhasznalok.felhasznalonev AS felhasznalonev,
             felhasznalok.nev AS modosito,
             telefonkonyvbeosztasok_mod.megjegyzes AS megjegyzes,
@@ -67,7 +88,8 @@ if($globaltelefonkonyvadmin || $csoportir)
             LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok_mod.csoport = telefonkonyvcsoportok.id
             LEFT JOIN felhasznalok ON telefonkonyvvaltozasok.bejelento = felhasznalok.id
         $where
-        ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok_mod.sorrend;");
+        $allapotszur
+        ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok_mod.sorrend, telefonkonyvfelhasznalok.nev DESC;");
 
     $oszlopok = array(
         array('nev' => '', 'tipus' => 's'),
@@ -81,12 +103,9 @@ if($globaltelefonkonyvadmin || $csoportir)
         array('nev' => 'Fax', 'tipus' => 's'),
         array('nev' => 'Közcélú fax', 'tipus' => 's'),
         array('nev' => 'Szolgálati mobil', 'tipus' => 's'),
-        array('nev' => 'Megjegyzés', 'tipus' => 's')
+        array('nev' => 'Megjegyzés', 'tipus' => 's'),
+        array('nev' => 'Bejelentő', 'tipus' => 's')
     );
-    if($globaltelefonkonyvadmin)
-    {
-        $oszlopok[] = array('nev' => 'Bejelentő', 'tipus' => 's');
-    }
 
     $oszlopszam = 0;
     $tipus = "telefonkonyv";
@@ -113,13 +132,6 @@ if($globaltelefonkonyvadmin || $csoportir)
         }
     }
 
-    ?><datalist id="alegysegek"><?php
-    foreach($alegysegek as $alegyseg)
-    {
-        ?><option><?=$alegyseg['nev']?></option><?php
-    }
-    ?></datalist><?php
-
     if($globaltelefonkonyvadmin) 
     {
         ?><div class="szerkgombsor"><?php
@@ -144,15 +156,14 @@ if($globaltelefonkonyvadmin || $csoportir)
                     }
                 ?></div>
             </div>
-            <div class="szuresvalaszto">Alegységre szűrés
-                <input style="width: 40ch"
-                        size="1"
-                        type="search"
-                        id="<?=$csoportfilter?>"
-                        list="alegysegek"
-                        onkeyup="filterCsoport('<?=$csoportfilter?>', '<?=$tipus?>')"
-                        placeholder="Alegység"
-                        title="Alegység">
+            <div class="szuresvalaszto">Lista szűrése
+                <select id="valtozasszures" name="valtozasszures" onchange="valtozasokSzurese();">
+                    <option value="minden" <?=($valtozasszures == "minden") ? "selected" : "" ?>>Minden mutatása</option>
+                    <option value="jovahagyasravarok" <?=($valtozasszures == "jovahagyasravarok") ? "selected" : "" ?>>Jóváhagyásra várók</option>
+                    <option value="jovahagyottak" <?=($valtozasszures == "jovahagyottak") ? "selected" : "" ?>>Jóváhagyottak</option>
+                    <option value="jovahagyottvagyelutasitott" <?=($valtozasszures == "jovahagyottvagyelutasitott") ? "selected" : "" ?>>Jóváhagyott vagy elutasitott</option>
+                    <option value="elutasitottak" <?=($valtozasszures == "elutasitottak") ? "selected" : "" ?>>Elutasítottak</option>
+                </select>
             </div>
         </div>
         <table id="<?=$tipus?>" class="telefonkonyvtabla">
@@ -225,7 +236,25 @@ if($globaltelefonkonyvadmin || $csoportir)
                     ?><tr class="trlink<?=($telefonszam['torolve']) ? ' mukodeskeptelen' : '' ?>"
                             id="<?=$csoportnev?>"
                             style="font-weight: normal;">
-                        <td class="prioritas <?=$allapot?>"><a href="<?=$kattinthatolink?>"></a></td>
+                        <td class="prioritas <?=$allapot?>" style="position: relative;" id="prioritylevel-<?=$valtozasid?>"><?php
+                            if($globaltelefonkonyvadmin)
+                            {
+                                ?><a onclick="rejtMutat('valaszto-<?=$valtozasid?>')" style="cursor:pointer;"></a>
+                                <div class="tkonyvquickapprove" style="display:none;" id="valaszto-<?=$valtozasid?>">
+                                    <form>
+                                        <input type ="hidden" id="id" name="id" value="<?=$valtozasid?>">
+                                        <input type ="hidden" id="csoport-<?=$valtozasid?>" name="csoport" value="<?=$telefonszam['csoportid']?>">
+                                        <input type ="hidden" id="allapot-<?=$valtozasid?>" name="allapot" value="0">
+                                    </form>
+                                    <div><a style="background-color: var(--online)" onclick="gyorsJovahagyas('<?=$valtozasid?>', 1)">Jóváhagy</a></div>
+                                    <div><a style="background-color: var(--offline)" onclick="gyorsJovahagyas('<?=$valtozasid?>', 0)">Elutasít</a></div>
+                                </div><?php
+                            }
+                            else
+                            {
+                                ?><a href="<?=$kattinthatolink?>"></a><?php
+                            }
+                        ?></td>
                         <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['beosztas']?></a></td>
                         <td style="width:4ch; text-align:right;"><a href="<?=$kattinthatolink?>"><?=$telefonszam['elotag']?></a></td>
                         <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['nev']?></a></td>
@@ -236,12 +265,9 @@ if($globaltelefonkonyvadmin || $csoportir)
                         <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['fax']?></a></td>
                         <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['kozcelufax']?></a></td>
                         <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['mobil']?></a></td>
-                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['megjegyzes']?></a></td><?php
-                        if($globaltelefonkonyvadmin)
-                        {
-                            ?><td><a href="<?=$kattinthatolink?>"><?=$telefonszam['modosito']?> (<?=$telefonszam['felhasznalonev']?>)<br><?=$telefonszam['bekuldesideje']?></a></td><?php
-                        }
-                    ?></tr><?php
+                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['megjegyzes']?></a></td>
+                        <td><a href="<?=$kattinthatolink?>"><?=$telefonszam['modosito']?> (<?=$telefonszam['felhasznalonev']?>)<br><?=$telefonszam['bekuldesideje']?></a></td>
+                    </tr><?php
                     $szamlalo++;
                 }
             ?></tbody>

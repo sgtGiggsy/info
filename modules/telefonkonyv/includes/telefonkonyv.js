@@ -262,7 +262,51 @@ function refreshSelections() {
     }
 }
 
-let legutobbi = jelenbeo;
+function valtozasokSzurese() {
+    let listaszur = document.getElementById("valtozasszures")
+    window.location.href = RootPath + "/telefonkonyvvaltozasok?valtozasszures=" + listaszur.value;
+}
+
+function gyorsJovahagyas(id, action) {
+    let allapotinp = document.getElementById('allapot-' + id);
+    let priority = document.getElementById('prioritylevel-' + id);
+    let uzenet;
+    let csoportdata = document.getElementById("csoport-" + id).value;
+    allapotinp.value = action;
+    rejtMutat('valaszto-' + id);
+    if(action == 1)
+    {
+        uzenet = "Változás sikeresen jóváhagyva"
+        priority.classList.remove('kritikus');
+        priority.classList.add('halaszthato');
+    }
+    else
+    {
+        uzenet = "Változás sikeresen elutasítva"
+        priority.classList.remove('halaszthato');
+        priority.classList.add('kritikus');
+    }
+    
+    $.post(RootPath + "/telefonkonyvdb?action=quickapprove",
+        {
+            id: id,
+            csoport: csoportdata,
+            allapot: action
+        },
+        function(data, status){
+            if(status == "success")
+                showToaster(uzenet);
+            else
+                showToaster("!!! A beküldött változás engedélyezése sikertelen !!!", false);
+                //alert("Data: " + data + "\nStatus: " + status);
+        }
+    );    
+}
+
+if(typeof jelenbeo !== 'undefined')
+{
+    let legutobbi = jelenbeo;
+}
 
 window.addEventListener("load", (event) => {
     let sorrend = document.getElementById('sorrend');

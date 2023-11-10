@@ -2242,6 +2242,32 @@ td img {
     position: relative;
 }
 
+.tkonyvquickapprove {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 2ch;
+    z-index: 99;
+    width: 100px;
+    background-color: var(--headpopupbg);
+    color: var(--fontlight);
+}
+
+.tkonyvquickapprove a {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    padding: 0.7em;
+    font-size: 1.2em;
+    color: unset!important;
+    font-style: normal!important;
+}
+
+.tkonyvquickapprove a:hover {
+    filter: brightness(80%);
+}
+
 /* ------------------------------- Speciális oldalak ------------------------------- */
 /* -- Tennivalók -- */
 .tennivalokwrap {
