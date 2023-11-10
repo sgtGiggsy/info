@@ -39,10 +39,11 @@ if(@$irhat)
                         <button onclick="switchBeosztas(); return false;">Beosztás szerkesztése</button>
                         <div class="right"><button onclick="delBeosztas(); return false;" class="redbutton" id="beodelbutton">Beosztás törlése</button></div><br>
                         <label for="beosztas">Beosztás*</label>
-                        <select name="beosztas" id="beosztas" onchange="checkIfNew(<?=$felhasznaloid?>);refreshSelections()" required>
+                        <select name="beosztas" id="beosztas" onchange="checkIfNew(<?=$felhasznaloid?>);refreshSelections();checkIfAvailable();" required>
                             <option></option>
-                            <option value="0" id="ujbeo" <?=($addnew) ? "selected" : "" ?>>Új beosztás létrehozása</option><?php
+                            <option value="0" id="ujbeo" <?=($addnew) ? "selected" : "" ?> style="font-size: 1em;">Új beosztás létrehozása</option><?php
                             $elozocsop = 0;
+                            $ind = 2;
                             foreach($beosztasok as $x)
                             {
                                 if($elozocsop != $x['csoportid'])
@@ -55,7 +56,12 @@ if(@$irhat)
                                     ?><optgroup label="<?=$x['csoportnev']?>"><?php
                                     $elozocsop = $x['csoportid'];
                                 }
-                                ?><option value="<?=$x['id']?>" <?=($x['id'] == $beosztas) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                if($x['id'] == $beosztas)
+                                {
+                                    $indexnumber = $ind;
+                                }
+                                ?><option value="<?=$x['id']?>" class=<?=($x['foglalt']) ? "'selectdontselect' title='Foglalt'" : "'selectavailable'" ?> <?=($x['id'] == $beosztas) ? "selected" : "" ?>><?=$x['nev']?></option><?php
+                                $ind++;
                             }
                             ?></optgroup>
                         </select>
@@ -282,4 +288,8 @@ if(@$irhat)
             </fieldset>
         </div>
     </form><?php
+    $PHPvarsToJS[] = array(
+            'name' => 'jelenbeo',
+            'val' => $indexnumber
+        );
 }

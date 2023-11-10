@@ -146,6 +146,22 @@ function checkIfNew(felhasznaloid)
     }
 }
 
+function checkIfAvailable() {
+    let select = document.getElementById("beosztas");
+    let index = select.selectedIndex;
+    if(select[index].title == "Foglalt")
+    {
+        let conf = confirm("A nyilvántartás szerint az adott beosztás foglalt, vagy az adminisztrátor még nem fogadta el a módosítást, ami szabaddá teszi.\nBiztos vagy benne, hogy erre a beosztásra szeretnéd a dolgozót rögzíteni?")
+        if(conf)
+            legutobbi = index;
+        else
+            select.selectedIndex = legutobbi;
+    }
+    else
+    {
+        legutobbi = index;
+    }
+}
 function onlyNumberKey(evt) {
     var ASCIICode = (evt.which) ? evt.which : evt.keyCode
     if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
@@ -190,7 +206,6 @@ function delUser() {
     mobil = document.getElementById('mobil');
     mobil.value = null;
 }
-
 
 function delBeosztas(){
     var x = confirm("Biztosan törölni akarod a beosztást?");
@@ -246,6 +261,8 @@ function refreshSelections() {
         xhttp.send();
     }
 }
+
+let legutobbi = jelenbeo;
 
 window.addEventListener("load", (event) => {
     let sorrend = document.getElementById('sorrend');

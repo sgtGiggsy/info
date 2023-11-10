@@ -66,7 +66,12 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
     ?><div id="notifpopup" onmouseleave="hidePopup('notifpopup')"><?php
         foreach($notifications as $notification)
         {
-            ?><a href="<?=$RootPath?>/<?=$notification['url']?>?ertesites=<?=$notification['id']?>">
+            $kotkarakter = "?";
+            if(str_contains($notification['url'], "?"))
+            {
+                $kotkarakter = "&";
+            }
+            ?><a href="<?=$RootPath?>/<?=$notification['url']?><?=$kotkarakter?>ertesites=<?=$notification['id']?>">
                 <div id="notif-<?=$notification['id']?>" class="notifitem<?=($notification['latta']) ? '-latta' : '' ?>">
                     <p class="notiftitle"><?=$notification['cim']?></p>
                     <p class="notifbody"><?=$notification['szoveg']?></p>

@@ -7,7 +7,7 @@ if(!isset($_GET['nevszerinti']))
 {
     $nevszerint = false;
     $orderby = "telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend";
-    $orderbymod = "telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok_mod.sorrend";
+    $orderbymod = "telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok_mod.sorrend, telefonkonyvfelhasznalok.nev DESC";
 }
 else
 {
@@ -276,7 +276,7 @@ if(isset($_GET['kereses']))
 
                 if($telefonszam['allapot'] == 4)
                 {
-                    $kattinthatolink .= "?modid=" . $telefonszam['modid'];
+                    $kattinthatolink .= "?modid=" . $telefonszam['modid'] . "&veglegesitett";
                 }
                 else
                 {

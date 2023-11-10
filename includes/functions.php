@@ -1894,6 +1894,48 @@ function getBeosztasList($where, $beosztas, $modid)
 	return $beosztasok;
 }
 
+function getBeosztasListAlt($where)
+{
+	// Kizárólag az eredeti, nem felülírt beosztások
+	$query = "SELECT DISTINCT telefonkonyvbeosztasok.id AS id,
+                telefonkonyvbeosztasok.nev AS nev,
+                telefonkonyvcsoportok.nev AS csoportid,
+                telefonkonyvcsoportok.nev AS csoportnev,
+				telefonkonyvbeosztasok.felhid AS foglalt
+            FROM telefonkonyvbeosztasok
+                LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
+                LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
+                LEFT JOIN telefonkonyvvaltozasok ON (telefonkonyvvaltozasok.origbeoid = telefonkonyvbeosztasok.id OR telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok.id)
+            WHERE telefonkonyvcsoportok.id > 1
+                AND telefonkonyvbeosztasok.allapot > 1
+				AND telefonkonyvbeosztasok.torolve IS NULL
+                $where
+            ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;";
+	
+	//var_dump($query);
+
+	$beosztasok = mySQLConnect($query);
+
+	// Kizárólag a módosított és elfogadott beosztások
+	/*$beosztasokmod = mySQLConnect("SELECT telefonkonyvbeosztasok_mod.id AS id,
+				telefonkonyvbeosztasok_mod.nev AS nev,
+				telefonkonyvcsoportok.nev AS csoportid,
+				telefonkonyvcsoportok.nev AS csoportnev
+			FROM telefonkonyvbeosztasok
+				LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
+				LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
+				LEFT JOIN telefonkonyvvaltozasok ON (telefonkonyvvaltozasok.origbeoid = telefonkonyvbeosztasok.id OR telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok.id)
+			WHERE $meglevobeo
+				telefonkonyvcsoportok.id > 1
+				AND telefonkonyvbeosztasok.allapot > 1
+				AND $beowhere
+				$where
+				$zarozar
+				ORDER BY telefonkonyvcsoportok.sorrend, telefonkonyvbeosztasok.sorrend;");*/
+
+	return $beosztasok;
+}
+
 function arrayMultiDimension($array)
 {
    rsort($array);

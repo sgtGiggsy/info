@@ -93,8 +93,6 @@ else
     {
         $modid = $_GET['modid'];
 
-        $oldalcim = "Beküldött módosítás állapota: ";
-
         $modositasok = mySQLConnect("SELECT telefonkonyvvaltozasok.origbeoid AS beosztas,
                 telefonkonyvbeosztasok_mod.nev AS beosztasnev,
                 telefonkonyvfelhasznalok.id AS felhid,
@@ -129,13 +127,22 @@ else
             $irhat = false;
         }
 
-        switch($allapot)
+        
+        if(!isset($_GET['veglegesitett']))
         {
-            case 1: $oldalcim .= "Beküldve, még nem került ellenőrzésre"; break;
-            case 2: $oldalcim .= "Változtatásokkal elfogadásra került"; break;
-            case 3: $oldalcim .= "Elfogadásra került"; break;
-            case 4: $oldalcim .= "Véglegesen rögzítve"; break;
-            default: $oldalcim .= "Adminisztrátor által elvetve";
+            $oldalcim = "Beküldött módosítás állapota: ";
+            switch($allapot)
+            {
+                case 1: $oldalcim .= "Beküldve, még nem került ellenőrzésre"; break;
+                case 2: $oldalcim .= "Változtatásokkal elfogadásra került"; break;
+                case 3: $oldalcim .= "Elfogadásra került"; break;
+                case 4: $oldalcim .= "Véglegesen rögzítve"; break;
+                default: $oldalcim .= "Adminisztrátor által elvetve";
+            }
+        }
+        else
+        {
+            $oldalcim = "Telefonszám szerkesztése";
         }
     }
     elseif(isset($_GET['action']) && $_GET['action'] == "addnew")
@@ -245,7 +252,7 @@ else
             }
         }
 
-        $beosztasok = getBeosztasList($where, $beosztas, $modid);
+        $beosztasok = getBeosztasListAlt($where);
 
         ?><datalist id="tkonyvfelhasznalok"><?php
             foreach($tkonyvfelhasznalok as $felhasznalo)

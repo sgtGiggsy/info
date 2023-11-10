@@ -58,6 +58,7 @@
     --topborder: #807d7d;
     --shadow: #252526;
     --selectbg: #f7f7f7;
+    --selectlowcontrast: #9e9e9e;
     --thead: #969494;
     --tsoro: #e0e0e0;
     --tsore: #bbbbbb;
@@ -904,6 +905,25 @@ textarea:focus, input:focus, select:focus {
 
 .redbutton:hover {
     background-color: #600000;
+}
+
+.selectdontselect {
+    font-style: italic;
+    color: var(--selectlowcontrast)!important;
+}
+
+.selectavailable {
+    font-weight: bold;
+}
+
+#beosztas optgroup {
+    font-weight: bolder;
+    font-size: 1.3em;
+}
+
+#beosztas option {
+    font-size: 0.75em;
+    color: var(--basefont);
 }
 
 /* A .tox a TinyMCE beviteli mezőjének wrapperje */
