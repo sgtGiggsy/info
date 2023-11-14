@@ -5,7 +5,9 @@ $tesztip = "192.168.1.1";
 $tesztcommunity = "public";
 
 $snmpadatok = [];
-$obj = snmpwalkoid($tesztip, $tesztcommunity, null);
+//$obj = snmpwalkoid($tesztip, $tesztcommunity, null);
+$obj = snmprealwalk("10.59.1.252", "o2i6h8f7k0", "iso.3.6.1.2.1.2.2.1");
+$obj2 = snmprealwalk("10.59.1.252", "o2i6h8f7k0", "iso.3.6.1.2.1.31.1.1.1");
 
 // Adat feldolgozás rész
 foreach($obj as $key => $rawvalue)
@@ -16,7 +18,7 @@ foreach($obj as $key => $rawvalue)
 
     // Az iso.3.6.1.2.1.1.2 az eszköz gyártójának SMI azonosítója
 
-    // Az iso.3.6.1.2.1.1.1 a hálózati elemek utolós (újra)indítása óta eltelt idő.
+    // Az iso.3.6.1.2.1.1.3 a hálózati elemek utolós (újra)indítása óta eltelt idő.
 
     // Az iso.3.6.1.2.1.1.4 a hálózati eszköz menedzserének neve és elérhetősége szöveges formátumban
 
@@ -124,8 +126,8 @@ foreach($obj as $key => $rawvalue)
     $azonosito = explode(".", $key);
     $id = end($azonosito);
 
-    $valarr = explode(" ", $rawvalue);
-    $value = end($valarr);
+    $valarr = explode(": ", $rawvalue);
+    $value = trim(end($valarr), "\"");
 
     if(str_contains($key, "iso.3.6.1.2.1.2.2.1.1."))
     {
@@ -273,6 +275,31 @@ foreach($obj as $key => $rawvalue)
     }
 }
 
+foreach($obj2 as $key => $rawvalue)
+{
+    //echo "<tr><td>$key</td>";
+    //echo "<td>$rawvalue</td></tr>";
+    
+    $azonosito = explode(".", $key);
+    $id = end($azonosito);
+
+    $valarr = explode(": ", $rawvalue);
+    $value = trim(end($valarr), "\"");
+
+    if(str_contains($key, "iso.3.6.1.2.1.31.1.1.1.1."))
+    {
+        // iso.3.6.1.2.1.31.1.1.1.1 az interface neve (virtuális, vagy fizikai)
+        $intlist[$id]->shortname = $value;
+    }
+
+    if(str_contains($key, "iso.3.6.1.2.1.31.1.1.1.18."))
+    {
+        // Az iso.3.6.1.2.1.31.1.1.1.18 az interface leírása
+        $intlist[$id]->description = $value;
+    }
+}
+
+
 
 // Adat megjelenítés rész
 ?><table><?php
@@ -284,7 +311,7 @@ foreach($intlist as $interface)
         echo "<tr>";
         foreach($interface as $x => $y)
         {
-            echo "<td>$x</td>";
+            echo "<th>$x</th>";
         }
         echo "</tr>";
         $elso = false;

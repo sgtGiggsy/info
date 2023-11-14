@@ -4,6 +4,8 @@ class DevInterface
 {
     public $id;
     public $name;
+    public $shortname;
+    public $description;
     public $type;
     public $mtu;
     public $speed;
@@ -27,7 +29,7 @@ class DevInterface
     public $portmode;
 
     public function InMBytes($direction) {
-        if($direction = "rx")
+        if($direction == "rx")
         {
             return round(($this->rx / 1048576), 2) . " MByte";
         }
@@ -56,9 +58,9 @@ class DevInterface
             case "2" : return "Down"; break;
             case "3" : return "Testing"; break;
             case "4" : return "Ismeretlen"; break;
-            case "5" : return "Not Connected"; break;
-            case "6" : return "Missing"; break;
-            case "7" : return "Automatic Down"; break;
+            case "5" : return "Nincs csatlakozva"; break;
+            case "6" : return "Hiányzik"; break;
+            case "7" : return "Automatikusan lekapcsolva"; break;
             default : return null;
         }
     }
@@ -84,6 +86,7 @@ class DevInterface
             case "15" : return "FDDI"; break;
             case "23" : return "PPPoE"; break;
             case "48" : return "Modem"; break;
+            case "53" : return "Virtuális"; break;
             case "55" : return "100BaseSV"; break;
             case "56" : return "Fiber"; break;
             case "94" : return "ADSL"; break;

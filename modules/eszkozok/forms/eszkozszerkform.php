@@ -150,6 +150,20 @@ if(@$irhat)
                         Amennyiben az eszköz, kizárólag nem támogatott verziójú SSH-ra képes, vagy nincs rajta beállítva az SSH elérés, úgy <b>ne</b> jelöljük ezt be.</p>"; ?>
 
                     <div>
+                        <label for="snmp">SNMP állapota:</label><br>
+                        <input type="checkbox" accept-charset="utf-8" name="snmp" id="snmp" value="1" <?= ($snmp) ? "checked" : "" ?>></input>
+                    </div>
+
+                    <?php $magyarazat .= "<strong>SNMP állapota</strong><p>Akkor kell bejelölni, ha az eszköz adatai a jelen beállítások szerint lekérhetőek SNMP protokolon keresztük.</p>"; ?>
+
+                    <div>
+                        <label for="snmpcommunity">SNMP közösség:</label><br>
+                        <input type="text" accept-charset="utf-8" name="snmpcommunity" id="snmpcommunity" value="<?=$snmpcommunity?>"></input>
+                    </div>
+
+                    <?php $magyarazat .= "<strong>SNMP közösség</strong><p>Az eszközön megadott, SNMP kapcsolódáshoz engedélyezett közösség neve.</p>"; ?>
+
+                    <div>
                         <label for="web">Webes felület:</label><br>
                         <input type="checkbox" accept-charset="utf-8" name="web" id="web" value="1" <?= ($web) ? "checked" : "" ?>></input>
                     </div><?php

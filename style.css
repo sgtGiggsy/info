@@ -2781,6 +2781,19 @@ div[id^=tennivalobody-].close {
     100% { transform: rotate(360deg); }
   }
 
+.devportload {
+    font-size: 1.3em;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    height: 55vh;
+    max-height: calc(55vh - 3.5em);
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 2em;
+}
+
 /* Toaster üzenet */
 #snackbar {
     visibility: hidden;

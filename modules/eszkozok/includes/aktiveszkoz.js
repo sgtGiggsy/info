@@ -66,3 +66,16 @@ if(typeof webeszkoz !== 'undefined')
         }
     }
 }
+
+if(typeof snmp !== 'undefined')
+{
+    let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("snmpdata").innerHTML = this.responseText;
+        }
+    };
+    xhttp.open("GET", RootPath + "/modules/eszkozok/includes/snmp_portdata.php?ip=" + deviceip + "&community=" + snmpcommunity, true);
+    //xhttp.setRequestHeader(header, value);
+    xhttp.send();
+}

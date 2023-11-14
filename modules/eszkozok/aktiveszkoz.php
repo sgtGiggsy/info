@@ -63,6 +63,8 @@ if($id)
             hibas,
             eszkozok.megjegyzes AS megjegyzes,
             beepitesek.megjegyzes AS beepmegjegyz,
+            snmp,
+            snmpcommunity,
             (SELECT MIN(id) FROM modositasok WHERE eszkoz = eszkid) AS elsomodositas,
             (SELECT felhasznalo FROM modositasok WHERE id = elsomodositas) AS letrehozoid,
             (SELECT nev FROM felhasznalok WHERE id = letrehozoid) AS letrehozo,
@@ -208,6 +210,8 @@ else
                 mac,
                 web,
                 ssh,
+                snmp,
+                snmpcommunity,
                 poe,
                 portszam,
                 uplinkportok,
@@ -300,7 +304,14 @@ else
                         <div><?=($eszkoz['ssh']) ? "Igen" : "Nem" ?></div>
                         <div>Weben menedzselhető</div>
                         <div><?=($eszkoz['web']) ? "Igen" : "Nem" ?></div>
-                        <div>Szoftver</div>
+                        <div>SNMP</div>
+                        <div><?=($eszkoz['snmp']) ? "Engedélyezve" : "Nincs engedélyezve" ?></div><?php
+                        if($eszkoz['snmp'])
+                        {
+                            ?><div>SNMP közösség</div>
+                            <div><?=$eszkoz['snmpcommunity']?></div><?php
+                        }
+                        ?><div>Szoftver</div>
                         <div><?=$eszkoz['szoftver']?></div>
                         <div>Access portok</div>
                         <div><?=$eszkoz['portszam']?></div>
@@ -350,6 +361,21 @@ else
                                 <div class="<?=($x['online']) ? "online" : "offline" ?>"><?=($x['online']) ? "Online" : "Offline" ?></div><?php
                             }
                         ?></div>
+                    </div>
+                </div><?php
+            }
+        
+        // Az aktuális SNMP állapot
+            if($mindolvas && $eszkoz['snmp'] && $eszkoz['snmpcommunity'])
+            {
+                $PHPvarsToJS[] = array('name' => 'snmp', 'val' => $eszkoz['snmp']);
+                $PHPvarsToJS[] = array('name' => 'deviceip', 'val' => $eszkoz['ipcim']);
+                $PHPvarsToJS[] = array('name' => 'snmpcommunity', 'val' => $eszkoz['snmpcommunity']);
+                
+                ?><div class="infobox">
+                    <div class="infoboxtitle">Eszköz portjainak aktuális állapota</div>
+                    <div class="infoboxbody" id="snmpdata">
+                        <div class="devportload"><div>Eszközportok lekérdezése folyamatban...</div><div class="loader"></div></div>
                     </div>
                 </div><?php
             }
@@ -624,6 +650,9 @@ else
                                 <th>Uplink portok</th>
                                 <th>PoE</th>
                                 <th>SSH</th>
+                                <th>SNMP</th>
+                                <th>SNMP közösség</th>
+                                <th>SSH</th>
                                 <th>Webes felület</th>
                                 <th>Tulajdonos</th>
                                 <th>Állapot</th>
@@ -659,6 +688,8 @@ else
                                         <td <?=($elozoverzio && $elozoverzio['uplinkportok'] != $x['uplinkportok']) ? "style='font-weight: bold;'" : "" ?>><?=$x['uplinkportok']?></td>
                                         <td <?=($elozoverzio && $elozoverzio['poe'] != $x['poe']) ? "style='font-weight: bold;'" : "" ?>><?=($x['poe']) ? "Képes" : "Nincs" ?></td>
                                         <td <?=($elozoverzio && $elozoverzio['ssh'] != $x['ssh']) ? "style='font-weight: bold;'" : "" ?>><?=($x['ssh']) ? "Elérhető" : "Nem elérhető" ?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['snmp'] != $x['snmp']) ? "style='font-weight: bold;'" : "" ?>><?=($x['snmp']) ? "Engedélyezve" : "Nincs engedélyezve" ?></td>
+                                        <td <?=($elozoverzio && $elozoverzio['snmpcommunity'] != $x['snmpcommunity']) ? "style='font-weight: bold;'" : "" ?>><?=$x['snmpcommunity']?></td>
                                         <td <?=($elozoverzio && $elozoverzio['web'] != $x['web']) ? "style='font-weight: bold;'" : "" ?>><?=($x['web']) ? "Van" : "Nincs" ?></td>
                                         <td <?=($elozoverzio && $elozoverzio['tulajid'] != $x['tulajid']) ? "style='font-weight: bold;'" : "" ?>><?=$x['tulajdonos']?></td>
                                         <td <?=($elozoverzio && $elozoverzio['hibas'] != $x['hibas']) ? "style='font-weight: bold;'" : "" ?>><?php switch($x['hibas']) { case 1: echo "Részlegesen működőképes"; Break; case 2: echo "Működésképtelen"; Break; default: echo "Működőképes"; } ?></td>
@@ -679,6 +710,8 @@ else
                                     <td <?=($elozoverzio['uplinkportok'] != $eszkoz['uplinkportok']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['uplinkportok']?></td>
                                     <td <?=($elozoverzio['poe'] != $eszkoz['poe']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['poe']) ? "Képes" : "Nincs" ?></td>
                                     <td <?=($elozoverzio['ssh'] != $eszkoz['ssh']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['ssh']) ? "Elérhető" : "Nem elérhető" ?></td>
+                                    <td <?=($elozoverzio['snmp'] != $eszkoz['snmp']) ? "style='font-weight: bold;'" : "" ?>><?=($x['snmp']) ? "Engedélyezve" : "Nincs engedélyezve" ?></td>
+                                    <td <?=($elozoverzio['snmpcommunity'] != $eszkoz['snmpcommunity']) ? "style='font-weight: bold;'" : "" ?>><?=$x['snmpcommunity']?></td>
                                     <td <?=($elozoverzio['web'] != $eszkoz['web']) ? "style='font-weight: bold;'" : "" ?>><?=($eszkoz['web']) ? "Van" : "Nincs" ?></td>
                                     <td <?=($elozoverzio['tulajid'] != $eszkoz['tulajid']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['tulajdonos']?></td>
                                     <td <?=($elozoverzio['hibas'] != $eszkoz['hibas']) ? "style='font-weight: bold;'" : "" ?>><?php switch($eszkoz['hibas']) { case 1: echo "Részlegesen működőképes"; Break; case 2: echo "Működésképtelen"; Break; default: echo "Működőképes"; } ?></td>

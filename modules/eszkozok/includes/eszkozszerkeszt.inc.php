@@ -381,7 +381,7 @@ else
         
         $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = 
         $uplinkportok = $szoftver = $nev = $leadva = $hibas = $raktar =
-        $megjegyzes = $poe = $ssh = $web = $felhasznaloszam = $simtipus =
+        $megjegyzes = $poe = $ssh = $snmp = $snmpcommunity = $web = $felhasznaloszam = $simtipus =
         $telefonszam = $pinkod = $pukkod = $magyarazat = $wifi = null;
 
         $button = "Új eszköz";

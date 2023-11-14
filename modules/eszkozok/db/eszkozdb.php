@@ -28,8 +28,8 @@ if(isset($irhat) && $irhat)
         {
             if($eszkoztipus == "aktiveszkoz")
             {
-                $stmt = $con->prepare('INSERT INTO aktiveszkozok (eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, modid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->bind_param('sssssssss', $last_id, $_POST['mac'], $_POST['poe'], $_POST['ssh'], $_POST['web'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $modif_id);
+                $stmt = $con->prepare('INSERT INTO aktiveszkozok (eszkoz, mac, poe, ssh, snmp, snmpcommunity, web, portszam, uplinkportok, szoftver, modid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->bind_param('sssssssssss', $last_id, $_POST['mac'], $_POST['poe'], $_POST['ssh'], $_POST['snmp'], $_POST['ssnmpcommunity'], $_POST['web'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $modif_id);
                 $stmt->execute();
             }
 
@@ -88,13 +88,13 @@ if(isset($irhat) && $irhat)
         {
             if($eszkoztipus == "aktiveszkoz")
             {
-                mySQLConnect("INSERT INTO aktiveszkozok_history (akteszkid, eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, modid)
-                    SELECT id, eszkoz, mac, poe, ssh, web, portszam, uplinkportok, szoftver, modid
+                mySQLConnect("INSERT INTO aktiveszkozok_history (akteszkid, eszkoz, mac, poe, ssh, snmp, snmpcommunity, web, portszam, uplinkportok, szoftver, modid)
+                    SELECT id, eszkoz, mac, poe, ssh, snmp, snmpcommunity, web, portszam, uplinkportok, szoftver, modid
                     FROM aktiveszkozok
                     WHERE eszkoz = $eszkoz");
 
-                $stmt = $con->prepare('UPDATE aktiveszkozok SET mac=?, poe=?, ssh=?, web=?, portszam=?, uplinkportok=?, szoftver=?, modid=? WHERE eszkoz=?');
-                $stmt->bind_param('ssssssssi', $_POST['mac'], $_POST['poe'], $_POST['ssh'], $_POST['web'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $modif_id, $_POST['id']);
+                $stmt = $con->prepare('UPDATE aktiveszkozok SET mac=?, poe=?, ssh=?, snmp=?, snmpcommunity=?, web=?, portszam=?, uplinkportok=?, szoftver=?, modid=? WHERE eszkoz=?');
+                $stmt->bind_param('ssssssssssi', $_POST['mac'], $_POST['poe'], $_POST['ssh'], $_POST['snmp'], $_POST['snmpcommunity'], $_POST['web'], $_POST['portszam'], $_POST['uplinkportok'], $_POST['szoftver'], $modif_id, $_POST['id']);
                 $stmt->execute();
             }
 
