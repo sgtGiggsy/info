@@ -25,7 +25,7 @@ class DevInterface
     public $txdroppedhealthy;
     public $txdroppeddamaged;
     public $txwaitlist;
-    public $vlan;
+    public $vlan = "Trunk";
     public $portmode;
 
     public function InMBytes($direction) {
@@ -70,9 +70,9 @@ class DevInterface
         return date("d \\n\a\p H:i:s", $this->statesince);
     }
 
-    public function PortSebessegMbit()
+    public function PortSebesseg()
     {
-        return $this->speed / 1000000 . "Mbit/s";
+        return round($this->speed / 1000000 , 2) . "Mbit/s";
     }
 
     public function PortTipus() {

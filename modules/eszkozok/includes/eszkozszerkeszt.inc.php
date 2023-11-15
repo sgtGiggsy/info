@@ -412,6 +412,8 @@ else
                     $mac = @$aktiveszkoz['mac'];
                     $poe = @$aktiveszkoz['poe'];
                     $ssh = @$aktiveszkoz['ssh'];
+                    $snmp = @$aktiveszkoz['snmp'];
+                    $snmpcommunity = @$aktiveszkoz['snmpcommunity'];
                     $web = @$aktiveszkoz['web'];
                     $portszam = @$aktiveszkoz['portszam'];
                     $uplinkportok = @$aktiveszkoz['uplinkportok'];
