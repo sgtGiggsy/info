@@ -27,6 +27,9 @@ class DevInterface
     public $txwaitlist;
     public $vlan = "Trunk";
     public $portmode;
+    public $bovitotipus;
+    public $bovitomodel;
+    public $bovitosorozatszam;
 
     public function InMBytes($direction) {
         if($direction == "rx")
@@ -95,4 +98,13 @@ class DevInterface
             default : return null;
         }
     }
+}
+
+class DevPluggable
+{
+    public $id;
+    public $portid;
+    public $type;
+    public $model;
+    public $serial;
 }

@@ -5,7 +5,7 @@ TODO Megoldani, hogy kész lekérdezés után le lehessen kérni további mezők
 */
 include("../../../includes/config.inc.php");
 include("../../../includes/functions.php");
-include('../classes/devinterface.class.php');
+include('../classes/networkelements.class.php');
 
 function clearKey($key)
 {
@@ -22,7 +22,6 @@ function clearValue($value)
 $ipaddress = $_GET['ip'];
 $community = $_GET['community'];
 
-$snmpadatok = [];
 //$obj = snmpwalkoid($tesztip, $tesztcommunity, null);
 $ids = @snmp2_real_walk($ipaddress, $community, "iso.3.6.1.2.1.2.2.1.1");
 
@@ -36,6 +35,8 @@ if($ids)
     $names = @snmp2_real_walk($ipaddress, $community, "iso.3.6.1.2.1.31.1.1.1.1");
     $descs = @snmp2_real_walk($ipaddress, $community, "iso.3.6.1.2.1.31.1.1.1.18");
     $vlans = @snmp2_real_walk($ipaddress, $community, 'iso.3.6.1.4.1.9.9.68.1.2.2.1.2');
+    $bovitok = @snmp2_real_walk($ipaddress, $community, 'iso.3.6.1.2.1.47.1.1.1.1.16');
+    $vanbovito = false;
 
     foreach($ids as $key => $rawvalue)
     {
@@ -99,7 +100,7 @@ if($ids)
     }
     else
     {
-        $vlans = snmp2_real_walk($ipaddress, $community, 'iso.3.6.1.2.1.17.7.1.4.5.1.1');
+        $vlans = @snmp2_real_walk($ipaddress, $community, 'iso.3.6.1.2.1.17.7.1.4.5.1.1');
         if($vlans)
         {
             foreach($vlans as $key => $rawvalue)
@@ -107,6 +108,104 @@ if($ids)
                 $id = clearKey($key);
                 $value = clearValue($rawvalue);
                 $intlist[$id]->vlan = $value;
+            }
+        }
+    }
+
+    foreach($bovitok as $key => $rawvalue)
+    {
+        $id = clearKey($key);
+        $value = clearValue($rawvalue);
+
+        // Az 1-es ID mindig az "anyaeszköz", ami néha tévesen FRU-ként (field replacable unit) van jelölve.
+        if($id != 1 && $value == 1)
+        {
+            $temp = new DevPluggable;
+            $temp->id = $id;
+            $pluggable[$id] = $temp;
+            $vanbovito = true;
+        }
+    }
+
+    if($vanbovito)
+    {
+        $containers = [];
+        $bovitotypes = @snmp2_real_walk($ipaddress, $community, 'iso.3.6.1.2.1.47.1.1.1.1.2');
+        $bovitoalters = @snmp2_real_walk($ipaddress, $community, 'iso.3.6.1.2.1.47.1.1.1.1.7');
+        $bovitoserials = @snmp2_real_walk($ipaddress, $community, 'iso.3.6.1.2.1.47.1.1.1.1.11');
+        $bovitomodels = @snmp2_real_walk($ipaddress, $community, 'iso.3.6.1.2.1.47.1.1.1.1.13');
+        $bovitoports = @snmp2_real_walk($ipaddress, $community, 'iso.3.6.1.2.1.47.1.1.1.1.4');
+
+        foreach($bovitotypes as $key => $rawvalue)
+        {
+            $id = clearKey($key);
+            $value = clearValue($rawvalue);
+            if(isset($pluggable[$id]))
+            {
+                $pluggable[$id]->type = $value;
+            }
+        }
+
+        foreach($bovitoalters as $key => $rawvalue)
+        {
+            $id = clearKey($key);
+            $value = clearValue($rawvalue);
+            /* 
+            * Csúnya, hack megoldás. A típus mezőben van, hogy port neveket találni, miközben a bővítő !!! NEM !!! az interface ID-jához van kötve,
+            * hanem az interfacet képviselő rendszerelem ID-jához. Ez azért baj, mert az interface-t képviselő rendszerelem ID-ja nincs kapcsolatban az interface ID-jával.
+            * A rendszerelem viszont tudja a saját nevét, ami nagyjából megegyezik az interface nevével, amit képvisel.
+            * Ezért ilyen esetben elmentjük a rendszerelemek típusnevét ID szerint, és később ezt az ID-t keressük ki, hogy összevessük a rendszerelem nevét az interfacek nevével.
+            */
+            $value = str_replace("GigabitEthernet", "Gi", $value);
+            $value = str_replace("FastEthernet", "Fe", $value);
+            $containers[$id] = $value;
+        }
+
+        foreach($bovitoserials as $key => $rawvalue)
+        {
+            $id = clearKey($key);
+            $value = clearValue($rawvalue);
+            if(isset($pluggable[$id]))
+                $pluggable[$id]->serial = $value;
+        }
+
+        foreach($bovitomodels as $key => $rawvalue)
+        {
+            $id = clearKey($key);
+            $value = clearValue($rawvalue);
+            if(isset($pluggable[$id]))
+                $pluggable[$id]->model = $value;
+        }
+
+        foreach($bovitoports as $key => $rawvalue)
+        {
+            $id = clearKey($key);
+            $value = clearValue($rawvalue);
+            if(isset($pluggable[$id]))
+                $pluggable[$id]->portid = $value;
+        }
+
+        foreach($intlist as $interface)
+        {
+            //echo $interface->id . " " . $interface->shortname . "<br>";
+            foreach($pluggable as $bovito)
+            {
+                //print_r($bovito);
+                //echo "<br><br>";
+                if($interface->id == $bovito->portid)
+                {
+                    $interface->bovitotipus = $bovito->type;
+                    $interface->bovitomodel = $bovito->model;
+                    $interface->bovitosorozatszam = $bovito->serial;
+                    break;
+                }
+                elseif(isset($containers[$bovito->portid]) && str_contains($containers[$bovito->portid], $interface->shortname))
+                {
+                    $interface->bovitotipus = $bovito->type;
+                    $interface->bovitomodel = $bovito->model;
+                    $interface->bovitosorozatszam = $bovito->serial;
+                    break;
+                }
             }
         }
     }
@@ -120,8 +219,14 @@ if($ids)
                 <th>VLAN</th>
                 <th>Admin állapot</th>
                 <th>Operatív állapot</th>
-                <th>Sebesség</th>
-            </tr>
+                <th>Sebesség</th><?php
+                if($vanbovito)
+                {
+                    ?><th>Bővítőszabvány</th>
+                    <th>Modell</th>
+                    <th>Sorozatszám</th><?php
+                }
+            ?></tr>
         </thead>
         <tbody><?php
             foreach($intlist as $interface)
@@ -141,8 +246,14 @@ if($ids)
                         <td><?=$interface->vlan?></td>
                         <td><?=$interface->PortAdminState()?></td>
                         <td><?=$interface->PortOperativeState()?></td>
-                        <td><?=$interface->PortSebesseg()?></td>
-                    </tr><?php
+                        <td><?=$interface->PortSebesseg()?></td><?php
+                        if($vanbovito)
+                        {
+                            ?><td><?=$interface->bovitotipus?></td>
+                            <td><?=$interface->bovitomodel?></td>
+                            <td><?=$interface->bovitosorozatszam?></td><?php
+                        }
+                    ?></tr><?php
                 }
             }
         ?></tbody>
