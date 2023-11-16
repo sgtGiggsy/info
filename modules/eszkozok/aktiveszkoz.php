@@ -366,7 +366,7 @@ else
             }
         
         // Az aktuális SNMP állapot
-            if($mindolvas && $eszkoz['snmp'] && $eszkoz['snmpcommunity'])
+            if($mindolvas && $eszkoz['snmp'] && $eszkoz['snmpcommunity'] && ($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
             {
                 $PHPvarsToJS[] = array('name' => 'snmp', 'val' => $eszkoz['snmp']);
                 $PHPvarsToJS[] = array('name' => 'deviceip', 'val' => $eszkoz['ipcim']);

@@ -94,13 +94,12 @@ else
         // Szerkesztő gombok
         if($mindir)
         {
-            ?><div style='display: inline-flex'>
-                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Nyomtató szerkesztése</button><?php
-                if(isset($elozmenyek) && mysqli_num_rows($elozmenyek) > 0)
-                {
-                    ?><button type='button' onclick=rejtMutat("elozmenyek")>Szerkesztési előzmények</button><?php
-                }
-            ?></div><?php
+            ?><div class="szerkgombsor">
+                <button type='button' onclick="location.href='./<?=$id?>?action=edit'">Nyomtató szerkesztése</button>
+                <button type='button' onclick="location.href='./<?=$id?>?beepites<?=($eszkoz['beepid'] && !$eszkoz['kiepitesideje']) ? '=' . $eszkoz['beepid'] . '&action=edit' : '&action=addnew' ?>'">
+                    <?=($eszkoz['beepid'] && !$eszkoz['kiepitesideje']) ? "Beépítés szerkesztése" : "Új beépítés" ?>
+                </button>
+            </div><?php
         }
 
         switch($eszkoz['maxmeret'])

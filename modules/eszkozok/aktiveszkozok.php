@@ -137,7 +137,7 @@ else
                         $kattinthatolink = './aktiveszkoz/' . $eszkoz['id'];
                         ?><tr class='trlink<?=($eszkoz['hibas'] == 1) ? " reszhibas" : "" ?><?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && $eszkoz['online'] == 0 && $eszkoz['online'] != null && $szemelyes['switchstateshow'] == 1) ? " offline" : "" ?>'>
                             <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['ipcim']?></a></td>
-                            <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['beepitesinev']?></a></td>
+                            <td nowrap><a href="<?=$kattinthatolink?>"><?=$eszkoz['beepitesinev']?></a></td>
                             <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['gyarto']?></a></td>
                             <td nowrap><a href="<?=$kattinthatolink?>"><?=$eszkoz['modell']?><?=$eszkoz['varians']?></a></td>
                             <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['portszam']?><?=($eszkoz['uplinkportok']) ? ' + ' . $eszkoz['uplinkportok'] : "" ?></a></td>
