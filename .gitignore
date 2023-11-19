@@ -16,3 +16,5 @@ homokozo.php
 .vscode
 api/classes
 node_modules
+nodejs/logs
+snmp_trap.json

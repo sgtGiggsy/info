@@ -1314,6 +1314,23 @@ function purifyPost($ishtml = false)
     }
 }
 
+function purifyArray($array)
+{
+	foreach($array as $key => $value)
+    {
+        if ($value == "NULL" || $value == "")
+        {
+            $array[$key] = NULL;
+        }
+		else
+        {
+            $array[$key] = quickXSSfilter($value);
+        }
+    }
+
+	return $array;
+}
+
 function showHelyiseg($szam, $nev = null)
 {
 	($szam) ? $szam . ". helyiség" : "";
@@ -2015,4 +2032,14 @@ function roundUp99($value)
 	{
 		return $value;
 	}
+}
+
+function secondsToFullFormat($seconds)
+{
+	$masodperc = str_pad(($seconds % 60), 2, "0", STR_PAD_LEFT);
+	$perc = str_pad(($seconds / 60 % 60), 2, "0", STR_PAD_LEFT);
+	$ora = str_pad((floor($seconds / 3600 % 24)), 2, "0", STR_PAD_LEFT);
+	$nap = str_pad((floor($seconds / 3600 / 24)), 2, "0", STR_PAD_LEFT);
+
+	return "$nap nap, $ora óra, $perc perc, $masodperc másodperc";
 }

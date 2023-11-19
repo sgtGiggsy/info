@@ -1538,12 +1538,12 @@ td img {
 }
 
 .trlink td {
-    padding: unset;
+    padding: 0.4em 0.3em 0.4em 0.3em;
     height: 3em;
 }
 
 .trlink td a {
-    padding: 0.4em 0.3em 0.4em 0.3em;
+    
     display: flex;
     height: 100%;
     align-items: center;
@@ -1584,6 +1584,10 @@ td img {
 }
 
 .offline {
+    color: var(--offline);
+}
+
+.offline a {
     color: var(--offline);
 }
 
