@@ -14,3 +14,5 @@ munkaprint.php
 terminal.php
 homokozo.php
 .vscode
+api/classes
+node_modules
