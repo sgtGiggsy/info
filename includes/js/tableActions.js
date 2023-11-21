@@ -88,10 +88,11 @@ function filterTable(szures, tablazat, oszlop, szuloszur = false)
         if(tdfirst && tdfirst.innerHTML && szuloszur)
         {
             szuloelem = tr[i];
-            if (szuloelem.title == oszlop || !szuloelem.title)
+            let szuroazon = szuloelem.getAttribute("szurazon");
+            if (szuroazon == oszlop || !szuroazon)
             {
                 szuloelem.style.display = "none";
-                szuloelem.title = oszlop;
+                szuloelem.setAttribute("szurazon", oszlop);
             }
         }
         if(td)
@@ -99,9 +100,10 @@ function filterTable(szures, tablazat, oszlop, szuloszur = false)
             txtValue = td.textContent;
             if (txtValue.toUpperCase().indexOf(filter) > -1)
             {
-                if(tr[i].title == oszlop || !tr[i].title)
+                let childazon = tr[i].getAttribute("szurazon");
+                if (childazon == oszlop || !childazon)
                 {
-                    if(szuloszur && szuloelem.title == oszlop)
+                    if(szuloszur && szuloelem.getAttribute("szurazon") == oszlop)
                     {
                         szuloelem.style.display = "";
                     }
@@ -111,7 +113,7 @@ function filterTable(szures, tablazat, oszlop, szuloszur = false)
             else
             {
                 tr[i].style.display = "none";
-                tr[i].title = oszlop;
+                tr[i].setAttribute("szurazon", oszlop);
             }
         }
 

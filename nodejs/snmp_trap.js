@@ -28,7 +28,7 @@ var oid = {
     "1.3.6.1.2.1.1.3.0": "sysuptime",
     "1.3.6.1.6.3.1.1.4.1": "trap"
 }
-
+console.log(settings);
 //console.log(fs.readFileSync(".\\logs\\snmp_trap.log", "utf8"));
 
 // Default options
@@ -42,6 +42,7 @@ var options = {
 };
 
 var callback = function (error, data) {
+    console.log("Trap érkezett");
     var eredmeny = 200;
     if(error) {
         //TODO Az értesítés API meghívása, és értesítés adása a hiba adataival
@@ -59,7 +60,7 @@ var callback = function (error, data) {
                 sysuptime:  messagebody[0].value / 100,
                 event:      messagebody[1].value,
                 eventlocal: "", // Gyakorlatban küldött snmp_trap-nél megnézni, hogy kinyerhető-e ez az adat
-                misc:       "" // Szebb lenne tömbként, de ez csak ideiglenes funkció, egy az egyben megy az adatbázisba stringként, így fölösleges
+                misc:       []
             }
         }
         else if(data.pdu.type == 164)
@@ -70,7 +71,7 @@ var callback = function (error, data) {
                 sysuptime:  data.pdu.upTime / 100,
                 event:    "1.3.6.1.6.3.1.1.5",
                 eventlocal: "", // Gyakorlatban küldött snmp_trap-nél megnézni, hogy kinyerhető-e ez az adat
-                misc:       "" // Szebb lenne tömbként, de ez csak ideiglenes funkció, egy az egyben megy az adatbázisba stringként, így fölösleges
+                misc:       []
             }
         }
         
@@ -80,7 +81,13 @@ var callback = function (error, data) {
         //! Ez csak addig lesz használatban, amíg az összes lehető trap beazonosításra kerül, utána mindenképp törölni!
         for(let i = startindex; i < messagecount; i++)
         {
-            trapbody.misc += "OID: " + messagebody[i].oid + " Value: " + messagebody[i].value + "\n";
+
+                //console.log(messagebody[i]);
+                trapbody.misc.push({
+                    OID: messagebody[i].oid,
+                    TrapVal: "" + messagebody[i].value // Hülyeségnek tűnhet, de enélkül van, hogy bytekódot továbbít az API felé, és az adatbázis írás (ami stringet próbál bevinni) nem sikerül
+                })
+
         }
         //console.log(JSON.stringify(trapbody, null, 2));
 
@@ -104,5 +111,5 @@ var callback = function (error, data) {
 };
 
 let receiver = snmp.createReceiver(options, callback);
-receiver.authorizer.addCommunity("public");
+receiver.authorizer.addCommunity(settings.community);
 //console.log(receiver.authorizer.communities);

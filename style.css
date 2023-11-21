@@ -1539,7 +1539,7 @@ td img {
 
 .trlink td {
     padding: 0.4em 0.3em 0.4em 0.3em;
-    height: 3em;
+    height: fit-content;
 }
 
 .trlink td a {
