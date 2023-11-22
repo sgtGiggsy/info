@@ -1,4 +1,5 @@
 <?php
+include('./modules/allapotjelentesek/includes/functions.php');
 
 if(!$csoportolvas)
 {
@@ -6,40 +7,44 @@ if(!$csoportolvas)
 }
 else
 {
-    function OIDs($oid)
+    $where = "WHERE (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)";
+    if(isset($_GET['nap']) || (isset($_GET['kezdodatum']) && isset($_GET['zarodatum'])))
     {
-        switch($oid)
+        if(isset($_GET['nap']))
         {
-            case "1.3.6.1.6.3.1.1.5" : return "Általános SNMP üzenet"; break;
-            case "1.3.6.1.6.3.1.1.5.1" : return "Rendszer újraindult áramkimaradás után"; break;
-            case "1.3.6.1.6.3.1.1.5.2" : return "Rendszer újraindult"; break;
-            case "1.3.6.1.6.3.1.1.5.3" : return "Port állapota offline"; break;
-            case "1.3.6.1.6.3.1.1.5.4" : return "Port állapota online"; break;
-            case "1.3.6.1.6.3.1.1.5.5" : return "Autentikációs hiba"; break;
-            case "1.3.6.1.4.1.9.10.56.2.0.1" : return "Változás az autentikációs beállításokban"; break;
-            case "1.3.6.1.4.1.9.9.41.2.0.1": return "Log bejegyzés készült az eszközön"; break;
-            case "1.3.6.1.4.1.9.6.1.101.0.151": return "Port STP állapota tanulásról továbbításra váltott"; break;
-            case "1.3.6.1.4.1.9.6.1.101.0.152": return "Port STP állapota továbbításról blokkolásra váltott"; break;
-            case "1.3.6.1.4.1.9.9.43.2.0.1": return "Változás az eszköz beállításaiban"; break;
-            case "1.3.6.1.4.1.9.0.1": return "Virtuális konzol kapcsolat lezárult"; break;
-            case "1.3.6.1.4.1.9.6.1.101.0.218": return "Egyetlen eszköz van csatlakoztatva a porthoz"; break;
-            case "1.3.6.1.4.1.9.6.1.101.0.217": return "Több eszköz van csatlakoztatva a porthoz"; break;
-            case "1.3.6.1.4.1.9.9.43.2.0.2": return "Az eszköz konfigurációja frissült"; break;
-            case "1.3.6.1.4.1.9.6.1.101.0.180": return "Másolási folyamat befejeződött"; break;
-            case "1.3.6.1.4.1.9.9.13.3.0.5": return "Redundáns táp hibája"; break;
-            case "1.3.6.1.4.1.9.9.46.2.0.7": return "Port dinamikus trunk állapotának változása"; break;
-            case "": return ""; break;
-            default : return $oid;
+            $date = $_GET['nap'];
+            if(str_contains($date, "-"))
+            {
+                $date = str_replace("-", "", $date);
+            }
+            $where .= " AND DATE(snmp_traps.timestamp) = DATE($date)";
+        }
+        else
+        {
+            $kezdo = $_GET['kezdodatum'];
+            $zaro = $_GET['zarodatum'];
+            if(str_contains($kezdo, "-"))
+            {
+                $kezdo = str_replace("-", "", $kezdo);
+            }
+            if(str_contains($zaro, "-"))
+            {
+                $zaro = str_replace("-", "", $zaro);
+            }
+
+            $where .= " AND (DATE(snmp_traps.timestamp) >= DATE($kezdo) AND DATE(snmp_traps.timestamp) <= DATE($zaro))";
         }
     }
+    else
+    {
+        //$where .= " AND DATE(snmp_traps.timestamp) = CURDATE()";
+    }
 
-
-    $where = "WHERE (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)";
     if(!$mindolvas)
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
-            'tipus' => "telephely",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'tipus' => "telephely",                   // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
             'and' => false,                          // Kerüljön-e AND a parancs elejére
             'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
             'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
@@ -57,11 +62,12 @@ else
             snmp_traps.eszkozid AS eszkozid,
             snmp_traps.timestamp AS timestamp,
             snmp_traps.eszkozid AS eszkozid,
-            event, eventlocal, systemuptime, misc,
-            ipcimek.ipcim
+            event, eventlocal, systemuptime, rawmessage,
+            ipcimek.ipcim, snmpcommunity
         FROM snmp_traps
             LEFT JOIN beepitesek ON beepitesek.eszkoz = snmp_traps.eszkozid
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
+            LEFT JOIN aktiveszkozok ON beepitesek.eszkoz = aktiveszkozok.eszkoz
         $where
         ORDER BY snmp_traps.timestamp DESC;");
 
@@ -97,6 +103,9 @@ else
                     $linkpre = "<a href='$kattinthatolink'>";
                     $linkend = "</a>";
                 }
+
+                $processed = processRaw($riasztas['rawmessage']);
+                $megjelenik = processMessageBody($processed, $riasztas['ipcim'], $riasztas['snmpcommunity']);
                 
                 ?><tr class="trlink" data-surgosseg="" data-traptipus="">
                     <td><?=$linkpre?><?=$riasztas['timestamp']?><?=$linkend?></td>
@@ -105,7 +114,7 @@ else
                     <td><?=$linkpre?><?=$riasztas['eventlocal']?><?=$linkend?></td>
                     <td><?=$linkpre?><?=$sysuptime?><?=$linkend?></td>
                     <td><?=$linkpre?>&nbsp;<?=$linkend?></td>
-                    <td><?=$linkpre?><pre><?=$riasztas['misc']?></pre><?=$linkend?></td>
+                    <td><?=$linkpre?><div class="snmpmessagebody"><?=$megjelenik?></div><?=$linkend?></td>
                 </tr><?php
             }
         ?></tbody>

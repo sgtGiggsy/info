@@ -1595,6 +1595,17 @@ td img {
     color: var(--warning);
 }
 
+.snmpmessagebody {
+    font-size: 0.8em;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 500px;
+}
+
+.snmpmessagebody div {
+    padding: 0 0.4em;
+}
+
 /* ------------------------------- Egyszerű igazításhoz használt típusok ------------------------------- */
 .left {
     float: left;

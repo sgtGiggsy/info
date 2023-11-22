@@ -2036,10 +2036,24 @@ function roundUp99($value)
 
 function secondsToFullFormat($seconds)
 {
+	if($seconds < 0)
+		$seconds = $seconds * - 1;
+	$nap = $ev = null;
 	$masodperc = str_pad(($seconds % 60), 2, "0", STR_PAD_LEFT);
 	$perc = str_pad(($seconds / 60 % 60), 2, "0", STR_PAD_LEFT);
 	$ora = str_pad((floor($seconds / 3600 % 24)), 2, "0", STR_PAD_LEFT);
-	$nap = str_pad((floor($seconds / 3600 / 24)), 2, "0", STR_PAD_LEFT);
+	$napok = floor($seconds / 3600 / 24);
+	$evek = floor($napok / 365);
 
-	return "$nap nap, $ora óra, $perc perc, $masodperc másodperc";
+	if($napok > 0)
+	{
+		$nap = "$napok nap, ";
+	}
+
+	if($napok > 364)
+	{
+		$ev = "$evek ev, ";
+	}
+
+	return $ev . $nap . "$ora óra, $perc perc, $masodperc másodperc";
 }
