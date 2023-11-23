@@ -1538,13 +1538,13 @@ td img {
 }
 
 .trlink td {
-    padding: 0.4em 0.3em 0.4em 0.3em;
     height: fit-content;
+    padding: unset;
 }
 
 .trlink td a {
-    
-    display: flex;
+    padding: 0.5em 0.3em 0.5em 0.3em;
+    display: block;
     height: 100%;
     align-items: center;
 }
@@ -1583,15 +1583,11 @@ td img {
     font-weight: bold;
 }
 
-.offline {
+.offline, .offline a {
     color: var(--offline);
 }
 
-.offline a {
-    color: var(--offline);
-}
-
-.warning {
+.warning, .warning a {
     color: var(--warning);
 }
 

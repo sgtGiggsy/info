@@ -9,27 +9,11 @@
 #       Ez a modul csupán a trap-ek fogadására szolgál, hogy alapszíntű felügyeleti képességgel ruházza fel a már meglévő rendszert.
 #       A munka oroszlánrészét a net-snmp csomag végzi, az én modulom csak a net-snmptől vett adatot alakítja át az oldal számára.
 #
-TODO    API elkészítése
-TODO    A Node.js modul elkészítése
-TODO    Az oldalon megjelenítés megvalósítása (közös felületen az összes trap, illetve az eszközök egyéni oldalán a rájuk vonatkozó)
-#
-?       A jelenleg ismert trap oid-k:
-?       1.3.6.1.6.3.1.1.5.1 - coldStart
-?       1.3.6.1.6.3.1.1.5.2 - warmStart
-?       1.3.6.1.6.3.1.1.5.3 - linkDown
-?       1.3.6.1.6.3.1.1.5.4 - linkUp
-?       1.3.6.1.6.3.1.1.5.5 - authenticationFailure
 */
 
 var snmp = require ("net-snmp");
 var settings = require('./snmp_trap.json');
-
-var oid = {
-    "1.3.6.1.2.1.1.3.0": "sysuptime",
-    "1.3.6.1.6.3.1.1.4.1": "trap"
-}
 console.log(settings);
-//console.log(fs.readFileSync(".\\logs\\snmp_trap.log", "utf8"));
 
 // Default options
 var options = {
@@ -42,13 +26,15 @@ var options = {
 };
 
 var callback = function (error, data) {
-    console.log("Trap érkezett");
+    let most = new Date();
+    let timestamp = most.getFullYear() + "-" + String(most.getMonth()).padStart(2, 0) + "-" + String(most.getDate()).padStart(2, 0) + " " + String(most.getHours()).padStart(2, 0) + ":" + String(most.getMinutes()).padStart(2, 0) + ":" + String(most.getSeconds()).padStart(2, 0);
+    console.log(timestamp + " Trap érkezett");
     var eredmeny = 200;
     if(error) {
         //TODO Az értesítés API meghívása, és értesítés adása a hiba adataival
         console.error (error);
         fs.readFileSync(settings.logfile, "utf8");
-        fs.appendFile(settings.logfile, "[ISMERETLEN] SNMP trap hiba!\n", (err) => {});
+        fs.appendFile(settings.logfile, "[ISMERETLEN] SNMP trap hiba!" + timestamp + "\n", (err) => {});
     } else {
         let messagebody = data.pdu.varbinds;
         let trapbody;
@@ -81,7 +67,6 @@ var callback = function (error, data) {
         //! Ez csak addig lesz használatban, amíg az összes lehető trap beazonosításra kerül, utána mindenképp törölni!
         for(let i = startindex; i < messagecount; i++)
         {
-
                 //console.log(messagebody[i]);
                 trapbody.misc.push({
                     OID: messagebody[i].oid,
@@ -89,11 +74,7 @@ var callback = function (error, data) {
                 })
 
         }
-        //console.log(JSON.stringify(trapbody, null, 2));
 
-        //console.log (JSON.stringify(data, null, 2));
-
-        //TODO Itt következik az oldal SNMP API-jának meghívása
         fetch(settings.api.url, {
             method: "POST",
             body: JSON.stringify(trapbody),
@@ -105,7 +86,7 @@ var callback = function (error, data) {
         .then((response) => eredmeny = response.status);
         if(eredmeny != 200 && eredmeny != 201)  {
             fs.readFileSync(settings.logfile, "utf8");
-            fs.appendFile(settings.logfile, "[ADATBÁZIS HIBA] A(z) " + trapbody.deviceip + " IP című eszköz által küldött " + trapbody.event + " OID-jű SNMP trap adatbázisba írása sikertelen\n", (err) => {});
+            fs.appendFile(settings.logfile, `[ADATBÁZIS HIBA] ${timestamp} A(z) ${trapbody.deviceip} IP című eszköz által küldött ${trapbody.event} OID-jű SNMP trap adatbázisba írása sikertelen\n`, (err) => {});
         }
     }
 };

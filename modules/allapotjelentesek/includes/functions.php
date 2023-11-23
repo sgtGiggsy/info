@@ -55,7 +55,7 @@ function valtozasIranyok($irany)
     switch($irany)
     {
         case 1 : return "törlés";
-        case 2 : return "commandSource";
+        case 2 : return "bevitt parancs";
         case 3 : return "futó";
         case 4 : return "induló";
         case 5 : return "helyi";
@@ -92,6 +92,37 @@ function trapSeverity($severity)
     }
 }
 
+function messageSeverity($type, $severity)
+{
+    if($type == "log")
+    {
+        switch($severity)
+        {
+            case 0 : $severity = 5; break;
+            case 1 : $severity = 3; break;
+            case 2 : $severity = 4; break;
+            case 3 : $severity = 3; break;
+            case 4 : $severity = 2; break;
+            case 5 : $severity = 1; break;
+            case 6 : $severity = 1; break;
+            case 7 : $severity = 0; break;
+        }
+    }
+
+    if($type == "trap")
+    {
+        switch($severity)
+        {
+            case 0 : $severity = 1; break;
+            case 1 : $severity = 2; break;
+            case 2 : $severity = 3; break;
+            case 3 : $severity = 4; break;
+        }
+    }
+
+    return $severity;
+}
+
 function identifyIANA($type) {
     switch($type)
     {
@@ -117,12 +148,12 @@ function tapAllapot($allapot)
 {
     switch($allapot)
     {
-        case 1 : return "normal";
-        case 2 : return "warning";
-        case 3 : return "critical";
-        case 4 : return "shutdown";
-        case 5 : return "notPresent";
-        case 6 : return "notFunctioning";
+        case 1 : return "normális";
+        case 2 : return "figyelmet igényel";
+        case 3 : return "kritikus";
+        case 4 : return "leállítva";
+        case 5 : return "nincs csatlakoztatva";
+        case 6 : return "nem működik";
     }
 }
 
@@ -130,7 +161,7 @@ function snmpUzenetKuldoIPTipus($tipus)
 {
     switch($tipus)
     {
-        case 0 : return "unknown";
+        case 0 : return "ismeretlen";
         case 1 : return "ipv4";
         case 2 : return "ipv6";
         case 3 : return "ipv4z";
@@ -167,7 +198,7 @@ function OIDs($oid)
 {
     switch($oid)
     {
-        case "1.3.6.1.6.3.1.1.5.1" : return "Rendszer újraindult áramkimaradás után";
+        case "1.3.6.1.6.3.1.1.5.1" : return "Rendszer újraindult";
         case "1.3.6.1.6.3.1.1.5.2" : return "Rendszer újraindult";
         case "1.3.6.1.6.3.1.1.5.3" : return "Port állapota offline";
         case "1.3.6.1.6.3.1.1.5.4" : return "Port állapota online";
@@ -186,6 +217,12 @@ function OIDs($oid)
         case "1.3.6.1.4.1.9.9.13.3.0.5": return "Redundáns táp hibája";
         case "1.3.6.1.4.1.9.9.46.2.0.7": return "Port dinamikus trunk állapotának változása";
         case "1.3.6.1.2.1.47.2.0.1": return "Rendszerelem inicializáció";
+        case "1.3.6.1.4.1.9.0.0": return "A rendszer újraindul";
+        case "1.3.6.1.2.1.17.0.2": return "Feszítőfa (STP) topológia változás";
+        case "": return "";
+        case "": return "";
+        case "": return "";
+        case "": return "";
         case "": return "";
         default : return $oid;
     }
@@ -368,8 +405,8 @@ function processMessageBody($body, $devip, $community)
     /* "1.3.6.1.4.1.9.2.1.2" = ?
     */
 
-    $veglegesuzenet = $rendszerelemnev = "";
-    $severity = 0;
+    $veglegesuzenet = $port = "";
+    $severity = 1;
 
     foreach($body as $element)
     {
@@ -395,7 +432,7 @@ function processMessageBody($body, $devip, $community)
 
         if(str_contains($element->OID, "1.3.6.1.4.1.9.2.6.1.1.5"))
         {
-            $veglegesuzenet .= "<div>Kapcsolat hossza:</div><div>" . round(($element->TrapVal / 1000), 2) . " másodperc</div>";
+            $veglegesuzenet .= "<div>Kapcsolat hossza:</div><div>" . round(($element->TrapVal / 100), 2) . " másodperc</div>";
             $megtalalt = true;
         }
 
@@ -465,12 +502,17 @@ function processMessageBody($body, $devip, $community)
         if(str_contains($element->OID, "1.3.6.1.4.1.9.9.41.1.2.3.1.3"))
         {
             $veglegesuzenet .= "<div>Az üzenet fontossága:</div><div>" . logSeverity($element->TrapVal) . "</div>";
+            $severity = messageSeverity("log", $element->TrapVal);
             $megtalalt = true;
         }
         
         if(str_contains($element->OID, "1.3.6.1.4.1.9.9.41.1.2.3.1.4"))
         {
             $veglegesuzenet .= "<div>Üzenet típusa:</div><div>" . $element->TrapVal . "</div>";
+            if($element->TrapVal == "UPDOWN")
+            {
+                $severity = 1;
+            }
             $megtalalt = true;
         }
         
@@ -482,7 +524,7 @@ function processMessageBody($body, $devip, $community)
 
         if(str_contains($element->OID, "1.3.6.1.4.1.9.9.41.1.2.3.1.6"))
         {
-            $veglegesuzenet .= "<div>Az elem aktuális uptime-ja:</div><div>" . secondsToFullFormat($element->TrapVal / 1000) . "</div>";
+            $veglegesuzenet .= "<div>Az elem aktuális uptime-ja:</div><div>" . secondsToFullFormat($element->TrapVal / 100) . "</div>";
             $megtalalt = true;
         }
 
@@ -495,7 +537,8 @@ function processMessageBody($body, $devip, $community)
 
         if(str_contains($element->OID, "1.3.6.1.2.1.2.2.1.2"))
         {
-            $veglegesuzenet .= "<div>Port neve:</div><div>" . $element->TrapVal . "</div>";
+            //$veglegesuzenet .= "<div>Port neve:</div><div>" . $element->TrapVal . "</div>";
+            $port = $element->TrapVal;
             $megtalalt = true;
         }
 
@@ -514,6 +557,7 @@ function processMessageBody($body, $devip, $community)
         if(str_contains($element->OID, "1.3.6.1.4.1.9.6.1.101.2.3.2"))
         {
             $veglegesuzenet .= "<div>Az értesítés súlyossága:</div><div>" . trapSeverity($element->TrapVal) . "</div>";
+            $severity = messageSeverity("trap", $element->TrapVal);
             $megtalalt = true;
         }
 
@@ -531,7 +575,7 @@ function processMessageBody($body, $devip, $community)
 
         if(str_contains($element->OID, "1.3.6.1.2.1.1.3"))
         {
-            $veglegesuzenet .= "<div>Idő a hálózatmenedzsment inicializációja óta:</div><div>" . secondsToFullFormat($element->TrapVal / 100) . "</div>";
+            $veglegesuzenet .= "<div>Idő a legutolsó újraindulás óta:</div><div>" . secondsToFullFormat($element->TrapVal / 100) . "</div>";
             $megtalalt = true;
         }
 
@@ -568,6 +612,7 @@ function processMessageBody($body, $devip, $community)
         if(str_contains($element->OID, "1.3.6.1.4.1.9.2.1.5"))
         {
             $veglegesuzenet .= "<div>Beazonosítási hibát okozó SNMP üzenet forrása:</div><div>" . $element->TrapVal . "</div>";
+            $severity = 3;
             $megtalalt = true;
         }
 
@@ -601,7 +646,7 @@ function processMessageBody($body, $devip, $community)
             $veglegesuzenet .= "<div>:</div><div>" . $element->TrapVal . "</div>";
             $megtalalt = true;
         }
-        if(str_contains($element->OID, ""))
+        if(str_contains($element->OID, "1.3.6.1.2.1.17.0.2"))
         {
             $veglegesuzenet .= "<div>:</div><div>" . $element->TrapVal . "</div>";
             $megtalalt = true;
@@ -626,22 +671,35 @@ function processMessageBody($body, $devip, $community)
 
         //echo $element->OID . "</div>";
 
-        if($rendszerelemifid)
+        if($rendszerelemifid && !$port)
         {
             $ping = $objectnev = "";
-            //$ping = exec("ping -n 1 -w 200 $devip", $output);
+            $ping = exec("ping -n 1 -w 200 $devip", $output);
             $elerheto = !str_contains($ping, "100% loss");
             if($elerheto)
             {
-                //$objectnev = @snmp2_get($devip, $community, "iso.3.6.1.2.1.31.1.1.1.1.$rendszerelemifid");
-                $veglegesuzenet .= "<div>Port:</div><div>" . $objectnev . "</div>";
+                $objectnev = @snmp2_get($devip, $community, "iso.3.6.1.2.1.31.1.1.1.1.$rendszerelemifid");
+                $portexpl = explode(": ", $objectnev);
+                $port = trim($portexpl[1], "\"");
+                //$veglegesuzenet .= "<div>Port:</div><div>" . $port . "</div>";
             }
         }
+
+        $port = str_replace("GigabitEthernet", "gi", $port);
+        $port = str_replace("FastEthernet", "fa", $port);
+        $port = str_replace("fa", "Fa", $port);
+        $port = str_replace("gi", "Gi", $port);
+        $port = str_replace("LongReachEthernet", "Lo", $port);
 
         // A legjobb megoldás ha félig megfejtett nyers üzeneteket nem írjuk ki/tesszük be az adatbázisba
         if(!$megtalalt)
             return null;
     }
     //echo $veglegesuzenet;
-    return $veglegesuzenet;
+    $returnarr = array(
+        "body" => $veglegesuzenet,
+        "port" => $port,
+        "severity" => $severity
+    );
+    return $returnarr;
 }

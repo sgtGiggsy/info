@@ -37,7 +37,7 @@ else
     }
     else
     {
-        //$where .= " AND DATE(snmp_traps.timestamp) = CURDATE()";
+        $where .= " AND DATE(snmp_traps.timestamp) = CURDATE()";
     }
 
     if(!$mindolvas)
@@ -58,12 +58,12 @@ else
         $where .= "AND $csoportwhere";
     }
 
-    $allapotjelzesek = mySQLConnect("SELECT DISTINCT snmp_traps.id,
+    $allapotjelzesek = mySQLConnect("SELECT DISTINCT snmp_traps.id AS id,
             snmp_traps.eszkozid AS eszkozid,
             snmp_traps.timestamp AS timestamp,
             snmp_traps.eszkozid AS eszkozid,
-            event, eventlocal, systemuptime, rawmessage,
-            ipcimek.ipcim, snmpcommunity
+            event, port, systemuptime, rawmessage,
+            ipcimek.ipcim, snmpcommunity, processedmessage, severity, beepitesek.nev AS beepnev
         FROM snmp_traps
             LEFT JOIN beepitesek ON beepitesek.eszkoz = snmp_traps.eszkozid
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
@@ -71,19 +71,20 @@ else
         $where
         ORDER BY snmp_traps.timestamp DESC;");
 
+    $bejegyzesdb = mysqli_num_rows($allapotjelzesek);
     $oszlopok = array(
+        array('nev' => 'Sorsz', 'tipus' => 'i'),
         array('nev' => 'Időpont', 'tipus' => 's'),
         array('nev' => 'IP cím', 'tipus' => 's'),
         array('nev' => 'Riasztási esemény', 'tipus' => 's'),
-        array('nev' => 'Érintett rendszerelem', 'tipus' => 's'),
+        array('nev' => 'Port', 'tipus' => 's'),
         array('nev' => 'Rendszer uptime', 'tipus' => 's'),
-        array('nev' => '>', 'tipus' => 's'),
-        array('nev' => 'A trap nyers tartalma', 'tipus' => 's')
+        array('nev' => 'A trap tartalma', 'tipus' => 's')
     );
     
     ?><div class="oldalcim">Eszköz riasztások</div>
     <button onclick="rejtMutat()">Rejt</button>
-    <table id="riasztasok">
+    <table id="riasztasok" class="telefonkonyvtabla">
         <thead>
             <tr><?php
                 sortTableHeader($oszlopok, "riasztasok", true, true);
@@ -92,29 +93,61 @@ else
         <tbody><?php
             foreach($allapotjelzesek as $riasztas)
             {
-                $eszkozid = $riasztas['eszkozid'];
                 $linkpre = $linkend = null;
+                $trapid = $riasztas['id'];
+                $eszkozid = $riasztas['eszkozid'];
+                $port = $riasztas['port'];
+                $body = $riasztas['processedmessage'];
+                $severity = $riasztas['severity'];
                 $sysuptime = secondsToFullFormat($riasztas['systemuptime']);
-                //$sysuptime = secondsToFullFormat(5676546);
-                //$sysuptime = sprintf('%03d óra, %02d perc, %02d másodperc', ($riasztas['systemuptime']/ 3600),($riasztas['systemuptime']/ 60 % 60), $riasztas['systemuptime']% 60);
-                if(!$eszkozid)
+                if($eszkozid)
                 {
                     $kattinthatolink = $RootPath . "/aktiveszkoz/" . $eszkozid;
                     $linkpre = "<a href='$kattinthatolink'>";
                     $linkend = "</a>";
                 }
 
-                $processed = processRaw($riasztas['rawmessage']);
-                $megjelenik = processMessageBody($processed, $riasztas['ipcim'], $riasztas['snmpcommunity']);
+                // Ez arra jó, hogy ha korábban egy üzenet "nem lett lefordítva" emberi nyelvre, akkor most megteszi
+                if(!$riasztas['processedmessage'] && !$riasztas['port'])
+                {
+                    $processed = processRaw($riasztas['rawmessage']);
+                    $fullyprocessed = processMessageBody($processed, $riasztas['ipcim'], $riasztas['snmpcommunity']);
+                    if($fullyprocessed)
+                    {
+                        $port = $fullyprocessed['port'];
+                        $body = $fullyprocessed['body'];
+                        $severity = $fullyprocessed['severity'];
+                        mySQLConnect("UPDATE snmp_traps SET processedmessage = '$body', port = '$port', severity = '$severity' WHERE id = $trapid;");
+                    }
+                }
+                switch($severity)
+                {
+                    case 2 : $urgclass = " fontos-font"; break;
+                    case 3 : $urgclass = " surgos-font"; break;
+                    case 4 : $urgclass = " kritikus-font"; break;
+                    default: $urgclass = "";
+                }
                 
-                ?><tr class="trlink" data-surgosseg="" data-traptipus="">
+                /*
+                else
+                    {
+                        $port = str_replace("GigabitEthernet", "gi", $port);
+                        $port = str_replace("FastEthernet", "fa", $port);
+                        $port = str_replace("fa", "Fa", $port);
+                        $port = str_replace("gi", "Gi", $port);
+                        $port = str_replace("LongReachEthernet", "Lo", $port);
+                        mySQLConnect("UPDATE snmp_traps SET port = '$port' WHERE id = $trapid;");
+                    }
+                */
+                
+                ?><tr class="trlink<?=$urgclass?>" data-surgosseg="<?=$severity?>">
+                    <td><?=$linkpre?><?=$bejegyzesdb--?><?=$linkend?></td>
                     <td><?=$linkpre?><?=$riasztas['timestamp']?><?=$linkend?></td>
-                    <td><?=$linkpre?><?=$riasztas['ipcim']?><?=$linkend?></td>
+                    <td title="<?=$riasztas['beepnev']?>"><?=$linkpre?><?=$riasztas['ipcim']?><?=$linkend?></td>
                     <td title="<?=$riasztas['event']?>"><?=$linkpre?><?=OIDs($riasztas['event'])?><?=$linkend?></td>
-                    <td><?=$linkpre?><?=$riasztas['eventlocal']?><?=$linkend?></td>
+                    <td><?=$linkpre?><?=($port) ? $port : "&nbsp" ?><?=$linkend?></td>
                     <td><?=$linkpre?><?=$sysuptime?><?=$linkend?></td>
-                    <td><?=$linkpre?>&nbsp;<?=$linkend?></td>
-                    <td><?=$linkpre?><div class="snmpmessagebody"><?=$megjelenik?></div><?=$linkend?></td>
+                    <td title="<?=$riasztas['rawmessage']?>"><?=$linkpre?><div class="snmpmessagebody"><?=$body?></div><?=$linkend?></td>
                 </tr><?php
             }
         ?></tbody>
