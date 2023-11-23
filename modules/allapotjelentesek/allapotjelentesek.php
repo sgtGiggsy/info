@@ -7,7 +7,43 @@ if(!$csoportolvas)
 }
 else
 {
-    $where = "WHERE (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)";
+    $enablekeres = true;
+    $javascriptfiles[] = "modules/allapotjelentesek/includes/allapotjelentesek.js";
+    $severityfilter = "minden";
+    if(isset($_GET['trapfontossag']))
+    {
+        $severityfilter = $_GET['trapfontossag'];
+        $_SESSION[getenv('SESSION_NAME').'trapfontossag'] = $severityfilter;
+    }
+    elseif(isset($_SESSION[getenv('SESSION_NAME').'trapfontossag']))
+    {
+        $severityfilter = $_SESSION[getenv('SESSION_NAME').'trapfontossag'];
+    }
+
+    $fontossagszur = null;
+    if($severityfilter != "minden")
+    {
+        $fontossagszur = " AND ";
+        switch($severityfilter)
+        {
+            case "informalis" : $fontossagszur .= "snmp_traps.severity = 1"; break;
+            case "figyelmeztetes" : $fontossagszur .= "snmp_traps.severity = 2"; break;
+            case "hiba" : $fontossagszur .= "snmp_traps.severity = 3"; break;
+            case "kritikus" : $fontossagszur .= "snmp_traps.severity = 4"; break;
+        }
+    }
+
+    if(isset($_GET['kereses']))
+    {
+        $keres = $_GET['kereses'];
+        $where = "WHERE ipcimek.ipcim LIKE '%$keres%'";
+    }
+    else
+    {
+        $where = "WHERE (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)";
+    }
+    $where .= $fontossagszur;
+    
     if(isset($_GET['nap']) || (isset($_GET['kezdodatum']) && isset($_GET['zarodatum'])))
     {
         if(isset($_GET['nap']))
@@ -35,7 +71,7 @@ else
             $where .= " AND (DATE(snmp_traps.timestamp) >= DATE($kezdo) AND DATE(snmp_traps.timestamp) <= DATE($zaro))";
         }
     }
-    else
+    elseif(!isset($_GET['kereses']))
     {
         $where .= " AND DATE(snmp_traps.timestamp) = CURDATE()";
     }
@@ -82,9 +118,18 @@ else
         array('nev' => 'A trap tartalma', 'tipus' => 's')
     );
     
-    ?><div class="oldalcim">Eszköz riasztások</div>
-    <button onclick="rejtMutat()">Rejt</button>
-    <table id="riasztasok" class="telefonkonyvtabla">
+    ?><div class="oldalcim">Eszköz riasztások
+        <div class="szuresvalaszto">Értesítések szűrése
+            <select id="severityfilter" name="severityfilter" onchange="severityFilter();">
+                <option value="minden" <?=($severityfilter == "minden") ? "selected" : "" ?>>Minden mutatása</option>
+                <option value="informalis" <?=($severityfilter == "informalis") ? "selected" : "" ?>>Informális</option>
+                <option value="figyelmeztetes" <?=($severityfilter == "figyelmeztetes") ? "selected" : "" ?>>Figyelmeztetés</option>
+                <option value="hiba" <?=($severityfilter == "hiba") ? "selected" : "" ?>>Hiba</option>
+                <option value="kritikus" <?=($severityfilter == "kritikus") ? "selected" : "" ?>>Kritikus hiba</option>
+            </select>
+        </div>
+    </div>
+    <table id="riasztasok" class="sorhover telefonkonyvtabla">
         <thead>
             <tr><?php
                 sortTableHeader($oszlopok, "riasztasok", true, true);

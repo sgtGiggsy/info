@@ -1514,6 +1514,14 @@ td img {
     max-width: 100%;
 }
 
+.sorhover tbody tr:nth-child(odd):hover {
+    background-color: var(--infoboxsoro);
+}
+
+.sorhover tbody tr:nth-child(even):hover {
+    background-color: var(--infoboxsore);
+}
+
 .telefonkonyvelvalaszto {
     font-size: 1.2em;
     font-weight: bold;
