@@ -295,7 +295,7 @@ fieldset {
     padding-bottom: 0.5em;
 }
 
-.ketharmad, .doublecolumn {
+.ketharmad, .doublecolumn, .doublecolumnnormalpad {
     display: grid;
     grid-gap: 1em;
     margin: 10px;
@@ -315,12 +315,21 @@ fieldset {
     grid-template-columns: 2fr 1fr;
 }
 
-.doublecolumn {
+.doublecolumn, .doublecolumnnormalpad {
     grid-template-columns: 1fr 1fr;
 }
 
 .ketharmad div, .doublecolumn div {
     padding: 0 0 1em 0;
+}
+
+.doublecolumnnormalpad {
+    grid-gap: unset;
+    margin: unset;
+}
+
+.doublecolumnnormalpad div {
+    padding: 0.4em;
 }
 
 .ketharmad input[type="submit"], .ketharmad input[type="text"], .ketharmad textarea, .ketharmad select,
@@ -1599,17 +1608,6 @@ td img {
     color: var(--warning);
 }
 
-.snmpmessagebody {
-    font-size: 0.8em;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    max-width: 500px;
-}
-
-.snmpmessagebody div {
-    padding: 0 0.4em;
-}
-
 /* ------------------------------- Egyszerű igazításhoz használt típusok ------------------------------- */
 .left {
     float: left;
@@ -2295,6 +2293,76 @@ td img {
     filter: brightness(80%);
 }
 
+.prevselnext {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.allapotjelentesek {
+    display: grid;
+    row-gap: 0.5em;
+}
+
+.allapotelem {
+    display: block;
+    overflow: hidden;
+    height: 8em;
+    text-decoration: none;
+    background-color: var(--tsore);
+    border: 1px solid var(--greyfont);
+    border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -ms-border-radius: 0.5em;
+    -o-border-radius: 0.5em;
+}
+
+.allapotelem:hover {
+    background-color: var(--tsoro);
+}
+
+.allapotelemdiv {
+    display: grid;
+    grid-template-columns: 4em 5fr 3fr;
+    height: 100%;
+}
+
+.allapotsorszam {
+    background-color: var(--scrolltrack);
+}
+
+.allapotelemparent {
+    position: relative;
+    padding: 0.6em;
+}
+
+.snmpmessagebody {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0.4em;
+    font-size: 0.6em;
+    max-width: 500px;
+}
+
+.eventtitle {
+    font-size: 1.5em;
+}
+
+.eventdevice {
+    margin-top: 0.4em;
+    font-size: 1.1em;
+}
+
+.eventdevice {
+    margin-top: 0.3em;
+    font-size: 0.9em;
+}
+
+.eventtime {
+    position: absolute;
+    bottom: 0.5em;
+    font-size: 0.75em;
+}
 /* ------------------------------- Speciális oldalak ------------------------------- */
 /* -- Tennivalók -- */
 .tennivalokwrap {

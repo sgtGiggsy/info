@@ -46,9 +46,18 @@ Class API_Call implements API
             $body = $processed['body'];
             $severity = $processed['severity'];
         }
-        if($object->event == "1.3.6.1.6.3.1.1.5.3" || $object->event == "1.3.6.1.4.1.9.9.43.2.0.1"  || $object->event == "1.3.6.1.4.1.9.0.0")
+
+        // Kontraproduktívnak tűnhet a link-down üzenetek figyelmeztetés szintre emelése, de az alapfeltételezés,
+        // hogy a végponti irányú portokon a link-down logolás és snmp trap ki van kapcsolva
+        if($object->event == "1.3.6.1.6.3.1.1.5.3" || $object->event == "1.3.6.1.4.1.9.9.43.2.0.1"  || $object->event == "1.3.6.1.4.1.9.0.0" || $object->event == "1.3.6.1.6.3.1.1.5.1" || $object->event == "1.3.6.1.6.3.1.1.5.2")
         {
             $severity = 2;
+        }
+
+        // A port STP állapot változás túl magas prioritást kap az üzenetek között alapértelmezetten
+        if($object->event == "1.3.6.1.4.1.9.6.1.101.0.151")
+        {
+            $severity = 1;
         }
 
         if(!$eszkozid)

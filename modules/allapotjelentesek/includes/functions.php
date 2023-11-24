@@ -219,8 +219,8 @@ function OIDs($oid)
         case "1.3.6.1.2.1.47.2.0.1": return "Rendszerelem inicializáció";
         case "1.3.6.1.4.1.9.0.0": return "A rendszer újraindul";
         case "1.3.6.1.2.1.17.0.2": return "Feszítőfa (STP) topológia változás";
-        case "": return "";
-        case "": return "";
+        case "1.3.6.1.4.1.9.9.10.1.3.0.5": return "Cserélhető FLASH eszköz csatlakoztatva";
+        case "1.3.6.1.4.1.9.9.10.1.3.0.4": return "Változás egy cserélhető FLASH eszköz állapotában";
         case "": return "";
         case "": return "";
         case "": return "";
@@ -640,17 +640,18 @@ function processMessageBody($body, $devip, $community)
             $megtalalt = true;
         }
 
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.10.1.1.2.1.3"))
+        {
+            $veglegesuzenet .= "<div>Cerélhető eszköz minimális partíciómérete:</div><div>" . ($element->TrapVal / 1024) . " kByte</div>";
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.10.1.1.2.1.7"))
+        {
+            $veglegesuzenet .= "<div>Cserélhető eszköz megnevezése:</div><div>" . $element->TrapVal . "</div>";
+            $megtalalt = true;
+        }
         /* //! csomag: 31*13*8 + 384
-        if(str_contains($element->OID, ""))
-        {
-            $veglegesuzenet .= "<div>:</div><div>" . $element->TrapVal . "</div>";
-            $megtalalt = true;
-        }
-        if(str_contains($element->OID, "1.3.6.1.2.1.17.0.2"))
-        {
-            $veglegesuzenet .= "<div>:</div><div>" . $element->TrapVal . "</div>";
-            $megtalalt = true;
-        }
         if(str_contains($element->OID, ""))
         {
             $veglegesuzenet .= "<div>:</div><div>" . $element->TrapVal . "</div>";
