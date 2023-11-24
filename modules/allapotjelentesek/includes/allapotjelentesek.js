@@ -16,20 +16,25 @@ function listaSzur(filterid, filterby) {
     listaelemek.forEach(elem => {
         let szoveg = elem.querySelector(`#${filterby}`).textContent;
 
-        // Első ág: megtalált és még nem volt elrejtve
-        if(szoveg.toUpperCase().indexOf(filter.toUpperCase()) > -1 && (!elem.getAttribute("data-kiszurt") || elem.getAttribute("data-kiszurt") == filterby))
+        // Első ág: megtalált
+        if(szoveg.toUpperCase().includes(filter.toUpperCase()))
         {
-            elem.style.display = "";
+            // Ha már el volt rejtve, de nem (csak) a jelen filter miatt, töröljük a jelen filtert a filterek listájáról
+            if(elem.getAttribute("data-kiszurt") && elem.getAttribute("data-kiszurt") != filterby)
+            {
+                let filttorles = elem.getAttribute("data-kiszurt");
+                let ujfilter = filttorles.replace(filterby, "");
+                elem.setAttribute("data-kiszurt", ujfilter);
+            }
+            // Ha nem volt elrejtve, vagy el volt, de a jelen filter által, akkor az elemet megjelenítjük, és a filterbejegyzést töröljük róla
+            else
+            {
+                elem.style.display = "";
+                elem.setAttribute("data-kiszurt", "");
+            }
         }
 
-        // Második ág, megtalált, el volt már rejtve a jelen szűrési feltétel által
-        else if(szoveg.toUpperCase().indexOf(filter.toUpperCase()) > -1 && elem.getAttribute("data-kiszurt").toUpperCase().indexOf(filterby.toUpperCase()) > -1)
-        {
-            let filttorles = elem.getAttribute("data-kiszurt");
-            let ujfilter = filttorles.replace(filterby, "");
-            console.log(ujfilter);
-            elem.setAttribute("data-kiszurt", ujfilter);
-        }
+        // Második ág, nem megtalált, most kerül rejtésre
         else
         {
             let regifilter = elem.getAttribute("data-kiszurt");
@@ -37,9 +42,9 @@ function listaSzur(filterid, filterby) {
             {
                 elem.setAttribute("data-kiszurt", filterby);
             }
-            else if(elem.getAttribute("data-kiszurt") && elem.getAttribute("data-kiszurt").toUpperCase().indexOf(filterby.toUpperCase()) < -1)
+            else if(!elem.getAttribute("data-kiszurt").includes(filterby))
             {
-                console.log("ujfilter");
+                console.log("régifilter")
                 elem.setAttribute("data-kiszurt", regifilter + filterby);
             }
             elem.style.display = "none";
