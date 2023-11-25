@@ -345,6 +345,7 @@ if(isset($irhat) && $irhat)
             {
                 $elemallapot = 3;
                 $modelemallapot = 1;
+                // Tudom, hogy nem elegáns, nem is hatákony, de ekkora darabszámnál nem okozhat jelentősebb bajt
                 foreach($modlist as $modositas)
                 {
                     $origbeoid = $modositas['origbeoid'];
@@ -354,24 +355,49 @@ if(isset($irhat) && $irhat)
 
                     $beomodositasok = mySQLConnect("SELECT * FROM telefonkonyvbeosztasok_mod WHERE id = $ujbeoid");
                     $beomodositasok = mysqli_fetch_assoc($beomodositasok);
+                    $ujsorrend = $beomodositasok['sorrend'];
+                    $ujelemcsoportja = $beomodositasok['csoport'];
 
                     if($origbeoid)
                     {
                         $beooriginals = mySQLConnect("SELECT * FROM telefonkonyvbeosztasok WHERE id = $origbeoid");
                         $beooriginals = mysqli_fetch_assoc($beooriginals);
+                        $beoorigsorrend = $beooriginals['sorrend'];
+
+                        if($ujsorrend != $beoorigsorrend)
+                        {
+                            mySQLConnect("UPDATE telefonkonyvbeosztasok SET sorrend = sorrend + 1 WHERE sorrend > $ujsorrend AND csoport = $ujelemcsoportja;");
+                        }
 
                         $stmt = $con->prepare('UPDATE telefonkonyvbeosztasok SET csoport=?, nev=?, sorrend=?, belsoszam=?, belsoszam2=?, fax=?, kozcelu=?, kozcelufax=?, felhid=?, megjegyzes=?, allapot=?, torolve=? WHERE id=?');
-                        $stmt->bind_param('ssssssssssssi', $beomodositasok['csoport'], $beomodositasok['nev'], $beomodositasok['sorrend'], $beomodositasok['belsoszam'], $beomodositasok['belsoszam2'], $beomodositasok['fax'], $beomodositasok['kozcelu'], $beomodositasok['kozcelufax'], $beomodositasok['felhid'], $beomodositasok['megjegyzes'], $elemallapot, $beomodositasok['torolve'], $origbeoid);
+                        $stmt->bind_param('ssssssssssssi', $beomodositasok['csoport'], $beomodositasok['nev'], $ujsorrend, $beomodositasok['belsoszam'], $beomodositasok['belsoszam2'], $beomodositasok['fax'], $beomodositasok['kozcelu'], $beomodositasok['kozcelufax'], $beomodositasok['felhid'], $beomodositasok['megjegyzes'], $elemallapot, $beomodositasok['torolve'], $origbeoid);
                         $stmt->execute();
 
+                        // A korábbi eredeti állapotot átteszük a módosításhoz használt rekorba
                         $stmt = $con->prepare('UPDATE telefonkonyvbeosztasok_mod SET csoport=?, nev=?, sorrend=?, belsoszam=?, belsoszam2=?, fax=?, kozcelu=?, kozcelufax=?, felhid=?, megjegyzes=?, allapot=?, torolve=? WHERE id=?');
                         $stmt->bind_param('ssssssssssssi', $beooriginals['csoport'], $beooriginals['nev'], $beooriginals['sorrend'], $beooriginals['belsoszam'], $beooriginals['belsoszam2'], $beooriginals['fax'], $beooriginals['kozcelu'], $beooriginals['kozcelufax'], $beooriginals['felhid'], $beooriginals['megjegyzes'], $modelemallapot, $beooriginals['torolve'], $ujbeoid);
                         $stmt->execute();
+
+                        if($ujsorrend != $beoorigsorrend)
+                        {
+                            mySQLConnect("UPDATE telefonkonyvbeosztasok SET sorrend = sorrend - 1 WHERE sorrend > $beoorigsorrend AND csoport = $ujelemcsoportja;");
+                        }
                     }
                     else
                     {
+                        // Először a legegyszerűbb forgatókönyvet vesszük, mikor az új elem a csoport legutolsó helyére kerül
+                        if($ujsorrend == 999999)
+                        {
+                            $regicsoportallapot = mySQLConnect("SELECT MAX(sorrend) AS utolsoelem FROM telefonkonyvbeosztasok WHERE csoport = $ujelemcsoportja");
+                            $ujsorrend = mysqli_fetch_assoc($regicsoportallapot)['utolsoelem'];
+                        }
+                        else
+                        {
+                            mySQLConnect("UPDATE telefonkonyvbeosztasok SET sorrend = sorrend + 1 WHERE sorrend > $ujsorrend AND csoport = $ujelemcsoportja;");
+                        }
+
                         $stmt = $con->prepare('INSERT INTO telefonkonyvbeosztasok (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, felhid, megjegyzes, allapot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-                        $stmt->bind_param('sssssssssss', $beomodositasok['csoport'], $beomodositasok['nev'], $beomodositasok['sorrend'], $beomodositasok['belsoszam'], $beomodositasok['belsoszam2'], $beomodositasok['fax'], $beomodositasok['kozcelu'], $beomodositasok['kozcelufax'], $beomodositasok['felhid'], $beomodositasok['megjegyzes'], $elemallapot);
+                        $stmt->bind_param('sssssssssss', $ujelemcsoportja, $beomodositasok['nev'], $ujsorrend, $beomodositasok['belsoszam'], $beomodositasok['belsoszam2'], $beomodositasok['fax'], $beomodositasok['kozcelu'], $beomodositasok['kozcelufax'], $beomodositasok['felhid'], $beomodositasok['megjegyzes'], $elemallapot);
                         $stmt->execute();
                     }
 

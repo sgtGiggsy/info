@@ -248,7 +248,7 @@ if(isset($_GET['kereses']))
         <div class="szerkcardoptionelement" id="alegyegenkent"><span onclick="location.href='./telefonkonyv'">Alegységekre bontott</span></div>
         <div class="szerkcardoptionelement" id="nevszerint"><span onclick="location.href='?nevszerinti'">Név szerinti</span></div>
     </div>
-    <table id="<?=$tipus?>" class="telefonkonyvtabla">
+    <table id="<?=$tipus?>" class="telefonkonyvtabla sorhover">
         <thead>
             <tr><?php
             if(!$nevszerint)

@@ -1634,7 +1634,6 @@ td img {
 .topmenubase {
     display: grid;
     grid-template-columns: 200px  minmax(min-content, 350px) max-content minmax(0px, 1fr) max-content;
-    top: 0;
     height: 50px;
     width: 100%;
     background-color: var(--topbase);
@@ -1998,7 +1997,7 @@ td img {
     width: 200px;
     left: 0;
     right: 0;
-    position: absolute;
+    /*position: absolute;*/
     padding-bottom: 0;
 }
 

@@ -36,9 +36,9 @@ if(isset($irhat) && $irhat)
             mySQLConnect("UPDATE telefonkonyvcsoportok SET sorrend = sorrend + 1 WHERE sorrend > $sorrend AND torolve IS NULL;");
         }
 
-        var_dump($sorrend);
-        var_dump($_POST['nev']);
-        var_dump($_POST['id']);
+        //var_dump($sorrend);
+        //var_dump($_POST['nev']);
+        //var_dump($_POST['id']);
         
         $stmt = $con->prepare('UPDATE telefonkonyvcsoportok SET nev=?, sorrend=? WHERE id=?');
         $stmt->bind_param('ssi', $_POST['nev'], $sorrend, $_POST['id']);
@@ -50,6 +50,7 @@ if(isset($irhat) && $irhat)
         }
         elseif(isset($origsorrend) && $origsorrend)
         {
+            // Mivel egy elemet áthelyeztünk, ahonnan kivettük, képződne egy lyuk, ha nem csökkentenénk a felette lévős sorszámokat
             mySQLConnect("UPDATE telefonkonyvcsoportok SET sorrend = sorrend - 1 WHERE sorrend > $origsorrend AND torolve IS NULL;");
         }
     }

@@ -166,7 +166,7 @@ if($globaltelefonkonyvadmin || $csoportir)
                 </select>
             </div>
         </div>
-        <table id="<?=$tipus?>" class="telefonkonyvtabla">
+        <table id="<?=$tipus?>" class="telefonkonyvtabla sorhover">
             <thead>
                 <tr><?php
                     foreach($oszlopok as $oszlop)
