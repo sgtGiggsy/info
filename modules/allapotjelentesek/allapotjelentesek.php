@@ -175,7 +175,7 @@ else
             </select>
         </div>
     </div>
-    <div class="tripplecolumn">
+    <div class="tripplecolumn szuresoptions">
             <div class="left doublecolumnnormalpad">
                 <div>
                     <label for="esemeny">Riasztási esemény</label>

@@ -2302,6 +2302,14 @@ td img {
     row-gap: 0.5em;
 }
 
+.szuresoptions {
+    background-color: var(--thead);
+    padding: 0.3em;
+    margin-bottom: 0.4em;
+    border: solid 1px var(--addnewborder);
+    box-shadow: 1px 1px 4px var(--shadow);
+}
+
 .allapotelem {
     display: block;
     overflow: hidden;
