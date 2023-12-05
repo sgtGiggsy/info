@@ -11,8 +11,16 @@ Class API_Call implements API
 
     static function GetItem($objid)
     {
-        //? Szükség lenne ennek az implementálására?
-        return null;
+        $allapotjelzesek = mySQLConnect("SELECT snmp_traps.id AS id,
+            snmp_traps.eszkozid AS eszkozid,
+            snmp_traps.timestamp AS timestamp,
+            event, port, systemuptime,
+            severity, message
+        FROM snmp_traps
+        WHERE eszkozid = $objid AND DATE(snmp_traps.datum) >= DATE_SUB(NOW(), interval 14 DAY)
+        ORDER BY snmp_traps.timestamp DESC");
+
+        return $allapotjelzesek;
     }
 
     static function Post($object, $tabla)
@@ -38,14 +46,14 @@ Class API_Call implements API
             $rawmessage .= "OID: " . $tovabbi->OID . "; Value: " . $tovabbi->TrapVal . "\n";
         }
 
-        $rawtoprocess = processRaw($rawmessage);
-        $processed = processMessageBody($rawtoprocess, $object->deviceip, $community);
-        if($processed) // Ha van nem feldolgozható része a nyers üzenetnek, null elemet ad vissza a függvény
-        {
-            $port = $processed['port'];
-            $body = $processed['body'];
-            $severity = $processed['severity'];
-        }
+        $tojson = json_encode($object->misc);
+
+        //$rawtoprocess = processRaw($rawmessage);
+        //$processed = processMessageBody($rawtoprocess, $object->deviceip, $community);
+        $processed = processMessageBody_json($tojson, $object->deviceip, $community);
+        $port = $processed['port'];
+        $message = $processed['body'];
+        $severity = $processed['severity'];
 
         // Kontraproduktívnak tűnhet a link-down üzenetek figyelmeztetés szintre emelése, de az alapfeltételezés,
         // hogy a végponti irányú portokon a link-down logolás és snmp trap ki van kapcsolva
@@ -67,8 +75,8 @@ Class API_Call implements API
 
         //$eszkozid = 10;
         //$event = $object->event;
-        $stmt = $con->prepare('INSERT INTO snmp_traps (eszkozid, event, port, rawmessage, processedmessage, systemuptime, severity) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssssss', $eszkozid, $object->event, $port, $rawmessage, $body, $object->sysuptime, $severity);
+        $stmt = $con->prepare('INSERT INTO snmp_traps (eszkozid, event, port, systemuptime, severity, message) VALUES (?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('ssssss', $eszkozid, $object->event, $port, $object->sysuptime, $severity, $message);
         $stmt->execute();
 
         if(mysqli_errno($con) == 0)

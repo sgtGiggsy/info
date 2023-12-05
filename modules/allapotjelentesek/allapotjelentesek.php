@@ -64,12 +64,20 @@ else
             {
                 $date = str_replace("-", "", $date);
             }
-            $where .= " AND DATE(snmp_traps.timestamp) = DATE($date)";
+            $where .= " AND DATE(snmp_traps.datum) = DATE($date)";
         }
         else
         {
             $kezdo = $kezdodatum = $_GET['kezdodatum'];
             $zaro = $zarodatum = $_GET['zarodatum'];
+            if(!$kezdo)
+            {
+                $kezdo = "1970-01-01";
+            }
+            if(!$zaro)
+            {
+                $zaro = date("Y-m-d");
+            }
             if(str_contains($kezdo, "-"))
             {
                 $kezdo = str_replace("-", "", $kezdo);
@@ -79,12 +87,12 @@ else
                 $zaro = str_replace("-", "", $zaro);
             }
 
-            $where .= " AND (DATE(snmp_traps.timestamp) >= DATE($kezdo) AND DATE(snmp_traps.timestamp) <= DATE($zaro))";
+            $where .= " AND (DATE(snmp_traps.datum) >= DATE($kezdo) AND DATE(snmp_traps.datum) <= DATE($zaro))";
         }
     }
     elseif(!isset($_GET['kereses']))
     {
-        $where .= " AND DATE(snmp_traps.timestamp) = CURDATE()";
+        $where .= " AND DATE(snmp_traps.datum) = CURDATE()";
     }
 
     if(!$mindolvas)
@@ -105,12 +113,11 @@ else
         $where .= "AND $csoportwhere";
     }
 
-    $allapotjelzesek = mySQLConnect("SELECT DISTINCT snmp_traps.id AS id,
+    $allapotjelzesek = mySQLConnect("SELECT snmp_traps.id AS id,
             snmp_traps.eszkozid AS eszkozid,
             snmp_traps.timestamp AS timestamp,
-            snmp_traps.eszkozid AS eszkozid,
-            event, port, systemuptime, rawmessage,
-            ipcimek.ipcim, snmpcommunity, processedmessage, severity, beepitesek.nev AS beepnev
+            event, port, systemuptime,
+            ipcimek.ipcim, snmpcommunity, severity, beepitesek.nev AS beepnev, message
         FROM snmp_traps
             LEFT JOIN beepitesek ON beepitesek.eszkoz = snmp_traps.eszkozid
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
@@ -128,6 +135,7 @@ else
     {
         $ma = new DateTime();
     }
+    $megjelen = $ma->format('Y F d.');
     $tegnap = $ma->modify("-1 day");
     $tegnap = $tegnap->format("Y-m-d");
     $holnap = $ma->modify("+2 day");
@@ -142,6 +150,12 @@ else
         array('nev' => 'Rendszer uptime', 'tipus' => 's'),
         array('nev' => 'A trap tartalma', 'tipus' => 's')
     );
+
+    
+    if(isset($date) && $date != date("Ymd"))
+    {
+        ?><h1 style="text-align: center; padding-bottom: 0.5em"><?=$megjelen?></h1><br><?php
+    }
     
     ?><div class="prevselnext">
         <div><?php
@@ -220,9 +234,10 @@ else
                     $trapid = $riasztas['id'];
                     $eszkozid = $riasztas['eszkozid'];
                     $port = $riasztas['port'];
-                    $body = $riasztas['processedmessage'];
+                    //$body = $riasztas['processedmessage'];
                     $severity = $riasztas['severity'];
                     $sysuptime = secondsToFullFormat($riasztas['systemuptime']);
+                    $jsondata = json_decode($riasztas['message']);
                     
                     switch($severity)
                     {
@@ -240,6 +255,7 @@ else
                     }
 
                     // Ez arra jó, hogy ha korábban egy üzenet "nem lett lefordítva" emberi nyelvre, akkor most megteszi
+                    /*
                     if(!$riasztas['processedmessage'] && !$riasztas['port'])
                     {
                         $processed = processRaw($riasztas['rawmessage']);
@@ -253,7 +269,6 @@ else
                         }
                     }
                     
-                    /*
                     else
                     {
                         $port = str_replace("GigabitEthernet", "gi", $port);
@@ -272,7 +287,20 @@ else
                         <td title="<?=$riasztas['event']?>"><?=$linkpre?><?=OIDs($riasztas['event'])?><?=$linkend?></td>
                         <td><?=$linkpre?><?=($port) ? $port : "&nbsp" ?><?=$linkend?></td>
                         <td><?=$linkpre?><?=$sysuptime?><?=$linkend?></td>
-                        <td title="<?=$riasztas['rawmessage']?>"><?=$linkpre?><div class="snmpmessagebody"><?=$body?></div><?=$linkend?></td>
+                        <td><?=$linkpre?><div class="snmpmessagebody"><?php
+                        if($jsondata)
+                        {
+                            foreach($jsondata as $adatelem)
+                            {
+                                if(isset($adatelem->szoveg))
+                                {
+                                    ?><div><?=$adatelem->szoveg?></div>
+                                    <div><?=$adatelem->ertek?></div>
+                                    <?php
+                                }
+                            }
+                        }
+                        ?></div><?=$linkend?></td>
                         </tr><?php
                     }
             ?></tbody>
@@ -287,10 +315,10 @@ else
                 $trapid = $riasztas['id'];
                 $eszkozid = $riasztas['eszkozid'];
                 $port = $riasztas['port'];
-                $body = $riasztas['processedmessage'];
                 $severity = $riasztas['severity'];
                 $kattinthatolink = $RootPath . "/aktiveszkoz/" . $eszkozid;
                 $sysuptime = secondsToFullFormat($riasztas['systemuptime']);
+                $jsondata = json_decode($riasztas['message']);
                 
                 switch($severity)
                 {
@@ -304,12 +332,25 @@ else
                     <div class="allapotelemdiv">
                         <div class="<?=$urgclass?> allapotelemparent"><?=$bejegyzesdb--?></div>
                         <div class="allapotelemparent">
+                            <div class="eventdevice" id="ip"><?=$riasztas['beepnev']?> - <?=$riasztas['ipcim']?><?=($port) ? " - " . $port . " port" : "" ?></div>
                             <div class="eventtitle" id="eventshort"><?=OIDs($riasztas['event'])?></div>
-                            <div class="eventdevice" id="ip"><?=$riasztas['ipcim']?><?=($port) ? " - " . $port : "" ?></div>
-                            <div class="eventdevice">A rendszer aktuális utolsó indítása óta eltelt idő:&nbsp;&nbsp;&nbsp;<?=$sysuptime?></div>
+                            <div class="eventuptime">A rendszer aktuális utolsó indítása óta eltelt idő:&nbsp;&nbsp;&nbsp;<?=$sysuptime?></div>
                             <div class="eventtime"><?=$riasztas['timestamp']?></div>
                         </div>
-                        <div class="snmpmessagebody" id="snmpmessage"><?=$body?></div>
+                        <div class="snmpmessagebody" id="snmpmessage"><?php
+                        if($jsondata)
+                        {
+                            foreach($jsondata as $adatelem)
+                            {
+                                if(isset($adatelem->szoveg))
+                                {
+                                    ?><div><?=$adatelem->szoveg?></div>
+                                    <div><?=$adatelem->ertek?></div>
+                                    <?php
+                                }
+                            }
+                        }
+                        ?></div>
                     </div>
                 </a><?php
             }

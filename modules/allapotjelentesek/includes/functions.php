@@ -1,4 +1,156 @@
 <?php
+/* //* "1.3.6.1.4.1.9.2.9.3.1.1" = kapcsolattípus, lehet "1.3.6.1.4.1.9.2.9.3.1.1.1.1" is, az IP cím az OID-ben: van switch IP . port . kapcsolódó eszköz IP
+    1 : unknown
+    2 : pad
+    3 : stream
+    4 : rlogin
+    5 : telnet
+    6 : tcp
+    7 : lat
+    8 : mop
+    9 : slip
+    10 : xremote
+    11 : rshell
+    */
+
+    /* //* "1.3.6.1.2.1.6.13.1.1" = kapcsolat állapot, az IP cím az OID-ben van: switch IP . port . kapcsolódó eszköz IP
+    1 : closed
+    2 : listen
+    3 : synSent
+    4 : synReceived
+    5 : established
+    6 : finWait1
+    7 : finWait2
+    8 : closeWait
+    9 : lastAck
+    10 : closing
+    11 : timeWait
+    12 : deleteTCB
+    */
+
+    /* //* "1.3.6.1.4.1.9.2.6.1.1.5" = kapcsolat hossza, az IP cím az OID-ben van: switch IP . port . kapcsolódó eszköz IP
+
+    */
+
+    /* //* "1.3.6.1.4.1.9.2.6.1.1.1" = az eszköz felé küldött byte-ok száma, az IP cím az OID-ben van: switch IP . port . kapcsolódó eszköz IP
+
+    */
+
+    /* //* "1.3.6.1.4.1.9.2.6.1.1.2" = az eszköz által küldött byte-ok száma, az IP cím az OID-ben van: switch IP . port . kapcsolódó eszköz IP
+
+    */
+
+    /* //* "1.3.6.1.4.1.9.2.9.2.1.18" = a kapcsolatban résztvevő TACACS felhasználónév
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.43.1.1.1" = az előző konfigurációváltozás óta eltelt tickek száma (negatív érték)
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.43.1.1.6.1.6" = kapcsolódó terminál típusa
+    1 : notApplicable
+    2 : unknown
+    3 : console
+    4 : terminal
+    5 : virtual
+    6 : auxiliary
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.43.1.1.6.1.8" = a terminál felhasználó
+    */
+
+    /* //!1.3.6.1.4.1.9.9.46.1.6.1.1.14" = port trunk állapota. Az OID-fabeli azonosítója az utolsó tagban (a .14 után, pl.: .14.5) van
+    1 : trunking
+    2 : notTrunking
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.43.1.1.6.1.3" = a változás csatornája
+    1 : commandLine
+    2 : snmp
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.43.1.1.6.1.4" = a beállítás változás forrása
+    1:erase
+    2:commandSource
+    3:running
+    4:startup
+    5:local
+    6:networkTftp
+    7:networkRcp
+    8:networkFtp
+    9:networkScp
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.43.1.1.6.1.5" = a beállítás változás iránya
+    1:erase
+    2:commandSource
+    3:running
+    4:startup
+    5:local
+    6:networkTftp
+    7:networkRcp
+    8:networkFtp
+    9:networkScp
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.41.1.2.3.1.2" = az üzenetet genráló elem típusa
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.41.1.2.3.1.3" = az üzenet sürgőssége
+    0:emerg
+    1:alert
+    2:crit
+    3:err
+    4:warning
+    5:notice
+    6:info
+    7:debug
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.41.1.2.3.1.4" = az üzenettípus megnevezése
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.41.1.2.3.1.5" = az üzenet szövege
+    */
+
+    /* //* "1.3.6.1.4.1.9.9.41.1.2.3.1.6" = a rendszer uptime az üzenet generálódásának idejében
+    */
+
+    /* //* "1.3.6.1.2.1.2.2.1.1" = az üzenetet generáló port ifindexe
+    */
+
+    /* //* "1.3.6.1.2.1.2.2.1.2" = az üzenetet generáló port neve
+    */
+
+    /* //* "1.3.6.1.2.1.2.2.1.3" = port típusának IANA azonosítója
+    */
+
+    /* //* "1.3.6.1.4.1.9.2.2.1.1.20" = portváltozás szöveges leírása
+    */
+
+    /* //* "1.3.6.1.4.1.9.6.1.101.2.3.1" = a trap szöveges leírása
+    */
+
+    /* //* "1.3.6.1.4.1.9.6.1.101.2.3.2" = a trap súlyossága
+    info(0),
+    warning(1),
+    error(2),
+    fatal-error(3)
+    */
+
+    /* //* "1.3.6.1.4.1.9.6.1.101.57.2.8.1" = a trapet generáló port ifindexe
+    */
+
+    /* //* "1.3.6.1.4.1.9.6.1.101.57.2.8.2" = a trapet generáló port vlan-ja
+    */
+
+    /* //* "1.3.6.1.2.1.47.1.4.1" = a sysUptime a trap generálódásának idején
+    */
+
+    /* //* "1.3.6.1.2.1.1.3" = a sysUptime a trap generálódásának idején
+    */
+
+    /* "1.3.6.1.4.1.9.2.1.2" = ?
+*/
 
 function kapcsolatTipus($tipus)
 {
@@ -250,161 +402,29 @@ function processRaw($rawmessage)
     return $returnarr;
 }
 
+function rawToJson($rawmessage)
+{
+    $returnarr = array();
+    $sorok = explode("\n", $rawmessage);
+    foreach($sorok as $sor)
+    {
+        $ertekek = explode("; ", $sor);
+        if($ertekek[0] && isset($ertekek[1])) // Az utolsó sor üres, ezért ha null, akkor ne foglalkozzunk vele
+        {
+            $oid = str_replace("OID: ", "", $ertekek[0]);
+            $value = str_replace("Value: ", "", $ertekek[1]);
+            $value = str_replace("Value:", "", $value); // null érték esetén nincs szóköz a Value: után
+            $temp = new stdClass();
+            $temp->OID = $oid;
+            $temp->TrapVal = $value;
+            $returnarr[] = $temp;
+        }
+    }
+    return json_encode($returnarr);
+}
+
 function processMessageBody($body, $devip, $community)
 {
-    /* //* "1.3.6.1.4.1.9.2.9.3.1.1" = kapcsolattípus, lehet "1.3.6.1.4.1.9.2.9.3.1.1.1.1" is, az IP cím az OID-ben: van switch IP . port . kapcsolódó eszköz IP
-    1 : unknown
-    2 : pad
-    3 : stream
-    4 : rlogin
-    5 : telnet
-    6 : tcp
-    7 : lat
-    8 : mop
-    9 : slip
-    10 : xremote
-    11 : rshell
-    */
-
-    /* //* "1.3.6.1.2.1.6.13.1.1" = kapcsolat állapot, az IP cím az OID-ben van: switch IP . port . kapcsolódó eszköz IP
-    1 : closed
-    2 : listen
-    3 : synSent
-    4 : synReceived
-    5 : established
-    6 : finWait1
-    7 : finWait2
-    8 : closeWait
-    9 : lastAck
-    10 : closing
-    11 : timeWait
-    12 : deleteTCB
-    */
-
-    /* //* "1.3.6.1.4.1.9.2.6.1.1.5" = kapcsolat hossza, az IP cím az OID-ben van: switch IP . port . kapcsolódó eszköz IP
-
-    */
-
-    /* //* "1.3.6.1.4.1.9.2.6.1.1.1" = az eszköz felé küldött byte-ok száma, az IP cím az OID-ben van: switch IP . port . kapcsolódó eszköz IP
-
-    */
-
-    /* //* "1.3.6.1.4.1.9.2.6.1.1.2" = az eszköz által küldött byte-ok száma, az IP cím az OID-ben van: switch IP . port . kapcsolódó eszköz IP
-
-    */
-
-    /* //* "1.3.6.1.4.1.9.2.9.2.1.18" = a kapcsolatban résztvevő TACACS felhasználónév
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.43.1.1.1" = az előző konfigurációváltozás óta eltelt tickek száma (negatív érték)
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.43.1.1.6.1.6" = kapcsolódó terminál típusa
-    1 : notApplicable
-    2 : unknown
-    3 : console
-    4 : terminal
-    5 : virtual
-    6 : auxiliary
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.43.1.1.6.1.8" = a terminál felhasználó
-    */
-
-    /* //!1.3.6.1.4.1.9.9.46.1.6.1.1.14" = port trunk állapota. Az OID-fabeli azonosítója az utolsó tagban (a .14 után, pl.: .14.5) van
-    1 : trunking
-    2 : notTrunking
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.43.1.1.6.1.3" = a változás csatornája
-    1 : commandLine
-    2 : snmp
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.43.1.1.6.1.4" = a beállítás változás forrása
-    1:erase
-    2:commandSource
-    3:running
-    4:startup
-    5:local
-    6:networkTftp
-    7:networkRcp
-    8:networkFtp
-    9:networkScp
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.43.1.1.6.1.5" = a beállítás változás iránya
-    1:erase
-    2:commandSource
-    3:running
-    4:startup
-    5:local
-    6:networkTftp
-    7:networkRcp
-    8:networkFtp
-    9:networkScp
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.41.1.2.3.1.2" = az üzenetet genráló elem típusa
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.41.1.2.3.1.3" = az üzenet sürgőssége
-    0:emerg
-    1:alert
-    2:crit
-    3:err
-    4:warning
-    5:notice
-    6:info
-    7:debug
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.41.1.2.3.1.4" = az üzenettípus megnevezése
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.41.1.2.3.1.5" = az üzenet szövege
-    */
-
-    /* //* "1.3.6.1.4.1.9.9.41.1.2.3.1.6" = a rendszer uptime az üzenet generálódásának idejében
-    */
-
-    /* //* "1.3.6.1.2.1.2.2.1.1" = az üzenetet generáló port ifindexe
-    */
-
-    /* //* "1.3.6.1.2.1.2.2.1.2" = az üzenetet generáló port neve
-    */
-
-    /* //* "1.3.6.1.2.1.2.2.1.3" = port típusának IANA azonosítója
-    */
-
-    /* //* "1.3.6.1.4.1.9.2.2.1.1.20" = portváltozás szöveges leírása
-    */
-
-    /* //* "1.3.6.1.4.1.9.6.1.101.2.3.1" = a trap szöveges leírása
-    */
-
-    /* //* "1.3.6.1.4.1.9.6.1.101.2.3.2" = a trap súlyossága
-    info(0),
-    warning(1),
-    error(2),
-    fatal-error(3)
-    */
-
-    /* //* "1.3.6.1.4.1.9.6.1.101.57.2.8.1" = a trapet generáló port ifindexe
-    */
-
-    /* //* "1.3.6.1.4.1.9.6.1.101.57.2.8.2" = a trapet generáló port vlan-ja
-    */
-
-    /* //* "1.3.6.1.2.1.47.1.4.1" = a sysUptime a trap generálódásának idején
-    */
-
-    /* //* "1.3.6.1.2.1.1.3" = a sysUptime a trap generálódásának idején
-    */
-
-    /* "1.3.6.1.4.1.9.2.1.2" = ?
-    */
-
     $veglegesuzenet = $port = "";
     $severity = 1;
 
@@ -699,6 +719,353 @@ function processMessageBody($body, $devip, $community)
     //echo $veglegesuzenet;
     $returnarr = array(
         "body" => $veglegesuzenet,
+        "port" => $port,
+        "severity" => $severity
+    );
+    return $returnarr;
+}
+
+function processMessageBody_json($body, $devip, $community)
+{
+    $port = "";
+    $return_json = null;
+    $severity = 1;
+
+    foreach(json_decode($body) as $element)
+    {
+        $element->TrapVal = str_replace(["\r", "\n"], "", $element->TrapVal);
+        $tempobj['oid'] = $element->OID;
+        $tempobj['rawval'] = $element->TrapVal;
+        $megtalalt = $rendszerelemifid = $hozzaadott = false;
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.2.9.3.1.1"))
+        {
+            /* "1.3.6.1.4.1.9.2.9.3.1.1" = kapcsolattípus, lehet "1.3.6.1.4.1.9.2.9.3.1.1.1.1" is */
+            $tempobj['szoveg'] = "Kapcsolat típusa";
+            $tempobj['ertek'] = kapcsolatTipus($element->TrapVal);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.2.1.6.13.1.1"))
+        {
+            /* "1.3.6.1.2.1.6.13.1.1" = kapcsolat állapot, az IP cím az OID-ben van: switch IP . port . kapcsolódó eszköz IP */
+            $ipcimportipcim = str_replace("1.3.6.1.2.1.6.13.1.1.", "", $element->OID);
+            $mindentag = explode(".", $ipcimportipcim);
+            $tempobj['szoveg'] = "A kapcsolat állapota";
+            $tempobj['ertek'] = kapcsolatAllapot($element->TrapVal);
+            $tempkapcsuzenet['szoveg'] = "Kapcsolódó eszköz címe";
+            $tempkapcsuzenet['ertek'] = "{$mindentag[5]}.{$mindentag[6]}.{$mindentag[7]}.{$mindentag[8]}";
+            $tempkapcsport['szoveg'] = "A kapcsolódáshoz használt port";
+            $tempkapcsport['ertek'] = $mindentag[4];
+            $return_json[] = $tempobj;
+            $return_json[] = $tempkapcsuzenet;
+            $return_json[] = $tempkapcsport;
+            $megtalalt = $hozzaadott = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.2.6.1.1.5"))
+        {
+            $tempobj['szoveg'] = "Kapcsolat hossza";
+            $tempobj['ertek'] = secondsToFullFormat(round(($element->TrapVal / 100), 2));
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.2.6.1.1.1"))
+        {
+            $tempobj['szoveg'] = "Fogadott adat";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.2.6.1.1.2"))
+        {
+            $tempobj['szoveg'] = "Küldött adat";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.2.9.2.1.18.1"))
+        {
+            $tempobj['szoveg'] = "Kapcsolódó felhasználó";
+            $tempobj['ertek'] = (($element->TrapVal) ? $element->TrapVal : "Ismeretlen");
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.43.1.1.1"))
+        {
+            $tempobj['szoveg'] = "Az előző konfiguráció módosítás óta eltelt idő";
+            $tempobj['ertek'] = secondsToFullFormat($element->TrapVal / 1000);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.43.1.1.6.1.6"))
+        {
+            $tempobj['szoveg'] = "Terminál típusa";
+            $tempobj['ertek'] = terminalTipus($element->TrapVal);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.43.1.1.6.1.8"))
+        {
+            $tempobj['szoveg'] = "Kapcsolódó felhasználó";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.46.1.6.1.1.14"))
+        {
+            $tempobj['szoveg'] = "A port trunking állapota";
+            $tempobj['ertek'] = (($element->TrapVal = 1) ? "trunk" : "nem trunk");
+            $megtalalt = true;
+            $rendszerelemifid = str_replace("1.3.6.1.4.1.9.9.46.1.6.1.1.14.", "", $element->OID);
+            
+            //! Megírni a névlekérést
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.43.1.1.6.1.3"))
+        {
+            $tempobj['szoveg'] = "A módosítást kezdeményező csatorna";
+            $tempobj['ertek'] = (($element->TrapVal = 1) ? "parancssor" : "SNMP");
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.43.1.1.6.1.4"))
+        {
+            $tempobj['szoveg'] = "A konfiguráció forrása";
+            $tempobj['ertek'] = valtozasIranyok($element->TrapVal);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.43.1.1.6.1.5"))
+        {
+            $tempobj['szoveg'] = "A konfiguráció célja";
+            $tempobj['ertek'] = valtozasIranyok($element->TrapVal);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.41.1.2.3.1.3"))
+        {
+            $tempobj['szoveg'] = "Az üzenet fontossága";
+            $tempobj['ertek'] = logSeverity($element->TrapVal);
+            $severity = messageSeverity("log", $element->TrapVal);
+            $megtalalt = true;
+        }
+        
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.41.1.2.3.1.4"))
+        {
+            $tempobj['szoveg'] = "Üzenet típusa";
+            $tempobj['ertek'] = $element->TrapVal;
+            if($element->TrapVal == "UPDOWN")
+            {
+                $severity = 1;
+            }
+            $megtalalt = true;
+        }
+        
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.41.1.2.3.1.5"))
+        {
+            $tempobj['szoveg'] = "Üzenet szövege";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.41.1.2.3.1.6"))
+        {
+            $tempobj['szoveg'] = "Az elem aktuális uptime-ja";
+            $tempobj['ertek'] = secondsToFullFormat($element->TrapVal / 100);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.2.1.2.2.1.1") || str_contains($element->OID, "1.3.6.1.4.1.9.6.1.101.57.2.8.1"))
+        {
+            //$veglegesuzenet .= "<div>Port ifindexe:</div><div>" . $element->TrapVal . "</div>";
+            $rendszerelemifid = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.2.1.2.2.1.2"))
+        {
+            //$veglegesuzenet .= "<div>Port neve:</div><div>" . $element->TrapVal . "</div>";
+            $port = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.2.1.2.2.1.3"))
+        {
+            $tempobj['szoveg'] = "Port típusa";
+            $tempobj['ertek'] = identifyIANA($element->TrapVal);
+            $megtalalt = true;
+        }
+        
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.2.2.1.1.20") || str_contains($element->OID, "1.3.6.1.4.1.9.6.1.101.2.3.1"))
+        {
+            $tempobj['szoveg'] = "Szöveges leírás";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.6.1.101.2.3.2"))
+        {
+            $tempobj['szoveg'] = "Az értesítés súlyossága";
+            $tempobj['ertek'] = trapSeverity($element->TrapVal);
+            $severity = messageSeverity("trap", $element->TrapVal);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.6.1.101.57.2.8.2"))
+        {
+            $tempobj['szoveg'] = "Port VLAN";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.2.1.47.1.4.1"))
+        {
+            $tempobj['szoveg'] = "Utolsó módosítás ideje";
+            $tempobj['ertek'] = secondsToFullFormat($element->TrapVal / 1000);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.2.1.1.3"))
+        {
+            $tempobj['szoveg'] = "Idő a legutolsó újraindulás óta";
+            $tempobj['ertek'] = secondsToFullFormat($element->TrapVal / 100);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.2.1.2"))
+        {
+            $tempobj['szoveg'] = "Az újraindulás oka";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.41.1.2.3.1.2"))
+        {
+            $tempobj['szoveg'] = "Az értesítést generáló elem neve";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.13.1.5.1.3"))
+        {
+            $tempobj['szoveg'] = "A hálózati táp állapota";
+            $tempobj['ertek'] = tapAllapot($element->TrapVal);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.13.1.5.1.2"))
+        {
+            $tempobj['szoveg'] = "A táp megnevezése";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.412.1.1.2"))
+        {
+            $tempobj['szoveg'] = "Nem autentikált SNMP üzenet forrása";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.2.1.5"))
+        {
+            $tempobj['szoveg'] = "Beazonosítási hibát okozó SNMP üzenet forrása";
+            $tempobj['ertek'] = $element->TrapVal;
+            $severity = 3;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.412.1.1.1"))
+        {
+            $tempobj['szoveg'] = "SNMP üzenetet küldő eszköz IP típusa";
+            $tempobj['ertek'] = snmpUzenetKuldoIPTipus($element->TrapVal);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.2.1.2.2.1.7"))
+        {
+            $tempobj['szoveg'] = "Interface adminisztratív állapota";
+            $tempobj['ertek'] = intAdminStatus($element->TrapVal);
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.2.9.2.1.18"))
+        {
+            $tempobj['szoveg'] = "TACACS felhasználónév";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.2.1.2.2.1.8"))
+        {
+            $tempobj['szoveg'] = "Port operatív állapota";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.10.1.1.2.1.3"))
+        {
+            $tempobj['szoveg'] = "Cerélhető eszköz minimális partíciómérete";
+            $tempobj['ertek'] = ($element->TrapVal / 1024) . " kByte";
+            $megtalalt = true;
+        }
+
+        if(str_contains($element->OID, "1.3.6.1.4.1.9.9.10.1.1.2.1.7"))
+        {
+            $tempobj['szoveg'] = "Cserélhető eszköz megnevezése";
+            $tempobj['ertek'] = $element->TrapVal;
+            $megtalalt = true;
+        }
+        /* //! csomag: 31*13*8 + 384
+        if(str_contains($element->OID, ""))
+        {
+            $veglegesuzenet .= "<div>:</div><div>" . $element->TrapVal . "</div>";
+            $megtalalt = true;
+        }
+        if(str_contains($element->OID, ""))
+        {
+            $veglegesuzenet .= "<div>:</div><div>" . $element->TrapVal . "</div>";
+            $megtalalt = true;
+        }
+        if(str_contains($element->OID, ""))
+        {
+            $veglegesuzenet .= "<div>:</div><div>" . $element->TrapVal . "</div>";
+            $megtalalt = true;
+        }
+
+        */
+
+        //echo $element->OID . "</div>";
+
+        if($rendszerelemifid && !$port)
+        {
+            $ping = $objectnev = "";
+            $ping = exec("ping -n 1 -w 200 $devip", $output);
+            $elerheto = !str_contains($ping, "100% loss");
+            if($elerheto)
+            {
+                $objectnev = @snmp2_get($devip, $community, "iso.3.6.1.2.1.31.1.1.1.1.$rendszerelemifid");
+                $portexpl = explode(": ", $objectnev);
+                $port = trim($portexpl[1], "\"");
+                //$veglegesuzenet .= "<div>Port:</div><div>" . $port . "</div>";
+            }
+        }
+
+        $port = str_replace("GigabitEthernet", "gi", $port);
+        $port = str_replace("FastEthernet", "fa", $port);
+        $port = str_replace("fa", "Fa", $port);
+        $port = str_replace("gi", "Gi", $port);
+        $port = str_replace("LongReachEthernet", "Lo", $port);
+
+        // A legjobb megoldás ha félig megfejtett nyers üzeneteket nem írjuk ki/tesszük be az adatbázisba
+        if($megtalalt && !$hozzaadott)
+            $return_json[] = $tempobj;
+            
+    }
+    //echo $veglegesuzenet;
+    $returnarr = array(
+        "body" => json_encode($return_json, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS),
         "port" => $port,
         "severity" => $severity
     );
