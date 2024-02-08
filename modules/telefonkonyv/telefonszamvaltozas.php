@@ -45,7 +45,7 @@ else
         $irhat = true;
         include("./modules/telefonkonyv/db/telefonkonyvdb.php");
         
-        redirectToGyujto("telefonkonyv");
+        echo "<script>window.close()</script>";
     }
 
     $button = "Mentés";

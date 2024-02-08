@@ -283,7 +283,9 @@ if(@$irhat)
                             ?><input type="submit" name="beKuld" value='<?=$button?>'><?php
                         }
                     ?></div>
-                    <?php cancelForm(); ?>
+                    <div class="submit">
+                        <button type="button" onclick="window.close()">Mégsem</button>
+                    </div>
                 </div>
             </fieldset>
         </div>

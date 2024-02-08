@@ -21,17 +21,22 @@ if(!$globaltelefonkonyvadmin && isset($felhasznaloid))
 {
     $csoportjogok = telefonKonyvCsoportjogok();
     $elsoelem = true;
-    $sajatcsoportmodmutat = "OR (telefonkonyvvaltozasok.allapot = 1 AND (";
-    foreach($csoportjogok as $jog)
+    $sajatcsoportmodmutat = "";
+    if(count($csoportjogok) > 0)
     {
-        if(!$elsoelem)
+        $sajatcsoportmodmutat = "OR (telefonkonyvvaltozasok.allapot = 1 AND (";
+        foreach($csoportjogok as $jog)
         {
-            $sajatcsoportmodmutat .= " OR ";
+            if(!$elsoelem)
+            {
+                $sajatcsoportmodmutat .= " OR ";
+            }
+            $elsoelem = false;
+            $sajatcsoportmodmutat .= "telefonkonyvcsoportok.id = $jog";
         }
-        $elsoelem = false;
-        $sajatcsoportmodmutat .= "telefonkonyvcsoportok.id = $jog";
+        $sajatcsoportmodmutat .= "))";
     }
-    $sajatcsoportmodmutat .= ")))";
+    $sajatcsoportmodmutat .= ")";
 }
 
 $where = "WHERE telefonkonyvbeosztasok.allapot > 1";
@@ -131,6 +136,7 @@ foreach($telefonkonyvorig as $fixbejegyzes)
         if($fixbejegyzes['telszamid'] == $ujbejegyzes['telszamid'])
         {
             $uj = true;
+            //echo "ujtrue";
             // Ha a módosítás a beosztás törlése, nem adjuk hozzá a megjelenő telefonkönyvhöz
             if($ujbejegyzes['torolve'] != 1)
             {
@@ -301,8 +307,10 @@ if(isset($_GET['kereses']))
                 $megjegyzes = $telefonszam['megjegyzes'];
                 if($csoportir)
                 {
-                    $szerklink = "<a href='$kattinthatolink' style='$linkstyle'>";
-                    $szerklinkr = "<a href='$kattinthatolink' style='justify-content: right; $linkstyle'>";
+                    //$szerklink = "<a href='$kattinthatolink' target='_blank' style='$linkstyle'>";
+                    //$szerklinkr = "<a href='$kattinthatolink' target='_blank' style='justify-content: right; $linkstyle'>";
+                    $szerklink = "<a onclick='window.open(\"$kattinthatolink\", \"_blank\")' style='$linkstyle; cursor: pointer;'>";
+                    $szerklinkr = "<a onclick='window.open(\"$kattinthatolink\", \"_blank\")' style='justify-content: right; cursor: pointer; $linkstyle'>";
                     $szerklinkzar = "</a>";
                 }
                 $style = " normalweightlink";
