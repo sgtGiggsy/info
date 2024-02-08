@@ -245,7 +245,8 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
 }
 else
 {
-	$_SESSION[getenv('SESSION_NAME').'id'] = false;
+	parseUserAgent();
+    $_SESSION[getenv('SESSION_NAME').'id'] = false;
 }
 
 // Oldal működéséhez használt alapbeállítások betöltése

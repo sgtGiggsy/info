@@ -45,14 +45,16 @@ function checkLDAPConnection($host)
 	}
 }
 
-function parseUserAgent($uastring)
+function parseUserAgent()
 {
+	$uastring = $_SERVER['HTTP_USER_AGENT'];
 	$arch = null;
 	$browser = explode(" ", $uastring);
 	$os = explode("; ", (explode(" (", $uastring))[1]);
 	if((str_contains($uastring, "like Gecko") && !str_contains($uastring, "like Gecko)")) || str_contains($uastring, "MSIE"))
 	{
 		$bongeszo = "Internet Explorer";
+		$_SESSION[getenv('SESSION_NAME').'explorer'] = true;
 	}
 	foreach($browser as $x)
 	{
@@ -122,7 +124,7 @@ function parseUserAgent($uastring)
 
 function logLogin($felhasznalo)
 {
-	$gepadat = parseUserAgent($_SERVER['HTTP_USER_AGENT']);
+	$gepadat = parseUserAgent();
 	$con = mySQLConnect(false);
 	if ($stmt = $con->prepare('INSERT INTO bejelentkezesek (felhasznalo, ipcim, bongeszo, bongeszoverzio, oprendszer, oprendszerverzio, oprendszerarch) VALUES (?, ?, ?, ?, ?, ?, ?)'))
     {
@@ -2042,6 +2044,7 @@ function secondsToFullFormat($seconds)
 	$masodperc = str_pad(($seconds % 60), 2, "0", STR_PAD_LEFT);
 	$perc = str_pad(($seconds / 60 % 60), 2, "0", STR_PAD_LEFT);
 	$ora = str_pad((floor($seconds / 3600 % 24)), 2, "0", STR_PAD_LEFT);
+	$ora = "$ora óra, ";
 	$napok = floor($seconds / 3600 / 24);
 	$evek = floor($napok / 365);
 
@@ -2055,5 +2058,5 @@ function secondsToFullFormat($seconds)
 		$ev = "$evek ev, ";
 	}
 
-	return $ev . $nap . "$ora óra, $perc perc, $masodperc másodperc";
+	return $ev . $nap . $ora . "$perc perc, $masodperc másodperc";
 }

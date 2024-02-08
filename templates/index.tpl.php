@@ -17,6 +17,13 @@
 	<div class="wrapper">
 		<!-- Tartalom -->
 		<div class="content">
+			<div class="left">
+				<?php if(isset($_SESSION[getenv('SESSION_NAME').'explorer']) && $_SESSION[getenv('SESSION_NAME').'explorer'])
+				{
+					?><span style="color: red; font-size: 2em;">Internet Explorer böngészőben nyitotta meg az oldalt, ez komoly működési hibákhoz vezethet!<br><br>
+					A felület rendeltetésszerű használatához kérem egy modernebb böngészőben (Microsoft Edge, Google Chrome, Mozilla Firefox) nyissa meg az oldalt!</span><?php
+				}
+			?></div>
 			<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$current?>">Hiba jelzése</a></div><?php
 			include('./includes/contentpage.inc.php')
 		?></div>
