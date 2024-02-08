@@ -1,7 +1,8 @@
 <?php
 if(@$irhat)
 {
-    ?><form action="<?=$RootPath?>/<?=$_GET['page']?><?=(isset($_GET['id'])) ? "/" . $_GET['id'] : "" ?>?beepites&action=<?=($_GET['beepites']) ? 'update' : 'new' ?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+    $currpage = $RootPath . "/" . $_GET['page'] . ((isset($_GET['id'])) ? "/" . $_GET['id'] : "" ) . "?beepites" . (($_GET['beepites']) ? "=" . $beepid : "") . "&action=" . (($_GET['beepites']) ? 'update' : 'new' ) . $kuldooldal;
+    ?><form action="<?=$currpage?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if($_GET['beepites'])
         {
             ?><input type ="hidden" id="id" name="id" value=<?=$beepid?>><?php
@@ -28,13 +29,17 @@ if(@$irhat)
                 {
                     ?><div>
                         <label for="ipcim">IP cím:</label><br>
-                        <select id="ipcim" name="ipcim">
+                        <select id="ipcim" name="ipcim" style="width: 80%;">
                             <option value="" selected></option><?php
                             foreach($ipcimek as $x)
                             {
                                 ?><option value="<?php echo $x["id"] ?>" <?= ($beepip == $x['id']) ? "selected" : "" ?>><?=$x['ipcim']?></option><?php
                             }
-                        ?></select>
+                        ?></select><?php
+                        $ipreuselink = str_replace("update", "edit", $currpage);
+                        $ipreuselink = str_replace("new", "addnew", $ipreuselink);
+                        $ipreuselink .= "&ipreuse";
+                        ?><button  type="button" onclick="location.href='<?=$ipreuselink?>'" style="width: 19%;">Foglalt IP használata</button>
                     </div><?php
                     $magyarazat .= "<strong>IP cím</strong><p>Az eszköz jelenlegi IP címe.</p>";
                 }

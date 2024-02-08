@@ -74,16 +74,25 @@ elseif(isset($_GET['beepites']) && isset($_GET['action']))
         }
 
         $where = null;
-        if(!$_GET['beepites'])
+        $beep = $_GET['beepites'];
+        $where = "WHERE beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL";
+        if($_GET['beepites'])
         {
-            $where = "WHERE beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL";
+            $where .= " OR beepitesek.id = $beep";
         }
 
-        $ipcimek = mySQLConnect("SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim
+        if(isset($_GET['ipreuse']))
+        {
+            $where = null;
+        }
+
+        $ipcimquery = "SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim
             FROM ipcimek
                 LEFT JOIN beepitesek ON ipcimek.id = beepitesek.ipcim
             $where
-            ORDER BY ipcimek.vlan, ipcimek.ipcim;");
+            ORDER BY ipcimek.vlan, ipcimek.ipcim;";
+
+        $ipcimek = mySQLConnect($ipcimquery);
 
         if($_GET['beepites'] && $_GET['action'] == "edit")
         {
