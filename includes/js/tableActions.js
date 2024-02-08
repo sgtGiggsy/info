@@ -121,3 +121,29 @@ function filterTable(szures, tablazat, oszlop, szuloszur = false)
         
     }
 }
+
+function mutatOszlop(osztalynev) {
+    let elemek = document.getElementsByClassName("hiddencol-" + osztalynev);
+    let elemdb = elemek.length;
+    let cursor = document.getElementById(osztalynev + "-cursor");
+    if(cursor.textContent == ">")
+    {
+        cursor.textContent = "<";
+    }
+    else
+    {
+        cursor.textContent = ">";
+    }
+
+    for(let i = 0; i < elemdb; i++)
+    {
+        if(elemek[i].style.display == "none")
+        {
+            elemek[i].style.display = "";
+        }
+        else
+        {
+            elemek[i].style.display = "none";
+        }
+    }
+}

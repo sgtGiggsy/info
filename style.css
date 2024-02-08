@@ -339,10 +339,14 @@ fieldset {
     width: 100%;
 }
 
-.dyntripplecol {
+.dyntripplecol, .dynquadcol {
     display: grid;
     grid-template-columns: minmax(0px, 1fr) minmax(0px, max-content) minmax(max-content, 0.5fr);
     grid-gap: 1em;
+}
+
+.dynquadcol {
+    grid-template-columns: minmax(0px, 1fr) minmax(0px, max-content) minmax(max-content, 0.5fr) minmax(max-content, 0.5fr);
 }
 
 .contentcards {
@@ -468,6 +472,14 @@ fieldset {
 .infoboxkepek img {
     max-width: 200px;
     max-height: 200px;
+}
+
+.tablenyitcsuk {
+    cursor: pointer;
+    display: block;
+    padding: 0.5em;
+    color: unset!important;
+    font-weight: bold!important;
 }
 
 .modmessage {
@@ -1566,6 +1578,10 @@ td img {
     align-items: center;
 }
 
+.normalweightlink {
+    font-weight: normal;
+}
+
 .normalweightlink a {
     font-weight: normal;
 }
@@ -2316,7 +2332,7 @@ td img {
     height: 8em;
     text-decoration: none;
     background-color: var(--tsore);
-    border: 1px solid var(--greyfont);
+    border: 2px solid var(--addnewborder);
     border-radius: 0.5em;
     -webkit-border-radius: 0.5em;
     -moz-border-radius: 0.5em;
@@ -2351,16 +2367,16 @@ td img {
     max-width: 500px;
 }
 
-.eventtitle {
+.eventdevice {
     font-size: 1.5em;
 }
 
-.eventdevice {
+.eventtitle {
     margin-top: 0.4em;
     font-size: 1.1em;
 }
 
-.eventdevice {
+.eventuptime {
     margin-top: 0.3em;
     font-size: 0.9em;
 }

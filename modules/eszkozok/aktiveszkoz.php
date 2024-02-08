@@ -1,5 +1,5 @@
 <?php
-
+include('./modules/allapotjelentesek/includes/functions.php');
 if($id)
 {
     $beepszur = null;
@@ -226,10 +226,20 @@ else
             WHERE eszkozok_history.eszkozid = $id
             ORDER BY eszkozok_history.modid");
 
+        $allapotjelzesek = mySQLConnect("SELECT snmp_traps.id AS id,
+                snmp_traps.eszkozid AS eszkozid,
+                snmp_traps.timestamp AS timestamp,
+                event, port, systemuptime,
+                severity, message
+            FROM snmp_traps
+            WHERE eszkozid = $id AND DATE(snmp_traps.datum) >= DATE_SUB(NOW(), interval 14 DAY)
+            ORDER BY snmp_traps.timestamp DESC");
+        $allapotjelentdb = mysqli_num_rows($allapotjelzesek);
+
         // Megjelenés rész
         ?><div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div><?php
 
-        ?><div class="dyntripplecol">
+        ?><div class="dynquadcol">
         <!-- Infóbox -->
             <div class="infobox">
                 <div class="infoboxtitle"><?=(isset($_GET['beepites'])) ? "Korábbi beépítés adatai" : "Eszköz adatai" ?></div>
@@ -348,8 +358,7 @@ else
         // Állapot előzmények
             if($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && mysqli_num_rows($allapotelozmenyek) > 0)
             {
-                ?>
-                <div class="infobox">
+                ?><div class="infobox">
                     <div class="infoboxtitle">Állapot előzmények</div>
                     <div class="infoboxbody">
                         <div class="infoboxbodytwocol">
@@ -376,6 +385,60 @@ else
                     <div class="infoboxtitle">Eszköz portjainak aktuális állapota</div>
                     <div class="infoboxbody" id="snmpdata">
                         <div class="devportload"><div>Eszközportok lekérdezése folyamatban...</div><div class="loader"></div></div>
+                    </div>
+                </div><?php
+            }
+
+        // Az eszközről gyűjtött SNMP trapek az elmúlt 14 napból
+            if($allapotjelentdb > 0)
+            {
+                ?><div class="infobox">
+                    <div class="infoboxtitle">Az eszköztől kapott üzenetek</div>
+                    <div class="infoboxbody">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sorsz</th>
+                                    <th>Időpont</th>
+                                    <th>Esemény</th>
+                                    <th>Port</th>
+                                    <th style="display: none" class="hiddencol-snmp">Bővebb tartalom</th>
+                                    <th><a onclick="mutatOszlop('snmp')" class="tablenyitcsuk" id="snmp-cursor">></a></th>
+                                </tr>
+                            </thead>
+                            <tbody><?php
+                                foreach($allapotjelzesek as $x)
+                                {
+                                    switch($x['severity'])
+                                    {
+                                        case 2 : $urgclass = " fontos-font"; break;
+                                        case 3 : $urgclass = " surgos-font"; break;
+                                        case 4 : $urgclass = " kritikus-font"; break;
+                                        default: $urgclass = "";
+                                    }
+                                    $jsondata = json_decode($x['message']);
+                                    ?><tr class="<?=$urgclass?>">
+                                        <td><?=$allapotjelentdb--?></td>
+                                        <td style="width: 10ch; white-space: break-spaces"><?=$x['timestamp']?></td>
+                                        <td><?=OIDs($x['event'])?></td>
+                                        <td><?=$x['port']?></td>
+                                        <td style="display: none" class="hiddencol-snmp"><div class="snmpmessagebody"><?php
+                                            if($jsondata && count($jsondata) > 0)
+                                            {
+                                                foreach($jsondata as $adatelem)
+                                                {
+                                                    if(isset($adatelem->szoveg))
+                                                    {
+                                                        ?><div><?=$adatelem->szoveg?></div>
+                                                        <div><?=$adatelem->ertek?></div><?php
+                                                    }
+                                                }
+                                            }
+                                        ?></div>
+                                    </tr><?php
+                                }
+                            ?></tbody>
+                        </table>
                     </div>
                 </div><?php
             }

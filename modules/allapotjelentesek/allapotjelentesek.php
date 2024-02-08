@@ -295,8 +295,7 @@ else
                                 if(isset($adatelem->szoveg))
                                 {
                                     ?><div><?=$adatelem->szoveg?></div>
-                                    <div><?=$adatelem->ertek?></div>
-                                    <?php
+                                    <div><?=$adatelem->ertek?></div><?php
                                 }
                             }
                         }

@@ -201,9 +201,22 @@ if($ids)
                 }
                 elseif(isset($containers[$bovito->portid]) && str_contains($containers[$bovito->portid], $interface->shortname))
                 {
-                    $interface->bovitotipus = $bovito->type;
-                    $interface->bovitomodel = $bovito->model;
-                    $interface->bovitosorozatszam = $bovito->serial;
+                    // Az összevetésre azért van szükség, mert az str_contains megtalálja pl a Gi1/0/49-re dugott bővítőt
+                    // a Gi1/0/4-es porton is. Mivel a $containers[$bovito->portid] nem egy az egyben a port nevét adja vissza
+                    // Így ebben az str_contains-szel érdemes keresni, és utána szűkteni a találatokat.
+                    $egyez = false;
+                    $pontos = explode(" ", $containers[$bovito->portid]);
+                    foreach($pontos as $bovitoportnev)
+                    {
+                        if($bovitoportnev == $interface->shortname)
+                            $egyez = true;
+                    }
+                    if($egyez)
+                    {
+                        $interface->bovitotipus = $bovito->type;
+                        $interface->bovitomodel = $bovito->model;
+                        $interface->bovitosorozatszam = $bovito->serial;
+                    }
                     break;
                 }
             }
@@ -222,9 +235,10 @@ if($ids)
                 <th>Sebesség</th><?php
                 if($vanbovito)
                 {
-                    ?><th>Bővítőszabvány</th>
-                    <th>Modell</th>
-                    <th>Sorozatszám</th><?php
+                    ?><th style="display:none" class="hiddencol-bovito">Bővítőszabvány</th>
+                    <th style="display:none" class="hiddencol-bovito">Modell</th>
+                    <th style="display:none" class="hiddencol-bovito">Sorozatszám</th>
+                    <th><a onclick="mutatOszlop('bovito')" class="tablenyitcsuk" id="bovito-cursor">></a></th><?php
                 }
             ?></tr>
         </thead>
@@ -249,9 +263,9 @@ if($ids)
                         <td><?=$interface->PortSebesseg()?></td><?php
                         if($vanbovito)
                         {
-                            ?><td><?=$interface->bovitotipus?></td>
-                            <td><?=$interface->bovitomodel?></td>
-                            <td><?=$interface->bovitosorozatszam?></td><?php
+                            ?><td style="display:none" class="hiddencol-bovito"><?=$interface->bovitotipus?></td>
+                            <td style="display:none" class="hiddencol-bovito"><?=$interface->bovitomodel?></td>
+                            <td style="display:none" class="hiddencol-bovito"><?=$interface->bovitosorozatszam?></td><?php
                         }
                     ?></tr><?php
                 }
