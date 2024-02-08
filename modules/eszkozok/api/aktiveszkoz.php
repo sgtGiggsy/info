@@ -9,6 +9,7 @@ Class API_Call implements API
             $telephelyszures = "AND telephely = $ertek";
         }
         
+        // Szó szerint százszoros sebességkülönbség van ezesetben az OR-ral joinolás, illetve az unióképzés között
         $query = mySQLConnect("SELECT eszkozok.id, ipcimek.ipcim, beepitesek.nev, online
                 FROM eszkozok
                     INNER JOIN modellek ON eszkozok.modell = modellek.id
@@ -16,16 +17,32 @@ Class API_Call implements API
                     LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                     LEFT JOIN aktiveszkoz_allapot ON eszkozok.id = aktiveszkoz_allapot.eszkozid
                     LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
-                    LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
+                    LEFT JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id
                     LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
                 WHERE (modellek.tipus = 1 OR modellek.tipus = 2)
+                    AND aktivbeepites = 1
                     AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL)
                     AND (aktiveszkoz_allapot.id = (SELECT MAX(ac.id) FROM aktiveszkoz_allapot ac WHERE ac.eszkozid = aktiveszkoz_allapot.eszkozid)
                         OR aktiveszkoz_allapot.id IS NULL)
-                    AND (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)
                     AND ipcimek.vlan = 1
                     $telephelyszures
-                ORDER BY ipcimek.ipcim;");
+        UNION SELECT eszkozok.id, ipcimek.ipcim, beepitesek.nev, online
+                FROM eszkozok
+                    INNER JOIN modellek ON eszkozok.modell = modellek.id
+                    LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+                    LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
+                    LEFT JOIN aktiveszkoz_allapot ON eszkozok.id = aktiveszkoz_allapot.eszkozid
+                    LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                    LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id
+                    LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+                WHERE (modellek.tipus = 1 OR modellek.tipus = 2)
+                    AND aktivbeepites = 1
+                    AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL)
+                    AND (aktiveszkoz_allapot.id = (SELECT MAX(ac.id) FROM aktiveszkoz_allapot ac WHERE ac.eszkozid = aktiveszkoz_allapot.eszkozid)
+                        OR aktiveszkoz_allapot.id IS NULL)
+                    AND ipcimek.vlan = 1
+                    $telephelyszures
+                ORDER BY ipcim;");
         
         $eredmeny = mysqliToArray($query);
 
