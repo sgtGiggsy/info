@@ -634,12 +634,56 @@ div[id^=kep-].shrink img {
     padding: 0.5em 1em;
 }
 
-.vizsgavalaszlista {
+.vizsgalap {
+    margin: 2.5cm;
+}
+
+.hiddenid {
+    visibility: hidden;
+    padding-top: 1ch;
+    float: right;
+}
+
+.vizsgavalaszlista, .vizsgalapvalasz {
     display: flex;
     flex-direction: column;
     padding: 0 2em;
     text-align: left;
     align-items: start;
+}
+
+.vizsgalapvalasz {
+    text-indent: -2.6ch;
+    font-size: 1.2em;
+}
+
+.vizsgalapkerdesblokk {
+    padding-top: 1.5cm;
+    break-inside: avoid;
+    width: 100%
+}
+
+.nevrffejlec {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    font-size: 1.3em;
+    gap: 1em;
+    overflow: hidden;
+    margin: 2em 0 2em 0;
+}
+
+.nevrffejlec p {
+    background: inherit;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    line-height: 200%;
+}
+
+.nevrffejlec p span {
+    position: absolute;
+    content: '';
 }
 
 .vizsgavalaszlista div {
@@ -3127,6 +3171,10 @@ div[id^=tennivalobody-].close {
         position: absolute;
         left: 0;
         top: 0;
+    }
+
+    .hiddenid {
+        visibility: visible;
     }
 
     .select-selected {

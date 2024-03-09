@@ -75,13 +75,16 @@ else
             {
                 $contextmenujogok['vizsgabeallitasok'] = $contextmenujogok['kerdeslista'] = $contextmenujogok['vizsgalista'] = 
                 $contextmenujogok['kerdesszerkeszt'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['adminlista'] =
-                $contextmenujogok['adminkijeloles'] = $contextmenujogok['ujkornyitas'] = $contextmenujogok['admin'] = true;
+                $contextmenujogok['adminkijeloles'] = $contextmenujogok['ujkornyitas'] = $contextmenujogok['admin'] = $contextmenujogok['vizsgalapok'] = true;
             }
             else
             {
                 $vizsgaadmin = mySQLConnect("SELECT * FROM vizsgak_adminok WHERE felhasznalo = $felhasznaloid AND vizsga = $vizsgaid;");
                 if(mysqli_num_rows($vizsgaadmin) > 0)
                 {
+                    // Ezek az alap jogok, amik minden vizsgaadminnak kiosztásra kerülnek
+                    $contextmenujogok['vizsgalista'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['admin'] = $contextmenujogok['vizsgalapok'] = true;
+
                     $vizsgaadmin = mysqli_fetch_assoc($vizsgaadmin);
 
                     if($vizsgaadmin['beallitasok'])
@@ -104,8 +107,6 @@ else
                     {
                         $contextmenujogok['ujkornyitas'] = true;
                     }
-                    
-                    $contextmenujogok['vizsgalista'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['admin'] = true;
                 }
             }
         }
