@@ -1,7 +1,7 @@
 <?php
 if(@$irhat)
 {
-    $fieldsetstate = "";
+    $fieldsetstate = $indexnumber = "";
     if(!$globaltelefonkonyvadmin && ($allapot === null || ($allapot > 0 && $allapot < 3)))
     {
         $fieldsetstate = "disabled";
@@ -138,6 +138,11 @@ if(@$irhat)
                             {
                                 ?><button onclick="delUser(); return false;">Dolgozó törlése</button><?php
                             }
+                            else
+                            {
+                                ?><button onclick="delUser(); return false;">Beosztás felvétele üresen</button><?php
+                            }
+
                         ?></div>
                     </div>
 

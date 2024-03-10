@@ -313,7 +313,7 @@ if(typeof jelenbeo !== 'undefined')
 window.addEventListener("load", (event) => {
     let sorrend = document.getElementById('sorrend');
     // A sorrend.title csak a változás felülvizsgálatnál létezik, ahol NEM szabad betöltéskor listát frissíteni
-    if(sorrend != null && sorrend.value != 999 && sorrend.title != null)
+    if(sorrend != null && sorrend.value != 999 && sorrend.title != "Sorrend")
     {
         refreshList();
     }

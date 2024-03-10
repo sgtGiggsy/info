@@ -93,7 +93,7 @@ if(@$irhat)
                     <div>
                         <label for="sorrend">Sorrend</label>
                         <div class="delbuttoninput">
-                            <select name="sorrend" id="sorrend" <?=($sorrend != $origsorrend) ? "style='background-color: yellow; color: black'; title='" . (($origsorrend) ? $origsorrend : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()">
+                            <select name="sorrend" id="sorrend" title="Sorrend" <?=($sorrend != $origsorrend) ? "style='background-color: yellow; color: black'; title='" . (($origsorrend) ? $origsorrend : "ÜRES VOLT" ) . "'" : "" ?> onchange="setAllapotPartial()">
                                 <?php $novaltozatlan = true; include("./modules/telefonkonyv/includes/beosztaslist.php"); ?>
                             </select><?php
                             if($sorrend != $origsorrend)
