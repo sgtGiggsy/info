@@ -629,7 +629,7 @@ function getWhere($eszktip = false)
 				$szures = "- Működésképtelen eszközök";
 			}
 		}
-		elseif(!$_GET['page'] != "raktar")
+		elseif(@!$_GET['page'] != "raktar")
 		{
 			$filter = false;
 			$where = "$eszktip AND (beepitesek.id = (SELECT MAX(ic.id) FROM beepitesek ic WHERE ic.eszkoz = beepitesek.eszkoz) OR beepitesek.id IS NULL) AND eszkozok.leadva IS NULL";

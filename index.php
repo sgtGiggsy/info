@@ -20,6 +20,7 @@ header('Pragma: no-cache');
 // Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
 $page = $id = $current = $felhasznaloid = null; $loginsuccess = false;
 
+// Címsorból vett GET értékek tisztítása nemkívánt karakterektől
 foreach($_GET as $key => $value)
 {
     $value = trim($value);
@@ -119,8 +120,6 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
             }
         }
     }
-
-    
 
     // MySQL-en keresztüli autentikációt elvégző rész
     if ($stmt = $con->prepare('SELECT id, jelszo FROM felhasznalok WHERE felhasznalonev = ?'))
@@ -455,6 +454,7 @@ if(isset($cselect) && $cselect)
     $javascriptfiles[] = "includes/js/customSelect.js";
 }
 
+
 // PHP változók átadni a JavaScriptnek
 $PHPvarsToJS = [
     array(
@@ -462,6 +462,12 @@ $PHPvarsToJS = [
         'val' => $RootPath
     )
 ];
+
+if($felhasznaloid && $szemelyes['switchstateshow'])
+{
+    $PHPvarsToJS[] = array('name' => 'Felhasznaloid', 'val' => $felhasznaloid);
+    $javascriptfiles[] = "modules/eszkozok/includes/eszkozonlinecheck.js";
+}
 
 // Oldal megjelenítése
 include('./templates/index.tpl.php');

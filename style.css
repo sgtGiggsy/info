@@ -2990,6 +2990,23 @@ div[id^=tennivalobody-].close {
     to {bottom: 0; opacity: 0;}
   }
 
+/* Aktív értseítések */
+#newsflash {
+    visibility: hidden;
+    overflow: hidden;
+    max-width: 50%;
+    background-color: var(--menuhover);
+    color: var(--warning);
+    padding: 0.5em;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+}
+
+#newsflash.show {
+    visibility: visible;
+}
+
 /* Tooltip */
 .ttipcontainer {
     -webkit-user-select: none;

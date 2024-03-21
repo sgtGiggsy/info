@@ -310,3 +310,15 @@ function copyToClipboard(idtocopy) {
         showToaster("A vágólapra másolás csak HTTPS-sel betöltött oldalon működik!");
     }
 }
+
+function showNewsflash()
+{
+    let newsflash = document.getElementById("newsflash");
+    newsflash.className = "show";
+}
+
+function hideNewsflash()
+{
+    let newsflash = document.getElementById("newsflash");
+    newsflash.className = newsflash.className.replace("show", "");
+}

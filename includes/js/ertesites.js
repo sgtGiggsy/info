@@ -6,12 +6,12 @@ function updateNotif() {
 }
 
 function seenAllNotif() {
-$.ajax({
-    type: "POST",
-    url: RootPath + "/ertesites?action=seenallnotif",
-});
+    $.ajax({
+        type: "POST",
+        url: RootPath + "/ertesites?action=seenallnotif",
+    });
 
-document.getElementById("notifcount").style.display = "none"
+    document.getElementById("notifcount").style.display = "none"
 }
 
 function seenNotif(notifid) {

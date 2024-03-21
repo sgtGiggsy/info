@@ -45,6 +45,7 @@
 
 		<!-- Betöltés során látható területen kívül eső, illetve nem létező tartalmak -->
 		<div id="snackbar"></div>
+		<div id="newsflash"></div>
 		<div id="formkuldatfedes" class="formkuldatfedes"><div class="formkuldmessage">Művelet folyamatban, kérlek várj...<br><div class="loader"></div></div></div>
 		<img src="<?=$RootPath?>/images/back.png" alt= "Vissza" id="backtotop" onclick="scrollToTop()"/>
 	</div>
