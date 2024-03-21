@@ -75,7 +75,7 @@ else
                 INNER JOIN vizsgak_kerdesek ON vizsgak_vizsgalapkerdesek.kerdesid = vizsgak_kerdesek.id
                 INNER JOIN vizsgak_valaszlehetosegek ON vizsgak_valaszlehetosegek.kerdes = vizsgak_kerdesek.id
             WHERE vizsgak_vizsgalapkerdesek.vizsgalapid = $id
-            ORDER BY vizsgak_kerdesek.id, vizsgak_valaszlehetosegek.id;");
+            ORDER BY vizsgak_vizsgalapkerdesek.id, vizsgak_valaszlehetosegek.id ASC;");
 
         if(!$kerdeseklistaja || mysqli_num_rows($kerdeseklistaja) == 0)
         {

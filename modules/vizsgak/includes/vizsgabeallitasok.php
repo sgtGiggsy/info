@@ -2,6 +2,7 @@
 if(!$felhasznaloid)
 {
     echo "<h2>Nincs bejelentkezett felhasználó!</h2>";
+    include("./belepes.php");
 }
 else
 {
