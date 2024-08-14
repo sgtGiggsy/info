@@ -2992,12 +2992,14 @@ div[id^=tennivalobody-].close {
 
 /* Aktív értseítések */
 #newsflash {
+    display: flex;
+    flex-direction: row;
     visibility: hidden;
     overflow: hidden;
+    height: 2em;
     max-width: 50%;
     background-color: var(--menuhover);
     color: var(--warning);
-    padding: 0.5em;
     position: fixed;
     right: 0;
     bottom: 0;
@@ -3005,6 +3007,33 @@ div[id^=tennivalobody-].close {
 
 #newsflash.show {
     visibility: visible;
+}
+
+#newsflashdesc, #newsflashtext {
+    padding: 0.5em;
+    width: fit-content;
+    white-space: nowrap;
+}
+
+#newsflashdesc {
+    font-weight: bold;
+    font-variant-caps: titling-caps;
+}
+
+#newsflashtextarea {
+    overflow: hidden;
+}
+
+#newsflashtext {
+    animation-name: infiniteScroll;
+    animation-duration: 20s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes infiniteScroll {
+    from {transform: translateX(0) }
+    to {transform: translateX(calc(0px - 50%));}
 }
 
 /* Tooltip */

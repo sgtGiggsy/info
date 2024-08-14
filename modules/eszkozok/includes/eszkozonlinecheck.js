@@ -1,7 +1,7 @@
 function getSwitchState() {
     let xhttp = new XMLHttpRequest();
     let response, count;
-    let newsflashtext = "<strong>Offline aktív eszközök: </strong>";
+    let newsflashtext = "";
 
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
@@ -12,15 +12,24 @@ function getSwitchState() {
                 hideNewsflash();
             }
             else {
+                document.getElementById("newsflashdesc").innerHTML = "Offline aktív eszközök:";
+                let textarea = document.getElementById("newsflashtext");
+                let duration = 0;
+
+                if(count > 3) {
+                    duration = count * 5;
+                }
+
+                textarea.style.animationDuration = duration + "s";
                 for(let i = 0; i < count; i++) {
                     newsflashtext += response[i].beepitesinev + " (" + response[i].ipcim + ")";
-                    if(i != count) {
-                        newsflashtext += "\t";
+                    if(i != count - 1) {
+                        newsflashtext += "&nbsp&nbsp|&nbsp&nbsp";
                     }
                 }
 
                 showNewsflash();
-                document.getElementById("newsflash").innerHTML = newsflashtext;
+                textarea.innerHTML = newsflashtext;
             }
         }
     };
@@ -29,7 +38,6 @@ function getSwitchState() {
 }
 
 window.addEventListener("load", (event) => {
+    getSwitchState();
     setInterval(getSwitchState, 3000);
 });
-
-

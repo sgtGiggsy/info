@@ -463,7 +463,7 @@ $PHPvarsToJS = [
     )
 ];
 
-if($felhasznaloid && $szemelyes['switchstateshow'])
+if($felhasznaloid && @$szemelyes['switchstateshow'])
 {
     $PHPvarsToJS[] = array('name' => 'Felhasznaloid', 'val' => $felhasznaloid);
     $javascriptfiles[] = "modules/eszkozok/includes/eszkozonlinecheck.js";
