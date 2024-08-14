@@ -11,7 +11,7 @@ else
     $vizsgakorok = mySQLConnect("SELECT * FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid ORDER BY id DESC");
     if(!isset($vizsgakorsorszam))
     {
-        $vizsgakorsorszam = mysqli_fetch_assoc($vizsgakorok)['sorszam'];
+        $vizsgakorsorszam = @mysqli_fetch_assoc($vizsgakorok)['sorszam'];
     }
     if(isset($_GET['kereses']))
     {

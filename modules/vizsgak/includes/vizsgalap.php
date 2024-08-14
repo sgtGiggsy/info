@@ -1,6 +1,6 @@
 <?php
 // Egyelőre kész
-if(!$contextmenujogok['admin'])
+if(@!$contextmenujogok['admin'])
 {
     echo "<h2>Az oldal kizárólag adminisztrátorok számára érhető el!</h2>";
 }
@@ -9,7 +9,7 @@ else
     if(isset($_GET['action']) && $_GET['action'] == "addnew")
     {
         $irhat = true;
-        $kerdesidlist = mySQLConnect("SELECT id FROM vizsgak_kerdesek WHERE vizsga = $vizsgaid AND kep IS NULL;");
+        $kerdesidlist = mySQLConnect("SELECT id FROM vizsgak_kerdesek WHERE vizsga = $vizsgaid;");
         $valasztlist = mySQLConnect("SELECT kerdes, helyes FROM vizsgak_valaszlehetosegek ORDER BY kerdes ASC, id ASC;");
         $kerdesdb = mysqli_num_rows($kerdesidlist);
         $kerdesidlist = mysqliToArray($kerdesidlist);
@@ -69,11 +69,13 @@ else
         $kerdeseklistaja = mySQLConnect("SELECT vizsgak_vizsgalapok.azonosito AS azonosito,
                 vizsgak_kerdesek.id AS kerdesid,
                 vizsgak_kerdesek.kerdes AS kerdes,
-                vizsgak_valaszlehetosegek.valaszszoveg AS valasz
+                vizsgak_valaszlehetosegek.valaszszoveg AS valasz,
+                feltoltesek.fajl AS kepurl
             FROM vizsgak_vizsgalapkerdesek
                 INNER JOIN vizsgak_vizsgalapok ON vizsgak_vizsgalapkerdesek.vizsgalapid = vizsgak_vizsgalapok.id
                 INNER JOIN vizsgak_kerdesek ON vizsgak_vizsgalapkerdesek.kerdesid = vizsgak_kerdesek.id
                 INNER JOIN vizsgak_valaszlehetosegek ON vizsgak_valaszlehetosegek.kerdes = vizsgak_kerdesek.id
+                LEFT JOIN feltoltesek ON vizsgak_kerdesek.kep = feltoltesek.id
             WHERE vizsgak_vizsgalapkerdesek.vizsgalapid = $id
             ORDER BY vizsgak_vizsgalapkerdesek.id, vizsgak_valaszlehetosegek.id ASC;");
 
@@ -113,6 +115,7 @@ else
                                 $sorsz++;
 
                                 ?><div class="vizsgalapkerdesblokk">
+                                    <div class="vizsgakerdeskep"><?=($kerdes['kepurl']) ? "<img src='$RootPath" . '/uploads/' . $kerdes['kepurl'] . "'>" : "" ?></div>
                                     <h3 style="text-align: justify;"><?=$sorsz?>. <?=$kerdes['kerdes']?></h3><?php
                             }
                             
