@@ -3,6 +3,19 @@ $magyarazat = "<strong>A bejelentkezés menete</strong>
     <p>Az oldalra bárki bármikor bejelentkezhet a tartományi felhasználóneve és jelszava megadásával.</p>";
 $kuldooldal = str_replace("&", "?", $kuldooldal);
 $kuldooldal = str_replace("?kuldooldalid", "&kuldooldalid", $kuldooldal);
+if(strpos($backtosender, "vizsga") && !strpos($backtosender, "vizsgak"))
+{
+    $vizsgid = explode("/", $backtosender);
+    for($i = 0; $i < count($vizsgid); $i++)
+    {
+        if($vizsgid[$i] == "vizsga")
+        {
+            $kivalasztottvizsga = $vizsgid[$i + 1];
+            break;
+        }
+    }
+    $kuldooldal = "?page=vizsga&id=" . $kivalasztottvizsga;
+}
 
 ?><div class="szerkcard">
     <div class="szerkcardtitle">Bejelentkezés<a class="help" onclick="rejtMutat('magyarazat')">?</a></div>
