@@ -7,10 +7,14 @@ $vizsgak = mySQLConnect("SELECT felhasznalok.id AS szerkesztoid,
         felhasznalok.nev AS vizsgaadmin,
         vizsgak_vizsgak.nev AS vizsganev,
         eles,
-        vizsgak_vizsgak.leiras AS leiras
+        vizsgak_vizsgak.leiras AS leiras,
+        korlatozott,
+        felheng.id AS engedfelh
     FROM vizsgak_vizsgak
         LEFT JOIN vizsgak_adminok ON vizsgak_adminok.vizsga = vizsgak_vizsgak.id
         LEFT JOIN felhasznalok ON vizsgak_adminok.felhasznalo = felhasznalok.id
+        LEFT JOIN vizsgak_engedelyezettek ON vizsgak_engedelyezettek.vizsga = vizsgak_vizsgak.id
+        LEFT JOIN felhasznalok felheng ON vizsgak_engedelyezettek.felhasznalo = felheng.id
     ORDER BY vizsgak_vizsgak.id;");
 
 
@@ -56,11 +60,12 @@ if(@$mindir)
 
             foreach($vizsgak as $vizsga)
             {
-                if($mindir || $vizsga['eles'] || $vizsga['szerkesztoid'] == $felhasznaloid)
+                if($mindir || $vizsga['szerkesztoid'] == $felhasznaloid || ($vizsga['eles'] && (!$vizsga['korlatozott'] || ($vizsga['korlatozott'] && $vizsga['engedfelh'] == $felhasznaloid))))
                 {
                     if($elozovizsga != $vizsga['vizsganev'])
                     {
                         $elozovizsga = $vizsga['vizsganev'];
+                        $elozoszerkeszto = "";
                     
                         ?><tr>
                             <td colspan=<?=count($oszlopok)?> class="telefonkonyvelvalaszto">
@@ -74,8 +79,9 @@ if(@$mindir)
                         
                     }
                 }
-                if($mindir)
+                if($mindir && $elozoszerkeszto != $vizsga['szerkesztoid'])
                 {
+                    $elozoszerkeszto = $vizsga['szerkesztoid'];
                     ?><tr>
                         <td></td>
                         <td><a href='<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/adminszerkeszt/<?=$vizsga['szerkesztoid']?>'><?=$vizsga['vizsgaadmin']?></td>

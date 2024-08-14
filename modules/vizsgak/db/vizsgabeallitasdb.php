@@ -25,8 +25,8 @@ if(isset($irhat) && $irhat)
             $fajlid = $fajllista[0];
         }
 
-        $stmt = $con->prepare('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, vendegudvozlo, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, fejleckep, lablec) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('ssssssssssss', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $_POST['lablec'], $fajlid);
+        $stmt = $con->prepare('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, vendegudvozlo, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, lablec, fejleckep, korlatozott) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssssssssssss', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $_POST['lablec'], $fajlid, $_POST['korlatozott']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
@@ -59,8 +59,8 @@ if(isset($irhat) && $irhat)
             }
         }
 
-        $stmt = $con->prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=?, eles=?, lablec=? WHERE id=?');
-        $stmt->bind_param('sssssssssssssi', $_POST['nev'], $vizsgaazonosito, $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['lablec'], $_POST['vizsgaid']);
+        $stmt = $con->prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=?, eles=?, lablec=?, korlatozott=? WHERE id=?');
+        $stmt->bind_param('ssssssssssssssi', $_POST['nev'], $vizsgaazonosito, $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['lablec'], $_POST['korlatozott'], $_POST['vizsgaid']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

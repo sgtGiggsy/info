@@ -7,7 +7,7 @@ else
 {
     $kerdeseklistaja = mySQLConnect("SELECT id as kerdid, kerdes,
             (SELECT COUNT(id) FROM vizsgak_kitoltesvalaszok WHERE kerdes = kerdid) AS kerdesszam,
-            (SELECT COUNT(vizsgak_kitoltesvalaszok.id) FROM vizsgak_kitoltesvalaszok INNER JOIN vizsgak_valaszlehetosegek ON vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id WHERE vizsgak_kitoltesvalaszok.kerdes = kerdid AND vizsgak_valaszlehetosegek.helyes = 1) AS helyes
+            (SELECT COUNT(vizsgak_kitoltesvalaszok.id) FROM vizsgak_kitoltesvalaszok INNER JOIN vizsgak_valaszlehetosegek ON vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id WHERE vizsgak_kitoltesvalaszok.kerdes = kerdid AND vizsgak_valaszlehetosegek.helyes IS NOT NULL) AS helyes
         FROM vizsgak_kerdesek
         WHERE vizsga = $vizsgaid
         ORDER BY id DESC;");

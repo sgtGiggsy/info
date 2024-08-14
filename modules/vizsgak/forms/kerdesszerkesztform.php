@@ -5,8 +5,6 @@ if(@$irhat)
             'name' => 'selectors',
             'val' => 'kerdes'
         );
-    $javascriptfiles[] = "includes/tinymce/tinymce.min.js";
-	$javascriptfiles[] = "includes/js/tinyMCEinitializer.js";
     $javascriptfiles[] = "modules/vizsgak/includes/kerdesszerkeszt.js";
 
     $nyithelp = true;

@@ -16,12 +16,18 @@ else
         $jelenkor = mysqli_fetch_assoc($jelenkor)['maxid'];
         if($vizsgaeles)
         {
-            $utolsovizsga = mySQLConnect("SELECT folyoszam FROM vizsgak_kitoltesek WHERE vizsgakor = $jelenkor ORDER BY id DESC LIMIT 1;");
-            $utolsovizsga = mysqli_fetch_assoc($utolsovizsga)['folyoszam'];
-            $segments = explode("/", $utolsovizsga);
+            $utolsovizsga = mySQLConnect("SELECT folyoszam,
+                    kezdet
+                FROM vizsgak_kitoltesek
+                    LEFT JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
+                WHERE vizsgakor = $jelenkor ORDER BY vizsgak_kitoltesek.id DESC LIMIT 1;");
+            $utolsovizsga = mysqli_fetch_assoc($utolsovizsga);
+            $utfolyoszam = $utolsovizsga['folyoszam'];
+            $segments = explode("/", $utfolyoszam);
             $lastfolyoszam = $segments[2];
             $lastfolyoszam++;
-            $folyoszam = date('Y') . "/" . $vizsgaid . "/" . $lastfolyoszam;
+            $ev = date('Y', strtotime($utolsovizsga['kezdet']));
+            $folyoszam = $ev . "/" . $vizsgaid . "/" . $lastfolyoszam;
         }
         else
         {

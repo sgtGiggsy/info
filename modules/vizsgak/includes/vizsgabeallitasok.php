@@ -24,8 +24,8 @@ else
             }
         }
         
-        $vizsgaid = $nev = $url = $udvozloszoveg = $vendegudvozlo = $kerdesszam = $minimumhelyes =
-        $vizsgaido = $ismetelheto = $maxismetles = $leiras = $fejleckep = $ujkorurl = $lablecszoveg = null;
+        $vizsgaid = $nev = $url = $udvozloszoveg = $vendegudvozlo = $kerdesszam = $minimumhelyes = $korlatozott =
+        $vizsgaido = $ismetelheto = $maxismetles = $leiras = $fejleckep = $ujkorurl = $lablecszoveg = $vizsgaeles = null;
         $vizsgabeallitasurl = "$RootPath/vizsga?action=addnew";
 
         if(isset($vizsgaadatok))
@@ -43,6 +43,8 @@ else
             $leiras =  $vizsgaadatok['leiras'];
             $lablecszoveg =  $vizsgaadatok['lablec'];
             $fejleckep =  $vizsgaadatok['fejleckep'];
+            $korlatozott = $vizsgaadatok['korlatozott'];
+            $vizsgaeles = $vizsgaadatok['eles'];
             $vizsgabeallitasurl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/vizsgabeallitasok?action=update";
             if($contextmenujogok['ujkornyitas'])
             {

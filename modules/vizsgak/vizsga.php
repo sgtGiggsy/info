@@ -19,7 +19,7 @@ else
         $vizsgaazonosito = $_GET['id'];
     }
     $pagename = $vizsgaazonosito;
-    $topmenuszoveges = true;
+    $topmenuszoveges = $felhasznaloengedelyezett = true;
     $aloldal = false;
 
     $kivalasztottvizsga = mySQLConnect("SELECT vizsgak_vizsgak.id AS id,
@@ -35,6 +35,7 @@ else
             leiras,
             lablec,
             eles,
+            korlatozott,
             feltoltesek.fajl AS fejleckep
     FROM vizsgak_vizsgak
         LEFT JOIN feltoltesek ON vizsgak_vizsgak.fejleckep = feltoltesek.id
@@ -66,6 +67,7 @@ else
         if(@$felhasznaloid)
         {
             // Felhasználó jogosultságainak bekérése
+            $felhasznaloengedelyezett = true;
             $contextmenujogok = array('admin' => false, 'vizsgazas' => true, 'ismerteto' => true);
             $contextmenujogok['vizsgabeallitasok'] = $contextmenujogok['kerdeslista'] = $contextmenujogok['vizsgalista'] = 
             $contextmenujogok['kerdesszerkeszt'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['adminlista'] =
@@ -76,10 +78,22 @@ else
                 $contextmenujogok['vizsgabeallitasok'] = $contextmenujogok['kerdeslista'] = $contextmenujogok['vizsgalista'] = 
                 $contextmenujogok['kerdesszerkeszt'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['adminlista'] =
                 $contextmenujogok['adminkijeloles'] = $contextmenujogok['ujkornyitas'] = $contextmenujogok['admin'] = $contextmenujogok['vizsgalapok'] = true;
+                if($vizsgaadatok['korlatozott'])
+                {
+                    $contextmenujogok['engedelyezettek'] = true;
+                }
             }
             else
             {
                 $vizsgaadmin = mySQLConnect("SELECT * FROM vizsgak_adminok WHERE felhasznalo = $felhasznaloid AND vizsga = $vizsgaid;");
+                if($vizsgaadatok['korlatozott'])
+                {
+                    $felhasznaloengedelyezett = mySQLConnect("SELECT * FROM vizsgak_engedelyezettek WHERE felhasznalo = $felhasznaloid AND vizsga = $vizsgaid;");
+                    if(mysqli_num_rows($felhasznaloengedelyezett) == 0)
+                    {
+                        $felhasznaloengedelyezett = false;
+                    }
+                }
                 if(mysqli_num_rows($vizsgaadmin) > 0)
                 {
                     // Ezek az alap jogok, amik minden vizsgaadminnak kiosztásra kerülnek
@@ -90,6 +104,10 @@ else
                     if($vizsgaadmin['beallitasok'])
                     {
                         $contextmenujogok['vizsgabeallitasok'] = true;
+                        if($vizsgaadatok['korlatozott'])
+                        {
+                            $contextmenujogok['engedelyezettek'] = true;
+                        }
                     }
                     
                     if($vizsgaadmin['kerdesek'])
@@ -111,7 +129,7 @@ else
             }
         }
 
-        if(!$vizsgaeles && !@$contextmenujogok['vizsgalista'])
+        if(!$vizsgaeles && !@$contextmenujogok['vizsgalista'] || !$felhasznaloengedelyezett)
         {
             echo "<h2>Nincs jogosultságod ennek a vizsgának a megtekintéséhez!</h2>";
         }

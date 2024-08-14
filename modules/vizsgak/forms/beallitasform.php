@@ -129,6 +129,20 @@ if(@$irhat)
 
                 <?php $magyarazat .= "<strong>Újrapróbálkozások maximális száma</strong><p>Itt adhatjuk meg, hogy a vizsgázó hányszor tehet kísérletet a vizsga kitöltésével.
                             Az itt megadott értéket a rendszer csak akkor veszi figyelembe, ha a vizsgát ismételhetőként állítjuk be.</p>"; ?>
+                
+                <div>
+                    <label for="korlatozott">Korlátozott vizsga</label><br>
+                    <label class="kapcsolo">
+                        <input type="hidden" name="korlatozott" id="publikalthidden" value="">
+                        <input type="checkbox" name="korlatozott" id="korlatozott" value="1" <?=($korlatozott) ? "checked" : "" ?>>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <?php $magyarazat .= "<strong>Korlátozott vizsga</strong><p>Ezt kiválasztva a vizsga korlátozottá tehető,
+                            hogy kizárólag csak az előre megadott felhasználók érhessék el.<br>
+                            Ezt bebpipálva a felső menüben megjelenik az <b>Engedélyezettek</b> menüpont, ahol megtekinthetjük,
+                            illetve módosíthatjuk az engedélyezett felhasználók listáját.</p>"; ?>
 
                 <div>
                     <label for="eles">A vizsga élesítve</label><br>

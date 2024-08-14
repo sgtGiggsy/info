@@ -9,7 +9,7 @@ else
     $con = mySQLConnect(false);
     $helyesertek = null;
 
-    purifyPost(true);
+    purifyPost();
     
     if(isset($_FILES["kerdeskep"]))
     {        
