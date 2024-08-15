@@ -19,10 +19,12 @@ else
     }
 
     $igenylo = $igenylesideje = $vegrehajtasideje = $munkavegzo2 = $leiras = $eszkoz = null;
+    $javascriptfiles[] = "modules/munkalapok/includes/templatebeszur.js";
     $hely = $_SESSION[getenv('SESSION_NAME')."defaultmunkahely"];
     $ugyintezo = $_SESSION[getenv('SESSION_NAME')."defaultugyintezo"];
     $munkavegzo1 = $_SESSION[getenv('SESSION_NAME').'id'];
     $datalist = mySQLConnect("SELECT DISTINCT leiras FROM munkalapok ORDER BY leiras DESC");
+    $templateek = mySQLConnect("SELECT id, szoveg FROM munkalaptemplateek ORDER BY hasznalva DESC, szoveg ASC;");
 
     $button = "Munka rögzítése";
     $button2 = "Munka rögzítése és nyomtatása";
@@ -102,6 +104,14 @@ else
                 </div>
 
                 <div>
+                    <div class="munkatemplatebeszur"><?php
+                        foreach($templateek as $template)
+                        {
+                            ?><div>
+                                <button onclick="templateBeszur('<?=$template['szoveg']?>', '<?=$template['id']?>'); return false;" type="button"><?=$template['szoveg']?></button>
+                            </div><?php
+                        }
+                    ?></div>
                     <div>
                         <label for="leiras">Elvégzett munka:</label><br>
                         <textarea name="leiras" id="leiras"><?=$leiras?></textarea>

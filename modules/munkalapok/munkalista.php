@@ -54,9 +54,9 @@ else
     $con = mySQLConnect("SELECT count(*) AS db FROM munkalapok");
     $count = (mysqli_fetch_assoc($con))['db'];
 
-    if(isset($_GET['oldal']))
+    if(isset($_GET['subpage']) && $_GET['subpage'] == 'oldal' && isset($_GET['param']) && verifyWholeNum($_GET['param']))
     {
-        $oldal = $_GET['oldal'];
+        $oldal = $_GET['param'];
         $start = ($oldal - 1) * $megjelenit;
     }
     else

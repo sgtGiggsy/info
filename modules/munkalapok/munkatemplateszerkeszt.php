@@ -15,15 +15,17 @@ else
         $targeturl = "$RootPath/munkalaptemplateek";
 
         header("Location: $targeturl");
+        die;
     }
 
     $irhat = true;
-    $magyarazat = null;
+    $magyarazat = $szoveg = null;
     $form = "modules/munkalapok/forms/templateform";
 
     if(isset($_GET['id']))
     {
         $template = mySQLConnect("SELECT id, szoveg FROM munkalaptemplateek WHERE id = $id;");
+        $szoveg = mysqli_fetch_assoc($template)['szoveg'];
         $oldalcim = "Munkalap template szerkesztése";
         $button = "Template szerkesztése";
     }

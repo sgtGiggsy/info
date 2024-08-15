@@ -3262,6 +3262,25 @@ div[id^=tennivalobody-].close {
     background-color: var(--tsore);
 }
 
+.munkatemplatebeszur {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min-content, 20ch));
+    font-size: 0.8em;
+}
+
+.munkatemplatebeszur div {
+    padding: 0;
+}
+
+.munkatemplatebeszur button {
+    max-width: unset;
+    display: block;
+    padding: 0.4em 0.7em;
+    width: 100%;
+    height: 100%;
+}
+
 /* ------------------------------- Nyomtatási kép ------------------------------- */
 @media print {
     body {
