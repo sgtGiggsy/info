@@ -108,7 +108,7 @@ if(isset($irhat) && $irhat)
                         {
                             $ldapresults = ldap_get_entries($ldapconnection, $ldapsearch);
                             // Ha nincs email, vagy megjelenő név valakinél megadva, warningot dobna a lekérés, így el kell nyomnunk az esetleges hibaüzenetet
-                            if($ldapresults[0]['displayname'][0])
+                            if(@$ldapresults[0]['displayname'][0])
                             {
                                 @$email = $ldapresults[0]['mail'][0];
                                 @$nev = $ldapresults[0]['displayname'][0];
