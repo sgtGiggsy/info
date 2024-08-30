@@ -1,4 +1,4 @@
-var kattintva = 0;
+var kattintva = 1;
 
 function templateBeszur(szoveg, id)
 {
@@ -23,4 +23,12 @@ function templateBeszur(szoveg, id)
         type: "POST",
         url: RootPath + "/munkatemplatedb?action=hasznalt&tempid=" + id,
     });
+}
+
+function templateTorol(szoveg)
+{
+    let szovegdoboz = document.getElementById('leiras');
+    szovegdoboz.value = szovegdoboz.value.replace(', ' + szoveg, '');
+    szovegdoboz.value = szovegdoboz.value.replace(szoveg + ', ', '');
+    szovegdoboz.value = szovegdoboz.value.replace(szoveg, '');
 }
