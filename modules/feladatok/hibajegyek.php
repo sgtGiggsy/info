@@ -17,7 +17,7 @@ else
     {}
     elseif($csoportolvas)
     {
-        $where .= " AND (felhasznalok.alakulat = $alakulat";
+        $where .= " AND (felhasznalok.szervezet = $szervezet";
     }
     elseif($sajatolvas)
     {
@@ -29,13 +29,13 @@ else
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
-            'tipus' => "alakulat",                 // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'tipus' => "szervezet",                 // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
             'and' => false,                          // Kerüljön-e AND a parancs elejére
-            'alakulatelo' => "felhasznalok",                  // A tábla neve, ahonnan az alakulat neve jön
+            'szervezetelo' => "felhasznalok",                  // A tábla neve, ahonnan az szervezet neve jön
             'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
-            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
             'telephelynull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-            'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+            'szervezetmegnevezes' => "szervezet"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
         );
 
         $csoportwhere = "OR " . csoportWhere($csoporttagsagok, $csopwhereset) . ")";
@@ -47,7 +47,7 @@ else
     }
 
     $hibajegyek = mySQLConnect("SELECT feladatok.id AS hibid, pubid,
-            felhasznalok.alakulat AS alakulat, alakulatok.rovid AS alakulatnev,
+            felhasznalok.szervezet AS szervezet, szervezetek.rovid AS szervezetnev,
             felhasznalok.nev AS bejelento, feladatok.allapot AS allapot,
             feladatok.rovid AS rovid, feladatok.timestamp AS bejelentesideje, eszkozneve,
             epuletek.nev AS epuletnev, epuletek.szam AS epuletszam,
@@ -59,7 +59,7 @@ else
             INNER JOIN felhasznalok ON feladatok.felhasznalo = felhasznalok.id
             LEFT JOIN feladatallapotok ON feladatallapotok.feladat = feladatok.id
             LEFT JOIN allapottipusok ON feladatallapotok.allapottipus = allapottipusok.id
-            LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
+            LEFT JOIN szervezetek ON felhasznalok.szervezet = szervezetek.id
             LEFT JOIN felhasznalok modositok ON feladatallapotok.felhasznalo = modositok.id
             LEFT JOIN helyisegek ON feladatok.helyiseg = helyisegek.id
             LEFT JOIN epuletek ON feladatok.epulet = epuletek.id
@@ -76,7 +76,7 @@ else
     $oszlopok = array(
         array('nev' => 'ID', 'tipus' => 'i'),
         array('nev' => 'Bejelentő', 'tipus' => 's'),
-        array('nev' => 'Alakulat', 'tipus' => 's'),
+        array('nev' => 'Szervezet', 'tipus' => 's'),
         array('nev' => 'Bejelentve', 'tipus' => 's'),
         array('nev' => 'Eszköz', 'tipus' => 's'),
         array('nev' => 'Rövid leírás', 'tipus' => 's'),
@@ -144,7 +144,7 @@ else
                     }
                     ?><td><a href="<?=$kattinthatolink?>"><?=$hibid?></a></td>
                     <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['bejelento']?></a></td>
-                    <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['alakulatnev']?></a></td>
+                    <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['szervezetnev']?></a></td>
                     <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['bejelentesideje']?></a></td>
                     <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['eszkozneve']?></a></td>
                     <td><a href="<?=$kattinthatolink?>"><?=$hibajegy['rovid']?></a></td>

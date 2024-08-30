@@ -13,7 +13,7 @@ if(@$irhat)
                     <input type="text" accept-charset="utf-8" name="nev" id="nev" value="<?=$nev?>"></input>
                 </div>
         
-                <?=alakulatPicker($alakulat, "alakulat")?>
+                <?=szervezetPicker($szervezet, "szervezet")?>
         
                 <?=helyisegPicker($helyiseg, "helyiseg")?>
         

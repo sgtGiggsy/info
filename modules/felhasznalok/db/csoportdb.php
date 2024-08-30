@@ -62,8 +62,8 @@ if(isset($irhat) && $irhat)
 
     elseif($_GET["action"] == "addresponsibility")
     {
-        $stmt = $con->prepare('INSERT INTO csoportjogok (csoport, alakulat, telephely) VALUES (?, ?, ?)');
-        $stmt->bind_param('sss', $_POST['id'], $_POST['alakulat'], $_POST['telephely']);
+        $stmt = $con->prepare('INSERT INTO csoportjogok (csoport, szervezet, telephely) VALUES (?, ?, ?)');
+        $stmt->bind_param('sss', $_POST['id'], $_POST['szervezet'], $_POST['telephely']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

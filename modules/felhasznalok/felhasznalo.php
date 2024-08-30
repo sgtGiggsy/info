@@ -59,7 +59,7 @@ elseif($mindir && isset($_GET['action']))
     // Új felhasználó manuális hozzáadása, vagy meglévő szerkesztése
     elseif($_GET['action'] == "addnew" || $_GET['action'] == "edit")
     {
-        $felhasznalonev = $nev = $email = $telefon = $alakulat = null;
+        $felhasznalonev = $nev = $email = $telefon = $szervezet = null;
         $button = "Új felhasználó";
         $oldalcim = "Új felhasználó hozzáadása";
         $form .= "felhasznaloszerkform";
@@ -78,7 +78,7 @@ elseif($mindir && isset($_GET['action']))
                 $nev = $felhasznalo['nev'];
                 $email = $felhasznalo['email'];
                 $telefon = $felhasznalo['telefon'];
-                $alakulat = $felhasznalo['alakulat'];
+                $szervezet = $felhasznalo['szervezet'];
 
                 $button = "Felhasználó szerkesztése";
                 $oldalcim = "Felhasználó szerkesztése";
@@ -167,21 +167,21 @@ else
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
-            'tipus' => "alakulat",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'tipus' => "szervezet",                        // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
             'and' => true,                          // Kerüljön-e AND a parancs elejére
-            'alakulatelo' => "felhasznalok",                  // A tábla neve, ahonnan az alakulat neve jön
+            'szervezetelo' => "felhasznalok",                  // A tábla neve, ahonnan az szervezet neve jön
             'telephelyelo' => null,           // A tábla neve, ahonnan a telephely neve jön
-            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
             'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-            'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+            'szervezetmegnevezes' => "szervezet"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
         );
 
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
     }
     
-    $query = mySQLConnect("SELECT felhasznalok.id as felhid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, alakulatok.nev AS alakulat
+    $query = mySQLConnect("SELECT felhasznalok.id as felhid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, szervezetek.nev AS szervezet
             FROM felhasznalok
-                LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
+                LEFT JOIN szervezetek ON felhasznalok.szervezet = szervezetek.id
             WHERE felhasznalok.id = $felhid $csoportwhere;");
     $felhasznalo = mysqli_fetch_assoc($query);
 
@@ -218,8 +218,8 @@ else
                         <div><?=$felhasznalo['nev']?></div>
                         <div>Felhasználónév:</div>
                         <div><?=$felhasznalo['felhasznalonev']?></div>
-                        <div>Alakulat:</div>
-                        <div><?=$felhasznalo['alakulat']?></div>
+                        <div>Szervezet:</div>
+                        <div><?=$felhasznalo['szervezet']?></div>
                         <div>Részleg:</div>
                         <div><?=$felhasznalo['osztaly']?></div>
                         <div>Beosztás:</div>

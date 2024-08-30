@@ -10,7 +10,7 @@ else
     if(isset($_GET['kereses']))
     {
         $keres = $_GET['kereses'];
-        $where = "WHERE felhasznalok.nev LIKE '%$keres%' OR alakulatok.rovid LIKE '%$keres%' OR mv1.nev LIKE '%$keres%' OR mv2.nev LIKE '%$keres%' OR leiras LIKE '%$keres%' OR eszkoz LIKE '%$keres%'";
+        $where = "WHERE felhasznalok.nev LIKE '%$keres%' OR szervezetek.rovid LIKE '%$keres%' OR mv1.nev LIKE '%$keres%' OR mv2.nev LIKE '%$keres%' OR leiras LIKE '%$keres%' OR eszkoz LIKE '%$keres%'";
     }
     
     $csoportwhere = null;
@@ -18,13 +18,13 @@ else
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
-            'tipus' => "alakulat",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'tipus' => "szervezet",                        // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
             'and' => false,                          // Kerüljön-e AND a parancs elejére
-            'alakulatelo' => "felhasznalok",                  // A tábla neve, ahonnan az alakulat neve jön
+            'szervezetelo' => "felhasznalok",                  // A tábla neve, ahonnan az szervezet neve jön
             'telephelyelo' => null,           // A tábla neve, ahonnan a telephely neve jön
-            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
             'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-            'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+            'szervezetmegnevezes' => "szervezet"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
         );
 
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
@@ -80,7 +80,7 @@ else
             igenylo, igenylesideje, vegrehajtasideje, munkavegzo1, munkavegzo2, leiras, eszkoz,
             felhasznalok.nev AS igenylonev,
             felhasznalok.telefon AS igenylotelefon,
-            alakulatok.rovid AS igenyloalakulat,
+            szervezetek.rovid AS igenyloszervezet,
             mv1.nev AS munkavegzo1nev,
             mv1.telefon AS munkavegzo1telefon,
             mv1.beosztas AS munkavegzo1beosztas,
@@ -95,7 +95,7 @@ else
             LEFT JOIN felhasznalok ON munkalapok.igenylo = felhasznalok.id
             LEFT JOIN felhasznalok mv1 ON munkalapok.munkavegzo1 = mv1.id
             LEFT JOIN felhasznalok mv2 ON munkalapok.munkavegzo2 = mv2.id
-            LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
+            LEFT JOIN szervezetek ON felhasznalok.szervezet = szervezetek.id
         $where $csoportwhere
         ORDER BY munkalapok.id DESC
         LIMIT $start, $megjelenit;");
@@ -139,7 +139,7 @@ else
             ?><div class="kartya">
                 <div>
                     <p><span>Megrendelő: </span><?=$munka['igenylonev']?> <?=$munka['igenylotelefon']?></p>
-                    <p><span>Alakulat: </span><?=$munka['igenyloalakulat']?></p>
+                    <p><span>Szervezet: </span><?=$munka['igenyloszervezet']?></p>
                 </div>
                 <div>
                     <p><span>Végrehajtotta: </span><?=$munka['munkavegzo1nev']?> (<?=$munka['munkavegzo1telefon']?>)</p><?php
@@ -165,7 +165,7 @@ else
                     <th class="tsorth" onclick="sortTable(0, 'i', 'munkalista')">Azonos.</th>
                     <th class="tsorth" onclick="sortTable(1, 's', 'munkalista')">Megrendelő</th>
                     <th class="tsorth" onclick="sortTable(2, 's', 'munkalista')">Telefon</th>
-                    <th class="tsorth" onclick="sortTable(3, 's', 'munkalista')">Alakulat</th>
+                    <th class="tsorth" onclick="sortTable(3, 's', 'munkalista')">Szervezet</th>
                     <th class="tsorth" onclick="sortTable(4, 's', 'munkalista')">Munkavégzés helye</th>
                     <th class="tsorth" onclick="sortTable(5, 's', 'munkalista')">Igénylés ideje</th>
                     <th class="tsorth" onclick="sortTable(6, 's', 'munkalista')">Végrehajtás ideje</th>
@@ -184,7 +184,7 @@ else
                 <td><?=$munkid?></td>
                 <td><?=$munka['igenylonev']?></td>
                 <td><?=$munka['igenylotelefon']?></td>
-                <td><?=$munka['igenyloalakulat']?></td>
+                <td><?=$munka['igenyloszervezet']?></td>
                 <td><?=$munka['telephely']?> <?=$munka['epulet']?>.  <?=$munka['eptipus']?> <?=$munka['helyiseg']?>.</td>
                 <td nowrap><?=str_replace("-", ".", $munka['igenylesideje'])?></td>
                 <td nowrap><?=str_replace("-", ".", $munka['vegrehajtasideje'])?></td>

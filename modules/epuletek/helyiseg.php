@@ -8,13 +8,13 @@ if(!isset($_GET['action']) || $_GET['action'] == "edit")
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
-            'tipus' => "telephely",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'tipus' => "telephely",                        // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
             'and' => true,                          // Kerüljön-e AND a parancs elejére
-            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'szervezetelo' => null,                  // A tábla neve, ahonnan az szervezet neve jön
             'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
-            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
             'telephelynull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+            'szervezetmegnevezes' => "tulajdonos"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
         );
 
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
@@ -207,7 +207,7 @@ else
                 beepitesideje,
                 beepitesek.id AS beepid,
                 pozicio,
-                alakulatok.rovid AS tulajdonos,
+                szervezetek.rovid AS tulajdonos,
                 rackszekrenyek.nev AS rack,
                 (SELECT count(id) FROM rackszekrenyek WHERE helyiseg = helyisegid) AS rackszam,
                 beepitesek.nev AS beepitesinev,
@@ -221,7 +221,7 @@ else
                     rackszekrenyek ON beepitesek.rack = rackszekrenyek.id LEFT JOIN
                     helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id LEFT JOIN
                     ipcimek ON beepitesek.ipcim = ipcimek.id LEFT JOIN
-                    alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                    szervezetek ON eszkozok.tulajdonos = szervezetek.id
             WHERE helyisegek.id = $helyisegid AND kiepitesideje IS NULL
             ORDER BY rack, pozicio;");
         if(mysqli_num_rows($eszkozok) > 0)

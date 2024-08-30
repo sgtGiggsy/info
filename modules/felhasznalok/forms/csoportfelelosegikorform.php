@@ -10,11 +10,10 @@ if(@$irhat)
                     ?><input type ="hidden" id="id" name="id" value=<?=$_GET['id']?>><?php
                 }
    
-                alakulatPicker(null);
+                szervezetPicker(null);
 
-                $magyarazat .= "<strong>Alakulat</strong><p>Az alakulat,
+                $magyarazat .= "<strong>Szervezet</strong><p>A szervezet,
                     amihez jogosultságot akarunk adni a csoportnak.</p>"
-
                 ?><div>
                     <label for="telephely">Telephely:</label><br>
                     <select id="telephely" name="telephely">

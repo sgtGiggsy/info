@@ -67,7 +67,7 @@ else
         {}
         elseif($csoportolvas)
         {
-            $where .= " AND (felhasznalok.alakulat = $alakulat";
+            $where .= " AND (felhasznalok.szervezet = $szervezet";
         }
         elseif($sajatolvas)
         {
@@ -79,13 +79,13 @@ else
         {
             // A CsoportWhere űrlapja
             $csopwhereset = array(
-                'tipus' => "alakulat",                 // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+                'tipus' => "szervezet",                 // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
                 'and' => false,                          // Kerüljön-e AND a parancs elejére
-                'alakulatelo' => "felhasznalok",                  // A tábla neve, ahonnan az alakulat neve jön
+                'szervezetelo' => "felhasznalok",                  // A tábla neve, ahonnan az szervezet neve jön
                 'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
-                'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+                'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
                 'telephelynull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-                'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+                'szervezetmegnevezes' => "szervezet"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
             );
 
             $csoportwhere = "OR " . csoportWhere($csoporttagsagok, $csopwhereset) . ")";
@@ -98,7 +98,7 @@ else
 
         $hibajegy = mySQLConnect("SELECT feladatok.id AS hibid,
                 feladatok.felhasznalo AS felhasznalo,
-                alakulatok.nev AS alakulat, alakulatok.id AS alakulatid,
+                szervezetek.nev AS szervezet, szervezetek.id AS szervezetid,
                 hatarido, elhalasztva, felhasznalok.nev AS bejelento,
                 felhasznalok.id AS bejelentoid, telefon,
                 feladatok.rovid AS rovid, bovitett, timestamp AS bejelentesideje,
@@ -109,7 +109,7 @@ else
                 (SELECT count(id) FROM feladatfajlok WHERE feladat = hibid) AS csatolmanyok
             FROM feladatok
                 INNER JOIN felhasznalok ON feladatok.felhasznalo = felhasznalok.id
-                LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
+                LEFT JOIN szervezetek ON felhasznalok.szervezet = szervezetek.id
                 LEFT JOIN helyisegek ON feladatok.helyiseg = helyisegek.id
                 LEFT JOIN epuletek ON feladatok.epulet = epuletek.id
                 LEFT JOIN szakok ON feladatok.szakid = szakok.id
@@ -129,7 +129,7 @@ else
             $epulet = $hibajegy['epulet'];
             $helyiseg = $hibajegy['helyiseg'];
             $origid = $hibajegy['hibid'];
-            $hibajegyalakulat = $hibajegy['alakulatid'];
+            $hibajegyszervezet = $hibajegy['szervezetid'];
 
             $hibajegyallapotok = mySQLConnect("SELECT felhasznalok.nev AS felhasznalo,
                     allapottipusok.folyamat AS esemeny,
@@ -154,13 +154,13 @@ else
             {
                 // A CsoportWhere űrlapja
                 $csopwhereset = array(
-                    'tipus' => "alakulat",                 // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+                    'tipus' => "szervezet",                 // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
                     'and' => false,                          // Kerüljön-e AND a parancs elejére
-                    'alakulatelo' => "csoportjogok",                  // A tábla neve, ahonnan az alakulat neve jön
+                    'szervezetelo' => "csoportjogok",                  // A tábla neve, ahonnan az szervezet neve jön
                     'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
-                    'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+                    'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
                     'telephelynull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-                    'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+                    'szervezetmegnevezes' => "szervezet"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
                 );
 
                 $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
@@ -179,7 +179,7 @@ else
                     INNER JOIN csoportjogok ON csoporttagsagok.csoport = csoportjogok.csoport
                     INNER JOIN csoportok ON csoporttagsagok.csoport = csoportok.id
                     INNER JOIN jogosultsagok ON jogosultsagok.felhasznalo = csoporttagsagok.felhasznalo
-                WHERE menupont = 11 AND iras > 1 AND csoportjogok.alakulat = $hibajegyalakulat AND (csoportok.szak = $szakid OR csoportok.szak IS NULL)");
+                WHERE menupont = 11 AND iras > 1 AND csoportjogok.szervezet = $hibajegyszervezet AND (csoportok.szak = $szakid OR csoportok.szak IS NULL)");
 
             $kijeloltek = mySQLConnect("SELECT felhasznalok.id AS felhid,
                     felhasznalok.nev AS felhasznalo
@@ -223,7 +223,7 @@ else
         {
             foreach($csoporttagsagok as $csoport)
             {
-                if($csoport['alakulat'] == $hibajegyalakulat || $csoport['alakulat'] == $alakulat)
+                if($csoport['szervezet'] == $hibajegyszervezet || $csoport['szervezet'] == $szervezet)
                 {
                     $irhat = true;
                     break;
@@ -288,8 +288,8 @@ else
                         <div><?=$hibajegy['bejelento']?></div>
                         <div>Bejelentő telefonszáma</div>
                         <div><?=$hibajegy['telefon']?></div>
-                        <div>Bejelentő alakulata</div>
-                        <div><?=$hibajegy['alakulat']?></div>
+                        <div>Bejelentő szervezete</div>
+                        <div><?=$hibajegy['szervezet']?></div>
                         <div>Bejelentés ideje</div>
                         <div><?=$hibajegy['bejelentesideje']?></div>
                         <div>Hibajegy állapota</div>
@@ -431,8 +431,8 @@ else
 
                 $valosnev = $_SESSION[getenv('SESSION_NAME').'nev'];
                 $origfelhasznaloid = $hibajegy['bejelentoid'];
-                $origalakulat = $hibajegy['alakulatid'];
-                hibajegyErtesites("$valosnev frissítette a(z) $id számú hibajegy állapotát", "Megtekintve", $id, $origfelhasznaloid, $origalakulat);
+                $origszervezet = $hibajegy['szervezetid'];
+                hibajegyErtesites("$valosnev frissítette a(z) $id számú hibajegy állapotát", "Megtekintve", $id, $origfelhasznaloid, $origszervezet);
             }
         }
 

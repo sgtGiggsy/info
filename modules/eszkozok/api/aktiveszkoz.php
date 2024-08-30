@@ -78,7 +78,7 @@ Class API_Call implements API
             beepitesideje,
             kiepitesideje,
             eszkozok.tulajdonos AS tulajid,
-            alakulatok.rovid AS tulajdonos,
+            szervezetek.rovid AS tulajdonos,
             rackszekrenyek.id AS rackid,
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
@@ -108,7 +108,7 @@ Class API_Call implements API
                 LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
                 LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-                LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
         WHERE eszkozok.id = $objid AND modellek.tipus < 11
         ORDER BY beepitesek.id DESC;");

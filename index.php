@@ -103,7 +103,7 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
                         @$email = $ldapresults[0]['mail'][0];
                         @$nev = $ldapresults[0]['displayname'][0];
                         @$osztaly = $ldapresults[0]['department'][0];
-                        @$alakulat = alakulatValaszto($ldapresults[0]['company'][0]);
+                        @$alakulat = szervezetValaszto($ldapresults[0]['company'][0]);
                         @$telefon = $ldapresults[0]['telephonenumber'][0];
                         @$beosztas = $ldapresults[0]['title'][0];
                         @$thumb = $ldapresults[0]['thumbnailphoto'][0];
@@ -113,7 +113,7 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
                             echo "<br>";
                         }*/
 
-                        //echo $alakulat . " és " . $telefon;
+                        //echo $szervezet . " és " . $telefon;
                     }
                     break;
                 }
@@ -143,17 +143,17 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
         {
             if(isset($jelszo)) // Ha létezett már a felhasználó a MySQL adatbázisban, frissítjük az adatait a DC-től kapottakkal
             {
-                if ($stmt = $con->prepare('UPDATE felhasznalok SET jelszo=?, nev=?, email=?, osztaly=?, alakulat=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?'))
+                if ($stmt = $con->prepare('UPDATE felhasznalok SET jelszo=?, nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?'))
                 {
-                    $stmt->bind_param('sssssssss', $hashedpassword, $nev, $email, $osztaly, $alakulat, $telefon, $beosztas, $thumb, $samaccountname);
+                    $stmt->bind_param('sssssssss', $hashedpassword, $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb, $samaccountname);
                     $stmt->execute();
                 }
             }
             else // Ha nem létezett a felhasználó a MySQL adatbázisban, létrehozzuk (a jelen táblabeállítás szerint a MySQL-ben automatikusan 1-es, azaz legalacsonyabb belépett joggal jön létre minden felhasználó)
             {
-                if ($stmt = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, jelszo, nev, email, osztaly, alakulat, telefon, beosztas, profilkep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'))
+                if ($stmt = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, jelszo, nev, email, osztaly, szervezet, telefon, beosztas, profilkep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'))
                 {
-                    $stmt->bind_param('sssssssss', $samaccountname, $hashedpassword, $nev, $email, $osztaly, $alakulat, $telefon, $beosztas, $thumb);
+                    $stmt->bind_param('sssssssss', $samaccountname, $hashedpassword, $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb);
                     $stmt->execute();
                 }
             }
@@ -218,7 +218,7 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
         $_SESSION[getenv('SESSION_NAME').'felhasznalonev'] = $row['felhasznalonev'];
         $_SESSION[getenv('SESSION_NAME').'nev'] =  $row['nev'];
         $_SESSION['profilkep'] =  $row['profilkep'];
-        $alakulat = $row['alakulat'];
+        $szervezet = $row['szervezet'];
 
         // Ez a rész gondoskodik róla, hogy ha egy adott oldalt próbált a felhasználó felkeresni,
         // a sikeres bejelentkezés után vissza legyen oda irányítva
@@ -294,7 +294,7 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
     $szemelyes = mysqli_fetch_assoc($szemelyesbeallitasok);
 
     // Csoporttagságok begyüjtése
-    $csoporttagsagok = mySQLConnect("SELECT csoportok.nev AS csoportnev, alakulat, telephely
+    $csoporttagsagok = mySQLConnect("SELECT csoportok.nev AS csoportnev, szervezet, telephely
         FROM csoportok
             INNER JOIN csoporttagsagok ON csoportok.id = csoporttagsagok.csoport
             LEFT JOIN csoportjogok ON csoportjogok.csoport = csoporttagsagok.csoport

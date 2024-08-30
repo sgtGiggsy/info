@@ -99,13 +99,13 @@ else
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
-            'tipus' => "telephely",                   // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'tipus' => "telephely",                   // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
             'and' => false,                          // Kerüljön-e AND a parancs elejére
-            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'szervezetelo' => null,                  // A tábla neve, ahonnan az szervezet neve jön
             'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
-            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
             'telephelynull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+            'szervezetmegnevezes' => "tulajdonos"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
         );
 
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);

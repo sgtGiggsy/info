@@ -38,9 +38,9 @@ if(@$irhat)
 
                 <?php $magyarazat .= "<strong>Telefon</strong><p>A felhasználó munkahelyi telefonszáma.</p>"?>
 
-                <?php alakulatPicker($alakulat, "alakulat", true); ?>
+                <?php szervezetPicker($szervezet, "szervezet", true); ?>
 
-                <?php $magyarazat .= "<strong>Alakulat</strong><p>A felhasználó alakulata.</p>"?>
+                <?php $magyarazat .= "<strong>szervezet</strong><p>A felhasználó szervezete.</p>"?>
 
                 <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
                 <?= cancelForm();?>

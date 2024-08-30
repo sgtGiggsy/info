@@ -224,9 +224,9 @@ if(@$irhat)
             ?></div>
             <div><?php
 
-                alakulatPicker($tulajdonos, "tulajdonos", true);
+                szervezetPicker($tulajdonos, "tulajdonos", true);
 
-                $magyarazat .= "<strong>Alakulat</strong><p>Az alakulat, amelyet az eszköz terhel.</p>";
+                $magyarazat .= "<strong>Szervezet</strong><p>A szervezet, amelyet az eszköz terhel.</p>";
 
                 if(isset($_GET['id']))
                 {

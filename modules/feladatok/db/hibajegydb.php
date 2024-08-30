@@ -29,7 +29,7 @@ if(isset($irhat) && $irhat)
         }
         
         $felhasznaloquery = mySQLConnect("SELECT felhasznalok.id AS id, felhasznalok.nev AS nev,
-                    felhasznalok.alakulat AS alakulat, feladatok.szakid AS szak,
+                    felhasznalok.szervezet AS szervezet, feladatok.szakid AS szak,
                     feladatok.id AS feladatid
                 FROM felhasznalok
                     LEFT JOIN feladatok ON feladatok.felhasznalo = felhasznalok.id
@@ -38,7 +38,7 @@ if(isset($irhat) && $irhat)
         
         $origfelhasznaloneve = $felhasznalo['nev'];
         $origfelhasznaloid = $felhasznalo['id'];
-        $origalakulat = $felhasznalo['alakulat'];
+        $origszervezet = $felhasznalo['szervezet'];
         $origszak = $felhasznalo['szak'];
         $origid = $felhasznalo['feladatid'];
     }
@@ -70,7 +70,7 @@ if(isset($irhat) && $irhat)
         $felhasznaloquery = mySQLConnect("SELECT nev FROM felhasznalok WHERE id = $felhid");
         $felhasznaloneve = mysqli_fetch_assoc($felhasznaloquery)['nev'];
 
-        hibajegyErtesites("$felhasznaloneve új hibajegyet hozott létre", $_POST['rovid'], $last_id, $felhid, $alakulat, $_POST['szakid']);
+        hibajegyErtesites("$felhasznaloneve új hibajegyet hozott létre", $_POST['rovid'], $last_id, $felhid, $szervezet, $_POST['szakid']);
     }
 
     elseif($_GET["action"] == "update")
@@ -85,7 +85,7 @@ if(isset($irhat) && $irhat)
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
 
-        hibajegyErtesites("$valosnev szerkesztette a(z) $sorszam számú hibajegyet", $_POST['rovid'], $sorszam, $origfelhasznaloid, $origalakulat, $_POST['szakid']);
+        hibajegyErtesites("$valosnev szerkesztette a(z) $sorszam számú hibajegyet", $_POST['rovid'], $sorszam, $origfelhasznaloid, $origszervezet, $_POST['szakid']);
     }
 
     elseif($_GET["action"] == "stateupdate")
@@ -190,7 +190,7 @@ if(isset($irhat) && $irhat)
             $torzs .= ": " . $_POST['megjegyzes'];
         }
 
-        hibajegyErtesites("$valosnev frissítette a(z) $sorszam számú hibajegy állapotát", $torzs, $sorszam, $origfelhasznaloid, $origalakulat, $origszak);
+        hibajegyErtesites("$valosnev frissítette a(z) $sorszam számú hibajegy állapotát", $torzs, $sorszam, $origfelhasznaloid, $origszervezet, $origszak);
     }
 
     if(isset($_FILES["fajlok"]) && $origid)

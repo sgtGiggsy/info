@@ -13,13 +13,13 @@ if($id)
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
-            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
             'and' => true,                          // Kerüljön-e AND a parancs elejére
-            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'szervezetelo' => null,                  // A tábla neve, ahonnan az szervezet neve jön
             'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
-            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
             'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+            'szervezetmegnevezes' => "tulajdonos"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
         );
 
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
@@ -53,7 +53,7 @@ if($id)
             beepitesideje,
             kiepitesideje,
             eszkozok.tulajdonos AS tulajid,
-            alakulatok.rovid AS tulajdonos,
+            szervezetek.rovid AS tulajdonos,
             rackszekrenyek.id AS rackid,
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
@@ -85,7 +85,7 @@ if($id)
                 LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
                 LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-                LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
         WHERE eszkozok.id = $id AND modellek.tipus < 11 $beepszur $csoportwhere
         ORDER BY beepitesek.id DESC;");
@@ -196,7 +196,7 @@ else
                 gyartok.nev AS gyarto,
                 sorozatszam,
                 tulajdonos AS tulajid,
-                alakulatok.rovid AS tulajdonos,
+                szervezetek.rovid AS tulajdonos,
                 varians,
                 megjegyzes,
                 leadva,
@@ -222,7 +222,7 @@ else
                 LEFT JOIN raktarak ON eszkozok_history.raktar = raktarak.id
                 LEFT JOIN modellek ON eszkozok_history.modell = modellek.id
                 LEFT JOIN gyartok ON modellek.gyarto = gyartok.id
-                LEFT JOIN alakulatok ON eszkozok_history.tulajdonos = alakulatok.id
+                LEFT JOIN szervezetek ON eszkozok_history.tulajdonos = szervezetek.id
             WHERE eszkozok_history.eszkozid = $id
             ORDER BY eszkozok_history.modid");
 

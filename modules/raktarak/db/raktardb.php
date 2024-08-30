@@ -8,8 +8,8 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO raktarak (nev, alakulat, helyiseg) VALUES (?, ?, ?)');
-        $stmt->bind_param('sss', $_POST['nev'], $_POST['alakulat'], $_POST['helyiseg']);
+        $stmt = $con->prepare('INSERT INTO raktarak (nev, szervezet, helyiseg) VALUES (?, ?, ?)');
+        $stmt->bind_param('sss', $_POST['nev'], $_POST['szervezet'], $_POST['helyiseg']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {
@@ -23,8 +23,8 @@ if(isset($irhat) && $irhat)
     }
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE raktarak SET nev=?, alakulat=?, helyiseg=? WHERE id=?');
-        $stmt->bind_param('sssi', $_POST['nev'], $_POST['alakulat'], $_POST['helyiseg'], $_POST['id']);
+        $stmt = $con->prepare('UPDATE raktarak SET nev=?, szervezet=?, helyiseg=? WHERE id=?');
+        $stmt->bind_param('sssi', $_POST['nev'], $_POST['szervezet'], $_POST['helyiseg'], $_POST['id']);
         $stmt->execute();
         if(mysqli_errno($con) != 0)
         {

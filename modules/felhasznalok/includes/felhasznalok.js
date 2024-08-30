@@ -1,9 +1,9 @@
 document.getElementById('telephely').onchange = function() {
-    select = document.getElementById('alakulat');
+    select = document.getElementById('szervezet');
     select.value = '';
 };
 
-document.getElementById('alakulat').onchange = function() {
+document.getElementById('szervezet').onchange = function() {
     select = document.getElementById('telephely');
     select.value = '';
 };

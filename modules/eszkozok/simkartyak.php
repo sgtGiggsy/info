@@ -19,14 +19,14 @@ else
             simtipusok.nev AS tipus,
             simkartyak.felhasznaloszam AS felhasznaloszamid,
             simfelhasznaloszamok.nev AS felhasznaloszam,
-            alakulatok.rovid AS tulajdonos,
+            szervezetek.rovid AS tulajdonos,
             eszkozok.megjegyzes AS megjegyzes,
             raktarak.nev as raktar,
             hibas
         FROM eszkozok
                 INNER JOIN simkartyak ON eszkozok.id = simkartyak.eszkoz
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
-                LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
                 LEFT JOIN simtipusok ON simkartyak.tipus = simtipusok.id
                 LEFT JOIN simfelhasznaloszamok ON simkartyak.felhasznaloszam = simfelhasznaloszamok.id;");
 

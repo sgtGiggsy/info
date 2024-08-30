@@ -14,13 +14,13 @@ else
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
-            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
             'and' => true,                          // Kerüljön-e AND a parancs elejére
-            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'szervezetelo' => null,                  // A tábla neve, ahonnan az szervezet neve jön
             'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
-            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
             'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+            'szervezetmegnevezes' => "tulajdonos"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
         );
 
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
@@ -41,7 +41,7 @@ else
             kiepitesideje,
             modellek.tipus AS tipusid,
             beepitesek.id AS beepid,
-            alakulatok.rovid AS tulajdonos,
+            szervezetek.rovid AS tulajdonos,
             rackszekrenyek.nev AS rack,
             beepitesek.nev AS beepitesinev,
             ipcimek.ipcim AS ipcim,
@@ -63,7 +63,7 @@ else
             LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-            LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+            LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
             LEFT JOIN wifitipusok ON wifitipusok.id = sohoeszkozok.wifi
         WHERE $where $csoportwhere
         ORDER BY telephely, epuletek.szam + 1, helyisegszam, pozicio, modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");

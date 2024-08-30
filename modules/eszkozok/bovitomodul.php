@@ -21,13 +21,13 @@ else
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
-            'tipus' => null,                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'tipus' => null,                        // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
             'and' => true,                          // Kerüljön-e AND a parancs elejére
-            'alakulatelo' => null,                  // A tábla neve, ahonnan az alakulat neve jön
+            'szervezetelo' => null,                  // A tábla neve, ahonnan az szervezet neve jön
             'telephelyelo' => "epuletek",           // A tábla neve, ahonnan a telephely neve jön
-            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
             'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-            'alakulatmegnevezes' => "tulajdonos"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+            'szervezetmegnevezes' => "tulajdonos"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
         );
 
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
@@ -41,13 +41,13 @@ else
                     INNER JOIN beepitesek ON beepitesek.switchport = switchportok.port
                 WHERE beepitesek.id = beepid) AS switchid,
             sorozatszam,
-            alakulatok.nev AS tulajdonos,
+            szervezetek.nev AS tulajdonos,
             gyartok.nev AS gyarto,
             modellek.modell AS modell,
             varians,
             beepitesek.beepitesideje AS beepitesideje,
             beepitesek.kiepitesideje AS kiepitesideje,
-            alakulatok.rovid AS tulajdonos,
+            szervezetek.rovid AS tulajdonos,
             raktarak.nev AS raktar,
             portok.port AS portnev,
             fizikairetegek.nev AS fizikaireteg,
@@ -62,7 +62,7 @@ else
                 LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
                 LEFT JOIN portok ON beepitesek.switchport = portok.id
                 LEFT JOIN switchportok ON portok.id = switchportok.port
-                LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
                 LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
                 LEFT JOIN fizikairetegek ON bovitomodellek.fizikaireteg = fizikairetegek.id
                 LEFT JOIN atviteliszabvanyok ON bovitomodellek.transzpszabvany = atviteliszabvanyok.id
@@ -104,7 +104,7 @@ else
                         portszam,
                         uplinkportok,
                         szoftver,
-                        alakulatok.nev AS tulajdonos,
+                        szervezetek.nev AS tulajdonos,
                         gyartok.nev AS gyarto,
                         modellek.modell AS modell,
                         varians,
@@ -120,7 +120,7 @@ else
                         helyisegnev,
                         beepitesideje,
                         kiepitesideje,
-                        alakulatok.rovid AS tulajdonos,
+                        szervezetek.rovid AS tulajdonos,
                         rackszekrenyek.id AS rackid,
                         rackszekrenyek.nev AS rack,
                         beepitesek.nev AS beepitesinev,
@@ -138,7 +138,7 @@ else
                             LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
                             LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
                             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-                            LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                            LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
                             LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
                         WHERE eszkozok.id = $akteszkid AND modellek.tipus < 11
                         ORDER BY beepitesek.id DESC;");
@@ -308,7 +308,7 @@ else
                         portszam,
                         uplinkportok,
                         szoftver,
-                        alakulatok.nev AS tulajdonos,
+                        szervezetek.nev AS tulajdonos,
                         gyartok.nev AS gyarto,
                         modellek.modell AS modell,
                         varians,
@@ -324,7 +324,7 @@ else
                         helyisegnev,
                         beepitesideje,
                         kiepitesideje,
-                        alakulatok.rovid AS tulajdonos,
+                        szervezetek.rovid AS tulajdonos,
                         rackszekrenyek.id AS rackid,
                         rackszekrenyek.nev AS rack,
                         beepitesek.nev AS beepitesinev,
@@ -342,7 +342,7 @@ else
                             LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
                             LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
                             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-                            LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                            LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
                             LEFT JOIN raktarak ON eszkozok.raktar = raktarak.id
                         WHERE eszkozok.id = $akteszkid AND modellek.tipus < 11
                         ORDER BY beepitesek.id DESC;");

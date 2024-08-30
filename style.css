@@ -56,7 +56,7 @@
     --topbase: #f7f7f7;
     --topbase2nd: #edebeb;
     --topborder: #807d7d;
-    --shadow: #252526;
+    --shadow: #25252646;
     --selectbg: #f7f7f7;
     --selectlowcontrast: #9e9e9e;
     --thead: #969494;
@@ -558,6 +558,7 @@ div[id^=kep-].shrink img {
 }
 
 .szerkcardtitle div {
+    width: unset;
     margin: 0 0.3em 0 0;
 }
 
@@ -620,6 +621,10 @@ div[id^=kep-].shrink img {
     top: 0;
 }
 
+.backforward div {
+    width: unset;
+}
+
 .backforward div:nth-child(odd) {
     left: 0;
 }
@@ -629,11 +634,11 @@ div[id^=kep-].shrink img {
 }
 
 .vizsgacard {
-    width: 50vw;
+    width: clamp(500px, 50vw, 900px) !important;
 }
 
 .vizsgakerdesbody {
-    padding: 0;
+    padding: 0 0 1em 0;
 }
 
 .vizsgakerdeskep img {

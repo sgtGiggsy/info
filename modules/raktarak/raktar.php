@@ -50,7 +50,7 @@ else
     // Ha a kért művelet nem jár adatbázisművelettel, a szerkesztési felület meghívása
     elseif($irhat && !$dbir)
     {
-        $nev = $alakulat = $helyiseg = null;
+        $nev = $szervezet = $helyiseg = null;
 
         $button = "Új raktár";
         $oldalcim = "Új raktár hozzáadása";
@@ -64,7 +64,7 @@ else
 
             $nev = $raktar['nev'];
             $helyiseg = $raktar['helyiseg'];
-            $alakulat = $raktar['alakulat'];
+            $szervezet = $raktar['szervezet'];
 
             $button = "Szerkesztés";
             $oldalcim = "Raktár szerkesztése";
@@ -97,7 +97,7 @@ else
                 beepitesideje,
                 kiepitesideje,
                 modellek.tipus AS tipusid,
-                alakulatok.rovid AS tulajdonos,
+                szervezetek.rovid AS tulajdonos,
                 beepitesek.nev AS beepitesinev,
                 ipcimek.ipcim AS ipcim,
                 beepitesek.megjegyzes AS megjegyzes,
@@ -110,7 +110,7 @@ else
                 INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
                 LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-                LEFT JOIN alakulatok ON eszkozok.tulajdonos = alakulatok.id
+                LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
             WHERE $where
             ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
 
@@ -123,13 +123,13 @@ else
                     helyisegek.id AS helyisegid,
                     helyisegszam,
                     helyisegnev,
-                    alakulatok.rovid AS alakulat,
+                    szervezetek.rovid AS szervezet,
                     telephelyek.id AS thelyid,
                     telephelyek.telephely AS telephely
                 FROM raktarak
                     INNER JOIN helyisegek ON raktarak.helyiseg = helyisegek.id
                     INNER JOIN epuletek ON helyisegek.epulet = epuletek.id
-                    INNER JOIN alakulatok ON raktarak.alakulat = alakulatok.id
+                    INNER JOIN szervezetek ON raktarak.szervezet = szervezetek.id
                     INNER JOIN telephelyek ON epuletek.telephely = telephelyek.id
                     INNER JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
                 WHERE raktarak.id = $id");

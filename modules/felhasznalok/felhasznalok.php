@@ -54,13 +54,13 @@ else
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(
-            'tipus' => "alakulat",                        // A szűrés típusa, null = mindkettő, alakulat = alakulat, telephely = telephely
+            'tipus' => "szervezet",                        // A szűrés típusa, null = mindkettő, szervezet = szervezet, telephely = telephely
             'and' => false,                          // Kerüljön-e AND a parancs elejére
-            'alakulatelo' => "felhasznalok",                  // A tábla neve, ahonnan az alakulat neve jön
+            'szervezetelo' => "felhasznalok",                  // A tábla neve, ahonnan az szervezet neve jön
             'telephelyelo' => null,           // A tábla neve, ahonnan a telephely neve jön
-            'alakulatnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az alakulatszűréshez
+            'szervezetnull' => false,                // Kerüljön-e IS NULL típusú kitétel a parancsba az szervezetszűréshez
             'telephelynull' => true,                // Kerüljön-e IS NULL típusú kitétel a parancsba az telephelyszűréshez
-            'alakulatmegnevezes' => "alakulat"    // Az alakulatot tartalmazó mező neve a felhasznált táblában
+            'szervezetmegnevezes' => "szervezet"    // Az szervezetot tartalmazó mező neve a felhasznált táblában
         );
 
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
@@ -74,9 +74,9 @@ else
         }
     }
 
-    $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, alakulatok.nev AS alakulat
+    $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, szervezetek.nev AS szervezet
         FROM felhasznalok
-            LEFT JOIN alakulatok ON felhasznalok.alakulat = alakulatok.id
+            LEFT JOIN szervezetek ON felhasznalok.szervezet = szervezetek.id
         $where $csoportwhere
         LIMIT $start, $megjelenit;");
 
@@ -113,7 +113,7 @@ else
                 <th>Usernév</th>
                 <th>Emailcím</th>
                 <th>Telefon</th>
-                <th>Alakulat</th>
+                <th>Szervezet</th>
                 <th>Részleg</th>
                 <th>Beosztás</th>
                 <th>Első bejelentkezés</th>
@@ -129,7 +129,7 @@ else
                 <td><a href="<?=$kattinthatolink?>"><?=$x['felhasznalonev']?></a></td>
                 <td><a href="<?=$kattinthatolink?>"><?=$x['email']?></a></td>
                 <td nowrap><a href="<?=$kattinthatolink?>"><?=$x['telefon']?></a></td>
-                <td><a href="<?=$kattinthatolink?>"><?=$x['alakulat']?></a></td>
+                <td><a href="<?=$kattinthatolink?>"><?=$x['szervezet']?></a></td>
                 <td><a href="<?=$kattinthatolink?>"><?=$x['osztaly']?></a></td>
                 <td><a href="<?=$kattinthatolink?>"><?=$x['beosztas']?></a></td>
                 <td><a href="<?=$kattinthatolink?>"><?=$x['elsobelepes']?></a></td>

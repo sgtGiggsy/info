@@ -200,40 +200,18 @@ function timeStampForSQL()
 	return date('Y-m-d H:i:s');
 }
 
-function alakulatValaszto($ldapres)
+function szervezetValaszto($ldapres)
 {
-	if(str_contains($ldapres, "101"))
+	if($ldapres)
 	{
-		return 1;
-	}
-	elseif(str_contains($ldapres, "43") || str_contains($ldapres, "51"))
-	{
-		return 2;
-	}
-	elseif(str_contains($ldapres, "Légijármű") || str_contains($ldapres, "LéJÜ") || str_contains($ldapres, "MH Lé.Jü.") || str_contains($ldapres, "MH Lé. Jü.")) 
-	{
-		return 3;
-	}
-	elseif(str_contains($ldapres, "Légi Műveleti") || str_contains($ldapres, "LMV"))
-	{
-		return 4;
-	}
-	elseif(str_contains($ldapres, "Katonai Igazgatási és Központi") || str_contains($ldapres, "KIKNYP"))
-	{
-		return 5;
-	}
-	elseif(str_contains($ldapres, "38"))
-	{
-		return 6;
-	}
-	elseif(str_contains($ldapres, "Nemzetbiztonsági"))
-	{
-		return 7;
+		@$szervezet = mySQLConnect("SELECT szervezet FROM `szervezetldap` WHERE '$ldapres' LIKE CONCAT('%', szervezetldap.needle, '%');")->fetch_assoc()['szervezet'];
 	}
 	else
 	{
-		return null;
+		$szervezet = null;
 	}
+
+	return $szervezet;
 }
 
 function sortTableHeader($oszlopok, $tablazatnev, $filterinput = false, $sortinput = true, $szuloszur = true, $sortbyurl = false, $onchange = false, $oszlopszam = 0)
@@ -493,12 +471,12 @@ function bugTypePicker($current)
 	</div><?php
 }
 
-function felhasznaloPicker($current, $selectnev, $alakulat = null)
+function felhasznaloPicker($current, $selectnev, $szervezet = null)
 {
 	$where = null;
-	if($alakulat)
+	if($szervezet)
 	{
-		$where = "WHERE alakulat = $alakulat";
+		$where = "WHERE szervezet = $szervezet";
 	}
 	$felhasznalok = mySQLConnect("SELECT id, nev FROM felhasznalok $where ORDER BY nev ASC");
 
@@ -511,15 +489,15 @@ function felhasznaloPicker($current, $selectnev, $alakulat = null)
 	?></select><?php
 }
 
-function alakulatPicker($current, $selectnev = 'alakulat', $hosszu = false)
+function szervezetPicker($current, $selectnev = 'szervezet', $hosszu = false)
 {
-	$alakulatok = mySQLConnect("SELECT * FROM alakulatok;");
+	$szervezetek = mySQLConnect("SELECT * FROM szervezetek;");
 
 	?><div>
-		<label for="<?=$selectnev?>">Alakulat:</label><br>
+		<label for="<?=$selectnev?>">szervezet:</label><br>
 		<select id="<?=$selectnev?>" name="<?=$selectnev?>">
 			<option value="" selected></option><?php
-			foreach($alakulatok as $x)
+			foreach($szervezetek as $x)
 			{
 				?><option value="<?=$x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=(!$hosszu) ? $x['rovid'] : $x['nev']?></option><?php
 			}
@@ -1034,7 +1012,7 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
 	}
 }
 
-function hibajegyErtesites($ertesites, $szoveg, $hibajegyid, $felhasznalo, $alakulat, $szak = null)
+function hibajegyErtesites($ertesites, $szoveg, $hibajegyid, $felhasznalo, $szervezet, $szak = null)
 {
 	$url = "hibajegy/$hibajegyid";
 	$tipus = "11";
@@ -1056,7 +1034,7 @@ function hibajegyErtesites($ertesites, $szoveg, $hibajegyid, $felhasznalo, $alak
                 	INNER JOIN csoporttagsagok ON csoportok.id = csoporttagsagok.csoport
 					INNER JOIN csoportjogok ON csoporttagsagok.csoport = csoportjogok.csoport
 					INNER JOIN jogosultsagok ON jogosultsagok.felhasznalo = csoporttagsagok.felhasznalo
-    			WHERE menupont = 11 AND iras > 1 AND csoportjogok.alakulat = $alakulat $szak
+    			WHERE menupont = 11 AND iras > 1 AND csoportjogok.szervezet = $szervezet $szak
 			UNION
 			SELECT id AS felhasznalo, '$ertesitesid' FROM felhasznalok WHERE id = $felhasznalo;");
 }
@@ -1087,14 +1065,14 @@ function revertXSSfilter($string)
 
 function csoportWhere($csoporttagsagok, $csopwhereset)
 {
-	$alakulatok = array();
+	$szervezetek = array();
     $telephelyek = array();
 
 	foreach($csoporttagsagok as $csoportjog)
     {
-        if($csoportjog['alakulat'] && !in_array($csoportjog['alakulat'], $alakulatok))
+        if($csoportjog['szervezet'] && !in_array($csoportjog['szervezet'], $szervezetek))
 		{
-			$alakulatok[] = $csoportjog['alakulat'];
+			$szervezetek[] = $csoportjog['szervezet'];
 		}
 		elseif($csoportjog['telephely'] && !in_array($csoportjog['telephely'], $telephelyek))
 		{
@@ -1109,9 +1087,9 @@ function csoportWhere($csoporttagsagok, $csopwhereset)
 		$where = "AND (";
 	}
 
-	if($csopwhereset['alakulatelo'])
+	if($csopwhereset['szervezetelo'])
 	{
-		$csopwhereset['alakulatelo'] = $csopwhereset['alakulatelo'] . ".";
+		$csopwhereset['szervezetelo'] = $csopwhereset['szervezetelo'] . ".";
 	}
 
 	if($csopwhereset['telephelyelo'])
@@ -1119,29 +1097,29 @@ function csoportWhere($csoporttagsagok, $csopwhereset)
 		$csopwhereset['telephelyelo'] = $csopwhereset['telephelyelo'] . ".";
 	}
 
-	$alakulatdb = count($alakulatok);
+	$szervezetdb = count($szervezetek);
 	$telepehelydb = count($telephelyek);
 
 	$wherealak = "";
 	$wheretelep = "";
 	
-	for($i = 0; $i < $alakulatdb; $i++)
+	for($i = 0; $i < $szervezetdb; $i++)
 	{
-		$wherealak .= $csopwhereset['alakulatelo'] . $csopwhereset['alakulatmegnevezes'] . " = " . $alakulatok[$i];
+		$wherealak .= $csopwhereset['szervezetelo'] . $csopwhereset['szervezetmegnevezes'] . " = " . $szervezetek[$i];
 
-		if($i != $alakulatdb - 1)
+		if($i != $szervezetdb - 1)
 		{
 			$wherealak .= " OR ";
 		}
 	}
 
-	if($csopwhereset['alakulatnull'])
+	if($csopwhereset['szervezetnull'])
 	{
-		if($alakulatdb > 0)
+		if($szervezetdb > 0)
 		{
 			$wherealak .= " OR ";
 		}
-		$wherealak .= $csopwhereset['alakulatelo'] . $csopwhereset['alakulatmegnevezes'] . " IS NULL";
+		$wherealak .= $csopwhereset['szervezetelo'] . $csopwhereset['szervezetmegnevezes'] . " IS NULL";
 	}
 
 	for($i = 0; $i < $telepehelydb; $i++)
@@ -1165,9 +1143,9 @@ function csoportWhere($csoporttagsagok, $csopwhereset)
 
 	if(!$csopwhereset['tipus'])
 	{
-		if($telepehelydb == 0 && $alakulatdb == 0)
+		if($telepehelydb == 0 && $szervezetdb == 0)
 		{
-			$where .= $csopwhereset['telephelyelo'] . "telephely = 999 AND " . $csopwhereset['alakulatelo'] . $csopwhereset['alakulatmegnevezes'] . " = 999";
+			$where .= $csopwhereset['telephelyelo'] . "telephely = 999 AND " . $csopwhereset['szervezetelo'] . $csopwhereset['szervezetmegnevezes'] . " = 999";
 		}
 		else
 		{		
@@ -1179,11 +1157,11 @@ function csoportWhere($csoporttagsagok, $csopwhereset)
 			$where .= $wheretelep;
 		}
 	}
-	elseif($csopwhereset['tipus'] == "alakulat")
+	elseif($csopwhereset['tipus'] == "szervezet")
 	{
-		if($alakulatdb == 0)
+		if($szervezetdb == 0)
 		{
-			$where .= $csopwhereset['alakulatelo'] . $csopwhereset['alakulatmegnevezes'] . " = 999";
+			$where .= $csopwhereset['szervezetelo'] . $csopwhereset['szervezetmegnevezes'] . " = 999";
 		}
 		else
 		{

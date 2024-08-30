@@ -102,8 +102,8 @@ elseif($mindir && isset($_GET['action']))
         if($_GET['action'] == "addresponsibility")
         {
             $magyarazat .= "<h3>Felelősségi kör hozzáadása</h3><p>Egy felelősségi kör <b>kizárólag</b>
-                alakulatra, vagy telephelyre fonatkozhat, <b>soha</b> nem egyszerre mindkettőre.
-                Ha egy csoportnak alakulatra és telephelyre is jogosultságot szeretnénk adni,
+                szervezetre, vagy telephelyre fonatkozhat, <b>soha</b> nem egyszerre mindkettőre.
+                Ha egy csoportnak szervezetre és telephelyre is jogosultságot szeretnénk adni,
                 úgy azt két külön folyamatban kell megtennünk.</p>";
             $telephelyek = mySQLConnect("SELECT * FROM telephelyek;");
             $button = "Felelősség hozzáadása";

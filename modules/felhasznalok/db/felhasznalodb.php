@@ -9,8 +9,8 @@ if(isset($irhat) && $irhat)
     if($_GET["action"] == "new")
     {
         $elsobelepes = null;
-        $stmt = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, nev, email, telefon, alakulat, elsobelepes) VALUES (?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('ssssss', $_POST['felhasznalonev'], $_POST['nev'], $_POST['email'], $_POST['telefon'], $_POST['alakulat'], $elsobelepes);
+        $stmt = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, nev, email, telefon, szervezet, elsobelepes) VALUES (?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('ssssss', $_POST['felhasznalonev'], $_POST['nev'], $_POST['email'], $_POST['telefon'], $_POST['szervezet'], $elsobelepes);
         $stmt->execute();
 
         if(mysqli_errno($con) != 0)
@@ -23,8 +23,8 @@ if(isset($irhat) && $irhat)
     elseif($_GET["action"] == "update")
     {
         $elsobelepes = null;
-        $stmt = $con->prepare('UPDATE felhasznalok SET felhasznalonev=?, nev=?, email=?, telefon=?, alakulat=? WHERE id=?');
-        $stmt->bind_param('ssssss', $_POST['felhasznalonev'], $_POST['nev'], $_POST['email'], $_POST['telefon'], $_POST['alakulat'], $_POST['id']);
+        $stmt = $con->prepare('UPDATE felhasznalok SET felhasznalonev=?, nev=?, email=?, telefon=?, szervezet=? WHERE id=?');
+        $stmt->bind_param('ssssss', $_POST['felhasznalonev'], $_POST['nev'], $_POST['email'], $_POST['telefon'], $_POST['szervezet'], $_POST['id']);
         $stmt->execute();
 
         if(mysqli_errno($con) != 0)
@@ -98,6 +98,7 @@ if(isset($irhat) && $irhat)
                 $ldapbind = ldap_bind($ldapconnection, $ldapusername, $plainpassword); // LDAP bejelentkezés, mivel nem errort, csak warningot dobhat hiba esetén, el kell nyomni a hibaüzenetet
                 if($ldapbind)
                 {
+                    $szervezetnevarray = array(); // Gyorsítótárazzuk a szervezetneveket, hogy ne kelljen annyi SQL lekérdezést végrehajtani
                     $felhasznalok = mySQLConnect("SELECT * FROM felhasznalok");
                     foreach($felhasznalok as $felhasznalo)
                     {
@@ -110,17 +111,25 @@ if(isset($irhat) && $irhat)
                             // Ha nincs email, vagy megjelenő név valakinél megadva, warningot dobna a lekérés, így el kell nyomnunk az esetleges hibaüzenetet
                             if(@$ldapresults[0]['displayname'][0])
                             {
+                                if(!array_key_exists($ldapresults[0]['company'][0], $szervezetnevarray))
+                                {
+                                    $szervezet = szervezetValaszto($ldapresults[0]['company'][0]);
+                                    $szervezetnevarray[$ldapresults[0]['company'][0]] = $szervezet;
+                                }
+                                else
+                                {
+                                    $szervezet = $szervezetnevarray[$ldapresults[0]['company'][0]];
+                                }
                                 @$email = $ldapresults[0]['mail'][0];
                                 @$nev = $ldapresults[0]['displayname'][0];
                                 @$osztaly = $ldapresults[0]['department'][0];
-                                @$alakulat = alakulatValaszto($ldapresults[0]['company'][0]);
                                 @$telefon = $ldapresults[0]['telephonenumber'][0];
                                 @$beosztas = $ldapresults[0]['title'][0];
                                 @$thumb = $ldapresults[0]['thumbnailphoto'][0];
         
-                                if ($stmt = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, alakulat=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?'))
+                                if ($stmt = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?'))
                                 {
-                                    $stmt->bind_param('ssssssss', $nev, $email, $osztaly, $alakulat, $telefon, $beosztas, $thumb, $samaccountname);
+                                    $stmt->bind_param('ssssssss', $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb, $samaccountname);
                                     $stmt->execute();
                                 }
                             }
