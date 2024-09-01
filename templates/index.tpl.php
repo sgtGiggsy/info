@@ -7,7 +7,7 @@
 	<link rel="shortcut icon" href="<?=$RootPath?>/favicon.ico"><?php
 	if(isset($szemelyes['szinsema']) && $szemelyes['szinsema'])
 	{
-		?><link rel="stylesheet" href="<?=$RootPath?>/<?=$szemelyes['szinsema']?>.css" type="text/css"><?php
+		?><link rel="stylesheet" href="<?=$RootPath?>/<?=$szemelyes['szinsema']?>.css" type="text/css" id='nightmode'><?php
 	}
 	?><link rel="stylesheet" href="<?=$RootPath?>/style.css" type="text/css">
 	<title><?=$ablakcim . " - " . $currentpage['gyujtocimszoveg']?></title>

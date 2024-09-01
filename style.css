@@ -142,6 +142,8 @@ ol, ul {
 
 svg {
     fill: var(--basefont);
+    height: 1.7em;
+    width: 1.7em;
 }
 
 fieldset {
@@ -541,7 +543,10 @@ div[id^=kep-].shrink img {
     background-color: var(--cardbase);
     border-radius: 15px;
     padding: unset;
-    /*overflow: hidden;*/
+}
+
+.szerkcard {
+    overflow: hidden;
 }
 
 .szerkcardtitle {
@@ -551,9 +556,9 @@ div[id^=kep-].shrink img {
     border-bottom: 1px var(--lightborder) solid;
     font-size: 1.3em;
     font-weight: bold;
-    padding: 1em;
+    padding: 0.5em 1em;
     position: relative;
-    align-items: start;
+    align-items: center;
     background-clip: border-box;
 }
 
@@ -2325,13 +2330,8 @@ td img {
 
 /* Lenyílók a címben */
 .szuresvalaszto, .help {
-    position: absolute;
-    right: 6px;
     text-align: right;
-}
-
-.szuresvalaszto {
-    top: 3px;
+    margin-left: auto;
 }
 
 /* Közlemények */
