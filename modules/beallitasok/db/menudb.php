@@ -21,14 +21,12 @@ if(isset($irhat) && $irhat)
 
     elseif($_GET["action"] == "update")
     {        
-        $postid = 1;
-        $ujsor = true;
-        do
+        foreach($_POST['menupont'] as $key)
         {
-            if(isset($_POST['id-'.$postid]))
+            if(count($key) > 1)
             {
                 $stmt = $con->prepare('UPDATE menupontok SET menupont=?, szulo=?, url=?, oldal=?, cimszoveg=?, szerkoldal=?, aktiv=?, menuterulet=?, sorrend=?, gyujtourl=?, gyujtocimszoveg=?, gyujtooldal=?, dburl=?, dboldal=?, apiurl=? WHERE id=?');
-                $stmt->bind_param('sssssssssssssssi', $_POST['menupont-'.$postid], $_POST['szulo-'.$postid], $_POST['url-'.$postid], $_POST['oldal-'.$postid], $_POST['cimszoveg-'.$postid], $_POST['szerkoldal-'.$postid], $_POST['aktiv-'.$postid], $_POST['menuterulet-'.$postid], $_POST['sorrend-'.$postid], $_POST['gyujtourl-'.$postid], $_POST['gyujtocimszoveg-'.$postid], $_POST['gyujtooldal-'.$postid], $_POST['dburl-'.$postid], $_POST['dboldal-'.$postid], $_POST['apiurl-'.$postid], $_POST['id-'.$postid]);
+                $stmt->bind_param('sssssssssssssssi', $key['menupont'], $key['szulo'], $key['url'], $key['oldal'], $key['cimszoveg'], $key['szerkoldal'], $key['aktiv'], $key['menuterulet'], $key['sorrend'], $key['gyujtourl'], $key['gyujtocimszoveg'], $key['gyujtooldal'], $key['dburl'], $key['dboldal'], $key['apiurl'], $key['id']);
                 $stmt->execute();
                 if(mysqli_errno($con) != 0)
                 {
@@ -36,12 +34,7 @@ if(isset($irhat) && $irhat)
                     echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
                 }
             }
-            else
-            {
-                $ujsor = false;
-            }
-            $postid++;
-        } while ($ujsor);
+        }
     }
 
     elseif($_GET["action"] == "delete")

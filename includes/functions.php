@@ -1283,15 +1283,50 @@ function purifyPost($ishtml = false)
 {
 	foreach($_POST as $key => $value)
     {
-        if ($value == "NULL" || $value == "")
-        {
-            $_POST[$key] = NULL;
-        }
-		elseif(!$ishtml)
-        {
-            $_POST[$key] = quickXSSfilter($value);
-        }
-    }
+        if(is_array($value))
+		{
+			foreach($value as $key2 => $value2)
+			{
+				if(is_array($value2))
+				{
+					foreach($value2 as $key3 => $value3)
+					{
+						if ($value3 == "NULL" || $value3 == "")
+						{
+							$_POST[$key][$key2][$key3] = NULL;
+						}
+						elseif(!$ishtml)
+						{
+							$_POST[$key][$key2][$key3] = quickXSSfilter($value3);
+						}
+					}
+				}
+				else
+				{
+					if ($value2 == "NULL" || $value2 == "")
+					{
+						$_POST[$key][$key2] = NULL;
+					}
+					elseif(!$ishtml)
+					{
+						$_POST[$key][$key2] = quickXSSfilter($value2);
+					}
+				}
+			}
+		}
+		else
+		{
+			if ($value == "NULL" || $value == "")
+			{
+				echo "null";
+				$_POST[$key] = NULL;
+			}
+			elseif(!$ishtml)
+			{
+				$_POST[$key] = quickXSSfilter($value);
+			}
+		}
+	}
 }
 
 function purifyArray($array)
