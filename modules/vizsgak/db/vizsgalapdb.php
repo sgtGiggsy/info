@@ -38,4 +38,12 @@ else
 
         mySQLConnect($vizsgalapkerdesinsertstring);
     }
+
+    elseif($_GET["action"] == "delete")
+    {
+        $disable = 0;
+        $stmt = $con->prepare('UPDATE vizsgak_vizsgalapok SET aktiv = ? WHERE id = ?');
+        $stmt->bind_param('si', $disable, $_GET['lapid']);
+        $stmt->execute();
+    }
 }

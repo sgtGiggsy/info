@@ -66,6 +66,7 @@ if(@$mindir)
                     {
                         $elozovizsga = $vizsga['vizsganev'];
                         $elozoszerkeszto = "";
+                        $elozoengedelyezett = $vizsga['engedfelh'];
                     
                         ?><tr>
                             <td colspan=<?=count($oszlopok)?> class="telefonkonyvelvalaszto">
@@ -79,9 +80,10 @@ if(@$mindir)
                         
                     }
                 }
-                if($mindir && $elozoszerkeszto != $vizsga['szerkesztoid'])
+                if($mindir && $elozoszerkeszto != $vizsga['szerkesztoid'] && (!$vizsga['engedfelh'] || $elozoengedelyezett == $vizsga['engedfelh']))
                 {
                     $elozoszerkeszto = $vizsga['szerkesztoid'];
+                    
                     ?><tr>
                         <td></td>
                         <td><a href='<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/adminszerkeszt/<?=$vizsga['szerkesztoid']?>'><?=$vizsga['vizsgaadmin']?></td>

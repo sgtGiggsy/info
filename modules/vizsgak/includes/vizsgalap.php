@@ -64,6 +64,14 @@ else
         header("Location: $RootPath/vizsga/$vizsgaurl/vizsgalapok");
     }
 
+    elseif(isset($_GET['action']) && $_GET['action'] == "delete")
+    {
+        $irhat = true;
+        $vizsgaurl = $vizsgaadatok['url'];
+        include("./modules/vizsgak/db/vizsgalapdb.php");
+        header("Location: $RootPath/vizsga/$vizsgaurl/vizsgalapok");
+    }
+
     else
     {
         $kerdeseklistaja = mySQLConnect("SELECT vizsgak_vizsgalapok.azonosito AS azonosito,

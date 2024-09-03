@@ -322,3 +322,12 @@ function hideNewsflash()
     let newsflash = document.getElementById("newsflash");
     newsflash.className = newsflash.className.replace("show", "");
 }
+
+function confirmSend(text, link)
+{
+    let conf = confirm(text);
+    if(conf)
+    {
+        window.document.location = link;
+    }
+}
