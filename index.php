@@ -4,6 +4,8 @@ include('./includes/config.inc.php');
 include('./includes/functions.php');
 $RootPath = getenv('APP_ROOT_PATH');
 $dbcallcount = 0;
+$logid = null;
+$params = array();
 
 // Session indítása, vagy folytatása
 if (session_status() == PHP_SESSION_NONE) {
@@ -23,6 +25,11 @@ $page = $id = $current = $felhasznaloid = null; $loginsuccess = false;
 // Címsorból vett GET értékek tisztítása nemkívánt karakterektől
 foreach($_GET as $key => $value)
 {
+    if($key != "page" && $key != "subpage" && $key != "id")
+    {
+        $params[$key] = $value;
+    }
+    
     $value = trim($value);
     $value = strip_tags($value);
     $value = str_replace(array("\r\n", "\r", "\n", "'", "\"", "<", ">", ";", ":", "(", ")"), "", $value);
@@ -103,7 +110,7 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
                         @$email = $ldapresults[0]['mail'][0];
                         @$nev = $ldapresults[0]['displayname'][0];
                         @$osztaly = $ldapresults[0]['department'][0];
-                        @$alakulat = szervezetValaszto($ldapresults[0]['company'][0]);
+                        @$szervezet = szervezetValaszto($ldapresults[0]['company'][0]);
                         @$telefon = $ldapresults[0]['telephonenumber'][0];
                         @$beosztas = $ldapresults[0]['title'][0];
                         @$thumb = $ldapresults[0]['thumbnailphoto'][0];
@@ -469,7 +476,9 @@ if($felhasznaloid && @$szemelyes['switchstateshow'])
     $javascriptfiles[] = "modules/eszkozok/includes/eszkozonlinecheck.js";
 }
 
-// Oldal megjelenítése
+logActivity($felhasznaloid, $params);
+include('./templates/svg.tpl.php');
+// Oldal megjelenítése , $params
 include('./templates/index.tpl.php');
 
 ?>

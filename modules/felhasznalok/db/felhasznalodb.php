@@ -99,7 +99,7 @@ if(isset($irhat) && $irhat)
                 if($ldapbind)
                 {
                     $szervezetnevarray = array(); // Gyorsítótárazzuk a szervezetneveket, hogy ne kelljen annyi SQL lekérdezést végrehajtani
-                    $felhasznalok = mySQLConnect("SELECT * FROM felhasznalok");
+                    $felhasznalok = mySQLConnect("SELECT * FROM felhasznalok;");
                     foreach($felhasznalok as $felhasznalo)
                     {
                         $samaccountname = $felhasznalo['felhasznalonev'];
@@ -111,14 +111,21 @@ if(isset($irhat) && $irhat)
                             // Ha nincs email, vagy megjelenő név valakinél megadva, warningot dobna a lekérés, így el kell nyomnunk az esetleges hibaüzenetet
                             if(@$ldapresults[0]['displayname'][0])
                             {
-                                if(!array_key_exists($ldapresults[0]['company'][0], $szervezetnevarray))
+                                if(isset($ldapresults[0]['company'][0]))
                                 {
-                                    $szervezet = szervezetValaszto($ldapresults[0]['company'][0]);
-                                    $szervezetnevarray[$ldapresults[0]['company'][0]] = $szervezet;
+                                    if(array_key_exists($ldapresults[0]['company'][0], $szervezetnevarray))
+                                    {
+                                        $szervezet = $szervezetnevarray[$ldapresults[0]['company'][0]];
+                                    }
+                                    else
+                                    {
+                                        $szervezet = szervezetValaszto($ldapresults[0]['company'][0]);
+                                        $szervezetnevarray[$ldapresults[0]['company'][0]] = $szervezet;
+                                    }
                                 }
                                 else
                                 {
-                                    $szervezet = $szervezetnevarray[$ldapresults[0]['company'][0]];
+                                    $szervezet = null;
                                 }
                                 @$email = $ldapresults[0]['mail'][0];
                                 @$nev = $ldapresults[0]['displayname'][0];
@@ -135,6 +142,10 @@ if(isset($irhat) && $irhat)
                             }
                         }
                     }
+                }
+                else
+                {
+                    echo "A megadott felhasználónév, vagy jelszó nem megfelelő!";
                 }
                 break;
             }

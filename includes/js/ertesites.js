@@ -22,7 +22,10 @@ function seenNotif(notifid) {
 }
 
 window.addEventListener("load", (event) => {
-    seenNotif(urlParams.get('ertesites'));
+    if(urlParams.get('ertesites'))
+    {
+        seenNotif(urlParams.get('ertesites'));
+    }
     var notifcount = document.getElementById("notifcount").textContent;
     if(urlParams.get('ertesites'))
     {

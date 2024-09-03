@@ -133,6 +133,29 @@ function logLogin($felhasznalo)
 	}
 }
 
+function logActivity($felhasznalo, $params)
+{
+
+	@$menupont = $_GET['page'];
+	@$almenu = $_GET['subpage'];
+	@$elemid = $_GET['id'];
+	if(count($params) > 0)
+	{
+		$params = json_encode($params);
+	}
+	else
+	{
+		$params = null;
+	}
+	
+	$con = mySQLConnect(false);
+	if ($stmt = $con->prepare('INSERT INTO felhasznalotevekenysegek (felhasznalo, ipcim, menupont, almenu, elemid, params) VALUES (?, ?, ?, ?, ?, ?)'))
+    {
+        $stmt->bind_param('ssssss', $felhasznalo, $_SERVER['REMOTE_ADDR'], $menupont, $almenu, $elemid, $params);
+		$stmt->execute();
+	}
+}
+
 function csvToArray($csv)
 {
 	$bom = pack('CCC', 0xEF, 0xBB, 0xBF);
