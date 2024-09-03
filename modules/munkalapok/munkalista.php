@@ -77,24 +77,21 @@ else
     
     $munkak = mySQLConnect("SELECT munkalapok.id AS id, hely, telephelyek.telephely AS telephely,
             epuletek.szam AS epulet, epulettipusok.tipus AS eptipus, helyisegek.helyisegszam AS helyiseg,
-            igenylo, igenylesideje, vegrehajtasideje, munkavegzo1, munkavegzo2, leiras, eszkoz,
-            felhasznalok.nev AS igenylonev,
-            felhasznalok.telefon AS igenylotelefon,
+            igenylonev, igenylotelefon, igenylesideje, vegrehajtasideje, leiras, eszkoz,
             szervezetek.rovid AS igenyloszervezet,
-            mv1.nev AS munkavegzo1nev,
-            mv1.telefon AS munkavegzo1telefon,
-            mv1.beosztas AS munkavegzo1beosztas,
-            mv2.nev AS munkavegzo2nev,
-            mv2.telefon AS munkavegzo2telefon,
-            mv2.beosztas AS munkavegzo2beosztas
+            munkavegzo1nev,
+            munkavegzo1telefon,
+            munkavegzo1beosztas,
+            munkavegzo2nev,
+            munkavegzo2telefon,
+            munkavegzo2beosztas,
+            IF(vegrehajtasideje > date_sub(now(), INTERVAL 31 DAY), 1, 0) AS modenged
         FROM munkalapok
             LEFT JOIN helyisegek ON munkalapok.hely = helyisegek.id
             LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
             LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
             LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
             LEFT JOIN felhasznalok ON munkalapok.igenylo = felhasznalok.id
-            LEFT JOIN felhasznalok mv1 ON munkalapok.munkavegzo1 = mv1.id
-            LEFT JOIN felhasznalok mv2 ON munkalapok.munkavegzo2 = mv2.id
             LEFT JOIN szervezetek ON felhasznalok.szervezet = szervezetek.id
         $where $csoportwhere
         ORDER BY munkalapok.id DESC
@@ -192,7 +189,7 @@ else
                 <td><?=$munka['eszkoz']?></td>
                 <td><?=$munka['munkavegzo1nev']?></td>
                 <td><a style="cursor: pointer;" onclick="window.open('<?=$RootPath?>/munkaszerkeszt/<?=$munka['id']?>?action=print')"><img src='<?=$RootPath?>/images/print.png' alt='Munkalap nyomtatása' title='Munkalap nyomtatása' /></a></td>
-                <td><?=($csoportir) ? "<a href='$RootPath/munkaszerkeszt/$munkid'><img src='$RootPath/images/edit.png' alt='Munka szerkesztése' title='Munka szerkesztése'/></a>" : "" ?></td>
+                <td><?=($csoportir && $munka['modenged']) ? "<a href='$RootPath/munkaszerkeszt/$munkid'><img src='$RootPath/images/edit.png' alt='Munka szerkesztése' title='Munka szerkesztése'/></a>" : "" ?></td>
             </tr><?php
         }
         ?></tbody>

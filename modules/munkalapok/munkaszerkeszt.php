@@ -19,6 +19,7 @@ else
     }
 
     $igenylo = $igenylesideje = $vegrehajtasideje = $munkavegzo2 = $leiras = $eszkoz = null;
+    $modenged = true;
     $javascriptfiles[] = "modules/munkalapok/includes/templatebeszur.js";
     $hely = $_SESSION[getenv('SESSION_NAME')."defaultmunkahely"];
     $ugyintezo = $_SESSION[getenv('SESSION_NAME')."defaultugyintezo"];
@@ -40,7 +41,7 @@ else
     {
         $munkaid = $_GET['id'];
         
-        $munka = mySQLConnect("SELECT * FROM munkalapok WHERE id = $munkaid");
+        $munka = mySQLConnect("SELECT *, IF(vegrehajtasideje > date_sub(now(), INTERVAL 31 DAY), 1, 0) AS modenged FROM munkalapok WHERE id = $munkaid");
         $munka = mysqli_fetch_assoc($munka);
 
         $hely = $munka['hely'];
@@ -52,6 +53,7 @@ else
         $leiras = $munka['leiras'];
         $eszkoz = $munka['eszkoz'];
         $ugyintezo = $munka['ugyintezo'];
+        $modenged = $munka['modenged'];
 
         $button = "Munka szerkesztése";
         $button2 = "Munka szerkesztése és nyomtatása";
@@ -108,7 +110,7 @@ else
                         foreach($templateek as $template)
                         {
                             ?><div class="beszurtorol">
-                                <button onclick="templateBeszur('<?=$template['szoveg']?>', '<?=$template['id']?>'); return false;" type="button"><?=$template['szoveg']?></button><button onclick="templateTorol('<?=$template['szoveg']?>'); return false;" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg></button>
+                                <button onclick="templateBeszur('<?=$template['szoveg']?>', '<?=$template['id']?>'); return false;" type="button"><?=$template['szoveg']?></button><button onclick="templateTorol('<?=$template['szoveg']?>'); return false;" type="button"><?=$deleteicon?></button>
                             </div><?php
                         }
                     ?></div>
@@ -122,13 +124,16 @@ else
                         <textarea name="eszkoz" id="eszkoz"><?=$eszkoz?></textarea>
                     </div>
 
-                    <div class="submit">
-                        <input type="submit" name="beKuld" value="<?=$button?>">
-                    </div>
-                    <div class="submit" style="padding-top: 5px;">        
-                        <input type="submit" onclick="window.open('<?=$RootPath?>/munkaszerkeszt/<?=$munka['id']?>?action=print')" name="nyomtat" value="<?=$button2?>">
-                    </div>
-                </form><?php
+                    <?php if($modenged)
+                    {
+                        ?><div class="submit">
+                            <input type="submit" name="beKuld" value="<?=$button?>">
+                        </div>
+                        <div class="submit" style="padding-top: 5px;">        
+                            <input type="submit" onclick="window.open('<?=$RootPath?>/munkaszerkeszt/<?=$munka['id']?>?action=print')" name="nyomtat" value="<?=$button2?>">
+                        </div><?php
+                    }
+                ?></form><?php
                 cancelForm();
                 ?></div>
             </div>
