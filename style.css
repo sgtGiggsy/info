@@ -146,6 +146,10 @@ svg {
     width: 1.7em;
 }
 
+button svg {
+    fill: var(--fontlight2);
+}
+
 fieldset {
     border: 0px;
 }
@@ -165,6 +169,11 @@ fieldset {
     position: absolute;
     right: 5px;
     top: 5px;
+}
+
+.buttonininput svg {
+    height: 1.25em;
+    width: 1.25em;
 }
 
 /* Görgetősáv */
@@ -1654,6 +1663,12 @@ td img {
     padding: unset;
 }
 
+@-moz-document url-prefix() {
+    .trlink td{
+      height: 100%;
+    }
+  } 
+
 .trlink td a {
     padding: 0.5em 0.3em 0.5em 0.3em;
     display: flex;
@@ -2093,6 +2108,8 @@ td img {
 }
 
 .leftmenuarea {
+    position: sticky;
+    top: 0;
     width: 200px;
     left: 0;
     right: 0;
@@ -2389,6 +2406,16 @@ td img {
 .prevselnext {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+}
+
+.prevnext {
+    display: flex;
+}
+
+.prevnext div:nth-child(2)
+{
+    display: flex;
+    justify-content: right;
 }
 
 .allapotjelentesek {
@@ -3296,12 +3323,6 @@ div[id^=tennivalobody-].close {
 .beszurtorol {
     display: grid;
     grid-template-columns: 1fr auto;
-}
-
-.beszurtorol svg {
-    width: 1.7em;
-    height: 1.7em;
-    fill: var(--fontlight2);
 }
 
 .beszurtorol button:nth-child(1) {
