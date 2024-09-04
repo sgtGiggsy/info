@@ -9,7 +9,7 @@ if(@$irhat)
             <div class="kereses" id="kereses">
                 <div class="felkormezo">
                     <input type="text" name="listaszur" id="listaszur" placeholder="Szűrés névre, vagy felhasználónévre" aria-label="Keresés" onkeyup="listaSzur()" />
-                    <button class="felkorbutton" class="searchicon"><?=$searchicon?></button>
+                    <button class="felkorbutton" class="searchicon"><?=$icons['search']?></button>
                 </div>
             </div>
         </div>

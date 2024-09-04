@@ -16,7 +16,7 @@ if(isset($beuszok) && $beuszok)
     }
 }
 ?><div class="szerkcard">
-    <div class="szerkcardtitle"><?=$oldalcim?><a class="help" onclick="rejtMutat('magyarazat')"><?=$helpicon?></a></div><?php
+    <div class="szerkcardtitle"><?=$oldalcim?><a class="help" onclick="rejtMutat('magyarazat')"><?=$icons['help']?></a></div><?php
     if(isset($beuszok) && $beuszok)
     {
         $i = 1;

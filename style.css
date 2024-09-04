@@ -1614,6 +1614,11 @@ tr:nth-child(odd) {
     right: 2px;
 }
 
+.trlink svg {
+    height: 2.5em;
+    width: 2.5em;
+}
+
 tr a, td a, th a {
     text-decoration: none;
 }
@@ -1787,8 +1792,14 @@ td img {
     transition: 0.5s;
 }
 
-.topmenuikonok img:hover {
-    filter: brightness(40%);
+.topmenuikonok svg {
+    width: 2.3em;
+    height: 2.3em;
+    margin-left: 0.5em;
+}
+
+.topmenuikonok svg:hover {
+    filter: brightness(60%);
     transition: 0.5s;
 }
 

@@ -10,7 +10,7 @@ if(isset($enablekeres) && $enablekeres)
         <form name="kereses" method="GET">
             <div class="felkormezo">
                 <input type="text" name="kereses" placeholder="Keresés" aria-label="Keresés" />
-                <button class="felkorbutton" class="searchicon"><?=$searchicon?></button>
+                <button class="felkorbutton" class="searchicon"><?=$icons['search']?></button>
             </div>
         </form>
     </div><?php
@@ -40,7 +40,7 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
 
     ?><div id="notifications">
         <a style="cursor: pointer" onclick="showPopup('notifpopup');updateNotif()">
-            <img src="<?=$RootPath?>/images/notification.png" title="Értesítések" alt="Értesítések">
+            <?=$icons['notifications']?>
         </a>
         <div id="notifcount" onclick="showPopup('notifpopup')" style="display: <?=($ujertesites) ? 'block' : 'none' ?> "><?=$ujertesites?></div>
     </div>

@@ -110,7 +110,7 @@ else
                         foreach($templateek as $template)
                         {
                             ?><div class="beszurtorol">
-                                <button onclick="templateBeszur('<?=$template['szoveg']?>', '<?=$template['id']?>'); return false;" type="button"><?=$template['szoveg']?></button><button onclick="templateTorol('<?=$template['szoveg']?>'); return false;" type="button"><?=$deleteicon?></button>
+                                <button onclick="templateBeszur('<?=$template['szoveg']?>', '<?=$template['id']?>'); return false;" type="button"><?=$template['szoveg']?></button><button onclick="templateTorol('<?=$template['szoveg']?>'); return false;" type="button"><?=$icons['delete']?></button>
                             </div><?php
                         }
                     ?></div>

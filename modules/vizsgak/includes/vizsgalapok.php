@@ -68,8 +68,8 @@ else
                         <td><a href="<?=$kattinthatolink?>"><?=$lap['azonosito']?></a></td>
                         <td><a href="<?=$kattinthatolink?>"><?=$lap['nev']?></a></td>
                         <td><a href="<?=$kattinthatolink?>"><?=$lap['timestamp']?></a></td>
-                        <td><a style="cursor: pointer;" onclick="window.open('<?=$RootPath?>/vizsga/<?=$vizsgaadatok['url']?>/vizsgalap/<?=$lap['vlapid']?>&action=print')"><?=$printicon?></a></td>
-                        <td><a style="cursor: pointer;" onclick="confirmSend('Biztos törölni szeretnéd ezt a vizsgalapot?', '<?=$RootPath?>/vizsga/<?=$vizsgaadatok['url']?>/vizsgalap?action=delete&lapid=<?=$lap['vlapid']?>')"><?=$deleteicon?></a></td>
+                        <td><a style="cursor: pointer;" onclick="window.open('<?=$RootPath?>/vizsga/<?=$vizsgaadatok['url']?>/vizsgalap/<?=$lap['vlapid']?>&action=print')"><?=$icons['print']?></a></td>
+                        <td><a style="cursor: pointer;" onclick="confirmSend('Biztos törölni szeretnéd ezt a vizsgalapot?', '<?=$RootPath?>/vizsga/<?=$vizsgaadatok['url']?>/vizsgalap?action=delete&lapid=<?=$lap['vlapid']?>')"><?=$icons['delete']?></a></td>
                     </tr>
                     <tr class="trlink">
                         <td><a href="<?=$kattinthatolink?>">&nbsp;</a></td>

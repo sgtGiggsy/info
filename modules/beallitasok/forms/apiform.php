@@ -24,7 +24,7 @@ if(@$irhat)
                             <label for="key">Kulcs</label><br>
                             <div class="buttonininput">
                                 <input type="text" name="key" id="key-<?=$idtocopy?>" value="<?=$api['apikey']?>" disabled />
-                                <a onclick="copyToClipboard('key-<?=$idtocopy?>')" style="cursor: pointer"><?=$clipboardicon?></a>
+                                <a onclick="copyToClipboard('key-<?=$idtocopy?>')" style="cursor: pointer"><?=$icons['clipboard']?></a>
                             </div>
                         </div>
 

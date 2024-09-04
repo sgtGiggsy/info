@@ -151,11 +151,11 @@ else
                             {
                                 ?><td><a href="<?=$kattinthatolink?>"><?=$eszkoz['megjegyzes']?><?=($eszkoz['megjegyzes'] && $eszkoz['emegjegyzes']) ? "<br>" : ""?><?=$eszkoz['emegjegyzes']?></a></td><?php
                                 szerkSor($eszkoz['beepid'], $eszkoz['id'], "aktiveszkoz"); ?>
-                                <td class="dontprint"><a href="telnet://<?=$eszkoz['ipcim']?>"><img src='<?=$RootPath?>/images/ssh.png' alt='Eszköz adminisztrálása' title='Eszköz adminisztrálása'/></a></td>
+                                <td class="dontprint"><a href="telnet://<?=$eszkoz['ipcim']?>"><?=$icons['console']?></a></td>
                                 <td class="dontprint"><?php
                                 if($eszkoz['web'])
                                 {
-                                    ?><a href="http://<?=$eszkoz['ipcim']?>" target="_blank"><img src='<?=$RootPath?>/images/webmanage.png' alt='Webes adminisztráció' title='Webes adminisztráció'/></a><?php
+                                    ?><a href="http://<?=$eszkoz['ipcim']?>" target="_blank"><?=$icons['web']?></a><?php
                                 }
                                 ?></td><?php
                             }
