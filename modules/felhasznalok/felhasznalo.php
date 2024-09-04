@@ -17,7 +17,7 @@ elseif($mindir && isset($_GET['action']))
     $irhat = false;
 
     // Ha a kért művelet nem a szerkesztő oldal betöltése, az adatbázis változót true-ra állítjuk
-    if($_GET['action'] == "new" || $_GET['action'] == "update" || $_GET['action'] == "delete" || $_GET['action'] == "sync" || ($_GET['action'] == "permissions" && count($_POST) > 0))
+    if($_GET['action'] == "new" || $_GET['action'] == "update" || $_GET['action'] == "delete" || $_GET['action'] == "sync" || $_GET['action'] == "syncou" || ($_GET['action'] == "permissions" && count($_POST) > 0))
     {
         $irhat = true;
         $dbir = true;
@@ -31,7 +31,7 @@ elseif($mindir && isset($_GET['action']))
             // Ez jelzi a visszajelző funkciónak, hogy milyen üzenetet kell kiírnia
             $dbop = "szerkesztes";
         }
-        elseif($_GET['action'] == "sync")
+        elseif($_GET['action'] == "sync" || $_GET['action'] == "syncou")
         {
             // Ez jelzi a visszajelző funkciónak, hogy milyen üzenetet kell kiírnia
             $dbop = "szinkronizalas";
@@ -39,7 +39,7 @@ elseif($mindir && isset($_GET['action']))
     }
 
     // Ha a kért művelet a szerkesztő oldal betöltése, az írás változót true-ra állítjuk
-    if($_GET['action'] == "addnew" || $_GET['action'] == "edit" || $_GET['action'] == "sync" || $_GET['action'] == "permissions")
+    if($_GET['action'] == "addnew" || $_GET['action'] == "edit" || $_GET['action'] == "sync" || $_GET['action'] == "syncou" || $_GET['action'] == "permissions")
     {
         $irhat = true;
     }
@@ -122,6 +122,21 @@ elseif($mindir && isset($_GET['action']))
         
         $oldalcim = "Felhasználók szinkronizálása az Active Directory-val";
         $form .= "felhasznalosyncform";
+
+        include('././templates/edit.tpl.php');
+    }
+
+    elseif($_GET['action'] == "syncou")
+    {
+        $magyarazat = "<strong>Kiválasztott OU szinkronizálása</strong>
+            <p>A szinkronizáláshoz kapcsolódni kell az Active Directory-hoz.
+            Kérlek adj meg egy érvényes Active Directory felhasználónevet, jelszót, valamint a szinkronizálni kívánt OU-t a folyamat futtatásához.
+            A megadott felhasználónévnek nem szüksége adminisztrátori jogokkal rendelkeznie.<br>
+            <span style='color: var(--warning)'>A folyamat a felhasználók számától függően akár több percig
+            is eltarthat, és ezalatt a rendszer semmilyen visszajelzést nem ad az állapotról!</span></p>";
+        
+        $oldalcim = "Kiválasztott OU szinkronizálása";
+        $form .= "ousyncform";
 
         include('././templates/edit.tpl.php');
     }

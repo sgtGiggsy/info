@@ -700,15 +700,16 @@ function raktarKeszlet($action, $filter)
 function szerkSor($beepid, $eszkid, $eszktip)
 {
 	$RootPath = getenv('APP_ROOT_PATH');
+	include('.\templates\svg.tpl.php');
 
 	?><td class="dontprint"><?php
 	if($beepid)
 	{
-		?><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?beepites=<?=$beepid?>&action=edit'><img src='<?=$RootPath?>/images/beepites.png' alt='Beépítés szerkesztése' title='Beépítés szerkesztése' /></a><?php
+		?><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?beepites=<?=$beepid?>&action=edit'><?=$icons['deploy']?></a><?php
 	}
 	?></td>
-	<td class="dontprint"><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?beepites&action=addnew'><img src='<?=$RootPath?>/images/newbeep.png' alt='Új beépítés' title='Új beépítés' /></a></td>
-	<td class="dontprint"><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?action=edit'><img src='<?=$RootPath?>/images/edit.png' alt='Eszköz szerkesztése' title='Eszköz szerkesztése'/></a></td><?php
+	<td class="dontprint"><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?beepites&action=addnew'><?=$icons['deploynew']?></a></td>
+	<td class="dontprint"><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?action=edit'><?=$icons['edit']?></a></td><?php
 }
 
 function modId($muvelet, $tipus, $objid)
@@ -1208,18 +1209,21 @@ function csoportWhere($csoporttagsagok, $csopwhereset)
 	return $where;
 }
 
-function mysqliToArray($mysqlires)
+function mysqliToArray($mysqlires, $ondimensional = false)
 {
 	$returnarr = array();
     foreach($mysqlires as $sor)
     {
-        $element = array();
+		$element = array();
 		foreach($sor as $key => $value)
 		{
+			if($ondimensional)
+			{
+				$element = $value;
+				break;
+			}
 			$element[$key] = $value;
 		}
-
-		//$port = array('portid' => $x['portid'], 'port' => $x['port'], 'hasznalatban' => $x['hasznalatban'], 'tipus' => $x['tipus'], 'szam' => $x['szam']);
         $returnarr[] = $element;
     }
 	return $returnarr;
@@ -2095,4 +2099,38 @@ function secondsToFullFormat($seconds)
 	}
 
 	return $ev . $nap . $ora . "$perc perc, $masodperc másodperc";
+}
+
+function ConvertToDistinguishedName($OrganizationalUnit)
+{
+	if(str_contains($OrganizationalUnit, 'DC='))
+	{
+		$forditott = $OrganizationalUnit;
+	}
+	else
+	{
+		$kimenet = explode("/", $OrganizationalUnit);
+		$db = count($kimenet) - 1;
+		$forditott = "";
+		$dcnev = "";
+		for ($i = $db; $i > -1; $i--) #Loop starts from the last section of the string array to put them to the front
+		{
+			if ($i != 0) #Do the conversion until we get to the DC part
+			{
+				$forditott .= 'OU="' . $kimenet[$i] . '",';
+			}
+			else #Here's where we turn DC name into DistinguishedName format too
+			{
+				$dcnevold = $kimenet[$i];
+				$dcnevtemp = explode(".", $dcnevold);
+				for ($j = 0; $j < count($dcnevtemp); $j++)
+				{
+					$dcnev .= 'DC="' . $dcnevtemp[$j] . '",';
+				}
+				$forditott .= trim($dcnev, ',');
+			}
+		}
+	}
+
+    return $forditott; #OU name in DistinguishedName form
 }

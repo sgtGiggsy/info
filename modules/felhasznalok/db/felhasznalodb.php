@@ -100,6 +100,7 @@ if(isset($irhat) && $irhat)
                 {
                     $szervezetnevarray = array(); // Gyorsítótárazzuk a szervezetneveket, hogy ne kelljen annyi SQL lekérdezést végrehajtani
                     $felhasznalok = mySQLConnect("SELECT * FROM felhasznalok;");
+                    $stmt = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?');
                     foreach($felhasznalok as $felhasznalo)
                     {
                         $samaccountname = $felhasznalo['felhasznalonev'];
@@ -134,11 +135,8 @@ if(isset($irhat) && $irhat)
                                 @$beosztas = $ldapresults[0]['title'][0];
                                 @$thumb = $ldapresults[0]['thumbnailphoto'][0];
         
-                                if ($stmt = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?'))
-                                {
-                                    $stmt->bind_param('ssssssss', $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb, $samaccountname);
-                                    $stmt->execute();
-                                }
+                                $stmt->bind_param('ssssssss', $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb, $samaccountname);
+                                $stmt->execute();
                             }
                         }
                     }
@@ -152,6 +150,108 @@ if(isset($irhat) && $irhat)
             else
             {
                 echo "$x AD kiszolgáló nem elérhető!<br>";
+            }
+        }
+    }
+
+    elseif($_GET["action"] == "ousync")
+    {
+
+        $ldapusername = $_POST['felhasznalonev'] . "@" . $LDAP_DOMAIN;
+        $plainpassword = $_POST['jelszo'];
+
+        $con = mySQLConnect(false);
+        $ldapfelhasznalok = array();
+
+        foreach($LDAP_SERVERS as $x)
+        {
+            if(checkLDAPConnection($x))
+            {
+                $ldapconnection = ldap_connect($x, $LDAP_PORT); // LDAP kapcsolat inicializálása
+                
+                ldap_set_option($ldapconnection, LDAP_OPT_PROTOCOL_VERSION, 3);
+                ldap_set_option($ldapconnection, LDAP_OPT_REFERRALS, 0);
+                $ldapbind = ldap_bind($ldapconnection, $ldapusername, $plainpassword); // LDAP bejelentkezés, mivel nem errort, csak warningot dobhat hiba esetén, el kell nyomni a hibaüzenetet
+                if($ldapbind)
+                {
+                    $szervezetnevarray = array();
+                    $userek = ldap_search($ldapconnection, $_POST['ou'], "(&(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))", array('samAccountName', 'mail', 'displayName', 'telephoneNumber', 'company', 'thumbnailphoto', 'department', 'title'));
+                    $info = ldap_get_entries($ldapconnection, $userek);
+                    foreach($info as $user)
+                    {
+                        if(@$user['samaccountname'][0])
+                        {
+                            $samaccountname = $user['samaccountname'][0];
+                            @$mail = $user['mail'][0];
+                            @$displayName = $user['displayname'][0];
+                            @$telephoneNumber = $user['telephonenumber'][0];
+                            @$company = $user['company'][0];
+                            @$thumb = $user['thumbnailphoto'][0];
+                            @$department = $user['department'][0];
+                            @$title = $user['title'][0];
+                            $ldapfelhasznalok[$samaccountname] = array(
+                                'samaccountname' => $samaccountname,
+                                'mail' => $mail,
+                                'displayName' => $displayName,
+                                'telephoneNumber' => $telephoneNumber,
+                                'company' => $company,
+                                'thumb' => $thumb,
+                                'department' => $department,
+                                'title' => $title
+                            );
+                        }
+                        else
+                        {
+                            var_dump($user);
+                            echo "<br>";
+                        }
+                    }
+                }
+                else
+                {
+                    echo "A megadott felhasználónév, vagy jelszó nem megfelelő!";
+                }
+                break;
+            }
+            else
+            {
+                echo "$x AD kiszolgáló nem elérhető!<br>";
+            }
+        }
+
+        $felhasznalolista = mySQLConnect("SELECT felhasznalonev FROM felhasznalok;");
+        $felhasznalolista = mysqliToArray($felhasznalolista, true);
+        $stmtupdate = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?');
+        $stmtinsert = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, nev, email, osztaly, szervezet, telefon, beosztas, profilkep) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+
+        foreach($ldapfelhasznalok as $ldapfelh)
+        {
+            if(isset($ldapfelh['company']) && $ldapfelh['company'] != null)
+            {
+                if(array_key_exists($ldapfelh['company'], $szervezetnevarray))
+                {
+                    $szervezet = $szervezetnevarray[$ldapfelh['company']];
+                }
+                else
+                {
+                    $szervezet = szervezetValaszto($ldapfelh['company']);
+                    $szervezetnevarray[$ldapfelh['company']] = $szervezet;
+                }
+            }
+            else
+            {
+                $szervezet = null;
+            }
+
+            if(!in_array($ldapfelh['samaccountname'], $felhasznalolista))
+            {
+                $stmtinsert->bind_param('ssssssss', $ldapfelh['samaccountname'], $ldapfelh['displayName'], $ldapfelh['mail'], $ldapfelh['department'], $szervezet, $ldapfelh['telephoneNumber'], $ldapfelh['title'], $ldapfelh['thumb']);
+                $stmtinsert->execute();
+            }
+            else
+            {
+                $stmtupdate->bind_param('ssssssss', $ldapfelh['displayName'], $ldapfelh['mail'], $ldapfelh['department'], $szervezet, $ldapfelh['telephoneNumber'], $ldapfelh['title'], $ldapfelh['thumb'], $samaccountname);
+                $stmtupdate->execute();
             }
         }
     }

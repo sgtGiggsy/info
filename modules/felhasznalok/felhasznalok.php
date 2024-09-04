@@ -85,6 +85,7 @@ else
         ?><div class="szerkgombsor">
             <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=addnew'">Új felhasználó</button>
             <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=sync'">Meglévő felhasználók AD-val szinkronizálása</button>
+            <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=syncou'">Kiválasztott OU szinkronizálása</button>
         </div><?php
     }
     ?><div class='oldalcim'>Felhasználók listája
