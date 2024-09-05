@@ -138,6 +138,10 @@ if(isset($irhat) && $irhat)
                                 $stmt->bind_param('ssssssss', $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb, $samaccountname);
                                 $stmt->execute();
                             }
+                            else
+                            {
+                                mySQLConnect("UPDATE felhasznalok SET aktiv = 0 WHERE felhasznalonev = '$samaccountname'");
+                            }
                         }
                     }
                 }
@@ -154,14 +158,14 @@ if(isset($irhat) && $irhat)
         }
     }
 
-    elseif($_GET["action"] == "ousync")
+    elseif($_GET["action"] == "syncou")
     {
-
         $ldapusername = $_POST['felhasznalonev'] . "@" . $LDAP_DOMAIN;
         $plainpassword = $_POST['jelszo'];
 
         $con = mySQLConnect(false);
         $ldapfelhasznalok = array();
+        $elsobelepes = null;
 
         foreach($LDAP_SERVERS as $x)
         {
@@ -175,7 +179,7 @@ if(isset($irhat) && $irhat)
                 if($ldapbind)
                 {
                     $szervezetnevarray = array();
-                    $userek = ldap_search($ldapconnection, $_POST['ou'], "(&(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))", array('samAccountName', 'mail', 'displayName', 'telephoneNumber', 'company', 'thumbnailphoto', 'department', 'title'));
+                    $userek = ldap_search($ldapconnection, ConvertToDistinguishedName($_POST['ou']), "(&(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))", array('samAccountName', 'mail', 'displayName', 'telephoneNumber', 'company', 'thumbnailphoto', 'department', 'title'));
                     $info = ldap_get_entries($ldapconnection, $userek);
                     foreach($info as $user)
                     {
@@ -222,7 +226,7 @@ if(isset($irhat) && $irhat)
         $felhasznalolista = mySQLConnect("SELECT felhasznalonev FROM felhasznalok;");
         $felhasznalolista = mysqliToArray($felhasznalolista, true);
         $stmtupdate = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?');
-        $stmtinsert = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, nev, email, osztaly, szervezet, telefon, beosztas, profilkep) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmtinsert = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, nev, email, elsobelepes, osztaly, szervezet, telefon, beosztas, profilkep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
         foreach($ldapfelhasznalok as $ldapfelh)
         {
@@ -245,7 +249,7 @@ if(isset($irhat) && $irhat)
 
             if(!in_array($ldapfelh['samaccountname'], $felhasznalolista))
             {
-                $stmtinsert->bind_param('ssssssss', $ldapfelh['samaccountname'], $ldapfelh['displayName'], $ldapfelh['mail'], $ldapfelh['department'], $szervezet, $ldapfelh['telephoneNumber'], $ldapfelh['title'], $ldapfelh['thumb']);
+                $stmtinsert->bind_param('ssssssss', $ldapfelh['samaccountname'], $ldapfelh['displayName'], $ldapfelh['mail'], $elsobelepes, $ldapfelh['department'], $szervezet, $ldapfelh['telephoneNumber'], $ldapfelh['title'], $ldapfelh['thumb']);
                 $stmtinsert->execute();
             }
             else
