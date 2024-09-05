@@ -8,7 +8,7 @@ $tevekenysegek = mySQLConnect("SELECT felhasznalotevekenysegek.id AS id,
         ORDER BY timestamp DESC
         LIMIT $start, $megjelenit;");
 
-?><table id='tevekenysegek' style="max-width: unset;">
+?><table id='tevekenysegek'>
     <thead>
         <tr>
             <th class="tsorth" onclick="sortTable(0, 's', 'tevekenysegek')">Idő</th>

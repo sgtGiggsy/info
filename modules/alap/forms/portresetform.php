@@ -16,31 +16,29 @@ $magyarazat .= "<strong>Portok resetelése</strong>
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <div>
-            <form action="<?=$RootPath?>/portdb?action=reset<?=$kuldooldal?>" method="post" id="portresetform">
-                <div>
-                    <label for="elsoport">Első port:</label><br>
-                    <select id="elsoport" name="elsoport"><?php
-                        foreach($portok as $x)
-                        {
-                            ?><option value="<?=$x["id"]?>"><?=$x['epuletszam']?> - <?=$x['port']?></option><?php
-                        }
-                    ?></select>
-                </div>
+        <form action="<?=$RootPath?>/portdb?action=reset<?=$kuldooldal?>" method="post" id="portresetform">
+            <div>
+                <label for="elsoport">Első port:</label><br>
+                <select id="elsoport" name="elsoport"><?php
+                    foreach($portok as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>"><?=$x['epuletszam']?> - <?=$x['port']?></option><?php
+                    }
+                ?></select>
+            </div>
 
-                <div>
-                    <label for="utolsoport">Utolsó port:</label><br>
-                    <select id="utolsoport" name="utolsoport"><?php
-                        foreach($portok as $x)
-                        {
-                            ?><option value="<?=$x["id"]?>"><?=$x['epuletszam']?> - <?=$x['port']?></option><?php
-                        }
-                    ?></select>
-                </div>
+            <div>
+                <label for="utolsoport">Utolsó port:</label><br>
+                <select id="utolsoport" name="utolsoport"><?php
+                    foreach($portok as $x)
+                    {
+                        ?><option value="<?=$x["id"]?>"><?=$x['epuletszam']?> - <?=$x['port']?></option><?php
+                    }
+                ?></select>
+            </div>
 
-                <div class="submit"><input type="submit" name="beKuld" value="Portok resetelése"></div>
-            </form>
-            <?= cancelForm(); ?>
-        </div>
+            <div class="submit"><input type="submit" name="beKuld" value="Portok resetelése"></div>
+        </form>
+        <?= cancelForm(); ?>
     </div><?php
 }

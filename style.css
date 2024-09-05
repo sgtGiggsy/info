@@ -223,10 +223,11 @@ fieldset {
 .contentcenter {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    /*justify-content: center;*/
+    align-items: center;
     position: relative;
-    margin: 0 auto;
-    /*width: clamp(20vw, 40vw, 70vw);*/
+    /*margin: 0 auto;
+    width: clamp(20vw, 40vw, 70vw);*/
     min-width: 20ch;
     /*max-width: 70ch;*/
 }
@@ -236,9 +237,10 @@ fieldset {
     text-align: left;
 }
 
-.contentcenter div {
-    width: 100%;
-    margin: 0 auto;
+.olvashato {
+    flex-direction: column;
+    max-width: 80ch;
+    width: 80ch!important;
 }
 
 .contentcenterpadding div {
@@ -2421,11 +2423,21 @@ td img {
 
 .prevnext {
     display: flex;
+    flex-grow: 1;
+    width: 100%;
+    padding: 0.5em 0;
 }
 
-.prevnext div:nth-child(2)
-{
+.prevnext div {
     display: flex;
+    min-width: 50%;
+}
+
+.prevnext div:nth-child(1) {
+    justify-content: left;
+}
+
+.prevnext div:nth-child(2) {
     justify-content: right;
 }
 
@@ -2733,7 +2745,7 @@ div[id^=tennivalobody-].close {
     grid-gap: 2em;
 }
 
-.szintlist div, .szintlist table, .raktarak table {
+.szintlist div, .szintlist table, .raktarak table, .fulltable {
     width: 100%;
     max-width: unset;
 }
@@ -3478,61 +3490,13 @@ div[id^=tennivalobody-].close {
 
 /* ------------------------------- Internet Explorer kompatibilitás ------------------------------- */
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-    .body {
-        margin: 0;
-        display: -ms-grid;
-        -ms-grid-columns: 200px 1fr 1fr;
-        -ms-grid-rows: 50px 1fr 200px 30px;
-    }
 
-    /* Explicit placement for IE */
-    /* Omitting default value of -ms-grid-column: 1 and -ms-grid-row: 1 where possible */
-    .content {
-        -ms-grid-row: 2;
-        -ms-grid-row-span: 2;
-        -ms-grid-column: 2;
-        -ms-grid-column-span: 3;
-        margin-left: auto;
-        margin-right: auto;
-        min-height: 700px;
+    .wrapper {
+        display: none;
     }
-
-    .topmenubase {
-        -ms-grid-row: 1;
-        -ms-grid-column-span: 3;
-    }
-
-    .topmenuikonok {
-        -ms-grid-row: 1;
-        -ms-grid-column: 3;
-        position: absolute;
-        right: 0px;
-        top: 5px;
-    }
-
-    #profilpopup {
-        top: 45px!important;
-    }
-
-    .kereses {
-        -ms-grid-row: 1;
-        -ms-grid-column: 2;
-    }
-
-    .leftmenuareabase {
-        -ms-grid-row: 2;
-        -ms-grid-row-span: 2;
-        -ms-grid-column: 1;
-    }
-
-    .footer {
-        -ms-grid-row: 3;
-        -ms-grid-column: 2;
-        -ms-grid-column-span: 2;
-    }
-
-    .bottom-line {
-        -ms-grid-row: 4;
-        -ms-grid-column-span: 4;
+    
+    #iewarning {
+        display: block!important;
+        padding: 15% 30% 0 30%;
     }
 }

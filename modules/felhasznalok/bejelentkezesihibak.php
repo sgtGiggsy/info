@@ -7,7 +7,7 @@ else
 {
     $lista = mySQLConnect("SELECT * FROM failedlogins ORDER BY id DESC");
     ?><div class='oldalcim'>Bejelentkezési hibák</div>
-    <div>
+    <div class="contentcenter">
     <table id='bejelentkezesihibak'>
         <thead>
             <tr>

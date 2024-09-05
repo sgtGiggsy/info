@@ -45,45 +45,47 @@ else
             ?><div class="PrintArea">
                 <div class='oldalcim'><?=$vizsgareszletezes['nev']?> (<?=$vizsgareszletezes['felhasznalonev']?>)</div>
                 <div class='contentcenter'>
-                    <h4><?=$vizsgareszletezes['kitoltesideje']?></h4><?php
-                    foreach($teszteredmenyek as $x)
-                    {
-                        $stilus = "";
-                        if(!isset($kerdesid) || $x['kerdesid'] != $kerdesid)
+                    <div class='olvashato'>
+                        <h4><?=$vizsgareszletezes['kitoltesideje']?></h4><?php
+                        foreach($teszteredmenyek as $x)
                         {
-                            $sorsz++;
-                            ?><h3><?=$sorsz?>. <?=$x['kerdes']?></h3><?php
-                        }
-
-                        $kerdesid = $x['kerdesid'];
-
-                        if($x['helyes'])
-                        {
-                            if($x['vid'] == $x['valasz'] || $x['vid'] == $x['valasz2'] || $x['vid'] == $x['valasz3'])
+                            $stilus = "";
+                            if(!isset($kerdesid) || $x['kerdesid'] != $kerdesid)
                             {
-                                $helyes += $x['helyes'];
-                                $stilus = "talalat";
+                                $sorsz++;
+                                ?><h3><?=$sorsz?>. <?=$x['kerdes']?></h3><?php
+                            }
+
+                            $kerdesid = $x['kerdesid'];
+
+                            if($x['helyes'])
+                            {
+                                if($x['vid'] == $x['valasz'] || $x['vid'] == $x['valasz2'] || $x['vid'] == $x['valasz3'])
+                                {
+                                    $helyes += $x['helyes'];
+                                    $stilus = "talalat";
+                                }
+                                else
+                                {
+                                    $stilus = "helyes";
+                                }
                             }
                             else
                             {
-                                $stilus = "helyes";
+                                if($x['vid'] == $x['valasz'] || $x['vid'] == $x['valasz2'] || $x['vid'] == $x['valasz3'])
+                                {
+                                    $stilus = "hibastipp";
+                                }
                             }
-                        }
-                        else
-                        {
-                            if($x['vid'] == $x['valasz'] || $x['vid'] == $x['valasz2'] || $x['vid'] == $x['valasz3'])
-                            {
-                                $stilus = "hibastipp";
-                            }
+
+                            ?><p <?=($stilus) ? "class=" . $stilus : "" ?>><?=$x['valaszszoveg']?></p><?php
                         }
 
-                        ?><p <?=($stilus) ? "class=" . $stilus : "" ?>><?=$x['valaszszoveg']?></p><?php
-                    }
-
-                    ?><br><h1 style="<?=($helyes < $vizsgaadatok['minimumhelyes']) ? 'color:red' : 'color:green' ?>">
-                        <?=($helyes < $vizsgaadatok['minimumhelyes']) ? "Sikertelen" : "Sikeres" ?>
-                        <br><?=roundUp99($helyes)?>/<?=$sorsz?>
-                    </h1>
+                        ?><br><h1 style="<?=($helyes < $vizsgaadatok['minimumhelyes']) ? 'color:red' : 'color:green' ?>">
+                            <?=($helyes < $vizsgaadatok['minimumhelyes']) ? "Sikertelen" : "Sikeres" ?>
+                            <br><?=roundUp99($helyes)?>/<?=$sorsz?>
+                        </h1>
+                    </div>
                 </div>
             </div><?php
         }
