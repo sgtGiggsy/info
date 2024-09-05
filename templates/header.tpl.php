@@ -80,8 +80,8 @@ if($_SESSION[getenv('SESSION_NAME').'id'])
 
 //// Profil
     ?><div id="profilpopup" onmouseleave="hidePopup('profilpopup')">
-        <a href="<?=$RootPath?>/felhasznalo">Profil</a>
-        <a href="<?=$RootPath?>/felhasznalo?beallitasok">Beállítások</a>
-        <a href="<?=$RootPath?>/kilep">Kilépés</a>
+        <a href="<?=$RootPath?>/felhasznalo"><?=$icons['person']?>Profil</a>
+        <a href="<?=$RootPath?>/felhasznalo?beallitasok"><?=$icons['customize']?>Beállítások</a>
+        <a href="<?=$RootPath?>/kilep"><?=$icons['logout']?>Kilépés</a>
     </div><?php
 }

@@ -92,7 +92,7 @@ elseif(isset($_GET['action']))
 								?><tr class='kattinthatotr' data-href='<?=$RootPath?>/kozlemeny/<?=$x['id']?>?action=edit'>
 									<td><?=$x['id']?></td>
 									<td><?=$x['cim']?></td>
-									<td><img src='<?=$RootPath?>/images/edit.png' /></td>
+									<td><?=$icons['editnews']?></td>
 								</tr><?php
 							}
 							?></tbody>
@@ -121,7 +121,7 @@ else
 	?><div class="oldalcim"><?=$kozlemeny['cim']?><?php
 		if($mindir)
 		{
-			?><a class="help" href="<?=$RootPath?>/kozlemeny/<?=$kozlemeny['kozlemenyid']?>?action=edit"><img src='<?=$RootPath?>/images/edit.png' alt='Közlemény szerkesztése' title='Közlemény szerkesztése'/></a><?php
+			?><a class="help" href="<?=$RootPath?>/kozlemeny/<?=$kozlemeny['kozlemenyid']?>?action=edit"><?=$icons['editnews']?></a><?php
 		}
 	?></div>
 	<div class="kozlemenyek">

@@ -1944,6 +1944,16 @@ td img {
     right: 0px;
 }
 
+#profilpopup a {
+    display: flex;
+}
+
+#profilpopup svg {
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 0.8em;
+}
+
 #notifpopup {
     right: 45px;
     width: 410px;
@@ -1974,7 +1984,7 @@ td img {
 }
 
 #profilpopup a, #korabbikorok a, #megvalaszoltkerdesek a {
-    padding: 12px 20px 12px 20px;
+    padding: 12px 20px 12px 10px;
     background-color: var(--headpopupbg);
     text-decoration: none;
     color: var(--fontlight);
@@ -2004,9 +2014,10 @@ td img {
     color: var(--fontlight);
 }
 
-#profilpopup a:hover, #korabbikorok a:hover, #megvalaszoltkerdesek a:hover {
+#profilpopup a:hover, #korabbikorok a:hover, #megvalaszoltkerdesek a:hover, #profilpopup a:hover svg {
     color: var(--linkhover);
     background-color: var(--menuhover);
+    fill: var(--linkhover);
 }
 
 #profilpopup.show, #notifpopup.show, #korabbikorok.show, #megvalaszoltkerdesek.show {
