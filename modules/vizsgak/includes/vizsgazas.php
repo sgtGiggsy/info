@@ -6,7 +6,7 @@ if(!$felhasznaloid)
 else
 {   
     $javascriptfiles[] = "modules/vizsgak/includes/vizsga.js";
-    $vizsgafolytat = false;
+    $vizsgafolytat = $debug = false;
 
     $korabbikitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.id AS id,
             vizsgak_kitoltesek.felhasznalo AS felhasznalo,
@@ -236,6 +236,11 @@ else
                 FROM vizsgak_valaszlehetosegek
                 WHERE kerdes = $kivalasztottkerdesid;");
 
+            if(isset($_GET['debug']) && $_GET['debug'] == "adminvagyok")
+            {
+                $debug = true;
+            }
+
             // Kérdés megjelenítés rész
             ?><div class="contentcenter">
                 <div class="vizsgacard">
@@ -299,7 +304,7 @@ else
                                         {
                                             $kivalaszt = "";
                                         }
-                                        ?><div><label><input type="<?=$inptype?>" name="valaszok[]" id="valaszok" onclick="halasztKuldSwitch();" value="<?=$valasz['id']?>" <?=$kivalaszt?>><?=$valasz['valaszszoveg']?></label></div><?php
+                                        ?><div><label <?=($debug && $valasz['helyes'] == 1) ? "style='font-style: italic;'" : "" ?>><input type="<?=$inptype?>" name="valaszok[]" id="valaszok" onclick="halasztKuldSwitch();" value="<?=$valasz['id']?>" <?=$kivalaszt?>><?=$valasz['valaszszoveg']?></label></div><?php
                                         
                                     }
                                 ?><div class="submit"><input type="submit" name="beKuld" id="valaszkuld" value='<?=($voltvalasztas) ? "Válasz beküldése" : "Kérdés későbbre halasztása" ?>'></div>

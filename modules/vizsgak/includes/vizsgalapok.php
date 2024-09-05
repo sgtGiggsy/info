@@ -9,7 +9,7 @@ else
     $vizsgalapok = mySQLConnect("SELECT vizsgak_vizsgalapok.id AS vlapid, azonosito, timestamp, megoldokulcs, felhasznalok.nev AS nev
         FROM vizsgak_vizsgalapok
             LEFT JOIN felhasznalok ON vizsgak_vizsgalapok.letrehozo = felhasznalok.id
-        WHERE vizsgaid = $vizsgaid AND aktiv = 1
+        WHERE vizsgaid = $vizsgaid AND vizsgak_vizsgalapok.aktiv = 1
         ORDER BY timestamp DESC;");
 
     if(isset($_GET['action']) && $_GET['action'] == "print")
