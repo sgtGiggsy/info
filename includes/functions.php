@@ -124,13 +124,18 @@ function parseUserAgent()
 
 function logLogin($felhasznalo)
 {
+	$gepnev = explode(".", gethostbyaddr($_SERVER['REMOTE_ADDR']))[0];
 	$gepadat = parseUserAgent();
 	$con = mySQLConnect(false);
-	if ($stmt = $con->prepare('INSERT INTO bejelentkezesek (felhasznalo, ipcim, bongeszo, bongeszoverzio, oprendszer, oprendszerverzio, oprendszerarch) VALUES (?, ?, ?, ?, ?, ?, ?)'))
+	if ($stmt = $con->prepare('INSERT INTO bejelentkezesek (felhasznalo, ipcim, bongeszo, bongeszoverzio, oprendszer, oprendszerverzio, oprendszerarch, gepnev) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'))
     {
-        $stmt->bind_param('sssssss', $felhasznalo, $_SERVER['REMOTE_ADDR'], $gepadat['bongeszo'], $gepadat['bongeszover'], $gepadat['oprendszer'], $gepadat['oprendszerver'], $gepadat['architektura']);
+        $stmt->bind_param('ssssssss', $felhasznalo, $_SERVER['REMOTE_ADDR'], $gepadat['bongeszo'], $gepadat['bongeszover'], $gepadat['oprendszer'], $gepadat['oprendszerver'], $gepadat['architektura'], $gepnev);
 		$stmt->execute();
 	}
+	$last_id = mysqli_insert_id($con);
+	$con->close();
+
+	return $last_id;
 }
 
 function logActivity($felhasznalo, $params)
@@ -496,10 +501,10 @@ function bugTypePicker($current)
 
 function felhasznaloPicker($current, $selectnev, $szervezet = null)
 {
-	$where = null;
+	$where = "WHERE aktiv = 1";
 	if($szervezet)
 	{
-		$where = "WHERE szervezet = $szervezet";
+		$where = " AND szervezet = $szervezet";
 	}
 	$felhasznalok = mySQLConnect("SELECT id, nev FROM felhasznalok $where ORDER BY nev ASC");
 

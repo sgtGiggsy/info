@@ -13,7 +13,7 @@ else
     }
     else
     {
-        ?><div class='oldalcim'>Bejelentkezések</div><div class="contentcenter"><div><?php
+        ?><div class='oldalcim'>Bejelentkezések</div><div class="contentcenter"><?php
     }
 
     $csoportwhere = null;
@@ -41,7 +41,7 @@ else
         }
     }
 
-    $lista = mySQLConnect("SELECT bejelentkezesek.id AS id, nev, ipcim, bongeszo, bongeszoverzio, oprendszer, oprendszerverzio, oprendszerarch, timestamp
+    $lista = mySQLConnect("SELECT bejelentkezesek.id AS id, nev, ipcim, bongeszo, bongeszoverzio, oprendszer, oprendszerverzio, oprendszerarch, timestamp, gepnev, felbontas
             FROM bejelentkezesek
                 INNER JOIN felhasznalok ON bejelentkezesek.felhasznalo = felhasznalok.id
             $where $csoportwhere
@@ -56,9 +56,11 @@ else
                 }
                 else { echo "<th></th>"; }
                 ?><th class="tsorth" onclick="sortTable(2, 's', 'bejelentkezesek')">IP cím</th>
-                <th class="tsorth" onclick="sortTable(3, 's', 'bejelentkezesek')">Oprendszer</th>
-                <th class="tsorth" onclick="sortTable(4, 's', 'bejelentkezesek')">Böngésző</th>
-                <th class="tsorth" onclick="sortTable(5, 's', 'bejelentkezesek')">Böngésző verzió</th>
+                <th class="tsorth" onclick="sortTable(3, 's', 'bejelentkezesek')">Gépnév</th>
+                <th class="tsorth" onclick="sortTable(4, 's', 'bejelentkezesek')">Oprendszer</th>
+                <th class="tsorth" onclick="sortTable(5, 's', 'bejelentkezesek')">Böngésző</th>
+                <th class="tsorth" onclick="sortTable(6, 's', 'bejelentkezesek')">Böngésző verzió</th>
+                <th class="tsorth" onclick="sortTable(7, 's', 'bejelentkezesek')">Képernyő felbontás</th>
             </tr>
         </thead>
         <tbody><?php
@@ -72,16 +74,18 @@ else
                 }
                 else { echo "<td></td>"; }
                 ?><td><?=$x['ipcim']?></td>
+                <td><?=$x['gepnev']?></td>
                 <td><?=$x['oprendszer'] . " " . $x['oprendszerverzio'] . " " . $x['oprendszerarch']?></td>
                 <td><?=$x['bongeszo']?></td>
                 <td><?=$x['bongeszoverzio']?></td>
+                <td><?=$x['felbontas']?></td>
             </tr><?php
         }
         ?></tbody>
         </table><?php
     if(!isset($felhid))
     {
-        ?></div></div><?php
+        ?></div><?php
     }
 }
 ?>

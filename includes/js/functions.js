@@ -331,3 +331,12 @@ function confirmSend(text, link)
         window.document.location = link;
     }
 }
+
+function userDeviceParams(loginid) {
+    $.post(RootPath + "/bejelentkezesdb",
+    {
+        loginid: loginid,
+        gepnev: window.location.hostname,
+        felbontas: window.screen.width + "x" + window.screen.height
+    });
+}

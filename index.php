@@ -20,7 +20,7 @@ header('Pragma: no-cache');
 //header("Content-Security-Policy-Report-Only: script-src 'nonce-{RANDOM}' 'strict-dynamic';");
 
 // Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
-$page = $id = $current = $felhasznaloid = null; $loginsuccess = false;
+$page = $id = $current = $felhasznaloid = $loginid = null; $loginsuccess = false;
 
 // Címsorból vett GET értékek tisztítása nemkívánt karakterektől
 foreach($_GET as $key => $value)
@@ -48,6 +48,11 @@ if(isset($_GET['page']))
 		header("Location: $RootPath/index.php");
 		die();
 	}
+}
+
+if(isset($_GET['loginid']))
+{
+    $loginid = $_GET['loginid'];
 }
 
 // Az előző oldal helyének kiderítése
@@ -179,7 +184,7 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
             {
                 $userid = mysqli_fetch_assoc($result)['id'];
                 $_SESSION[getenv('SESSION_NAME').'id'] = true;
-                logLogin($userid);
+                $loginid = logLogin($userid);
                 $loginsuccess = true;
             }
             else
@@ -233,12 +238,12 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
         {
             if(isset($_GET['kuldooldalid']))
             {
-                header("Location: $RootPath/" . $_GET['kuldooldal'] . "/" . $_GET['kuldooldalid'] . "?sikeres=bejelentkezes");
+                header("Location: $RootPath/" . $_GET['kuldooldal'] . "/" . $_GET['kuldooldalid'] . "?sikeres=bejelentkezes&loginid=" . $loginid);
                 die;
             }
             else
             {
-                header("Location: $RootPath/" . $_GET['kuldooldal'] . "?sikeres=bejelentkezes");
+                header("Location: $RootPath/" . $_GET['kuldooldal'] . "?sikeres=bejelentkezes&loginid=" . $loginid);
                 die;
             }
         }
@@ -445,10 +450,10 @@ else
 
 // JavaScript fájlok listája
 $javascriptfiles = [
-    "includes/js/pageload.js",
     "includes/js/functions.js",
     "includes/js/tableActions.js",
-    "includes/js/ertesites.js"
+    "includes/js/ertesites.js",
+    "includes/js/pageload.js"
 ];
 
 if(isset($_GET['page']) && $_GET['page'] != "aktiveszkoz" && $_GET['page'] != "sohoeszkoz" && $_GET['page'] != "mediakonverter" || ($_GET['page'] == "aktiveszkoz" && isset($_GET['action'])))
@@ -470,15 +475,21 @@ $PHPvarsToJS = [
     )
 ];
 
+if($loginid)
+{
+    $PHPvarsToJS[] = array('name' => 'loginid', 'val' => $loginid);
+}
+
 if($felhasznaloid && @$szemelyes['switchstateshow'])
 {
     $PHPvarsToJS[] = array('name' => 'Felhasznaloid', 'val' => $felhasznaloid);
     $javascriptfiles[] = "modules/eszkozok/includes/eszkozonlinecheck.js";
 }
 
+if($felhasznaloid != 1)
 logActivity($felhasznaloid, $params);
 include('./templates/svg.tpl.php');
-// Oldal megjelenítése , $params
+// Oldal megjelenítése
 include('./templates/index.tpl.php');
 
 ?>
