@@ -1,5 +1,5 @@
 <?php
-$count = mySQLConnect("SELECT count(*) AS db FROM $adattabla")->fetch_assoc()['db'];
+$count = mySQLConnect("SELECT count(*) AS db FROM $adattabla $where")->fetch_assoc()['db'];
 
 if(isset($_POST['oldalankent']))
 {
@@ -28,11 +28,15 @@ else
 if($oldal != 1)
 {
     $previd = $oldal - 1;
+    $firstid = 1;
 }
 
 if($oldal * $megjelenit < $count)
 {
     $nextid = $oldal + 1;
+    $lastid = $count / $megjelenit;
+    if(!is_int($lastid))
+        $lastid = floor($lastid) + 1;
 }
 
 ?><div class='oldalcim'><?=$oldalcim?>
@@ -54,16 +58,24 @@ if($oldal * $megjelenit < $count)
 <div class="contentcenter">
     <div class="prevnext">
         <div><?php
+            if(@$firstid)
+            {
+                ?><a href="<?=$RootPath?>/<?=$oldalnev?><?=$keres?>"><?=$icons['elsooldal']?></a><?php
+            }
             if(@$previd)
             {
-                ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$previd?><?=$keres?>">Előző oldal</a><?php
+                ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$previd?><?=$keres?>"><?=$icons['elozooldal']?></a><?php
             }
         ?></div>
         <div><?php
 
         if(@$nextid)
         {
-            ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$nextid?><?=$keres?>">Következő oldal</a><?php
+            ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$nextid?><?=$keres?>"><?=$icons['kovetkezooldal']?></a><?php
+        }
+        if(@$lastid)
+        {
+            ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$lastid?><?=$keres?>"><?=$icons['utolsooldal']?></a><?php
         }
         ?></div>
     </div><?php
@@ -72,16 +84,24 @@ if($oldal * $megjelenit < $count)
 
     ?><div class="prevnext">
         <div><?php
+            if(@$firstid)
+            {
+                ?><a href="<?=$RootPath?>/<?=$oldalnev?><?=$keres?>"><?=$icons['elsooldal']?></a><?php
+            }
             if(@$previd)
             {
-                ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$previd?><?=$keres?>">Előző oldal</a><?php
+                ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$previd?><?=$keres?>"><?=$icons['elozooldal']?></a><?php
             }
         ?></div>
         <div><?php
 
         if(@$nextid)
         {
-            ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$nextid?><?=$keres?>">Következő oldal</a><?php
+            ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$nextid?><?=$keres?>"><?=$icons['kovetkezooldal']?></a><?php
+        }
+        if(@$lastid)
+        {
+            ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$lastid?><?=$keres?>"><?=$icons['utolsooldal']?></a><?php
         }
         ?></div>
     </div>

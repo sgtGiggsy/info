@@ -3,7 +3,6 @@ $tevekenysegek = mySQLConnect("SELECT felhasznalotevekenysegek.id AS id,
             felhasznalotevekenysegek.felhasznalo AS felhasznalo,
             felhasznalok.nev AS nev, felhasznalonev, ipcim, timestamp, menupont, almenu, elemid, params, gyanus
         FROM felhasznalotevekenysegek
-            LEFT JOIN felhasznalok ON felhasznalotevekenysegek.felhasznalo = felhasznalok.id
         $where
         ORDER BY timestamp DESC
         LIMIT $start, $megjelenit;");

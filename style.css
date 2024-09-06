@@ -2086,6 +2086,15 @@ td img {
     color: var(--linkhover);
 }
 
+#searchbar::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 10px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='grey'><polygon points='0,0 2,0 12,10, 12,12, 10,12, 0,2, 0,10, 10,0 12,0 12,2, 2,12, 0,12'/></svg>");
+}
+
 .contextheader {
     position: relative;
     height: 250px;
@@ -2439,6 +2448,11 @@ td img {
     padding: 0.5em 0;
 }
 
+.prevnext a {
+    display: flex;
+    align-items: center;
+}
+
 .prevnext div {
     display: flex;
     min-width: 50%;
@@ -2450,6 +2464,11 @@ td img {
 
 .prevnext div:nth-child(2) {
     justify-content: right;
+}
+
+.prevnext svg {
+    height: 2.2em;
+    width: 2.2em;
 }
 
 .allapotjelentesek {

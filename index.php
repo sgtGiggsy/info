@@ -20,7 +20,7 @@ header('Pragma: no-cache');
 //header("Content-Security-Policy-Report-Only: script-src 'nonce-{RANDOM}' 'strict-dynamic';");
 
 // Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
-$page = $id = $current = $felhasznaloid = $loginid = null; $loginsuccess = false;
+$page = $id = $current = $felhasznaloid = $loginid = $activitylogid = null; $loginsuccess = false;
 
 // Címsorból vett GET értékek tisztítása nemkívánt karakterektől
 foreach($_GET as $key => $value)
@@ -487,7 +487,7 @@ if($felhasznaloid && @$szemelyes['switchstateshow'])
 }
 
 if($felhasznaloid != 1)
-logActivity($felhasznaloid, $params);
+$activitylogid = logActivity($felhasznaloid, $params);
 include('./templates/svg.tpl.php');
 // Oldal megjelenítése
 include('./templates/index.tpl.php');

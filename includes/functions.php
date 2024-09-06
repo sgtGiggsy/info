@@ -20,8 +20,17 @@ function mySQLConnect($querystring = null)
 
 	if($querystring && $con)
 	{
-		//echo $querystring;
-		$result = mysqli_query($con, $querystring);
+		$result = null;
+		try
+		{
+			$result = mysqli_query($con, $querystring);
+		}
+		catch(Exception $e)
+		{
+			echo $e->getMessage() . "<br>";
+			if($_SESSION[getenv('SESSION_NAME').'id'] == 1)
+				echo $querystring;
+		}
 		$con->close();
 		return $result;
 	}
@@ -140,7 +149,6 @@ function logLogin($felhasznalo)
 
 function logActivity($felhasznalo, $params)
 {
-
 	@$menupont = $_GET['page'];
 	@$almenu = $_GET['subpage'];
 	@$elemid = $_GET['id'];
@@ -159,6 +167,10 @@ function logActivity($felhasznalo, $params)
         $stmt->bind_param('ssssss', $felhasznalo, $_SERVER['REMOTE_ADDR'], $menupont, $almenu, $elemid, $params);
 		$stmt->execute();
 	}
+	$last_id = mysqli_insert_id($con);
+	$con->close();
+
+	return $last_id;
 }
 
 function csvToArray($csv)
@@ -504,9 +516,9 @@ function felhasznaloPicker($current, $selectnev, $szervezet = null)
 	$where = "WHERE aktiv = 1";
 	if($szervezet)
 	{
-		$where = " AND szervezet = $szervezet";
+		$where .= " AND szervezet = $szervezet";
 	}
-	$felhasznalok = mySQLConnect("SELECT id, nev FROM felhasznalok $where ORDER BY nev ASC");
+	$felhasznalok = mySQLConnect("SELECT id, nev FROM felhasznalok $where ORDER BY nev ASC;");
 
 	?><select id="<?=$selectnev?>" name="<?=$selectnev?>">
 		<option value="" selected></option><?php
@@ -1313,6 +1325,7 @@ function atHurkolas($helyiportid, $hurok, $con, $jelenportmod)
 
 function purifyPost($ishtml = false)
 {
+	$activitylogid = $GLOBALS['activitylogid'];
 	foreach($_POST as $key => $value)
     {
         if(is_array($value))

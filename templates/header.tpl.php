@@ -9,7 +9,7 @@ if(isset($enablekeres) && $enablekeres)
     ?><div class="kereses" id="kereses">
         <form name="kereses" method="GET">
             <div class="felkormezo">
-                <input type="text" name="kereses" placeholder="Keresés" aria-label="Keresés" />
+                <input type="search" name="kereses" id="searchbar" placeholder="Keresés" aria-label="Keresés" <?=isset($keresinheader) ? "value=\"{$keresinheader}\"" : "" ?> />
                 <button class="felkorbutton" class="searchicon"><?=$icons['search']?></button>
             </div>
         </form>
