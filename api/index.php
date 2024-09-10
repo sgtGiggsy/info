@@ -1,6 +1,7 @@
 <?php
 include("../includes/config.inc.php");
 include("../includes/functions.php");
+include("../classes/Ertesites.class.php");
 
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');

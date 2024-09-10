@@ -2,6 +2,7 @@
 // Alap includolások
 include('./includes/config.inc.php');
 include('./includes/functions.php');
+include('./Classes/Ertesites.class.php');
 $RootPath = getenv('APP_ROOT_PATH');
 $dbcallcount = 0;
 $logid = null;

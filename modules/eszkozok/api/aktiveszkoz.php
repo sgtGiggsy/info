@@ -116,43 +116,41 @@ Class API_Call implements API
         return mysqliToArray($aktiveszkoz);
     }
 
-    static function Post($object, $tabla)
+    static function Post($object, $filter)
     {
         $con = mySQLConnect(false);
         $timestamp = timeStampForSQL();
         $statuscode = 400;
-        if($tabla == "allapot")
+        if($filter == "allapotlista")
         {
-            $eszkozid = $online = null;
-            if(isset($object->eszkid) && isset($object->online))
+            $statuscode = 201;
+            $updatefreq = mySQLConnect("SELECT ertek FROM beallitasok WHERE nev = 'switch_update_frequency';")->fetch_assoc()['ertek'];
+            $utolsoupdate = mysqli_num_rows(mySQLConnect("SELECT ertek FROM beallitasok WHERE nev = 'last_switch_update' AND ertek < date_sub(now(), INTERVAL $updatefreq HOUR);"));
+            if($utolsoupdate > 0)
             {
-                $eszkozid = $object->eszkid;
-                $online = $object->online;
+                mySQLConnect("UPDATE beallitasok SET ertek = current_timestamp() WHERE nev = 'last_switch_update';");
+            }
 
-                $stmt = $con->prepare('INSERT INTO aktiveszkoz_allapot (eszkozid, online, timestamp) VALUES (?, ?, ?)');
-                $stmt->bind_param('sss', $eszkozid, $online, $timestamp);
-                $stmt->execute();
+            $stmt = $con->prepare('INSERT INTO aktiveszkoz_allapot (eszkozid, online, timestamp) VALUES (?, ?, ?)');
+            $felhasznalok = Ertesites::GetFelhasznalok(1);
 
-                if(mysqli_errno($con) == 0)
+            foreach($object as $eszkoz)
+            {
+                if($utolsoupdate > 0 || $eszkoz->cim)
                 {
-                    $statuscode = 201;
-                    if($object->utolso)
+                    $stmt->bind_param('sss', $eszkoz->eszkid, $eszkoz->online, $timestamp);
+                    $stmt->execute();
+                    
+                    if($eszkoz->cim)
                     {
-                        mySQLConnect("UPDATE beallitasok SET ertek = current_timestamp() WHERE nev = 'last_switch_check';");
-                    }
-                    if($object->ertesit)
-                    {
-                        $cim = $object->cim;
-                        $szoveg = $object->szoveg;
-                        $tipus = 1;
-                        $url = "aktiveszkoz/" . $object->eszkid;
-
-                        $stmt = $con->prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
-                        $stmt->bind_param('ssss', $cim, $szoveg, $url, $tipus);
-                        $stmt->execute();
+                        $ertesites = new Ertesites($eszkoz->cim, $eszkoz->szoveg, "aktiveszkoz/" . $eszkoz->eszkid);
+                        $ertesites->SetFelhasznalok($felhasznalok);
+                        $ertesites->Ment();
                     }
                 }
             }
+            
+            mySQLConnect("UPDATE beallitasok SET ertek = current_timestamp() WHERE nev = 'last_switch_check';");
         }
 
         return $statuscode;

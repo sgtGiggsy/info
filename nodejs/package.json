@@ -1,5 +1,10 @@
 {
   "dependencies": {
-    "net-snmp": "^3.9.7"
+    "nan": "^2.20.0",
+    "net-ping": "^1.2.4",
+    "net-snmp": "^3.9.7",
+    "node-gyp": "^10.2.0",
+    "raw-socket": "^1.8.1",
+    "tcp-ping": "^0.1.1"
   }
 }
