@@ -15,7 +15,7 @@ else
     {
         include("./{$currentpage['url']}.php");
     }
-    elseif($_GET['page'] == $gyujtooldal)
+    elseif($gyujtooldal != null && $_GET['page'] == $gyujtooldal)
     {
         include("./{$currentpage['gyujtourl']}.php");
     }
@@ -26,6 +26,11 @@ else
     elseif($_GET['page'] == $currentpage['szerkoldal'])
     {
         include("./{$currentpage['szerkoldal']}.php");
+    }
+    else
+    {
+        http_response_code(404);
+        include("./404.php");
     }
 }
 ?>

@@ -67,7 +67,7 @@ function apiCallException(responsecode)
 function createTimestamp()
 {
     let most = new Date();
-    return most.getFullYear() + "-" + String(most.getMonth()).padStart(2, 0) + "-" + String(most.getDate()).padStart(2, 0) + " " + String(most.getHours()).padStart(2, 0) + ":" + String(most.getMinutes()).padStart(2, 0) + ":" + String(most.getSeconds()).padStart(2, 0);
+    return most.getFullYear() + "-" + String(most.getMonth() + 1).padStart(2, 0) + "-" + String(most.getDate()).padStart(2, 0) + " " + String(most.getHours()).padStart(2, 0) + ":" + String(most.getMinutes()).padStart(2, 0) + ":" + String(most.getSeconds()).padStart(2, 0);
 }
 
 function foFolyamat()

@@ -27,7 +27,7 @@ var options = {
 
 var callback = function (error, data) {
     let most = new Date();
-    let timestamp = most.getFullYear() + "-" + String(most.getMonth()).padStart(2, 0) + "-" + String(most.getDate()).padStart(2, 0) + " " + String(most.getHours()).padStart(2, 0) + ":" + String(most.getMinutes()).padStart(2, 0) + ":" + String(most.getSeconds()).padStart(2, 0);
+    let timestamp = most.getFullYear() + "-" + String(most.getMonth() + 1).padStart(2, 0) + "-" + String(most.getDate()).padStart(2, 0) + " " + String(most.getHours()).padStart(2, 0) + ":" + String(most.getMinutes()).padStart(2, 0) + ":" + String(most.getSeconds()).padStart(2, 0);
     console.log(timestamp + " Trap érkezett");
     var eredmeny = 200;
     if(error) {

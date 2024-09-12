@@ -3,6 +3,7 @@
 include('./includes/config.inc.php');
 include('./includes/functions.php');
 include('./Classes/Ertesites.class.php');
+include('./templates/svg.tpl.php');
 $RootPath = getenv('APP_ROOT_PATH');
 $dbcallcount = 0;
 $logid = null;
@@ -21,7 +22,7 @@ header('Pragma: no-cache');
 //header("Content-Security-Policy-Report-Only: script-src 'nonce-{RANDOM}' 'strict-dynamic';");
 
 // Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
-$page = $id = $current = $felhasznaloid = $loginid = $activitylogid = null; $loginsuccess = false;
+$page = $id = $current = $felhasznaloid = $loginid = $activitylogid =$gyujtooldal = null; $loginsuccess = false;
 
 // Címsorból vett GET értékek tisztítása nemkívánt karakterektől
 foreach($_GET as $key => $value)
@@ -356,7 +357,8 @@ foreach($menu as $menupont)
 			}
 		}
         $currentpage = $menupont;
-        $gyujtooldal = $gyujtotemp;
+        if($menupont['gyujtourl'])
+            $gyujtooldal = $gyujtotemp;
     }
 
     // Ha egy menüpont megjelenése nincs kifejezett joghoz kötve, menüterülethez adása
@@ -457,7 +459,7 @@ $javascriptfiles = [
     "includes/js/pageload.js"
 ];
 
-if(isset($_GET['page']) && $_GET['page'] != "aktiveszkoz" && $_GET['page'] != "sohoeszkoz" && $_GET['page'] != "mediakonverter" || ($_GET['page'] == "aktiveszkoz" && isset($_GET['action'])))
+if(isset($_GET['page']) && ($_GET['page'] != "aktiveszkoz" && $_GET['page'] != "sohoeszkoz" && $_GET['page'] != "mediakonverter" || ($_GET['page'] == "aktiveszkoz" && isset($_GET['action']))))
 {
     $javascriptfiles[] = "includes/js/progressOverlay.js";
 }
@@ -489,7 +491,6 @@ if($felhasznaloid && @$szemelyes['switchstateshow'])
 
 if($felhasznaloid != 1)
 $activitylogid = logActivity($felhasznaloid, $params);
-include('./templates/svg.tpl.php');
 // Oldal megjelenítése
 include('./templates/index.tpl.php');
 

@@ -14,7 +14,7 @@ if(strpos($backtosender, "vizsga") && !strpos($backtosender, "vizsgak"))
             break;
         }
     }
-    $kuldooldal = "?page=vizsga&id=" . $kivalasztottvizsga;
+    @$kuldooldal = "?page=vizsga&id=" . $kivalasztottvizsga;
 }
 
 ?><div class="szerkcard">

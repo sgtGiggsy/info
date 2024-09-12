@@ -24,11 +24,15 @@ function mySQLConnect($querystring = null)
 		try
 		{
 			$result = mysqli_query($con, $querystring);
+			if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NAME').'id'] == 1 && !$result)
+			{
+				echo $querystring;
+			}
 		}
 		catch(Exception $e)
 		{
 			echo $e->getMessage() . "<br>";
-			if($_SESSION[getenv('SESSION_NAME').'id'] == 1)
+			if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NAME').'id'] == 1)
 				echo $querystring;
 		}
 		$con->close();
