@@ -147,11 +147,24 @@ elseif(isset($_SESSION[getenv('SESSION_NAME').'id']) && isset($_GET['beallitasok
     $switchstate = false;
     $magyarazat = null;
     $irhat = true;
-    $id = $_SESSION[getenv('SESSION_NAME').'id'];
     $form = "modules/felhasznalok/forms/szemelyesbeallitasokform";
     $button = "Beállítások szerkesztése";
     $oldalcim = "Személyes beállítások szerkesztése";
-    $jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $id AND menupont = 5 AND olvasas > 1");
+    $jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $felhasznaloid AND menupont = 5 AND olvasas > 1");
+    $ertesitestipusok = mySQLConnect("SELECT id, ertesitestipus, feliratkozva, felhasznalo, email
+            FROM (
+                SELECT DISTINCT(ertesitestipusok.id) AS id, ertesitestipusok.nev AS ertesitestipus, IF(ertesitesfeliratkozasok.felhasznalo = $felhasznaloid, 1, 0) AS feliratkozva, ertesitesfeliratkozasok.felhasznalo AS felhasznalo, email
+                    FROM ertesitestipusok
+                        INNER JOIN jogosultsagok ON ertesitestipusok.menupont = jogosultsagok.menupont
+                        INNER JOIN ertesitesfeliratkozasok ON ertesitestipusok.id = ertesitesfeliratkozasok.ertesitestipus
+                    WHERE ertesitesfeliratkozasok.felhasznalo = $felhasznaloid
+            UNION ALL
+                SELECT DISTINCT(ertesitestipusok.id) AS id, ertesitestipusok.nev AS ertesitestipus, null AS feliratkozva, null AS felhasznalo, null AS email
+                    FROM ertesitestipusok
+                        INNER JOIN jogosultsagok ON ertesitestipusok.menupont = jogosultsagok.menupont
+                    WHERE jogosultsagok.felhasznalo = $felhasznaloid
+            ) ertesitestipuslista
+            GROUP BY id;");
     if(mysqli_num_rows($jogosultsagok) > 0)
     {
         $switchstate = true;
@@ -159,6 +172,7 @@ elseif(isset($_SESSION[getenv('SESSION_NAME').'id']) && isset($_GET['beallitasok
 
     if(count($_POST) > 0)
     {
+        //print_r($_POST['ertesitesfeliratkozasok'][0]);
         $irhat = true;
         include("./modules/felhasznalok/db/szemelyesdb.php");
         header("Location: ./felhasznalo?beallitasok");

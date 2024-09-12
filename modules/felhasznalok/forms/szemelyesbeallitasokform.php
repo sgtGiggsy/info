@@ -27,6 +27,29 @@ if(@$irhat)
                 }
 
                 ?><div>
+                    <label>Értesítés feliratkozások</label><br><?php
+                    foreach($ertesitestipusok as $ertesitestipus)
+                    {
+                        ?><label class="customcb flexcb">
+                            <input type="checkbox" name="ertesitesfeliratkozasok[]" value="<?=$ertesitestipus['id']?>" <?=($ertesitestipus['feliratkozva'] == 1) ? "checked" : "" ?>>
+                                <span class="customcbjelolo customcbleft"></span>
+                            </input>
+                            <span class="customcbleftlabel">
+                                <?=$ertesitestipus['ertesitestipus']?>
+                                <label class="customcb flexcb">
+                                    <input type="checkbox" name="emailertesites[]" value="<?=$ertesitestipus['id']?>" <?=($ertesitestipus['email'] == 1) ? "checked" : "" ?>>
+                                        <span class="customcbjelolo customcbleft"></span>
+                                    </input>
+                                    <span class="customcbleftlabel">
+                                        E-mail értesítés is
+                                    </span>
+                                </label>
+                            </span>
+                        </label><?php
+                    }
+                ?></div>
+                
+                <div>
                     <label>Színséma</label><br>
                     <div class="kapcsolo toggle <?=(isset($szemelyes['szinsema']) && $szemelyes['szinsema'] == "dark") ? "on" : "off" ?>" onclick="this.classList.toggle(`off`);this.classList.toggle(`on`);switchNightMode();">
                         <input type="hidden" name="szinsema" id="szinsemahidden" value="">

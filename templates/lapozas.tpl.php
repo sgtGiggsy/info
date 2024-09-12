@@ -1,5 +1,33 @@
 <?php
+function PrevNext($firstid, $previd, $nextid, $lastid, $RootPath, $oldalnev, $keres, $icons)
+{
+    ?><div class="prevnext">
+        <div><?php
+            if($firstid)
+            {
+                ?><button type="button" onclick="location.href='<?=$RootPath?>/<?=$oldalnev?><?=$keres?>'"><?=$icons['elsooldal']?></button><?php
+            }
+            if($previd)
+            {
+                ?><button type="button" onclick="location.href='<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$previd?><?=$keres?>'"><?=$icons['elozooldal']?></button><?php
+            }
+        ?></div>
+        <div><?php
+
+        if($nextid)
+        {
+            ?><button type="button" onclick="location.href='<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$nextid?><?=$keres?>'"><?=$icons['kovetkezooldal']?></button><?php
+        }
+        if($lastid)
+        {
+            ?><button type="button" onclick="location.href='<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$lastid?><?=$keres?>'"><?=$icons['utolsooldal']?></button><?php
+        }
+        ?></div>
+    </div><?php
+}
+
 $count = mySQLConnect("SELECT count(*) AS db FROM $adattabla $where")->fetch_assoc()['db'];
+$firstid = $previd = $nextid = $lastid = null;
 
 if(isset($_POST['oldalankent']))
 {
@@ -55,54 +83,8 @@ if($oldal * $megjelenit < $count)
         </form>
     </div>
 </div>
-<div class="contentcenter">
-    <div class="prevnext">
-        <div><?php
-            if(@$firstid)
-            {
-                ?><a href="<?=$RootPath?>/<?=$oldalnev?><?=$keres?>"><?=$icons['elsooldal']?></a><?php
-            }
-            if(@$previd)
-            {
-                ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$previd?><?=$keres?>"><?=$icons['elozooldal']?></a><?php
-            }
-        ?></div>
-        <div><?php
-
-        if(@$nextid)
-        {
-            ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$nextid?><?=$keres?>"><?=$icons['kovetkezooldal']?></a><?php
-        }
-        if(@$lastid)
-        {
-            ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$lastid?><?=$keres?>"><?=$icons['utolsooldal']?></a><?php
-        }
-        ?></div>
-    </div><?php
-
+<div class="contentcenter"><?php
+    PrevNext($firstid, $previd, $nextid, $lastid, $RootPath, $oldalnev, $keres, $icons);
     include("./" . $table . ".php");
-
-    ?><div class="prevnext">
-        <div><?php
-            if(@$firstid)
-            {
-                ?><a href="<?=$RootPath?>/<?=$oldalnev?><?=$keres?>"><?=$icons['elsooldal']?></a><?php
-            }
-            if(@$previd)
-            {
-                ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$previd?><?=$keres?>"><?=$icons['elozooldal']?></a><?php
-            }
-        ?></div>
-        <div><?php
-
-        if(@$nextid)
-        {
-            ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$nextid?><?=$keres?>"><?=$icons['kovetkezooldal']?></a><?php
-        }
-        if(@$lastid)
-        {
-            ?><a href="<?=$RootPath?>/<?=$oldalnev?>/oldal/<?=$lastid?><?=$keres?>"><?=$icons['utolsooldal']?></a><?php
-        }
-        ?></div>
-    </div>
-</div>
+    PrevNext($firstid, $previd, $nextid, $lastid, $RootPath, $oldalnev, $keres, $icons);
+?></div>

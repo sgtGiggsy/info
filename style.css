@@ -1494,9 +1494,18 @@ input:checked + .slider:before {
 }
 
 /* EGYEDI CHECKBOX */
-.customcb {
-    display: block;
+.flexcb {
+    padding: 0.5em;
+}
+
+.flexcb .customcbjelolo {
     position: relative;
+}
+
+.customcb {
+    display: flex;
+    position: relative;
+    align-items: center;
     cursor: pointer;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -1527,10 +1536,21 @@ input:checked + .slider:before {
 .tablejelolo {
     top: -0.75em;
 }
+
+.customcbleftlabel {
+    padding-left: 0.5em;
+    font-weight: normal;
+    font-size: 0.8em;
+}
+
+.customcbleftlabel .customcbjelolo {
+    height: 1em;
+    width: 1em;
+}
   
 /* On mouse-over, add a grey background color */
 .customcb:hover input ~ .customcbjelolo {
-    
+    background-color: var(--cardtitle);
 }
   
 /* When the checkbox is checked, add a blue background */
@@ -1564,6 +1584,13 @@ input:checked + .slider:before {
     box-shadow: 3px 3px 3px var(--shadow);
 }
 
+.customcbleftlabel .customcbjelolo:after {
+    left: 0.1em;
+    width: 0.4em;
+    height: 0.6em;
+    border-width: 0 4px 4px 0;
+}
+
 /* ------------------------------- Táblázatok ------------------------------- */
 /* Táblázat alapbeállítások */
 table {
@@ -1587,7 +1614,7 @@ thead, tbody {
     width: 100%;
 }
 
-thead tr:nth-child(1) {background: none !important }
+thead tr {background: none !important }
 
 td, th {
     border: 0px;
@@ -1601,6 +1628,10 @@ tr:nth-child(even) {
 
 tr:nth-child(odd) {
     background-color: var(--tsoro)
+}
+
+td:nth-child(1), .trlink :nth-child(1) a {
+    padding-left: 0.7em;
 }
 
 .trlink:hover {
@@ -1952,6 +1983,7 @@ td img {
     width: 1.2em;
     height: 1.2em;
     margin-right: 0.8em;
+    fill: var(--fontlight)
 }
 
 #notifpopup {
@@ -2470,6 +2502,23 @@ td img {
     height: 2.2em;
     width: 2.2em;
 }
+
+.prevnext button {
+    background-color: var(--infoboxtitle);
+    border-color: var(--scrollthumb);
+}
+
+.prevnext button:hover {
+    background-color: var(--infoboxscrollthumb);
+    box-shadow: 5px 5px 5px rgba(0 0 0 / .5),
+        -1px -1px 2px var(--overlayclose);
+}
+
+.prevnext button:hover + button, .prevnext button:has(+ button:hover) {
+    box-shadow: 3px 3px 3px rgba(0 0 0 / .5),
+        -1px -1px 2px var(--overlayclose);
+}
+
 
 .allapotjelentesek {
     display: grid;

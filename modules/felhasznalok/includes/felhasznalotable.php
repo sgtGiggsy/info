@@ -8,8 +8,8 @@ $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev
 ?><table class="fulltable">
     <thead>
         <tr>
+            <th>Név</th>    
             <th>Usernév</th>
-            <th>Felhasználó</th>
             <th>Emailcím</th>
             <th>Telefon</th>
             <th>Szervezet</th>
@@ -23,8 +23,8 @@ $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev
     {
         $kattinthatolink = $RootPath . '/felhasznalo/' . $x['felhasznaloid'];
         ?><tr class="trlink">
-            <td><a href="<?=$kattinthatolink?>"><?=$x['felhasznalonev']?></a></td>
             <td><a href="<?=$kattinthatolink?>"><?=$x['nev']?></a></td>
+            <td><a href="<?=$kattinthatolink?>"><?=$x['felhasznalonev']?></a></td>
             <td><a href="<?=$kattinthatolink?>"><?=$x['email']?></a></td>
             <td nowrap><a href="<?=$kattinthatolink?>"><?=$x['telefon']?></a></td>
             <td><a href="<?=$kattinthatolink?>"><?=$x['szervezet']?></a></td>
