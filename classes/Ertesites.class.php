@@ -57,15 +57,18 @@ class Ertesites
 
         if(count($this->felhasznalok) > 0)
         {
+            $mail = new MailHandler($this->szoveg);
+            $mail->Subject($this->cim);
             foreach($this->felhasznalok as $felhasznalo)
             {
                 $felhid = $felhasznalo['felhasznalo'];
                 mySQLConnect("INSERT INTO ertesites_megjelenik(felhasznalo, ertesites) VALUES ($felhid, $this->ertesitesid);");
                 if($felhasznalo['email'])
                 {
-                    //TODO Egyelőre még meg sem írt emailküldő osztály meghívása
+                    $mail->addAddress($felhasznalo['email']);
                 }
             }
+            $mail->Send();
         }
         else
         {
@@ -93,13 +96,19 @@ class Ertesites
     public function SetTipus($tipus)
     {
         $this->tipus = $tipus;
-        $felhasznalok = mySQLConnect("SELECT felhasznalo, email FROM ertesitesfeliratkozasok WHERE ertesitestipus = $tipus;");
+        $felhasznalok = mySQLConnect("SELECT felhasznalo, IF(ertesitesfeliratkozasok.email, felhasznalok.email, null) AS email
+                FROM ertesitesfeliratkozasok
+                    INNER JOIN felhasznalok ON ertesitesfeliratkozasok.felhasznalo = felhasznalok.id
+                WHERE ertesitestipus = $tipus;");
         $this->felhasznalok = mysqliToArray($felhasznalok);
     }
 
     public static function GetFelhasznalok($tipus)
     {
-        $felhasznalok = mySQLConnect("SELECT felhasznalo, email FROM ertesitesfeliratkozasok WHERE ertesitestipus = $tipus;");
+        $felhasznalok = mySQLConnect("SELECT felhasznalo, IF(ertesitesfeliratkozasok.email, felhasznalok.email, null) AS email
+                FROM ertesitesfeliratkozasok
+                    INNER JOIN felhasznalok ON ertesitesfeliratkozasok.felhasznalo = felhasznalok.id
+                WHERE ertesitestipus = $tipus;");
         return mysqliToArray($felhasznalok);
     }
 }
