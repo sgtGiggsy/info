@@ -10,114 +10,76 @@ else
     if(isset($_GET['kereses']))
     {
         $keres = $_GET['kereses'];
-        $where = "WHERE ipcimek.ipcim LIKE '%$keres%' OR ipcimek.vlan LIKE '%$keres%' OR ipcimek.eszkoz LIKE '%$keres%' OR beepitesek.nev LIKE '%$keres%' OR ipcimek.megjegyzes LIKE '%$keres%'";
+        $where = "WHERE ipcim LIKE '%$keres%' OR vlannev LIKE '%$keres%' OR eszkoz LIKE '%$keres%' OR beepitesnev LIKE '%$keres%' OR megjegyzes LIKE '%$keres%'";
     }
 
-    $ipcimek = mySQLConnect("SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim, ipcimek.vlan AS vlan, ipcimek.eszkoz AS eszkoz, vlanok.nev AS vlannev, beepitesek.nev AS beepitesnev, beepitesideje, kiepitesideje, ipcimek.megjegyzes AS megjegyzes, leadva, sorozatszam, eszkozok.id AS eszkid, beepitesek.id AS beepid
-        FROM ipcimek
-            LEFT JOIN vlanok ON ipcimek.vlan = vlanok.id
-            LEFT JOIN beepitesek ON beepitesek.ipcim = ipcimek.id
-            LEFT JOIN eszkozok ON beepitesek.eszkoz = eszkozok.id
+    $ipcimek = mySQLConnect("SELECT id, ipcim, vlan, eszkoz, vlannev, beepitesnev, beepitesideje, kiepitesideje, megjegyzes, leadva, sorozatszam, eszkid, beepid
+        FROM (
+            SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim, ipcimek.vlan AS vlan, ipcimek.eszkoz AS eszkoz, vlanok.nev AS vlannev, beepitesek.nev AS beepitesnev, beepitesideje, kiepitesideje, ipcimek.megjegyzes AS megjegyzes, leadva, sorozatszam, eszkozok.id AS eszkid, beepitesek.id AS beepid
+                FROM ipcimek
+                    LEFT JOIN vlanok ON ipcimek.vlan = vlanok.id
+                    LEFT JOIN beepitesek ON beepitesek.ipcim = ipcimek.id
+                    LEFT JOIN eszkozok ON beepitesek.eszkoz = eszkozok.id
+                WHERE (beepitesek.aktivbeepites = 1 OR ipcimek.eszkoz IS NOT NULL)
+            UNION
+                SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim, ipcimek.vlan AS vlan, ipcimek.eszkoz AS eszkoz, vlanok.nev AS vlannev, beepitesek.nev AS beepitesnev, beepitesideje, kiepitesideje, ipcimek.megjegyzes AS megjegyzes, leadva, sorozatszam, eszkozok.id AS eszkid, beepitesek.id AS beepid
+                    FROM ipcimek
+                        LEFT JOIN vlanok ON ipcimek.vlan = vlanok.id
+                        LEFT JOIN beepitesek ON beepitesek.ipcim = ipcimek.id
+                        LEFT JOIN eszkozok ON beepitesek.eszkoz = eszkozok.id
+            WHERE (beepitesek.aktivbeepites = 0 OR beepitesek.aktivbeepites IS NULL) AND ipcimek.eszkoz IS NULL
+        ) AS t
         $where
-        ORDER BY beepitesek.beepitesideje DESC;");
+        GROUP BY id;");
+
+    $ipcimelozmenyek = mySQLConnect("SELECT id, ipcim, vlan, eszkoz, vlannev, beepitesnev, beepitesideje, kiepitesideje, megjegyzes, leadva, sorozatszam, eszkid, beepid
+        FROM (
+            SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim, ipcimek.vlan AS vlan, ipcimek.eszkoz AS eszkoz, vlanok.nev AS vlannev, beepitesek.nev AS beepitesnev, beepitesideje, kiepitesideje, ipcimek.megjegyzes AS megjegyzes, leadva, sorozatszam, eszkozok.id AS eszkid, beepitesek.id AS beepid
+                FROM ipcimek
+                    LEFT JOIN vlanok ON ipcimek.vlan = vlanok.id
+                    LEFT JOIN beepitesek ON beepitesek.ipcim = ipcimek.id
+                    LEFT JOIN eszkozok ON beepitesek.eszkoz = eszkozok.id
+        ) AS t
+        $where;");
     if($mindir)
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/ipszerkeszt'">Új rezervált IP</button><?php
     }
 
-    $ipcimek = mysqliNaturalSort($ipcimek, 'ipcim')
+    $ipcimek = mysqliNaturalSort($ipcimek, 'ipcim');
+    $ipcimelozmenyek = mysqliNaturalSort($ipcimelozmenyek, 'ipcim');
 
     ?><div class="oldalcim">Rezervált IP címek listája</div><?php
-    $zar = false;
-    $elozoipk = array();
-    $ipcimekszurt = array();
-    $elozoip = null;
+
+    $altabla = $zar = false;
+    $elozmenyid = 1;
 
     foreach($ipcimek as $ipcim)
     {
-        $elozoip = end($elozoipk);
-
-        // echo "Előző: " . @$elozoip['ipcim'] . " mostani: " . $ipcim['ipcim'] . "<br>";
-        if($elozoip != null && $elozoip['ipcim'] != $ipcim['ipcim'])
-        {
-            //Összehasonlítás
-         //   echo count($elozoipk); echo " - ";
-           // echo $elozoipk[0]['ipcim']; echo "<br>";
-
-
-           usort($elozoipk, function($a, $b) {
-                if($a["beepitesideje"] == null)
-                {
-                    $a["beepitesideje"] = "zzzzz";
-                }
-        
-                if($b["beepitesideje"] == null)
-                {
-                    $b["beepitesideje"] = "zzzzz";
-                }
-        
-                return strnatcmp($b["beepitesideje"], $a["beepitesideje"]); //Case sensitive
-                //return strnatcasecmp($a['manager'],$b['manager']); //Case insensitive
-            });
-
-            //$ipcimekszurt[] = $elozoipk[0];
-
-            $elemszam = count($elozoipk);
-
-           for($i = 0; $i < $elemszam; $i++)
-           {
-                if($i == 0 && $elemszam > 1)
-                {
-                    $elozoipk[$i]["elozmenyek"] = true;
-                    $elozoipk[$i]["szulo"] = true;
-                }
-                elseif($i == 0 && $elemszam == 1)
-                {
-                    $elozoipk[$i]["elozmenyek"] = false;
-                    $elozoipk[$i]["szulo"] = false;
-                }
-                else
-                {
-                    $elozoipk[$i]["elozmenyek"] = true;
-                    $elozoipk[$i]["szulo"] = false;
-                }
-
-
-                $ipcimekszurt[] = $elozoipk[$i];
-                //echo "ip: " . $elozoipk[$i]['ipcim'] . " - " . $elozoipk[$i]["elozmenyek"] . "<br>";
-           }
-
-
-            // Lezárás
-            $elozoipk = array();
-            $elozoipk[] = $ipcim;
-        }
-        else
-        {
-            // echo "ipadd: " . $ipcim['ipcim'] . "<br>";
-            $elozoipk[] = $ipcim;
-        }
-    }
-
-    $altabla = false;
-    $elozmenyid = 1;
-
-    foreach($ipcimekszurt as $ipcim)
-    {
         $ipid = $ipcim['id'];
-        $hasznalatban = false;
-        $volthasznalva = true;
+        $hasznalatban = $szulo = $volthasznalva = false;
+        $eszkoz = null;
+        $elozmenyek = array();
+        foreach($ipcimelozmenyek as $elozmeny)
+        {
+            if($elozmeny['ipcim'] == $ipcim['ipcim'])
+            {
+                if($elozmeny['beepid'] != $ipcim['beepid'])
+                    $elozmenyek[] = $elozmeny;
+                $szulo = true;
+            }
+            if($szulo && $elozmeny['ipcim'] == $ipcim['ipcim'])
+            {
+                break;
+            }
+        }
 
         if($ipcim['eszkoz'] || $ipcim['beepid'])
         {
+            $eszkoz = $ipcim['beepitesnev'];
             if($ipcim['beepitesnev'] && $ipcim['beepitesideje'] && !$ipcim['kiepitesideje'])
             {
                 $hasznalatban = true;
-                $eszkoz = $ipcim['beepitesnev'];
-            }
-            elseif($ipcim['beepitesnev'] && !$ipcim['beepitesideje'] || $ipcim['kiepitesideje'])
-            {
-                $eszkoz = $ipcim['beepitesnev'];
             }
 
             if($ipcim['eszkoz'] && !$hasznalatban)
@@ -125,22 +87,9 @@ else
                 $eszkoz = $ipcim['eszkoz'];
                 $hasznalatban = true;
             }
-        }
-        else
-        {
-            $volthasznalva = false;
+            $volthasznalva = true;
         }
 
-       // echo "ipcim: " . $ipcim['ipcim'] . " altab: " . $altabla . " elozmenyek: " . $ipcim['elozmenyek'] . " szülő: " . $ipcim['szulo'] . "<br>";
-        if($altabla && ($ipcim['szulo'] || !$ipcim['elozmenyek']))
-        {
-                        ?></tbody>
-                    </table>
-                </td>
-            </tr><?php
-            $altabla = false;
-        }
-        
         if(@$tableid != $ipcim['vlan'])
         {
             if($zar)
@@ -165,50 +114,49 @@ else
             <tbody><?php
             $zar = true;
         }
-        
 
-        if(!$ipcim['elozmenyek'] || $ipcim['szulo'])
+        ?><tr <?=($hasznalatban) ? "style='font-weight: bold'" : "" ?>>
+            <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?>'><?=$ipcim['ipcim']?></td>
+            <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?>'><?=$ipcim['vlan']?></td>
+            <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?> <?=($ipcim['leadva']) ? "mukodeskeptelen" : "" ?>' ><?=$eszkoz?></td>
+            <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?> <?=($ipcim['leadva']) ? "mukodeskeptelen" : "" ?>' ><?=$ipcim['megjegyzes']?></td>
+            <td><?=($szulo && count($elozmenyek) > 0) ? "<a style='cursor: pointer' onclick=\"rejtMutat('elozmeny-$elozmenyid')\">+</a>" : "" ?></td>
+            <td><?=($csoportir) ? "<a href='$RootPath/ipszerkeszt/$ipid'><img src='$RootPath/images/edit.png' alt='IP cím szerkesztése' title='IP cím szerkesztése'/></a>" : "" ?></td>
+        </tr><?php
+        if($szulo && count($elozmenyek) > 0)
         {
-            ?><tr <?=($hasznalatban) ? "style='font-weight: bold'" : "" ?>>
-                <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?>'><?=$ipcim['ipcim']?></td>
-                <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?>'><?=$ipcim['vlan']?></td>
-                <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?> <?=($ipcim['leadva']) ? "mukodeskeptelen" : "" ?>' ><?=$eszkoz?></td>
-                <td class='<?=(!$hasznalatban && $volthasznalva) ? "reszhibas" : "" ?> <?=($ipcim['leadva']) ? "mukodeskeptelen" : "" ?>' ><?=$ipcim['megjegyzes']?></td>
-                <td><?=($ipcim['szulo']) ? "<a style='cursor: pointer' onclick=\"rejtMutat('elozmeny-$elozmenyid')\">+</a>" : "" ?></td>
-                <td><?=($csoportir) ? "<a href='$RootPath/ipszerkeszt/$ipid'><img src='$RootPath/images/edit.png' alt='IP cím szerkesztése' title='IP cím szerkesztése'/></a>" : "" ?></td>
+            $altabla = true;
+            ?><tr id="elozmeny-<?=$elozmenyid?>" style="display:none">
+                <td colspan=6>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td></td>
+                                <td>Eszköz</td>
+                                <td>Sorozatszám</td>
+                                <td>Beépítés ideje</td>
+                                <td>Kiépítés ideje</td>
+                            </tr>
+                        </thead>
+                        <tbody><?php
+                            foreach($elozmenyek as $elozmeny)
+                            {
+                                ?><tr>
+                                    <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
+                                    <td><?=$elozmeny['beepitesnev']?></td>
+                                    <td><?=$elozmeny['sorozatszam']?></td>
+                                    <td><?=$elozmeny['beepitesideje']?></td>
+                                    <td><?=$elozmeny['kiepitesideje']?></td>
+                                </tr><?php
+                            }
+                        ?></tbody>
+                    </table>
+                </td>
             </tr><?php
-            if($ipcim['szulo'])
-            {
-                $altabla = true;
-                ?><tr id="elozmeny-<?=$elozmenyid?>" style="display:none">
-                    <td colspan=6>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <td></td>
-                                    <td>Eszköz</td>
-                                    <td>Sorozatszám</td>
-                                    <td>Beépítés ideje</td>
-                                    <td>Kiépítés ideje</td>
-                                </tr>
-                            </thead>
-                            <tbody><?php
-                $elozmenyid++;
-            }
+            $elozmenyid++;
         }
-        else
-        {
-            ?><tr>
-                <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
-                <td><?=$eszkoz?></td>
-                <td><?=$ipcim['sorozatszam']?></td>
-                <td><?=$ipcim['beepitesideje']?></td>
-                <td><?=$ipcim['kiepitesideje']?></td>
-            </tr><?php
-        }
-        $eszkoz = null;
-        
     }
+
     ?></tbody>
     </table><?php
     $enablekeres = true;
