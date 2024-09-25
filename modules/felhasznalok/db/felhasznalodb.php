@@ -249,7 +249,7 @@ if(isset($irhat) && $irhat)
 
             if(!in_array($ldapfelh['samaccountname'], $felhasznalolista))
             {
-                $stmtinsert->bind_param('ssssssss', $ldapfelh['samaccountname'], $ldapfelh['displayName'], $ldapfelh['mail'], $elsobelepes, $ldapfelh['department'], $szervezet, $ldapfelh['telephoneNumber'], $ldapfelh['title'], $ldapfelh['thumb']);
+                $stmtinsert->bind_param('sssssssss', $ldapfelh['samaccountname'], $ldapfelh['displayName'], $ldapfelh['mail'], $elsobelepes, $ldapfelh['department'], $szervezet, $ldapfelh['telephoneNumber'], $ldapfelh['title'], $ldapfelh['thumb']);
                 $stmtinsert->execute();
             }
             else

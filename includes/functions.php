@@ -1367,7 +1367,7 @@ function purifyPost($ishtml = false)
 		{
 			if ($value == "NULL" || $value == "")
 			{
-				echo "null";
+				//echo "null";
 				$_POST[$key] = NULL;
 			}
 			elseif(!$ishtml)

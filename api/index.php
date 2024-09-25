@@ -108,7 +108,8 @@ else
 			}
 			else
 			{
-				$valasz = array('valasz' => 'Nincs jogosultságod a kívánt művelet elvégzéséhez!');
+				$valasz = array('valasz' => 'Nincs jogosultságod a kívánt művelet elvégzéséhez!',
+					'Jogosultságszint' => $dbapi['jog']);
 				$statuscode = 405;
 			}
 		}

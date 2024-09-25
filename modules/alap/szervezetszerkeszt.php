@@ -14,6 +14,7 @@ else
         include("./modules/alap/db/szervezetdb.php");
 
         redirectToGyujto("szervezetek");
+        die;
     }
     
     $button = "Új szervezet";

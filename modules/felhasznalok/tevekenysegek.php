@@ -19,7 +19,6 @@ else
         $keres = $_GET['kereses'];
         $where .= "WHERE felhasznalok.nev LIKE '%$keres%' OR felhasznalonev LIKE '%$keres%'";
         $keres = "?kereses=" . $keres;
-        $keresinheader = $_GET['kereses'];
     }
 
     include('././templates/lapozas.tpl.php');

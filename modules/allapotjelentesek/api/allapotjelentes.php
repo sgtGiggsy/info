@@ -38,13 +38,14 @@ Class API_Call implements API
             WHERE ipcimek.ipcim = '$object->deviceip' AND beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL;");
 
         $eszkoz = mysqli_fetch_assoc($aktiveszkoz);
-        $eszkozid = $eszkoz['eszkid'];
-        $community = $eszkoz['snmpcommunity'];
+        @$eszkozid = $eszkoz['eszkid'];
+        @$community = $eszkoz['snmpcommunity'];
+        /*
         $rawmessage = "";
         foreach($object->misc as $tovabbi)
         {
             $rawmessage .= "OID: " . $tovabbi->OID . "; Value: " . $tovabbi->TrapVal . "\n";
-        }
+        }*/
 
         $tojson = json_encode($object->misc);
 
@@ -70,13 +71,13 @@ Class API_Call implements API
 
         if(!$eszkozid)
         {
-            $rawmessage .= "IP CIM: " . $object->deviceip;
+            $ismeretleneszkip = $object->deviceip;
         }
 
         //$eszkozid = 10;
         //$event = $object->event;
-        $stmt = $con->prepare('INSERT INTO snmp_traps (eszkozid, event, port, systemuptime, severity, message) VALUES (?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('ssssss', $eszkozid, $object->event, $port, $object->sysuptime, $severity, $message);
+        $stmt = $con->prepare('INSERT INTO snmp_traps (eszkozid, event, port, systemuptime, severity, message, ismeretleneszkip) VALUES (?, ?, ?, ?, ?, ?, ?)');
+        $stmt->bind_param('sssssss', $eszkozid, $object->event, $port, $object->sysuptime, $severity, $message, $ismeretleneszkip);
         $stmt->execute();
 
         if(mysqli_errno($con) == 0)

@@ -1046,8 +1046,11 @@ function processMessageBody_json($body, $devip, $community)
             if($elerheto)
             {
                 $objectnev = @snmp2_get($devip, $community, "iso.3.6.1.2.1.31.1.1.1.1.$rendszerelemifid");
-                $portexpl = explode(": ", $objectnev);
-                $port = trim($portexpl[1], "\"");
+                if($objectnev)
+                {
+                    $portexpl = explode(": ", $objectnev);
+                    $port = trim($portexpl[1], "\"");
+                }
                 //$veglegesuzenet .= "<div>Port:</div><div>" . $port . "</div>";
             }
         }

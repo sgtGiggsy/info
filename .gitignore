@@ -24,3 +24,4 @@ modules/telefonkonyv/includes/telefonkonyvexport.php
 modules/telefonkonyv/includes/telefonkonyvmodositasexport.php
 api/apiteszt.php
 nodejs/*.json
+external
