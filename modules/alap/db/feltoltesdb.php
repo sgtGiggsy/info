@@ -37,15 +37,14 @@ if(isset($irhat) && $irhat)
 
         if(count($feltoltottfajlok) > 0)
         {
+            $fajlfeltolt = new mySQLHandler();
+            $fajlfeltolt->InitQuery('INSERT INTO feltoltesek (fajl) VALUES (?)');
             foreach($feltoltottfajlok as $fajl)
             {
-                $stmt = $con->prepare('INSERT INTO feltoltesek (fajl) VALUES (?)');
-                $stmt->bind_param('s', $fajl);
-                $stmt->execute();
-
-                $fajlid = mysqli_insert_id($con);
-                $uploadids[] = $fajlid;
+                $fajlfeltolt->Run($fajl);
+                $uploadids[] = $fajlfeltolt->last_insert_id;
             }
+            $fajlfeltolt->Close();
         }
     }
 }

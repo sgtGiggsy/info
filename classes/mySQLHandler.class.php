@@ -7,6 +7,7 @@ class MySQLHandler
     public $result;
     public $siker = false;
     public $hibakod;
+    public $sorokszama = 0;
     private $querystring = "";
     private $types = "";
     private $vartparam = 0;
@@ -121,6 +122,7 @@ class MySQLHandler
     public function InitQuery(string $query)
     {
         $this->querystring = $query;
+        $this->types = "";
         if($this->con)
         {
             try
@@ -176,9 +178,9 @@ class MySQLHandler
             {
                 $paramcount = 1;
                 if(is_array($params))
-                $paramcount = count($params);
+                    $paramcount = count($params);
                 if(!$this->types)
-                $this->SetTypes($params);
+                    $this->SetTypes($params);
             }
             
             if($paramcount == strlen($this->types) && $this->vartparam == $paramcount)
@@ -203,6 +205,8 @@ class MySQLHandler
                 $this->stmt->execute();
                 $this->last_insert_id = mysqli_insert_id($this->con);
                 $this->result = $this->stmt->get_result();
+                if(!is_bool($this->result))
+                    $this->sorokszama = mysqli_num_rows($this->result);
             }
     
             if($this->con && mysqli_errno($this->con) != 0)
@@ -288,5 +292,17 @@ class MySQLHandler
 
         //echo json_encode($returnarr);
         return $returnarr;
+    }
+
+    public function Close($backtosender = null)
+    {
+        if($this->con)
+            mysqli_close($this->con);
+
+        if($backtosender)
+        {
+            header("Location: $backtosender");
+            die;
+        }
     }
 }
