@@ -3,8 +3,8 @@
 include('./includes/config.inc.php');
 include('./includes/functions.php');
 include('./Classes/Ertesites.class.php');
+include('./Classes/MySQLhandler.class.php');
 include('./Classes/MailHandler.class.php');
-include('./templates/svg.tpl.php');
 
 $RootPath = getenv('APP_ROOT_PATH');
 $dbcallcount = 0;
@@ -24,7 +24,7 @@ header('Pragma: no-cache');
 //header("Content-Security-Policy-Report-Only: script-src 'nonce-{RANDOM}' 'strict-dynamic';");
 
 // Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
-$page = $id = $current = $felhasznaloid = $loginid = $activitylogid =$gyujtooldal = null; $loginsuccess = false;
+$page = $id = $current = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = null; $loginsuccess = false;
 
 // Címsorból vett GET értékek tisztítása nemkívánt karakterektől
 foreach($_GET as $key => $value)
