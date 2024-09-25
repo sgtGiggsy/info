@@ -5,8 +5,9 @@ class MySQLHandler
     public $con;
     public $last_insert_id = null;
     public $result;
-    public $siker = true;
+    public $siker = false;
     public $hibakod;
+    private $querystring = "";
     private $types = "";
     private $vartparam = 0;
     private $stmt;
@@ -39,6 +40,46 @@ class MySQLHandler
     {
         if($this->con)
             mysqli_close($this->con);
+    }
+
+    public function ShowException($paramszamokay = true, $paramcount = 0)
+    {
+        if($this->showdebug)
+        {
+            if(!$this->con)
+            {
+                echo "<h2>A meghívni kísérelt MySQL kapcsolat már lezárult!</h2>";
+            }
+            elseif(!$this->stmt)
+            {
+                echo "<h2>Hibásan megírt SQL query!</h2>";
+                echo $this->querystring;
+            }
+            elseif(!$paramszamokay)
+            {
+                echo "<h2>Hibás paraméterszám!</h2>";
+                echo "Várt paraméter: " . $this->vartparam . "<br>";
+                echo "Típusszám: " . strlen($this->types) . "<br>";
+                echo "Paraméterszám: " . $paramcount . "<br>";
+            }
+            elseif(!$this->querystring)
+            {
+                echo "<h2>Nem adtál meg lekérdezést!</h2>";
+            }
+            elseif(!$this->siker)
+            {
+                echo "<h2>A MySQL lekérdezésbe valamilyen hiba csúszott!</h2>";
+                echo mysqli_error($this->con);
+            }
+            else
+            {   
+                echo "<h2>Ismeretlen hiba a MySQL lekérdezésben!</h2>";
+            }
+        }
+        else
+        {
+            echo "<h2>A MySQL lekérdezésbe valamilyen hiba csúszott!</h2>";
+        }
     }
 
     private function GetType($param)
@@ -79,6 +120,7 @@ class MySQLHandler
 
     public function InitQuery(string $query)
     {
+        $this->querystring = $query;
         if($this->con)
         {
             try
@@ -91,30 +133,24 @@ class MySQLHandler
             }
             if(!$prep)
             {
-                if($this->showdebug)
-                {
-                    echo "<h2>Hibásan megírt SQL query!</h2>";
-                    echo $query;
-                }
                 $this->stmt = null;
                 $this->siker = false;
-                return false;
             }
             else
             {
                 $this->vartparam = $this->stmt->param_count;
-                return true;
+                $this->siker = true;
             }
         }
-        elseif($this->showdebug)
+        else
         {
-            echo "<h2>A meghívni kísérelt MySQL kapcsolat már lezárult!</h2>";
+            $this->ShowException();
         }
+        return $this->siker;
     }
 
     public function Query(string $query, $params = null, $keepalive = false)
     {
-        //$stmt = $this->stmt;
         if($this->InitQuery($query))
         {
             if($params)
@@ -123,29 +159,32 @@ class MySQLHandler
             }
             return $this->Run($params, $keepalive);
         }
+        else
+        {
+            $this->ShowException();
+            return false;
+        }
     }
 
     public function Run($params = null, $keepalive = true)
     {
-        if($this->stmt)
+        $paramszamokay = false;
+        $paramcount = 0;
+        if($this->stmt && $this->siker)
         {
-            @$GLOBALS['dbcallcount']++;
-    
-            $paramcount = 0;
-            $paramszamokay = false;
             if($params)
             {
                 $paramcount = 1;
                 if(is_array($params))
-                    $paramcount = count($params);
+                $paramcount = count($params);
                 if(!$this->types)
-                    $this->SetTypes($params);
+                $this->SetTypes($params);
             }
-    
+            
             if($paramcount == strlen($this->types) && $this->vartparam == $paramcount)
                 $paramszamokay = true;
-    
-    
+            
+            
             if($params != null && $paramszamokay)
             {
                 if(is_array($params))
@@ -157,24 +196,13 @@ class MySQLHandler
                     $this->stmt->bind_param($this->types, $params);
                 }
             }
-    
+            
             if($paramszamokay)
             {
+                @$GLOBALS['dbcallcount']++;
                 $this->stmt->execute();
                 $this->last_insert_id = mysqli_insert_id($this->con);
                 $this->result = $this->stmt->get_result();
-            }
-            else
-            {
-                if($this->showdebug)
-                {
-                    echo "<h2>Hibás paraméterszám!</h2>";
-                    echo "Várt paraméter: " . $this->vartparam . "<br>";
-                    echo "Típusszám: " . strlen($this->types) . "<br>";
-                    echo "Paraméterszám: " . $paramcount . "<br>";
-                }
-    
-                $this->result = false;
             }
     
             if($this->con && mysqli_errno($this->con) != 0)
@@ -188,13 +216,19 @@ class MySQLHandler
                 @mysqli_close($this->con);
                 $this->con = null;
             }
-            
-            return $this->result;
+        }
+        
+        if(!$this->stmt || !$this->siker || !$paramszamokay)
+        {
+            $this->ShowException($paramszamokay, $paramcount);
+            $this->result = false;
         }
         else
         {
-            return false;
+            $this->siker = true;
         }
+
+        return $this->result;
     }
 
     public function NaturalSort($column, $casesensitive = false, $result = null)
