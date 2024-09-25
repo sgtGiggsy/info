@@ -6,10 +6,13 @@
 
 if(isset($enablekeres) && $enablekeres)
 {
+    $keresoszoveg = null;
+    if(isset($_GET['kereses']))
+        $keresoszoveg = $_GET['kereses'];
     ?><div class="kereses" id="kereses">
         <form name="kereses" method="GET">
             <div class="felkormezo">
-                <input type="search" name="kereses" id="searchbar" placeholder="Keresés" aria-label="Keresés" <?=isset($keresinheader) ? "value=\"{$keresinheader}\"" : "" ?> />
+                <input type="search" name="kereses" id="searchbar" placeholder="Keresés" aria-label="Keresés" <?=($keresoszoveg) ? "value=\"{$keresoszoveg}\"" : "" ?> />
                 <button class="felkorbutton" class="searchicon"><?=$icons['search']?></button>
             </div>
         </form>

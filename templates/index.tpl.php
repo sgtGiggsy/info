@@ -1,4 +1,6 @@
-<!DOCTYPE HTML>
+<?php
+include('./templates/svg.tpl.php');
+?><!DOCTYPE HTML>
 <html xml:lang="hu" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="utf-8">

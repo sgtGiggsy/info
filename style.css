@@ -965,7 +965,8 @@ textarea {
 }
 
 textarea:focus, input:focus, select:focus {
-    outline: 1px solid var(--shadow);
+    outline: 1px solid var(--buttonborder);
+    border: 1px solid var(--buttonborder);
 }
 
 .telinput, .delbuttoninput {
@@ -1884,6 +1885,7 @@ td img {
 
 .felkormezo input:focus {
     outline: none;
+    border: none;
 }
 
 .felkormezo input:-webkit-autofill {
