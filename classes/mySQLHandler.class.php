@@ -1,6 +1,6 @@
 <?php
 
-class mySQLHandler
+class MySQLHandler
 {
     public $con;
     public $last_insert_id = null;
@@ -10,9 +10,14 @@ class mySQLHandler
     private $types = "";
     private $vartparam = 0;
     private $stmt;
+    private $showdebug = false;
 
     public function __construct()
 	{
+        if(isset($GLOBALS['felhasznaloid']) && $GLOBALS['felhasznaloid'] == 1)
+        {
+            $this->showdebug = true;
+        }
         try
         {
             $this->con = mysqli_connect($GLOBALS['DATABASE_HOST'], $GLOBALS['DATABASE_USER'], $GLOBALS['DATABASE_PASS'], $GLOBALS['DATABASE_NAME']);
@@ -56,7 +61,7 @@ class mySQLHandler
         }
     }
 
-    private function SetTypesParams($params)
+    private function SetTypes($params)
     {
         $this->types = "";
         if(is_array($params))
@@ -86,7 +91,7 @@ class mySQLHandler
             }
             if(!$prep)
             {
-                if(@$GLOBALS['felhasznaloid'] == 1)
+                if($this->showdebug)
                 {
                     echo "<h2>Hibásan megírt SQL query!</h2>";
                     echo $query;
@@ -101,22 +106,26 @@ class mySQLHandler
                 return true;
             }
         }
+        elseif($this->showdebug)
+        {
+            echo "<h2>A meghívni kísérelt MySQL kapcsolat már lezárult!</h2>";
+        }
     }
 
-    public function Query(string $query, $params = null)
+    public function Query(string $query, $params = null, $keepalive = false)
     {
         //$stmt = $this->stmt;
         if($this->InitQuery($query))
         {
             if($params)
             {
-                $this->SetTypesParams($params);
+                $this->SetTypes($params);
             }
-            return $this->Run($params, true);
+            return $this->Run($params, $keepalive);
         }
     }
 
-    public function Run($params = null, $close = false)
+    public function Run($params = null, $keepalive = true)
     {
         if($this->stmt)
         {
@@ -129,13 +138,15 @@ class mySQLHandler
                 $paramcount = 1;
                 if(is_array($params))
                     $paramcount = count($params);
+                if(!$this->types)
+                    $this->SetTypes($params);
             }
     
             if($paramcount == strlen($this->types) && $this->vartparam == $paramcount)
                 $paramszamokay = true;
     
     
-            if($params != null && $this->types && $paramszamokay)
+            if($params != null && $paramszamokay)
             {
                 if(is_array($params))
                 {
@@ -155,7 +166,7 @@ class mySQLHandler
             }
             else
             {
-                if(@$GLOBALS['felhasznaloid'] == 1)
+                if($this->showdebug)
                 {
                     echo "<h2>Hibás paraméterszám!</h2>";
                     echo "Várt paraméter: " . $this->vartparam . "<br>";
@@ -172,7 +183,7 @@ class mySQLHandler
                 $this->siker = false;
             }
     
-            if($close && $this->con)
+            if(!$keepalive && $this->con)
             {
                 @mysqli_close($this->con);
                 $this->con = null;

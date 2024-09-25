@@ -6,14 +6,17 @@ if(!@$mindolvas)
 }
 else
 {
+    $ipcimekSQL = new MySQLHandler();
     $where = null;
+    $bindarr = array();
     if(isset($_GET['kereses']))
     {
-        $keres = $_GET['kereses'];
-        $where = "WHERE ipcim LIKE '%$keres%' OR vlannev LIKE '%$keres%' OR eszkoz LIKE '%$keres%' OR beepitesnev LIKE '%$keres%' OR megjegyzes LIKE '%$keres%'";
+        $keres = '%' . $_GET['kereses'] . '%';
+        $where = "WHERE ipcim LIKE ? OR vlannev LIKE ? OR eszkoz LIKE ? OR beepitesnev LIKE ? OR megjegyzes LIKE ?";
+        $bindarr = array($keres, $keres, $keres, $keres, $keres);
     }
 
-    $ipcimek = mySQLConnect("SELECT id, ipcim, vlan, eszkoz, vlannev, beepitesnev, beepitesideje, kiepitesideje, megjegyzes, leadva, sorozatszam, eszkid, beepid
+    $ipcimek = $ipcimekSQL->Query("SELECT id, ipcim, vlan, eszkoz, vlannev, beepitesnev, beepitesideje, kiepitesideje, megjegyzes, leadva, sorozatszam, eszkid, beepid
         FROM (
             SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim, ipcimek.vlan AS vlan, ipcimek.eszkoz AS eszkoz, vlanok.nev AS vlannev, beepitesek.nev AS beepitesnev, beepitesideje, kiepitesideje, ipcimek.megjegyzes AS megjegyzes, leadva, sorozatszam, eszkozok.id AS eszkid, beepitesek.id AS beepid
                 FROM ipcimek
@@ -30,9 +33,10 @@ else
             WHERE (beepitesek.aktivbeepites = 0 OR beepitesek.aktivbeepites IS NULL) AND ipcimek.eszkoz IS NULL
         ) AS t
         $where
-        GROUP BY id;");
+        GROUP BY id;", $bindarr, true);
+    $ipcimek = $ipcimekSQL->NaturalSort('ipcim');
 
-    $ipcimelozmenyek = mySQLConnect("SELECT id, ipcim, vlan, eszkoz, vlannev, beepitesnev, beepitesideje, kiepitesideje, megjegyzes, leadva, sorozatszam, eszkid, beepid
+    $ipcimelozmenyek = $ipcimekSQL->Query("SELECT id, ipcim, vlan, eszkoz, vlannev, beepitesnev, beepitesideje, kiepitesideje, megjegyzes, leadva, sorozatszam, eszkid, beepid
         FROM (
             SELECT ipcimek.id AS id, ipcimek.ipcim AS ipcim, ipcimek.vlan AS vlan, ipcimek.eszkoz AS eszkoz, vlanok.nev AS vlannev, beepitesek.nev AS beepitesnev, beepitesideje, kiepitesideje, ipcimek.megjegyzes AS megjegyzes, leadva, sorozatszam, eszkozok.id AS eszkid, beepitesek.id AS beepid
                 FROM ipcimek
@@ -40,15 +44,12 @@ else
                     LEFT JOIN beepitesek ON beepitesek.ipcim = ipcimek.id
                     LEFT JOIN eszkozok ON beepitesek.eszkoz = eszkozok.id
         ) AS t
-        $where;");
+        $where;", $bindarr);
+
     if($mindir)
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/ipszerkeszt'">Új rezervált IP</button><?php
     }
-
-    $ipcimek = mysqliNaturalSort($ipcimek, 'ipcim');
-    $ipcimelozmenyek = mysqliNaturalSort($ipcimelozmenyek, 'ipcim');
-
     ?><div class="oldalcim">Rezervált IP címek listája</div><?php
 
     $altabla = $zar = false;
@@ -60,6 +61,7 @@ else
         $hasznalatban = $szulo = $volthasznalva = false;
         $eszkoz = null;
         $elozmenyek = array();
+
         foreach($ipcimelozmenyek as $elozmeny)
         {
             if($elozmeny['ipcim'] == $ipcim['ipcim'])
@@ -67,10 +69,6 @@ else
                 if($elozmeny['beepid'] != $ipcim['beepid'])
                     $elozmenyek[] = $elozmeny;
                 $szulo = true;
-            }
-            if($szulo && $elozmeny['ipcim'] == $ipcim['ipcim'])
-            {
-                break;
             }
         }
 
@@ -126,7 +124,8 @@ else
         if($szulo && count($elozmenyek) > 0)
         {
             $altabla = true;
-            ?><tr id="elozmeny-<?=$elozmenyid?>" style="display:none">
+            ?><tr style="display:none"></tr>
+            <tr id="elozmeny-<?=$elozmenyid?>" style="display:none">
                 <td colspan=6>
                     <table>
                         <thead>
