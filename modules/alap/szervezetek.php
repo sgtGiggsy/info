@@ -7,7 +7,7 @@ if(!@$mindolvas)
 else
 {
     $statarr = array(1 => "Alakulat", 2 => "HM Tulajdon", 3 => "Civil beszállító");
-    $szervezetek = mySQLConnect("SELECT szervezetek.id AS id,
+    $szervezetek = new MySQLHandler("SELECT szervezetek.id AS id,
             nev, rovid,
             statusz,
             GROUP_CONCAT(needle ORDER BY szervezetldap.id SEPARATOR '; ') AS ldapstring
@@ -15,6 +15,7 @@ else
     	    LEFT JOIN szervezetldap ON szervezetek.id = szervezetldap.szervezet
         GROUP BY nev
         ORDER BY id;");
+    $szervezetek = $szervezetek->result;
     if($mindir) 
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/szervezetszerkeszt'">Új szervezet</button><?php

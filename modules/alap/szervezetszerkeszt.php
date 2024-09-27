@@ -25,20 +25,17 @@ else
     if(isset($_GET['id']))
     {
         $szervezetid = $_GET['id'];
-        $szervezetszerk = mySQLConnect("SELECT * FROM szervezetek WHERE id = $szervezetid;");
-        $szervezetszerk = mysqli_fetch_assoc($szervezetszerk);
+        $szervezetszerk = new MySQLHandler("SELECT id, nev, rovid, statusz FROM szervezetek WHERE id = ?;", $szervezetid);
+        $szervezetszerk->Bind($id, $nev, $rovid, $statusz);
 
-        $ldapstringSQL = mySQLConnect("SELECT needle FROM szervezetldap WHERE szervezet = $szervezetid;");
+        $ldapstringSQL = new MySQLHandler("SELECT needle FROM szervezetldap WHERE szervezet = ?;", $szervezetid);
+        $ldapstringSQL = $ldapstringSQL->result;
+
         foreach($ldapstringSQL as $x)
         {
             $ldapstring .= $x['needle'] . "; ";
         }
         $ldapstring = rtrim($ldapstring, "; ");
-
-        $id = $szervezetszerk['id'];
-        $nev = $szervezetszerk['nev'];
-        $rovid = $szervezetszerk['rovid'];
-        $statusz = $szervezetszerk['statusz'];
 
         $button = "Szervezet szerkesztése";
         $oldalcim = "Szervezet szerkesztése";

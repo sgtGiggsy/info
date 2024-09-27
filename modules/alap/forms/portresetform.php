@@ -1,6 +1,6 @@
 <?php
 $javascriptfiles[] = "modules/alap/includes/portreset.js";
-$portok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, IF(vegpontiportok.epulet IS NULL, IF(transzportportok.epulet IS NOT NULL, transzportportok.epulet, NULL), vegpontiportok.epulet) AS epuletid, (SELECT nev FROM epuletek WHERE id = epuletid) AS epuletszam
+$portok = new MySQLHandler("SELECT portok.id AS id, portok.port AS port, IF(vegpontiportok.epulet IS NULL, IF(transzportportok.epulet IS NOT NULL, transzportportok.epulet, NULL), vegpontiportok.epulet) AS epuletid, (SELECT nev FROM epuletek WHERE id = epuletid) AS epuletszam
         FROM portok
             LEFT JOIN vegpontiportok ON vegpontiportok.port = portok.id
             LEFT JOIN transzportportok ON transzportportok.port = portok.id
@@ -9,6 +9,8 @@ $portok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, IF(vegponti
             LEFT JOIN sohoportok ON sohoportok.port = portok.id
             LEFT JOIN tkozpontportok ON tkozpontportok.port = portok.id
         WHERE switchportok.eszkoz IS NULL AND mediakonverterportok.eszkoz IS NULL AND sohoportok.eszkoz IS NULL AND tkozpontportok.eszkoz IS NULL;");
+$portok = $portok->result;
+
 $magyarazat .= "<strong>Portok resetelése</strong>
     <p>Ezzel lehet a kiválasztott tartomány portjainak helyiség és rack hozzárendeléseit törölni.
     Technikai okokból, itt az ÖSSZES port feltüntetésre kerül!</p>";

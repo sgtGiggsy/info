@@ -23,10 +23,8 @@ else
     if(isset($_GET['id']))
     {
         $gyartoid = $_GET['id'];
-        $gyarto = mySQLConnect("SELECT * FROM gyartok WHERE id = $gyartoid;");
-        $gyarto = mysqli_fetch_assoc($gyarto);
-
-        $nev = $gyarto['nev'];
+        $gyarto = new MySQLHandler("SELECT id, nev FROM gyartok WHERE id = ?", $_GET['id']);
+        $gyarto = $gyarto->Bind($id, $nev);
 
         $button = "Szerkesztés";
         $oldalcim = "Gyártó szerkesztése";

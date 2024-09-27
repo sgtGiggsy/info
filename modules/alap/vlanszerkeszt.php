@@ -23,13 +23,8 @@ else
     if(isset($_GET['id']))
     {
         $vlanid = $_GET['id'];
-        $vlanszerk = mySQLConnect("SELECT * FROM vlanok WHERE id = $vlanid;");
-        $vlanszerk = mysqli_fetch_assoc($vlanszerk);
-
-        $id = $vlanszerk['id'];
-        $nev = $vlanszerk['nev'];
-        $leiras = $vlanszerk['leiras'];
-        $kceh = $vlanszerk['kceh'];
+        $vlanszerk = new MySQLHandler("SELECT id, nev, leiras, kceh FROM vlanok WHERE id = ?;", $vlanid);
+        $vlanszerk->Bind($id, $nev, $leiras, $kceh);
 
         $button = "VLAN szerkesztése";
         $oldalcim = "VLAN szerkesztése";

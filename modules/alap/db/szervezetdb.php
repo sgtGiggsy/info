@@ -3,8 +3,6 @@
 if(isset($irhat) && $irhat)
 {
     $szervezetdb = new mySQLHandler();
-    
-    $con = mySQLConnect(false);
 
     purifyPost();
 

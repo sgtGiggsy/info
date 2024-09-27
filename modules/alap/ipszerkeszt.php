@@ -21,19 +21,13 @@ else
     $oldalcim = "Új IP cím hozzáadása";
     $button = "Új IP cím";
 
-    $eszkozok = mySQLConnect("SELECT * FROM eszkozok");
+    $eszkozok = new MySQLHandler("SELECT * FROM eszkozok;");
+    $eszkozok = $eszkozok->result;
 
     if(isset($_GET['id']))
     {
-        $ipid = $_GET['id'];
-        $ipszerk = mySQLConnect("SELECT * FROM ipcimek WHERE id = $ipid;");
-        $ipszerk = mysqli_fetch_assoc($ipszerk);
-
-        $id = $ipszerk['id'];
-        $ipcim = $ipszerk['ipcim'];
-        $vlan = $ipszerk['vlan'];
-        $eszkoz = $ipszerk['eszkoz'];
-        $megjegyzes = $ipszerk['megjegyzes'];
+        $ipszerk = new MySQLHandler("SELECT id, ipcim, vlan, eszkoz, megjegyzes FROM ipcimek WHERE id = ?;", $_GET['id']);
+        $ipszerk->Bind($id, $ipcim, $vlan, $eszkoz, $megjegyzes);
 
         $button = "IP cím szerkesztése";
         $oldalcim = "IP cím szerkesztése";

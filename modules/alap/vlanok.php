@@ -6,14 +6,9 @@ if(!@$mindolvas)
 }
 else
 {
-    $where = null;
-    if(isset($_GET['id']))
-    {
-        $modelltipid = $_GET['id'];
-        $where = "WHERE modellek.tipus = $thelyid";
-    }
+    $vlanok = new MySQLHandler("SELECT * FROM vlanok;");
+    $vlanok = $vlanok->result;
 
-    $vlanok = mySQLConnect("SELECT * FROM vlanok;");
     if($mindir) 
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/vlanszerkeszt'">Új VLAN</button><?php

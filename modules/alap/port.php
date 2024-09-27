@@ -13,7 +13,7 @@ else
 	}
 	else
 	{
-		$portres = mySQLConnect("SELECT portok.id AS portid,
+		$portres = new MySQLHandler("SELECT portok.id AS portid,
 				portok.port AS port,
 				epuletek.nev AS epuletnev,
 				helyisegszam,
@@ -55,9 +55,9 @@ else
 				LEFT JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
 				LEFT JOIN helyisegek ON vegpontiportok.helyiseg = helyisegek.id
 				LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
-			WHERE portok.id = $portid;");
-		$port = mysqli_fetch_assoc($portres);
-		$port2 = mysqli_fetch_assoc($portres);
+			WHERE portok.id = ?;", $portid);
+		$port = $portres->Fetch();
+		$port2 = $portres->Fetch();
 
 		//print_r($port);
 		//echo "<br>";
@@ -74,13 +74,13 @@ else
 		
 		if($helyisegid)
 		{
-			$helyiseg = mySQLConnect("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
+			$helyiseg = new MySQLHandler("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
 				FROM helyisegek
 					INNER JOIN epuletek ON helyisegek.epulet = epuletek.id
 					INNER JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
 					INNER JOIN telephelyek ON epuletek.telephely = telephelyek.id
-				WHERE helyisegek.id = $helyisegid;");
-			$helyiseg = mysqli_fetch_assoc($helyiseg);
+				WHERE helyisegek.id = ?;", $helyisegid);
+			$helyiseg = $helyiseg->Fetch();
 
 			?><div class="breadcumblist">
 				<ol vocab="https://schema.org/" typeof="BreadcrumbList">

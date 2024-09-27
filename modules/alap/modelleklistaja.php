@@ -6,19 +6,20 @@ if(!@$mindolvas)
 }
 else
 {
-    $where = null;
+    $where = $modelltipid = null;
     if(isset($_GET['id']))
     {
         $modelltipid = $_GET['id'];
-        $where = "WHERE modellek.tipus = $thelyid";
+        $where = "WHERE eszkoztipusok.nev = ?";
     }
 
-    $modellek = mySQLConnect("SELECT modellek.id AS id, gyartok.nev AS gyarto, modell, eszkoztipusok.nev AS tipus
-        FROM modellek
-            INNER JOIN gyartok ON modellek.gyarto = gyartok.id
-            INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
-        $where
-        ORDER BY tipus, gyarto, modell;");
+    $modellek = new MySQLHandler("SELECT modellek.id AS id, gyartok.nev AS gyarto, modell, eszkoztipusok.nev AS tipus
+            FROM modellek
+                INNER JOIN gyartok ON modellek.gyarto = gyartok.id
+                INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
+            $where
+            ORDER BY tipus, gyarto, modell;", $modelltipid);
+    $modellek = $modellek->result;
 
     if($mindir) 
     {
