@@ -15,7 +15,7 @@ else
     	    LEFT JOIN szervezetldap ON szervezetek.id = szervezetldap.szervezet
         GROUP BY nev
         ORDER BY id;");
-    $szervezetek = $szervezetek->result;
+    $szervezetek = $szervezetek->Result();
     if($mindir) 
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/szervezetszerkeszt'">Új szervezet</button><?php

@@ -9,7 +9,7 @@ $portok = new MySQLHandler("SELECT portok.id AS id, portok.port AS port, IF(vegp
             LEFT JOIN sohoportok ON sohoportok.port = portok.id
             LEFT JOIN tkozpontportok ON tkozpontportok.port = portok.id
         WHERE switchportok.eszkoz IS NULL AND mediakonverterportok.eszkoz IS NULL AND sohoportok.eszkoz IS NULL AND tkozpontportok.eszkoz IS NULL;");
-$portok = $portok->result;
+$portok = $portok->Result();
 
 $magyarazat .= "<strong>Portok resetelése</strong>
     <p>Ezzel lehet a kiválasztott tartomány portjainak helyiség és rack hozzárendeléseit törölni.

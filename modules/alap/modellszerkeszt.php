@@ -23,7 +23,7 @@ else
     $oldalcim = "Új modell rögzítése";
 
     $tipusok = new MySQLHandler("SELECT * FROM eszkoztipusok ORDER BY nev ASC");
-    $tipusok = $tipusok->result;
+    $tipusok = $tipusok->Result();
 
     if(isset($_GET['id']))
     {

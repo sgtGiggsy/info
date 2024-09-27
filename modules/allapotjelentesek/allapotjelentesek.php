@@ -9,7 +9,8 @@ else
 {
     $enablekeres = true;
     $nezet = "lista";
-    $fontossagszur = $kezdodatum = $zarodatum = null;
+    $fontossagszur = $kezdodatum = $zarodatum = $keres = null;
+    $paramarr = array();
     $javascriptfiles[] = "modules/allapotjelentesek/includes/allapotjelentesek.js";
     $severityfilter = "minden";
     if(isset($_GET['trapfontossag']))
@@ -46,8 +47,9 @@ else
 
     if(isset($_GET['kereses']))
     {
-        $keres = $_GET['kereses'];
-        $where = "WHERE ipcimek.ipcim LIKE '%$keres%'";
+        $keres = "%" . $_GET['kereses'] . "%";
+        $paramarr[] = $keres;
+        $where = "WHERE ipcimek.ipcim LIKE ?";
     }
     else
     {
@@ -64,7 +66,8 @@ else
             {
                 $date = str_replace("-", "", $date);
             }
-            $where .= " AND DATE(snmp_traps.datum) = DATE($date)";
+            $paramarr[] = $date;
+            $where .= " AND DATE(snmp_traps.datum) = DATE(?)";
         }
         else
         {
@@ -87,7 +90,9 @@ else
                 $zaro = str_replace("-", "", $zaro);
             }
 
-            $where .= " AND (DATE(snmp_traps.datum) >= DATE($kezdo) AND DATE(snmp_traps.datum) <= DATE($zaro))";
+            $paramarr[] = $kezdo;
+            $paramarr[] = $zaro;
+            $where .= " AND (DATE(snmp_traps.datum) >= DATE(?) AND DATE(snmp_traps.datum) <= DATE(?))";
         }
     }
     elseif(!isset($_GET['kereses']))
@@ -113,7 +118,7 @@ else
         $where .= "AND $csoportwhere";
     }
 
-    $allapotjelzesek = mySQLConnect("SELECT snmp_traps.id AS id,
+    $allapotjelzesek = new MySQLHandler("SELECT snmp_traps.id AS id,
             snmp_traps.eszkozid AS eszkozid,
             snmp_traps.timestamp AS timestamp,
             event, port, systemuptime,
@@ -123,9 +128,9 @@ else
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
             LEFT JOIN aktiveszkozok ON beepitesek.eszkoz = aktiveszkozok.eszkoz
         $where
-        ORDER BY snmp_traps.timestamp DESC;");
-
-    $bejegyzesdb = mysqli_num_rows($allapotjelzesek);
+        ORDER BY snmp_traps.timestamp DESC;", $paramarr);
+    $bejegyzesdb = $allapotjelzesek->sorokszama;
+    $allapotjelzesek = $allapotjelzesek->Result();
 
     if(isset($date))
     {

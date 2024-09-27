@@ -19,7 +19,7 @@ else
                 INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
             $where
             ORDER BY tipus, gyarto, modell;", $modelltipid);
-    $modellek = $modellek->result;
+    $modellek = $modellek->Result();
 
     if($mindir) 
     {

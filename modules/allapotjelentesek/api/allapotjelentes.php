@@ -11,35 +11,31 @@ Class API_Call implements API
 
     static function GetItem($objid)
     {
-        $allapotjelzesek = mySQLConnect("SELECT snmp_traps.id AS id,
+        $allapotjelzesek = new MySQLHandler("SELECT snmp_traps.id AS id,
             snmp_traps.eszkozid AS eszkozid,
             snmp_traps.timestamp AS timestamp,
             event, port, systemuptime,
             severity, message
         FROM snmp_traps
-        WHERE eszkozid = $objid AND DATE(snmp_traps.datum) >= DATE_SUB(NOW(), interval 14 DAY)
-        ORDER BY snmp_traps.timestamp DESC");
+        WHERE eszkozid = ? AND DATE(snmp_traps.datum) >= DATE_SUB(NOW(), interval 14 DAY)
+        ORDER BY snmp_traps.timestamp DESC", $objid);
 
-        return $allapotjelzesek;
+        return $allapotjelzesek->Result();
     }
 
     static function Post($object, $tabla)
     {
-        $con = mySQLConnect(false);
         $statuscode = 400;
         $port = $body = $severity = null;
         //$jelentes = purifyArray($object);
 
-        $aktiveszkoz = mySQLConnect("SELECT eszkozok.id AS eszkid, ipcimek.ipcim AS ipcim, snmpcommunity
+        $eszkoz = new MySQLHandler("SELECT eszkozok.id AS eszkid, snmpcommunity
             FROM eszkozok
                 INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
                 LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
-            WHERE ipcimek.ipcim = '$object->deviceip' AND beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL;");
-
-        $eszkoz = mysqli_fetch_assoc($aktiveszkoz);
-        @$eszkozid = $eszkoz['eszkid'];
-        @$community = $eszkoz['snmpcommunity'];
+            WHERE ipcimek.ipcim = ? AND beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL;", $object->deviceip);
+        $eszkoz = $eszkoz->Bind($eszkozid, $community);
         /*
         $rawmessage = "";
         foreach($object->misc as $tovabbi)
@@ -76,11 +72,11 @@ Class API_Call implements API
 
         //$eszkozid = 10;
         //$event = $object->event;
-        $stmt = $con->prepare('INSERT INTO snmp_traps (eszkozid, event, port, systemuptime, severity, message, ismeretleneszkip) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssssss', $eszkozid, $object->event, $port, $object->sysuptime, $severity, $message, $ismeretleneszkip);
-        $stmt->execute();
+        $post = new MySQLHandler();
+        $post->Query('INSERT INTO snmp_traps (eszkozid, event, port, systemuptime, severity, message, ismeretleneszkip) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            array($eszkozid, $object->event, $port, $object->sysuptime, $severity, $message, $ismeretleneszkip));
 
-        if(mysqli_errno($con) == 0)
+        if($post->siker)
         {
             $statuscode = 201;
         }

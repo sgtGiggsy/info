@@ -4,10 +4,10 @@ class MySQLHandler
 {
     public $con;
     public $last_insert_id = null;
-    public $result;
     public $siker = false;
     public $hibakod;
     public $sorokszama = 0;
+    private $result;
     private $querystring = "";
     private $types = "";
     private $vartparam = 0;
@@ -122,6 +122,11 @@ class MySQLHandler
         {
             $this->GetType($params);
         }
+    }
+
+    public function Result()
+    {
+        return $this->result;
     }
 
     public function Fetch()

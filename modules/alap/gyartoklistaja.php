@@ -7,7 +7,7 @@ if(!@$mindolvas)
 else
 {
     $gyartok = new MySQLHandler("SELECT * FROM gyartok ORDER BY nev;");
-    $gyartok = $gyartok->result;
+    $gyartok = $gyartok->Result();
     $tipus = "gyartoklistaja";
 
     if($mindir) 

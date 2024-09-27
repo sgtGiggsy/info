@@ -29,7 +29,7 @@ else
         $szervezetszerk->Bind($id, $nev, $rovid, $statusz);
 
         $ldapstringSQL = new MySQLHandler("SELECT needle FROM szervezetldap WHERE szervezet = ?;", $szervezetid);
-        $ldapstringSQL = $ldapstringSQL->result;
+        $ldapstringSQL = $ldapstringSQL->Result();
 
         foreach($ldapstringSQL as $x)
         {

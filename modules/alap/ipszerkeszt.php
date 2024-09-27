@@ -22,7 +22,7 @@ else
     $button = "Új IP cím";
 
     $eszkozok = new MySQLHandler("SELECT * FROM eszkozok;");
-    $eszkozok = $eszkozok->result;
+    $eszkozok = $eszkozok->Result();
 
     if(isset($_GET['id']))
     {

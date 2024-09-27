@@ -7,7 +7,7 @@ if(!@$mindolvas)
 else
 {
     $vlanok = new MySQLHandler("SELECT * FROM vlanok;");
-    $vlanok = $vlanok->result;
+    $vlanok = $vlanok->Result();
 
     if($mindir) 
     {
