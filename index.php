@@ -87,8 +87,6 @@ if(isset($_GET['id']))
 // Felhasználó beléptetése
 if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION_NAME').'id']) && isset($_POST['felhasznalonev']) && !(isset($_GET['page']) && $_GET['page'] == "kilep"))
 {
-	$con = mySQLConnect();
-
     $samaccountname = $_POST['felhasznalonev'];
     $plainpassword = $_POST['jelszo'];
     $hashedpassword = password_hash($plainpassword, PASSWORD_DEFAULT); // A jelszó hash-e az adatbázisban tároláshoz
@@ -138,19 +136,8 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
     }
 
     // MySQL-en keresztüli autentikációt elvégző rész
-    if ($stmt = $con->prepare('SELECT id, jelszo FROM felhasznalok WHERE felhasznalonev = ?'))
-    {
-        $stmt->bind_param('s', $samaccountname);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows > 0)
-        {
-            $stmt->bind_result($id, $jelszo);
-            $stmt->fetch();
-            $stmt->close();
-        }
-    }
+    $login = new MySQLHandler('SELECT id, jelszo FROM felhasznalok WHERE felhasznalonev = ?', $samaccountname);
+    $login->Bind($id, $jelszo);
 
     // A lényegi bejelentkeztetést végző elágazás, csak akkor lépünk be ide, ha legalább az egyik módon van érvényes eredmény a felhasználónév-jelszó párosra
     if((isset($ldapbind) && $ldapbind) || (isset($jelszo) && (password_verify($_POST['jelszo'], $jelszo))))
@@ -159,19 +146,13 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
         {
             if(isset($jelszo)) // Ha létezett már a felhasználó a MySQL adatbázisban, frissítjük az adatait a DC-től kapottakkal
             {
-                if ($stmt = $con->prepare('UPDATE felhasznalok SET jelszo=?, nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?'))
-                {
-                    $stmt->bind_param('sssssssss', $hashedpassword, $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb, $samaccountname);
-                    $stmt->execute();
-                }
+                $update = new MySQLHandler('UPDATE felhasznalok SET jelszo=?, nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?',
+                    array($hashedpassword, $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb, $samaccountname));
             }
             else // Ha nem létezett a felhasználó a MySQL adatbázisban, létrehozzuk (a jelen táblabeállítás szerint a MySQL-ben automatikusan 1-es, azaz legalacsonyabb belépett joggal jön létre minden felhasználó)
             {
-                if ($stmt = $con->prepare('INSERT INTO felhasznalok (felhasznalonev, jelszo, nev, email, osztaly, szervezet, telefon, beosztas, profilkep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'))
-                {
-                    $stmt->bind_param('sssssssss', $samaccountname, $hashedpassword, $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb);
-                    $stmt->execute();
-                }
+                $insert = new MySQLHandler('INSERT INTO felhasznalok (felhasznalonev, jelszo, nev, email, osztaly, szervezet, telefon, beosztas, profilkep) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    array($samaccountname, $hashedpassword, $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb));
             }
         }
 
@@ -181,12 +162,12 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
         }
         else
         {
-            $result = mySQLConnect("SELECT * FROM felhasznalok WHERE felhasznalonev = '$samaccountname'");
+            $result = new MySQLHandler("SELECT id FROM felhasznalok WHERE felhasznalonev = ?", $samaccountname);
 
             session_regenerate_id();
-            if(mysqli_num_rows($result) == 1) // Ez az egyedüli "Sikeres bejelentkezés" ág. Bármely más ágra fut ki a modul, a bejelentkezés sikertelen
+            if($result->sorokszama == 1) // Ez az egyedüli "Sikeres bejelentkezés" ág. Bármely más ágra fut ki a modul, a bejelentkezés sikertelen
             {
-                $userid = mysqli_fetch_assoc($result)['id'];
+                $userid = $result->Bind($id);
                 $_SESSION[getenv('SESSION_NAME').'id'] = true;
                 $loginid = logLogin($userid);
                 $loginsuccess = true;
@@ -205,12 +186,8 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
 
     if(isset($hiba) && $hiba)
     {
-        $con = mySQLConnect();
-		if ($stmt = $con->prepare('INSERT INTO failedlogins (felhasznalonev, ipcim) VALUES (?, ?)'))
-		{
-			$stmt->bind_param('ss', $_POST['felhasznalonev'], $_SERVER['REMOTE_ADDR']);
-			$stmt->execute();
-		}
+		$failed = new MySQLHandler('INSERT INTO failedlogins (felhasznalonev, ipcim) VALUES (?, ?)',
+            array($_POST['felhasznalonev'], $_SERVER['REMOTE_ADDR']));
         echo "<h2>$hiba</h2>";
         ?><script type='text/javascript'>alert('<?=$hiba?>')</script>
         <head><meta http-equiv="refresh" content="0; URL='./belepes'" /></head><?php
@@ -225,17 +202,11 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
         $samaccountname = $_SESSION[getenv('SESSION_NAME').'felhasznalonev'];
     }
     // Mivel van aktív sessionje, ellenőrizzük, hogy továbbra is jogosult-e bejelentkezve lenni
-    $result = mySQLConnect("SELECT * FROM felhasznalok WHERE felhasznalonev = '$samaccountname'");
-    $row = $result->fetch_assoc();
+    $result = new MySQLHandler("SELECT id, felhasznalonev, nev, profilkep, szervezet FROM felhasznalok WHERE felhasznalonev = ?", $samaccountname);
 
-    if(mysqli_num_rows($result) == 1)
+    if($result->sorokszama == 1)
     {
-        $_SESSION[getenv('SESSION_NAME').'id'] = $row['id'];
-        $_SESSION[getenv('SESSION_NAME').'felhasznalonev'] = $row['felhasznalonev'];
-        $_SESSION[getenv('SESSION_NAME').'nev'] =  $row['nev'];
-        $_SESSION['profilkep'] =  $row['profilkep'];
-        $szervezet = $row['szervezet'];
-
+        $result->Bind($_SESSION[getenv('SESSION_NAME').'id'], $_SESSION[getenv('SESSION_NAME').'felhasznalonev'], $_SESSION[getenv('SESSION_NAME').'nev'], $_SESSION['profilkep'], $szervezet);
         // Ez a rész gondoskodik róla, hogy ha egy adott oldalt próbált a felhasználó felkeresni,
         // a sikeres bejelentkezés után vissza legyen oda irányítva
         if($loginsuccess && isset($_GET['kuldooldal']) && $_GET['kuldooldal'] != "belepes")
@@ -265,7 +236,8 @@ else
 }
 
 // Oldal működéséhez használt alapbeállítások betöltése
-$beallitas = mySQLConnect("SELECT * FROM beallitasok");
+$beallitas = new MySQLHandler("SELECT * FROM beallitasok");
+$beallitas = $beallitas->Result();
 foreach($beallitas as $x)
 {
     $nev = $x['nev'];
@@ -282,7 +254,8 @@ else
 }
 
 // Betöldendő oldal kiválasztása, menüterületek feltöltése, és felhasználói jogosultságok megállapítása
-$menu = mySQLConnect("SELECT * FROM menupontok ORDER BY menuterulet ASC, sorrend ASC, aktiv DESC, id ASC");
+$menu = new MySQLHandler("SELECT * FROM menupontok ORDER BY menuterulet ASC, sorrend ASC, aktiv DESC, id ASC");
+$menu = $menu->Result();
 $sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
 
 // Ha nincs betölteni kívánt oldal, a főoldal kiválasztása betöltésre
@@ -300,21 +273,23 @@ else
 if($_SESSION[getenv('SESSION_NAME').'id'])
 {
     $felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
-    $jogosultsagok = mySQLConnect("SELECT * FROM jogosultsagok WHERE felhasznalo = $felhasznaloid;");
+    $jogosultsagok = new MySQLHandler("SELECT * FROM jogosultsagok WHERE felhasznalo = ?", $felhasznaloid);
+    $jogosultsagok = $jogosultsagok->Result();
 }
 
 // Felhasználó személyes beállításainak lekérése
 if($_SESSION[getenv('SESSION_NAME').'id'])
 {
-    $szemelyesbeallitasok = mySQLConnect("SELECT * FROM szemelyesbeallitasok WHERE felhid = $felhasznaloid");
-    $szemelyes = mysqli_fetch_assoc($szemelyesbeallitasok);
+    $szemelyesbeallitasok = new MySQLHandler("SELECT * FROM szemelyesbeallitasok WHERE felhid = ?", $felhasznaloid);
+    $szemelyes = $szemelyesbeallitasok->Fetch();
 
     // Csoporttagságok begyüjtése
-    $csoporttagsagok = mySQLConnect("SELECT csoportok.nev AS csoportnev, szervezet, telephely
+    $csoporttagsagok = new MySQLHandler("SELECT csoportok.nev AS csoportnev, szervezet, telephely
         FROM csoportok
             INNER JOIN csoporttagsagok ON csoportok.id = csoporttagsagok.csoport
             LEFT JOIN csoportjogok ON csoportjogok.csoport = csoporttagsagok.csoport
-        WHERE felhasznalo = $felhasznaloid;");
+        WHERE felhasznalo = ?",$felhasznaloid);
+    $csoporttagsagok = $csoporttagsagok->Result();
 }
 
 // Menüterületeket tároló tömb elkészítése
