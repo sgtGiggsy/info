@@ -14,7 +14,7 @@ class MySQLHandler
     private $stmt;
     private $showdebug = false;
 
-    public function __construct()
+    public function __construct(string $query = null, $params = null)
 	{
         if(isset($GLOBALS['felhasznaloid']) && $GLOBALS['felhasznaloid'] == 1)
         {
@@ -34,6 +34,11 @@ class MySQLHandler
         {
             mysqli_set_charset($this->con, "UTF8");
             $this->stmt = $this->con->stmt_init();
+        }
+
+        if($query)
+        {
+            $this->Query($query, $params);
         }
     }
 
@@ -116,6 +121,18 @@ class MySQLHandler
         else
         {
             $this->GetType($params);
+        }
+    }
+
+    public function Fetch()
+    {
+        if($this->result)
+        {
+            return mysqli_fetch_assoc($this->result);
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -235,6 +252,33 @@ class MySQLHandler
         return $this->result;
     }
 
+    public function Bind(&...$array)
+    {
+        $returnarr = array();
+        $tobind = mysqli_fetch_assoc($this->result);
+        $dbelem = count($tobind);
+
+        if($dbelem == count($array))
+        {
+            $i = 0;
+            foreach($tobind as $key => $value)
+            {
+                $array[$i] = $value;
+                $returnarr[$key] = $value;
+                $i++;
+            }
+            
+            return $returnarr;
+        }
+        else
+        {
+            echo "<h2>Az SQL lekérdezés mezőinek, és a kötni kívánt tömb elemeinek száma különbözik!</h2>";
+            echo "SQL adatbázisból vett mezők száma: . $dbelem";
+            echo "A kötni kívánt elemek száma: " . count($array);
+            return false;
+        }
+    }
+
     public function NaturalSort($column, $casesensitive = false, $result = null)
     {
         if(!$result)
@@ -242,7 +286,7 @@ class MySQLHandler
             $result = $this->result;
         }
 
-        $result = $this->MySQLIToArray();
+        $result = $this->AsArray();
         usort($result, function($a, $b) use ($column, $casesensitive) {
             if($a[$column] == null)
             {
@@ -268,7 +312,7 @@ class MySQLHandler
         return $result;
     }
 
-    public function MySQLIToArray($ondimensional = false, $result = null)
+    public function AsArray($ondimensional = false, $result = null)
     {
         if(!$result)
         {
