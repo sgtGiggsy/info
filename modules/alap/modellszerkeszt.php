@@ -6,15 +6,8 @@ if(@!$mindir)
 }
 else
 {
-    $gyarto = $modell = $tipus = $szines = $scanner = $fax = $defadmin = $defpass = $maxmeret = $magyarazat = null;
-    if(isset($_GET['tipus']))
-    {
-        $tipusnev = $_GET['tipus'];
-        if($tipusnev == "nyomtato")
-        {
-            $tipus = "12";
-        }
-    }
+    $gyarto = $modell = $tipus = $szines = $scanner = $fax = $defadmin = $defpass = $maxmeret = $magyarazat = $fizikaireteg =
+    $transzpszabvany = $transzpcsatlakozo = $transzpsebesseg = $lanszabvany = $lancsatlakozo = $lansebesseg = $modellid = $tipusnev = null;
 
     if(count($_POST) > 0)
     {
@@ -29,69 +22,53 @@ else
     $form = "modules/alap/forms/modellszerkesztform";
     $oldalcim = "Új modell rögzítése";
 
-    $tipusok = mySQLConnect("SELECT * FROM eszkoztipusok ORDER BY nev ASC");
+    $tipusok = new MySQLHandler("SELECT * FROM eszkoztipusok ORDER BY nev ASC");
+    $tipusok = $tipusok->result;
 
     if(isset($_GET['id']))
     {
+        $where = null;
         $modellid = $_GET['id'];
-        $modellszerk = mySQLConnect("SELECT * FROM modellek WHERE id = $modellid;");
-        $modellszerk = mysqli_fetch_assoc($modellszerk);
+        if($modellid)
+            $where = "WHERE modell = ?";
+        
+        $modellszerk = new MySQLHandler("SELECT gyarto, modell, tipus FROM modellek WHERE id = ?;", $modellid);
+        $modellszerk->Bind($gyarto, $modell, $tipus);
+        $tipusnev = eszkozTipusValaszto($tipus);
 
-        $gyarto = $modellszerk['gyarto'];
-        $modell = $modellszerk['modell'];
-        $tipus = $modellszerk['tipus'];
-
-        if(@$tipusnev == "nyomtato" || @$tipus == "12")
+        if(@$tipus == "12")
         {
-            $tipusnev = "nyomtato";
-            $tipus = "12";
-            $nyomtato = mySQLConnect("SELECT * FROM nyomtatomodellek WHERE modell = $modellid;");
-            $nyomtato = mysqli_fetch_assoc($nyomtato);
-
-            $szines = @$nyomtato['szines'];
-            $scanner = @$nyomtato['scanner'];
-            $fax = @$nyomtato['fax'];
-            $maxmeret = @$nyomtato['maxmeret'];
+            $nyomtato = new MySQLHandler("SELECT szines, scanner, fax, maxmeret FROM nyomtatomodellek $where;", $modellid);
+            $nyomtato->Bind($szines, $scanner, $fax, $maxmeret);
         }
 
-        if(@$tipusnev == "mediakonverter" || @$tipus > 20 && @$tipus < 26)
+        if(@$tipus > 20 && @$tipus < 31)
         {
-            $tipusnev = "mediakonverter";
-            $fizikairetegek = mySQLConnect("SELECT * FROM fizikairetegek;");
-            $csatlakozok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
-            $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
-            $atviteliszabvanyok = mySQLConnect("SELECT * FROM atviteliszabvanyok;");
+            $sql = new MySQLHandler();
 
-            $mediakonverter = mySQLConnect("SELECT * FROM mediakonvertermodellek WHERE modell = $modellid;");
-            $mediakonverter = mysqli_fetch_assoc($mediakonverter);
-            $fizikaireteg = @$mediakonverter['fizikaireteg'];
-            $transzpszabvany = @$mediakonverter['transzpszabvany'];
-            $transzpcsatlakozo = @$mediakonverter['transzpcsatlakozo'];
-            $transzpsebesseg = @$mediakonverter['transzpsebesseg'];
-            $lanszabvany = @$mediakonverter['lanszabvany'];
-            $lancsatlakozo = @$mediakonverter['lancsatlakozo'];
-            $lansebesseg = @$mediakonverter['lansebesseg'];
+            $sql->Query("SELECT * FROM fizikairetegek;", null, true);
+            $fizikairetegek = $sql->AsArray();
+
+            $sql->Query("SELECT * FROM csatlakozotipusok;", null, true);
+            $csatlakozok = $sql->AsArray();
+
+            $sql->Query("SELECT * FROM sebessegek;", null, true);
+            $sebessegek = $sql->AsArray();
+
+            $sql->Query("SELECT * FROM atviteliszabvanyok;");
+            $atviteliszabvanyok = $sql->AsArray();
         }
 
-        if(@$tipusnev == "bovitomodul" || @$tipus > 25 && @$tipus < 31)
+        if(@$tipus > 20 && @$tipus < 26)
         {
-            $tipusnev = "bovitomodul";
-            $fizikairetegek = mySQLConnect("SELECT * FROM fizikairetegek;");
-            $csatlakozok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
-            $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
-            $atviteliszabvanyok = mySQLConnect("SELECT * FROM atviteliszabvanyok;");
-
-            $mediakonverter = mySQLConnect("SELECT * FROM bovitomodellek WHERE modell = $modellid;");
-            $mediakonverter = mysqli_fetch_assoc($mediakonverter);
-            $fizikaireteg = @$mediakonverter['fizikaireteg'];
-            $transzpszabvany = @$mediakonverter['transzpszabvany'];
-            $transzpcsatlakozo = @$mediakonverter['transzpcsatlakozo'];
-            $transzpsebesseg = @$mediakonverter['transzpsebesseg'];
+            $mediakonverter = new MySQLHandler("SELECT fizikaireteg, transzpszabvany, transzpcsatlakozo, transzpsebesseg, lanszabvany, lancsatlakozo, lansebesseg FROM mediakonvertermodellek $where;", $modellid, true);
+            $mediakonverter->Bind($fizikaireteg, $transzpszabvany, $transzpcsatlakozo, $transzpsebesseg, $lanszabvany, $lancsatlakozo, $lansebesseg);
         }
 
-        if (!isset($tipusnev))
+        if(@$tipus > 25 && @$tipus < 31)
         {
-            $tipusnev = eszkozTipusValaszto($tipus);
+            $bovitomodul = new MySQLHandler("SELECT fizikaireteg, transzpszabvany, transzpcsatlakozo, transzpsebesseg FROM bovitomodellek $where;", $modellid);
+            $bovitomodul->Bind($fizikaireteg, $transzpszabvany, $transzpcsatlakozo, $transzpsebesseg);
         }
 
         $button = "Szerkesztés";
