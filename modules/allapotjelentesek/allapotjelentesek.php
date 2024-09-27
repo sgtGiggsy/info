@@ -16,21 +16,21 @@ else
     if(isset($_GET['trapfontossag']))
     {
         $severityfilter = $_GET['trapfontossag'];
-        $_SESSION[getenv('SESSION_NAME').'trapfontossag'] = $severityfilter;
+        $_SESSION['trapfontossag'] = $severityfilter;
     }
-    elseif(isset($_SESSION[getenv('SESSION_NAME').'trapfontossag']))
+    elseif(isset($_SESSION['trapfontossag']))
     {
-        $severityfilter = $_SESSION[getenv('SESSION_NAME').'trapfontossag'];
+        $severityfilter = $_SESSION['trapfontossag'];
     }
 
     if(isset($_GET['nezet']) && ($_GET['nezet'] == "tablazatos" || $_GET['nezet'] == "lista"))
     {
         $nezet = $_GET['nezet'];
-        $_SESSION[getenv('SESSION_NAME').'nezet'] = $nezet;
+        $_SESSION['nezet'] = $nezet;
     }
-    elseif(isset($_SESSION[getenv('SESSION_NAME').'nezet']))
+    elseif(isset($_SESSION['nezet']))
     {
-        $nezet = $_SESSION[getenv('SESSION_NAME').'nezet'];
+        $nezet = $_SESSION['nezet'];
     }
 
     if($severityfilter != "minden")

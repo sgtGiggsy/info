@@ -146,7 +146,7 @@ else
             WHERE switchportok.eszkoz = $id AND beepitesek.kiepitesideje IS NULL
             ORDER BY portok.id;");
 
-        if($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'])
+        if($_SESSION['onlinefigyeles'])
         {
             $allapotelozmenyek = mySQLConnect("SELECT * FROM aktiveszkoz_allapot WHERE eszkozid = $id
                 UNION
@@ -356,7 +356,7 @@ else
             </div><?php
             
         // Állapot előzmények
-            if($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && mysqli_num_rows($allapotelozmenyek) > 0)
+            if($_SESSION['onlinefigyeles'] && mysqli_num_rows($allapotelozmenyek) > 0)
             {
                 ?><div class="infobox">
                     <div class="infoboxtitle">Állapot előzmények</div>

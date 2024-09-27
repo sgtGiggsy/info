@@ -60,21 +60,21 @@ if(isset($_GET['loginid']))
 }
 
 // Az előző oldal helyének kiderítése
-if(!isset($_SESSION[getenv('SESSION_NAME').'elozo']))
+if(!isset($_SESSION['elozo']))
 {
     $backtosender = @$_SERVER['HTTP_REFERER'];
-    $_SESSION[getenv('SESSION_NAME').'elozo'] = @$_SERVER['HTTP_REFERER'];
+    $_SESSION['elozo'] = @$_SERVER['HTTP_REFERER'];
 }
 else
 {
     if(str_contains(@$_SERVER['HTTP_REFERER'], @$_SERVER['REDIRECT_URL']) || isset($_GET['action']))
     {
-        $backtosender = $_SESSION[getenv('SESSION_NAME').'elozo'];
+        $backtosender = $_SESSION['elozo'];
     }
     else
     {
         $backtosender = @$_SERVER['HTTP_REFERER'];
-        $_SESSION[getenv('SESSION_NAME').'elozo'] = @$_SERVER['HTTP_REFERER'];
+        $_SESSION['elozo'] = @$_SERVER['HTTP_REFERER'];
     } 
 }
 
@@ -85,7 +85,7 @@ if(isset($_GET['id']))
 }
 
 // Felhasználó beléptetése
-if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION_NAME').'id']) && isset($_POST['felhasznalonev']) && !(isset($_GET['page']) && $_GET['page'] == "kilep"))
+if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev']) && !(isset($_GET['page']) && $_GET['page'] == "kilep"))
 {
     $samaccountname = $_POST['felhasznalonev'];
     $plainpassword = $_POST['jelszo'];
@@ -168,7 +168,7 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
             if($result->sorokszama == 1) // Ez az egyedüli "Sikeres bejelentkezés" ág. Bármely más ágra fut ki a modul, a bejelentkezés sikertelen
             {
                 $userid = $result->Bind($id);
-                $_SESSION[getenv('SESSION_NAME').'id'] = true;
+                $_SESSION['id'] = true;
                 $loginid = logLogin($userid);
                 $loginsuccess = true;
             }
@@ -195,18 +195,18 @@ if((!isset($_SESSION[getenv('SESSION_NAME').'id']) || !$_SESSION[getenv('SESSION
     }
 }
 
-if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NAME').'id'])
+if(isset($_SESSION['id']) && $_SESSION['id'])
 {
 	if(!isset($samaccountname))
     {
-        $samaccountname = $_SESSION[getenv('SESSION_NAME').'felhasznalonev'];
+        $samaccountname = $_SESSION['felhasznalonev'];
     }
     // Mivel van aktív sessionje, ellenőrizzük, hogy továbbra is jogosult-e bejelentkezve lenni
     $result = new MySQLHandler("SELECT id, felhasznalonev, nev, profilkep, szervezet FROM felhasznalok WHERE felhasznalonev = ?", $samaccountname);
 
     if($result->sorokszama == 1)
     {
-        $result->Bind($_SESSION[getenv('SESSION_NAME').'id'], $_SESSION[getenv('SESSION_NAME').'felhasznalonev'], $_SESSION[getenv('SESSION_NAME').'nev'], $_SESSION['profilkep'], $szervezet);
+        $result->Bind($_SESSION['id'], $_SESSION['felhasznalonev'], $_SESSION['nev'], $_SESSION['profilkep'], $szervezet);
         // Ez a rész gondoskodik róla, hogy ha egy adott oldalt próbált a felhasználó felkeresni,
         // a sikeres bejelentkezés után vissza legyen oda irányítva
         if($loginsuccess && isset($_GET['kuldooldal']) && $_GET['kuldooldal'] != "belepes")
@@ -226,13 +226,13 @@ if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NA
     else
     {
         session_destroy();
-		$_SESSION[getenv('SESSION_NAME').'id'] = false; 
+		$_SESSION['id'] = false; 
     }
 }
 else
 {
 	parseUserAgent();
-    $_SESSION[getenv('SESSION_NAME').'id'] = false;
+    $_SESSION['id'] = false;
 }
 
 // Oldal működéséhez használt alapbeállítások betöltése
@@ -242,15 +242,15 @@ foreach($beallitas as $x)
 {
     $nev = $x['nev'];
     $ertek = trim($x['ertek']);
-    $_SESSION[getenv('SESSION_NAME')."$nev"] = $ertek;
+    $_SESSION["$nev"] = $ertek;
 }
-if($_SESSION[getenv('SESSION_NAME').'ismetelheto'] == 0)
+if($_SESSION['ismetelheto'] == 0)
 {
-    $_SESSION[getenv('SESSION_NAME').'ismetelheto'] = false;
+    $_SESSION['ismetelheto'] = false;
 }
 else
 {
-    $_SESSION[getenv('SESSION_NAME').'ismetelheto'] = true;
+    $_SESSION['ismetelheto'] = true;
 }
 
 // Betöldendő oldal kiválasztása, menüterületek feltöltése, és felhasználói jogosultságok megállapítása
@@ -270,15 +270,15 @@ else
 
 // Felhasználó jogosultságainak lekérése, a menüpontok is ezalapján jelennek meg,
 // innentől kezdve a $felhasznaloid változónak bejelentkezett felhasználó esetén léteznie KELL
-if($_SESSION[getenv('SESSION_NAME').'id'])
+if($_SESSION['id'])
 {
-    $felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+    $felhasznaloid = $_SESSION['id'];
     $jogosultsagok = new MySQLHandler("SELECT * FROM jogosultsagok WHERE felhasznalo = ?", $felhasznaloid);
     $jogosultsagok = $jogosultsagok->Result();
 }
 
 // Felhasználó személyes beállításainak lekérése
-if($_SESSION[getenv('SESSION_NAME').'id'])
+if($_SESSION['id'])
 {
     $szemelyesbeallitasok = new MySQLHandler("SELECT * FROM szemelyesbeallitasok WHERE felhid = ?", $felhasznaloid);
     $szemelyes = $szemelyesbeallitasok->Fetch();
@@ -310,7 +310,7 @@ foreach($menu as $menupont)
     }
     if($menupont['oldal'] == $pagetofind || $gyujtotemp == $pagetofind || $menupont['dboldal'] == $pagetofind || $menupont['szerkoldal'] == $pagetofind)
     {
-        if($_SESSION[getenv('SESSION_NAME').'id'])
+        if($_SESSION['id'])
 		{
 			foreach($jogosultsagok as $jogosultsag)
 			{
@@ -346,11 +346,11 @@ foreach($menu as $menupont)
     // aktiv 2 = bejelentkezetteknek
     // aktiv 3 = mindenkinek
     // aktiv 4 = kijelentkezetteknek
-    if($menupont['aktiv'] == 0 || $menupont['aktiv'] == 3 || (($menupont['aktiv'] == 2 && $_SESSION[getenv('SESSION_NAME').'id'])) || ($menupont['aktiv'] == 4 && !$_SESSION[getenv('SESSION_NAME').'id']))
+    if($menupont['aktiv'] == 0 || $menupont['aktiv'] == 3 || (($menupont['aktiv'] == 2 && $_SESSION['id'])) || ($menupont['aktiv'] == 4 && !$_SESSION['id']))
     {
         array_push($menuk[$menupont['menuterulet']], $menupont);
     }
-    elseif($menupont['aktiv'] == 1 && $_SESSION[getenv('SESSION_NAME').'id'])
+    elseif($menupont['aktiv'] == 1 && $_SESSION['id'])
     {
         foreach($jogosultsagok as $jogosultsag)
         {

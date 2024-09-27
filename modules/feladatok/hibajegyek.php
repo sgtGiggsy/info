@@ -1,5 +1,5 @@
 <?php
-if(!$_SESSION[getenv('SESSION_NAME').'id'])
+if(!$_SESSION['id'])
 {
     getPermissionError();
 }

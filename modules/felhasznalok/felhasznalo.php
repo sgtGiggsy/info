@@ -142,7 +142,7 @@ elseif($mindir && isset($_GET['action']))
     }
 }
 // A személyes beállítások meghívása
-elseif(isset($_SESSION[getenv('SESSION_NAME').'id']) && isset($_GET['beallitasok']))
+elseif(isset($_SESSION['id']) && isset($_GET['beallitasok']))
 {
     $switchstate = false;
     $magyarazat = null;
@@ -192,7 +192,7 @@ else
     }
 
     $csoportwhere = null;
-    if(!$mindolvas && $felhid != $_SESSION[getenv('SESSION_NAME').'id'])
+    if(!$mindolvas && $felhid != $_SESSION['id'])
     {
         // A CsoportWhere űrlapja
         $csopwhereset = array(

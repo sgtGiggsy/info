@@ -24,7 +24,7 @@ function mySQLConnect($querystring = null)
 		try
 		{
 			$result = mysqli_query($con, $querystring);
-			if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NAME').'id'] == 1 && !$result)
+			if(isset($_SESSION['id']) && $_SESSION['id'] == 1 && !$result)
 			{
 				echo $querystring;
 			}
@@ -32,7 +32,7 @@ function mySQLConnect($querystring = null)
 		catch(Exception $e)
 		{
 			echo $e->getMessage() . "<br>";
-			if(isset($_SESSION[getenv('SESSION_NAME').'id']) && $_SESSION[getenv('SESSION_NAME').'id'] == 1)
+			if(isset($_SESSION['id']) && $_SESSION['id'] == 1)
 				echo $querystring;
 		}
 		$con->close();
@@ -67,7 +67,7 @@ function parseUserAgent()
 	if((str_contains($uastring, "like Gecko") && !str_contains($uastring, "like Gecko)")) || str_contains($uastring, "MSIE"))
 	{
 		$bongeszo = "Internet Explorer";
-		$_SESSION[getenv('SESSION_NAME').'explorer'] = true;
+		$_SESSION['explorer'] = true;
 	}
 	foreach($browser as $x)
 	{
@@ -736,7 +736,7 @@ function szerkSor($beepid, $eszkid, $eszktip)
 function modId($muvelet, $tipus, $objid)
 {
 	$con = mySQLConnect();
-	$felhasznalo = $_SESSION[getenv('SESSION_NAME').'id'];
+	$felhasznalo = $_SESSION['id'];
 	$string = "INSERT INTO modositasok (felhasznalo, muvelet, $tipus) VALUES ($felhasznalo, $muvelet, $objid)";
 	mysqli_query($con, $string);
 
@@ -747,7 +747,7 @@ function modId($muvelet, $tipus, $objid)
 
 function getNotifications()
 {
-	$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+	$felhasznaloid = $_SESSION['id'];
 	$notifications = array();
 	$switchcheck = mySQLConnect("SELECT ertek
 		FROM `beallitasok`
@@ -1486,7 +1486,7 @@ function telefonKonyvAdminCheck($mindir, $felhid = null)
 	$globaltelefonkonyvadmin = false;
 	if(!$felhid)
 	{
-		$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+		$felhasznaloid = $_SESSION['id'];
 	}
 	else
 	{
@@ -1516,7 +1516,7 @@ function telefonKonyvAdminCheck($mindir, $felhid = null)
 function telefonKonyvCsoportjogok()
 {
 	$returnarray = array();
-	$felhasznaloid = $_SESSION[getenv('SESSION_NAME').'id'];
+	$felhasznaloid = $_SESSION['id'];
 	$tkonyvjog = mySQLConnect("SELECT csoport FROM telefonkonyvadminok WHERE felhasznalo = $felhasznaloid ORDER BY csoport ASC");
 
 	foreach($tkonyvjog as $jog)
@@ -1854,7 +1854,7 @@ function getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $settings)
 		}
 		else
 		{
-			$felhasznalo = $_SESSION[getenv('SESSION_NAME').'id'];
+			$felhasznalo = $_SESSION['id'];
 		}
 		if($filtercount > 0)
 		{

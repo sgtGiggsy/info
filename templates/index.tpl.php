@@ -16,7 +16,7 @@ include('./templates/svg.tpl.php');
 </head>
 
 <body><?php
-	if(isset($_SESSION[getenv('SESSION_NAME').'explorer']) && $_SESSION[getenv('SESSION_NAME').'explorer'])
+	if(isset($_SESSION['explorer']) && $_SESSION['explorer'])
 	{
 		?><span style="color: red; font-size: 2em;" id="iewarning">Internet Explorer böngészőben nyitotta meg az oldalt, de ez a felület <strong>NEM MŰKÖDIK INTERNET EXPLORERREL</strong>!<br><br>
 			A felület rendeltetésszerű használatához kérem egy modernebb böngészőben (Microsoft Edge, Google Chrome, Mozilla Firefox) nyissa meg az oldalt!</span><?php

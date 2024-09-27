@@ -27,9 +27,9 @@ if(isset($topmenuszoveges) && $topmenuszoveges)
 }
 
 ?><div class="topmenuikonok"><?php
-if($_SESSION[getenv('SESSION_NAME').'id'])
+if($_SESSION['id'])
 {
-    $usernev = $_SESSION[getenv('SESSION_NAME').'nev'];
+    $usernev = $_SESSION['nev'];
     $menuterulet = 2; include('./includes/menu.inc.php');
     $notifications = getNotifications();
     $ujertesites = 0;
@@ -60,7 +60,7 @@ else
 
 // Előugró menük
 //// Értesítések
-if($_SESSION[getenv('SESSION_NAME').'id'])
+if($_SESSION['id'])
 {
     ?><div id="notifpopup" onmouseleave="hidePopup('notifpopup')"><?php
         foreach($notifications as $notification)

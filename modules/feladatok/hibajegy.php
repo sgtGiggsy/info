@@ -1,5 +1,5 @@
 <?php
-if(!$_SESSION[getenv('SESSION_NAME').'id'])
+if(!$_SESSION['id'])
 {
     getPermissionError();
 }
@@ -429,7 +429,7 @@ else
                 mySQLConnect("INSERT INTO feladatallapotok (feladat, felhasznalo, allapottipus, szerepkor)
                         VALUES ($origid, $felhasznaloid, '21', '3');");
 
-                $valosnev = $_SESSION[getenv('SESSION_NAME').'nev'];
+                $valosnev = $_SESSION['nev'];
                 $origfelhasznaloid = $hibajegy['bejelentoid'];
                 $origszervezet = $hibajegy['szervezetid'];
                 hibajegyErtesites("$valosnev frissítette a(z) $id számú hibajegy állapotát", "Megtekintve", $id, $origfelhasznaloid, $origszervezet);

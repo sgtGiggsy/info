@@ -20,10 +20,11 @@ else
 
     $igenylo = $igenylesideje = $vegrehajtasideje = $munkavegzo2 = $leiras = $eszkoz = null;
     $modenged = true;
+    $munkaprint = "?print";
     $javascriptfiles[] = "modules/munkalapok/includes/templatebeszur.js";
-    $hely = $_SESSION[getenv('SESSION_NAME')."defaultmunkahely"];
-    $ugyintezo = $_SESSION[getenv('SESSION_NAME')."defaultugyintezo"];
-    $munkavegzo1 = $_SESSION[getenv('SESSION_NAME').'id'];
+    $hely = $_SESSION["defaultmunkahely"];
+    $ugyintezo = $_SESSION["defaultugyintezo"];
+    $munkavegzo1 = $_SESSION['id'];
     $datalist = mySQLConnect("SELECT DISTINCT leiras FROM munkalapok ORDER BY leiras DESC");
     $templateek = mySQLConnect("SELECT id, szoveg FROM munkalaptemplateek ORDER BY hasznalva DESC, szoveg ASC;");
 
@@ -54,6 +55,7 @@ else
         $eszkoz = $munka['eszkoz'];
         $ugyintezo = $munka['ugyintezo'];
         $modenged = $munka['modenged'];
+        $munkaprint = "/" . $munkaid . "?print";
 
         $button = "Munka szerkesztése";
         $button2 = "Munka szerkesztése és nyomtatása";
@@ -129,8 +131,8 @@ else
                         ?><div class="submit">
                             <input type="submit" name="beKuld" value="<?=$button?>">
                         </div>
-                        <div class="submit" style="padding-top: 5px;">        
-                            <input type="submit" onclick="window.open('<?=$RootPath?>/munkaszerkeszt/<?=$munka['id']?>?action=print')" name="nyomtat" value="<?=$button2?>">
+                        <div class="submit" style="padding-top: 5px;">
+                            <input type="submit" onclick="window.open('<?=$RootPath?>/munkaszerkeszt<?=$munkaprint?>')" name="nyomtat" value="<?=$button2?>">
                         </div><?php
                     }
                 ?></form><?php

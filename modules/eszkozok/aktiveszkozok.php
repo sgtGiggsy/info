@@ -10,7 +10,7 @@ if(!$csoportolvas)
 }
 else
 {
-    if(!$_SESSION[getenv('SESSION_NAME').'onlinefigyeles'])
+    if(!$_SESSION['onlinefigyeles'])
     {
         $szuresek = getWhere("(modellek.tipus = 1 OR modellek.tipus = 2)");
         $onfigy = "";
@@ -135,7 +135,7 @@ else
                     else
                     {
                         $kattinthatolink = './aktiveszkoz/' . $eszkoz['id'];
-                        ?><tr class='trlink<?=($eszkoz['hibas'] == 1) ? " reszhibas" : "" ?><?=($_SESSION[getenv('SESSION_NAME').'onlinefigyeles'] && $eszkoz['online'] == 0 && $eszkoz['online'] != null && $szemelyes['switchstateshow'] == 1) ? " offline" : "" ?>'>
+                        ?><tr class='trlink<?=($eszkoz['hibas'] == 1) ? " reszhibas" : "" ?><?=($_SESSION['onlinefigyeles'] && $eszkoz['online'] == 0 && $eszkoz['online'] != null && $szemelyes['switchstateshow'] == 1) ? " offline" : "" ?>'>
                             <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['ipcim']?></a></td>
                             <td nowrap><a href="<?=$kattinthatolink?>"><?=$eszkoz['beepitesinev']?></a></td>
                             <td><a href="<?=$kattinthatolink?>"><?=$eszkoz['gyarto']?></a></td>

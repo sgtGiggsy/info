@@ -15,7 +15,7 @@ if(isset($irhat) && $irhat)
         $felhid = $felhasznaloid;
     }
 
-    $valosnev = $_SESSION[getenv('SESSION_NAME').'nev'];
+    $valosnev = $_SESSION['nev'];
 
     if(isset($_POST['id']) || isset($_POST['feladat']))
     {
@@ -202,7 +202,7 @@ if(isset($irhat) && $irhat)
         $ev = date("Y");
         $honap = date("m");
         $gyokermappa = "./uploads/";
-        $mappagyokernelkul = $_SESSION[getenv('SESSION_NAME').'hibajegymappa'] . "/$ev/$honap/";
+        $mappagyokernelkul = $_SESSION['hibajegymappa'] . "/$ev/$honap/";
         $feltoltesimappa = "$gyokermappa/$mappagyokernelkul";
 
         $include = true;

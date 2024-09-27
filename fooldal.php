@@ -12,27 +12,27 @@ if($loginid)
 {
 	$loginid = "?loginid=$loginid";
 }
-if($_SESSION[getenv('SESSION_NAME').'id'] == 0)
+if($_SESSION['id'] == 0)
 {
-	if($_SESSION[getenv('SESSION_NAME').'fooldalkijelentkezve'])
+	if($_SESSION['fooldalkijelentkezve'])
 	{
-		header("Location: ./" . $_SESSION[getenv('SESSION_NAME').'fooldalkijelentkezve'] . $loginid);
+		header("Location: ./" . $_SESSION['fooldalkijelentkezve'] . $loginid);
 	}
 	else
 	{
 		echo "<div class='oldalcim'>Főoldal</div>";
-		echo $_SESSION[getenv('SESSION_NAME').'udvozloszoveg'];
+		echo $_SESSION['udvozloszoveg'];
 	}
 }
 else
 {
-	if($_SESSION[getenv('SESSION_NAME').'fooldalbejelentkezve'])
+	if($_SESSION['fooldalbejelentkezve'])
 	{
-		header("Location: ./" . $_SESSION[getenv('SESSION_NAME').'fooldalbejelentkezve'] . $loginid);
+		header("Location: ./" . $_SESSION['fooldalbejelentkezve'] . $loginid);
 	}
 	else
 	{
 		echo "<div class='oldalcim'>Főoldal</div>";
-		echo $_SESSION[getenv('SESSION_NAME').'udvozloszovegbelepve'];
+		echo $_SESSION['udvozloszovegbelepve'];
 	}
 }

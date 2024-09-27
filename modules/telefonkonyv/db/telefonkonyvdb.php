@@ -13,7 +13,7 @@ if(!isset($irhat))
 if(isset($irhat) && $irhat)
 {
     $con = mySQLConnect(false);
-    $bejelento = $_SESSION[getenv('SESSION_NAME').'id'];
+    $bejelento = $_SESSION['id'];
 
     purifyPost();
 

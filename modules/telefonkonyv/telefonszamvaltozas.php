@@ -33,9 +33,9 @@ else
         'and' => true
     );
 
-    $belsoelohivo = $_SESSION[getenv('SESSION_NAME').'belsoelohivo'];
-    $varosielohivo = $_SESSION[getenv('SESSION_NAME').'varosielohivo'];
-    $mobilelohivo = $_SESSION[getenv('SESSION_NAME').'mobilelohivo'];
+    $belsoelohivo = $_SESSION['belsoelohivo'];
+    $varosielohivo = $_SESSION['varosielohivo'];
+    $mobilelohivo = $_SESSION['mobilelohivo'];
     $where = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwhereadmin);
     $wheremod = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwheremod);
     $csillaggaljelolt = "A csillaggal jelölt mezők kitöltése kötelező.";

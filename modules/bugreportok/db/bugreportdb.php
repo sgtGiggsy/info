@@ -1,6 +1,6 @@
 <?php
 
-if(!isset($_SESSION[getenv('SESSION_NAME').'id']))
+if(!isset($_SESSION['id']))
 {
     echo "<h2>Nincs bejelentkezett felhasználó!</h2>";
 }

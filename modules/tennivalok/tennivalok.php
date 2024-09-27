@@ -1,6 +1,6 @@
 <?php
 
-if(!$_SESSION[getenv('SESSION_NAME').'id'])
+if(!$_SESSION['id'])
 {
 	echo "Nincs jogosultsága az oldal megtekintésére!";
 }

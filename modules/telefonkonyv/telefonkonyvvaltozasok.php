@@ -6,11 +6,11 @@ if($globaltelefonkonyvadmin || $csoportir)
     if(isset($_GET['valtozasszures']))
     {
         $valtozasszures = $_GET['valtozasszures'];
-        $_SESSION[getenv('SESSION_NAME').'valtozasszures'] = $valtozasszures;
+        $_SESSION['valtozasszures'] = $valtozasszures;
     }
-    elseif(isset($_SESSION[getenv('SESSION_NAME').'valtozasszures']))
+    elseif(isset($_SESSION['valtozasszures']))
     {
-        $valtozasszures = $_SESSION[getenv('SESSION_NAME').'valtozasszures'];
+        $valtozasszures = $_SESSION['valtozasszures'];
     }
 
     $javascriptfiles[] = "modules/telefonkonyv/includes/telefonkonyv.js";
