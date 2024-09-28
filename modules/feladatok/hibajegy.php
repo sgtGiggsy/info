@@ -340,7 +340,7 @@ else
             <div class="szerkcard">
                 <div class="szerkcardtitle"><?=($irhat) ? "Állapotváltozás" : "További információ megadása" ?></div>
                 <div class="szerkcardbody">
-                    <form action="<?=$RootPath?>/hibajegy&action=stateupdate<?=$kuldooldal?>" method="post" enctype="multipart/form-data" onsubmit="beKuld.disabled = true; return true;">
+                    <form action="<?=$RootPath?>/hibajegy&action=stateupdate" method="post" enctype="multipart/form-data" onsubmit="beKuld.disabled = true; return true;">
                         <div class="hibajegyallapotupdate">
                             <input type ="hidden" id="feladat" name="feladat" value=<?=$id?>>
 

@@ -2,7 +2,7 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/felhasznalo?action=syncou<?=$kuldooldal?>" method="post">
+        <form action="<?=$RootPath?>/felhasznalo?action=syncou" method="post">
 
             <div>
                 <label for="felhasznalonev">Felhasználónév:

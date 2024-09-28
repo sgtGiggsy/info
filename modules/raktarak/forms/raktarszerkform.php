@@ -2,7 +2,7 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/raktar<?=(isset($id)) ? '&action=update' : '?action=new' ?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+        <form action="<?=$RootPath?>/raktar<?=(isset($id)) ? '&action=update' : '?action=new' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
             if(isset($_GET['id']))
             {
                 ?><input type ="hidden" id="id" name="id" value=<?=$id?>><?php

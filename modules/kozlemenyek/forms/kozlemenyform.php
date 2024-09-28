@@ -7,7 +7,7 @@ if(@$irhat)
         );
     $javascriptfiles[] = "includes/tinymce/tinymce.min.js";
 	$javascriptfiles[] = "includes/js/tinyMCEinitializer.js";
-    ?><form action="<?=$RootPath?>/kozlemeny&action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?><?=$kuldooldal?>" method="post">
+    ?><form action="<?=$RootPath?>/kozlemeny&action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?>" method="post">
         <div class="ketharmad"><?php
             if(isset($_GET['id']))
             {

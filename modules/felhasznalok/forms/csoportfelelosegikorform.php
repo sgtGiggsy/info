@@ -4,7 +4,7 @@ if(@$irhat)
     $javascriptfiles[] = "modules/felhasznalok/includes/felhasznalok.js";
     ?><div class="contentleft">
         <div>
-            <form action="<?=$RootPath?>/csoport?action=addresponsibility<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+            <form action="<?=$RootPath?>/csoport?action=addresponsibility" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
                 if(isset($_GET['id']))
                 {
                     ?><input type ="hidden" id="id" name="id" value=<?=$_GET['id']?>><?php

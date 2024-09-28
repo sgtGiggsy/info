@@ -2,7 +2,7 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/felhasznalo&action=permissions<?=$kuldooldal?>" method="post">
+        <form action="<?=$RootPath?>/felhasznalo&action=permissions" method="post">
             <table>
                 <thead>
                     <tr>

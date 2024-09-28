@@ -24,7 +24,7 @@ header('Pragma: no-cache');
 //header("Content-Security-Policy-Report-Only: script-src 'nonce-{RANDOM}' 'strict-dynamic';");
 
 // Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
-$page = $id = $current = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = null; $loginsuccess = false;
+$page = $id = $userid = $current = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = null; $loginsuccess = false;
 
 // Címsorból vett GET értékek tisztítása nemkívánt karakterektől
 foreach($_GET as $key => $value)
@@ -60,22 +60,27 @@ if(isset($_GET['loginid']))
 }
 
 // Az előző oldal helyének kiderítése
-if(!isset($_SESSION['elozo']))
+if(!isset($_SESSION['elozmenyek']))
 {
     $backtosender = @$_SERVER['HTTP_REFERER'];
-    $_SESSION['elozo'] = @$_SERVER['HTTP_REFERER'];
+    $_SESSION['elozmenyek'] = array(@$_SERVER['HTTP_REFERER']);
 }
 else
 {
-    if(str_contains(@$_SERVER['HTTP_REFERER'], @$_SERVER['REDIRECT_URL']) || isset($_GET['action']))
+    if(@$_SERVER['HTTP_REFERER'] && !str_contains(@$_SERVER['HTTP_REFERER'], @$_SERVER['REDIRECT_URL']) && !str_contains(@$_SERVER['HTTP_REFERER'], "belepes"))
     {
-        $backtosender = $_SESSION['elozo'];
+        array_push($_SESSION['elozmenyek'], $_SERVER['HTTP_REFERER']);
+        $backtosender = $_SERVER['HTTP_REFERER'];
     }
     else
     {
-        $backtosender = @$_SERVER['HTTP_REFERER'];
-        $_SESSION['elozo'] = @$_SERVER['HTTP_REFERER'];
-    } 
+        $backtosender = end($_SESSION['elozmenyek']);
+    }
+
+    if(count($_SESSION['elozmenyek']) > 5)
+    {
+        array_shift($_SESSION['elozmenyek']);
+    }
 }
 
 // Az lekérdezendő elem ID-jének begyüjtése
@@ -137,7 +142,7 @@ if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev
 
     // MySQL-en keresztüli autentikációt elvégző rész
     $login = new MySQLHandler('SELECT id, jelszo FROM felhasznalok WHERE felhasznalonev = ?', $samaccountname);
-    $login->Bind($id, $jelszo);
+    $login->Bind($userid, $jelszo);
 
     // A lényegi bejelentkeztetést végző elágazás, csak akkor lépünk be ide, ha legalább az egyik módon van érvényes eredmény a felhasználónév-jelszó párosra
     if((isset($ldapbind) && $ldapbind) || (isset($jelszo) && (password_verify($_POST['jelszo'], $jelszo))))
@@ -167,7 +172,7 @@ if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev
             session_regenerate_id();
             if($result->sorokszama == 1) // Ez az egyedüli "Sikeres bejelentkezés" ág. Bármely más ágra fut ki a modul, a bejelentkezés sikertelen
             {
-                $userid = $result->Bind($id);
+                $userid = $result->Bind($userid);
                 $_SESSION['id'] = true;
                 $loginid = logLogin($userid);
                 $loginsuccess = true;
@@ -209,18 +214,10 @@ if(isset($_SESSION['id']) && $_SESSION['id'])
         $result->Bind($_SESSION['id'], $_SESSION['felhasznalonev'], $_SESSION['nev'], $_SESSION['profilkep'], $szervezet);
         // Ez a rész gondoskodik róla, hogy ha egy adott oldalt próbált a felhasználó felkeresni,
         // a sikeres bejelentkezés után vissza legyen oda irányítva
-        if($loginsuccess && isset($_GET['kuldooldal']) && $_GET['kuldooldal'] != "belepes")
+        if($loginsuccess)
         {
-            if(isset($_GET['kuldooldalid']))
-            {
-                header("Location: $RootPath/" . $_GET['kuldooldal'] . "/" . $_GET['kuldooldalid'] . "?sikeres=bejelentkezes&loginid=" . $loginid);
-                die;
-            }
-            else
-            {
-                header("Location: $RootPath/" . $_GET['kuldooldal'] . "?sikeres=bejelentkezes&loginid=" . $loginid);
-                die;
-            }
+            header("Location: " . $backtosender . "?sikeres=bejelentkezes&loginid=" . $loginid);
+            die;
         }
     }
     else
@@ -412,20 +409,6 @@ elseif(@$_GET['sikeres'] == "szerkesztes")
 elseif(@$_GET['sikeres'] == "bejelentkezes")
 {
     $succesmessage = "Sikeres bejelentkezés";
-}
-
-// A jelenlegi oldal adatainak $_GET-hez történő előkészítése
-if(isset($_GET['page']) && isset($_GET['id']))
-{
-    $kuldooldal = "&kuldooldal=" . $_GET['page'] . "&kuldooldalid=" . $_GET['id'];
-}
-elseif(isset($_GET['page']))
-{
-    $kuldooldal = "&kuldooldal=" . $_GET['page'];
-}
-else
-{
-    $kuldooldal = null;
 }
 
 // JavaScript fájlok listája

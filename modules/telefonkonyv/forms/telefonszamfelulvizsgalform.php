@@ -1,7 +1,7 @@
 <?php
 if(@$irhat)
 {
-    ?><form action="<?=$RootPath?>/valtozasfelulvizsgalat&action=review<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+    ?><form action="<?=$RootPath?>/valtozasfelulvizsgalat&action=review" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if($modositasoka)
         {
             ?><div class="infobox modmessage">

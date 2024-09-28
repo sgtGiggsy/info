@@ -3,7 +3,7 @@ if(@$irhat)
 {
     ?><div class="contentleft">
         <div>
-            <form action="<?=$RootPath?>/beallitasok&action=update<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
+            <form action="<?=$RootPath?>/beallitasok&action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
 
                 <?php $magyarazat = "<h2>Munkalapok beállítása</h2><p></p>"; ?>
 

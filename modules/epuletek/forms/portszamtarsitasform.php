@@ -3,7 +3,7 @@ if(@$irhat)
 {
     $javascriptfiles[] = "modules/epuletek/includes/portmuveletek.js";
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/epulet?action=szamtarsitas<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
+        <form action="<?=$RootPath?>/epulet?action=szamtarsitas" method="post" onsubmit="beKuld.disabled = true; return true;">
             <div class="portparositas"><?php
 
                 $magyarazat = "<h2>Portok telefonszámmal társítása</h2>";

@@ -1,7 +1,7 @@
 <?php
 if(@$irhat)
 {
-    ?><form action="<?=$RootPath?>/hibajegy&action=<?=(isset($id)) ? 'update' : 'new' ?><?=$kuldooldal?>" method="post" enctype="multipart/form-data" onsubmit="beKuld.disabled = true; return true;">
+    ?><form action="<?=$RootPath?>/hibajegy&action=<?=(isset($id)) ? 'update' : 'new' ?>" method="post" enctype="multipart/form-data" onsubmit="beKuld.disabled = true; return true;">
         <div class="doublecolumn">
             <div><?php
                 if(isset($id))

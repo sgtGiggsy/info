@@ -18,7 +18,7 @@ $magyarazat .= "<strong>Portok resetelése</strong>
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/portdb?action=reset<?=$kuldooldal?>" method="post" id="portresetform">
+        <form action="<?=$RootPath?>/portdb?action=reset" method="post" id="portresetform">
             <div>
                 <label for="elsoport">Első port:</label><br>
                 <select id="elsoport" name="elsoport"><?php

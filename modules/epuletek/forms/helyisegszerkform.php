@@ -6,7 +6,7 @@ if(@$irhat)
             LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
             LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id;");
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/helyisegdb?action=<?=($_GET['page'] == "helyiseg" && isset($id)) ? 'update' : 'new' ?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+        <form action="<?=$RootPath?>/helyisegdb?action=<?=($_GET['page'] == "helyiseg" && isset($id)) ? 'update' : 'new' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
             if($_GET['page'] == "helyiseg" && isset($id))
             {
                 ?><input type ="hidden" id="id" name="id" value=<?=$id?>><?php

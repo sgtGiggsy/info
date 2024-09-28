@@ -2,7 +2,7 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/portdb?action=generate&tipus=<?=($eszkoztipus == "aktiveszkoz") ? "switch" : "soho" ?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
+        <form action="<?=$RootPath?>/portdb?action=generate&tipus=<?=($eszkoztipus == "aktiveszkoz") ? "switch" : "soho" ?>" method="post" onsubmit="beKuld.disabled = true; return true;">
             <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$id?>>
             
             <div>

@@ -3,7 +3,7 @@ if(@$irhat)
 {
     ?><div class="contentleft">
         <div>
-            <form action="<?=$RootPath?>/menu&action=new<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
+            <form action="<?=$RootPath?>/menu&action=new" method="post" onsubmit="beKuld.disabled = true; return true;">
                 <div class="menucard">
                     <div class="menucardtitle"><?=$menupont['menupont']?></div>
                     <div class="menucardbody">

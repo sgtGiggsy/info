@@ -10,7 +10,7 @@ if(@$irhat)
     
     ?><div class="contentleft">
         <div>
-            <form action="<?=$RootPath?>/beallitasok&action=update<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
+            <form action="<?=$RootPath?>/beallitasok&action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
                 <?php $magyarazat = "<h2>Főoldal beállításai</h2>
                     <p>Itt adhatjuk meg, hogy a főoldalon egy menüpont jelenjen meg,
                     vagy valami szöveges tartalom attól függően, hogy a felhasználó bejelentkezett, vagy sem.

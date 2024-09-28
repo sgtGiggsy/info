@@ -3,7 +3,7 @@ if(@$irhat)
 {
     $javascriptfiles[] = "modules/epuletek/includes/portmuveletek.js";
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/epulet?action=transzporttarsitas<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
+        <form action="<?=$RootPath?>/epulet?action=transzporttarsitas" method="post" onsubmit="beKuld.disabled = true; return true;">
             <div class="portparositas"><?php
 
                 $magyarazat = "<h2>Transzport portok más transzform portokkal társítása</h2>";

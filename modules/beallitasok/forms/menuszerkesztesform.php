@@ -5,7 +5,7 @@ if(@$irhat)
     $javascriptfiles[] = "modules/beallitasok/includes/formactions.js";
     ?><div class="contentleft">
         <div>
-            <form action="<?=$RootPath?>/menu&action=update<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+            <form action="<?=$RootPath?>/menu&action=update" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
                 foreach($menu as $menupont)
                 {
                     ?><div id="mid-<?=$menupont['id']?>" class="menucard<?=($menupont['szulo']) ? "-child" : "" ?>">

@@ -28,16 +28,17 @@ if(@$irhat)
 
                 ?><div>
                     <label>Értesítés feliratkozások</label><br><?php
+                    $ind = 0;
                     foreach($ertesitestipusok as $ertesitestipus)
                     {
                         ?><label class="customcb flexcb">
-                            <input type="checkbox" name="ertesitesfeliratkozasok[]" value="<?=$ertesitestipus['id']?>" <?=($ertesitestipus['feliratkozva'] == 1) ? "checked" : "" ?>>
+                            <input type="checkbox" name="ertesitesfeliratkozasok[<?=$ind?>]" value="<?=$ertesitestipus['id']?>" <?=($ertesitestipus['feliratkozva'] == 1) ? "checked" : "" ?>>
                                 <span class="customcbjelolo customcbleft"></span>
                             </input>
                             <span class="customcbleftlabel">
                                 <?=$ertesitestipus['ertesitestipus']?>
                                 <label class="customcb flexcb">
-                                    <input type="checkbox" name="emailertesites[]" value="<?=$ertesitestipus['id']?>" <?=($ertesitestipus['email'] == 1) ? "checked" : "" ?>>
+                                    <input type="checkbox" name="emailertesites[<?=$ind?>]" value="1" <?=($ertesitestipus['email'] == 1) ? "checked" : "" ?>>
                                         <span class="customcbjelolo customcbleft"></span>
                                     </input>
                                     <span class="customcbleftlabel">
@@ -46,6 +47,7 @@ if(@$irhat)
                                 </label>
                             </span>
                         </label><?php
+                        $ind++;
                     }
                 ?></div>
                 

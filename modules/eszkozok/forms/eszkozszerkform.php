@@ -1,7 +1,7 @@
 <?php
 if(@$irhat)
 {
-    ?><form action="<?=$RootPath?>/<?=$eszkoztipus?><?=(isset($_GET['id'])) ? '/' . $_GET['id'] . '&action=update' : '&action=new' ?>&tipus=<?=$eszkoztipus?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+    ?><form action="<?=$RootPath?>/<?=$eszkoztipus?><?=(isset($_GET['id'])) ? '/' . $_GET['id'] . '&action=update' : '&action=new' ?>&tipus=<?=$eszkoztipus?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if(isset($_GET['id']))
         {
             ?><input type ="hidden" id="id" name="id" value=<?=$id?>><?php

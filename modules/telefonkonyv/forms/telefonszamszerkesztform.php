@@ -6,7 +6,7 @@ if(@$irhat)
     {
         $fieldsetstate = "disabled";
     }
-    ?><form action="<?=$RootPath?>/telefonszamvaltozas&action=new<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+    ?><form action="<?=$RootPath?>/telefonszamvaltozas&action=new" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if($adminmegjegyzes)
         {
             ?><div class="infobox modmessage">

@@ -4,7 +4,7 @@ if(@$irhat)
     ?><div class="contentcenter">
         <small>Ez a menüpont a portok genrálását végzi el. A túlbonyolítás elkerülése végett csak az utolsó két tag generálása végezhető el egyszere. Tehát ha négy tagból áll a port,
         és van 1-1- valamint 1-2- kezdetű porttartomány is, akkor azokat külön kell legenerálni.</small>
-        <form action="<?=$RootPath?>/portdb?action=generate&tipus=telefonkozpont<?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;">
+        <form action="<?=$RootPath?>/portdb?action=generate&tipus=telefonkozpont" method="post" onsubmit="beKuld.disabled = true; return true;">
             <input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$id?>>
             
             <div>

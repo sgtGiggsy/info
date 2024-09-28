@@ -2,7 +2,7 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/epulet&action=<?=(isset($id)) ? 'update' : 'new' ?><?=$kuldooldal?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+        <form action="<?=$RootPath?>/epulet&action=<?=(isset($id)) ? 'update' : 'new' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
             if(isset($id))
             {
                 ?><input type ="hidden" id="id" name="id" value=<?=$id?>><?php
