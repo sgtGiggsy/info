@@ -6,7 +6,6 @@ if(!$irhat)
 }
 else
 {
-    $con = mySQLConnect(false);
     $helyesertek = null;
 
     purifyPost();
@@ -40,19 +39,19 @@ else
             $fajlid = $fajllista[0];
         }
         
-        $stmt = $con->prepare('INSERT INTO vizsgak_kerdesek (vizsga, kerdes, letrehozo, kep) VALUES (?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $vizsgaid, $_POST['kerdes'], $felhasznaloid, $fajlid);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $kerdesek = new MySQLHandler('INSERT INTO vizsgak_kerdesek (vizsga, kerdes, letrehozo, kep) VALUES (?, ?, ?, ?)',
+            array($vizsgaid, $_POST['kerdes'], $felhasznaloid, $fajlid));
+
+        if(!$kerdesek->siker)
         {
             echo "<h2>A kérdés hozzáadása sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
         else
         {
-            $kerdesid = mysqli_insert_id($con);
-
+            $kerdesid = $kerdesek->last_insert_id;
             $valasszam = count($_POST['valasz']);
+            $valaszlehetosegek = new MySQLHandler();
+            $valaszlehetosegek->Prepare('INSERT INTO vizsgak_valaszlehetosegek (kerdes, valaszszoveg, helyes) VALUES (?, ?, ?)');
             for($i = 1; $i <= $valasszam; $i++)
             {
                 $helyes = null;
@@ -63,16 +62,14 @@ else
                 
                 if($_POST['valasz'][$i-1])
                 {
-                    $stmt = $con->prepare('INSERT INTO vizsgak_valaszlehetosegek (kerdes, valaszszoveg, helyes) VALUES (?, ?, ?)');
-                    $stmt->bind_param('sss', $kerdesid, $_POST['valasz'][$i-1], $helyes);
-                    $stmt->execute();
-                    if(mysqli_errno($con) != 0)
+                    $valaszlehetosegek->Run(array($kerdesid, $_POST['valasz'][$i-1], $helyes));
+                    if(!$valaszlehetosegek->siker)
                     {
                         echo "<h2>A válasz hozzáadása sikertelen!<br></h2>";
-                        echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
                     }
                 }
             }
+            $valaszlehetosegek->Close();
         }
     }
 
@@ -89,17 +86,22 @@ else
             $fajlid = $fajllista[0];
         }
 
-        $stmt = $con->prepare('UPDATE vizsgak_kerdesek SET kerdes=?, modosito=?, modositasideje=?, kep=? WHERE id=?');
-        $stmt->bind_param('ssssi', $_POST['kerdes'], $felhasznaloid, $timestamp, $fajlid, $_POST['id']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $vizsgakerdesek = new MySQLHandler("UPDATE vizsgak_kerdesek SET kerdes=?, modosito=?, modositasideje=?, kep=? WHERE id=?",
+            array($_POST['kerdes'], $felhasznaloid, $timestamp, $fajlid, $_POST['id']));
+        
+        if(!$vizsgakerdesek->siker)
         {
             echo "<h2>A kérdés szerkesztése sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
 
         $valasszam = count($_POST['valasz']);
         $kerdesid = $_POST['id'];
+        $torol = new MySQLHandler();
+        $torol->Prepare('DELETE FROM vizsgak_valaszlehetosegek WHERE id=?');
+        $frissit = new MySQLHandler();
+        $frissit->Prepare('UPDATE vizsgak_valaszlehetosegek SET valaszszoveg=?, helyes=? WHERE id=?');
+        $beszur = new MySQLHandler();
+        $beszur->Prepare('INSERT INTO vizsgak_valaszlehetosegek (kerdes, valaszszoveg, helyes) VALUES (?, ?, ?)');
         for($i = 1; $i <= $valasszam; $i++)
         {
             $helyes = null;
@@ -111,33 +113,29 @@ else
             {
                 if(isset($_POST['torol'][$i]))
                 {
-                    $torolid = $_POST['torol'][$i];
-                    mySQLConnect("DELETE FROM vizsgak_valaszlehetosegek WHERE id = $torolid;");
+                    $torol->Run($_POST['torol'][$i]);
                 }
                 else
                 {
-                    $stmt = $con->prepare('UPDATE vizsgak_valaszlehetosegek SET valaszszoveg=?, helyes=? WHERE id=?');
-                    $stmt->bind_param('ssi', $_POST['valasz'][$i-1], $helyes, $_POST['vid'][$i]);
-                    $stmt->execute();
-                    if(mysqli_errno($con) != 0)
+                    $frissit->Run(array($_POST['valasz'][$i-1], $helyes, $_POST['vid'][$i]));
+                    if(!$frissit->siker)
                     {
                         echo "<h2>A válasz hozzáadása sikertelen!<br></h2>";
-                        echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
                     }
                 }
             }
             else
             {
-                $stmt = $con->prepare('INSERT INTO vizsgak_valaszlehetosegek (kerdes, valaszszoveg, helyes) VALUES (?, ?, ?)');
-                $stmt->bind_param('sss', $kerdesid, $_POST['valasz'][$i-1], $helyes);
-                $stmt->execute();
-                if(mysqli_errno($con) != 0)
+                $beszur->Run(array($kerdesid, $_POST['valasz'][$i-1], $helyes));
+                if(!$beszur->siker)
                 {
                     echo "<h2>A válasz hozzáadása sikertelen!<br></h2>";
-                    echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
                 }
             }
         }
+        $beszur->Close();
+        $frissit->Close();
+        $torol->Close();
     }
     elseif($_GET["action"] == "delete")
     {

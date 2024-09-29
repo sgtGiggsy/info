@@ -172,7 +172,7 @@ if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev
             session_regenerate_id();
             if($result->sorokszama == 1) // Ez az egyedüli "Sikeres bejelentkezés" ág. Bármely más ágra fut ki a modul, a bejelentkezés sikertelen
             {
-                $userid = $result->Bind($userid);
+                $result = $result->Bind($userid);
                 $_SESSION['id'] = true;
                 $loginid = logLogin($userid);
                 $loginsuccess = true;

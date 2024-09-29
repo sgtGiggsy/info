@@ -29,7 +29,7 @@ if(isset($irhat) && $irhat)
             $szervezetdb->Query("DELETE FROM szervezetldap WHERE szervezet = ?", $_POST['id'], true);
         }
 
-        $szervezetdb->InitQuery('INSERT INTO szervezetldap (szervezet, needle) VALUES (?, ?)');
+        $szervezetdb->Prepare('INSERT INTO szervezetldap (szervezet, needle) VALUES (?, ?)');
         foreach($ldapstring as $needle)
         {
             if($needle != "")

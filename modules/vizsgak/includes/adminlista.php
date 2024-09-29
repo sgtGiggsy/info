@@ -9,14 +9,15 @@ elseif(!$contextmenujogok['adminlista'])
 }
 else
 {
-    $adminlista = mySQLConnect("SELECT beallitasok, kerdesek, adminkijeloles, ujkornyitas,
+    $adminlista = new MySQLHandler("SELECT beallitasok, kerdesek, adminkijeloles, ujkornyitas,
                 felhasznalok.nev AS felhasznalo,
                 felhasznalok.felhasznalonev AS felhasznalonev,
                 felhasznalok.id AS felhasznaloid
             FROM vizsgak_adminok
                 INNER JOIN felhasznalok ON vizsgak_adminok.felhasznalo = felhasznalok.id
-            WHERE vizsga = '$vizsgaid'
-            ORDER BY felhasznalok.nev ASC;");
+            WHERE vizsga = ?
+            ORDER BY felhasznalok.nev ASC;", $vizsgaid);
+    $adminlista = $adminlista->Result();
 
     $oszlopok = array(
         array('nev' => 'Név', 'tipus' => 's'),

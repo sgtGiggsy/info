@@ -38,7 +38,7 @@ if(isset($irhat) && $irhat)
         if(count($feltoltottfajlok) > 0)
         {
             $fajlfeltolt = new mySQLHandler();
-            $fajlfeltolt->InitQuery('INSERT INTO feltoltesek (fajl) VALUES (?)');
+            $fajlfeltolt->Prepare('INSERT INTO feltoltesek (fajl) VALUES (?)');
             foreach($feltoltottfajlok as $fajl)
             {
                 $fajlfeltolt->Run($fajl);

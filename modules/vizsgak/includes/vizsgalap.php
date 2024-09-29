@@ -9,10 +9,11 @@ else
     if(isset($_GET['action']) && $_GET['action'] == "addnew")
     {
         $irhat = true;
-        $kerdesidlist = mySQLConnect("SELECT id FROM vizsgak_kerdesek WHERE vizsga = $vizsgaid;");
-        $valasztlist = mySQLConnect("SELECT kerdes, helyes FROM vizsgak_valaszlehetosegek ORDER BY kerdes ASC, id ASC;");
-        $kerdesdb = mysqli_num_rows($kerdesidlist);
-        $kerdesidlist = mysqliToArray($kerdesidlist);
+        $kerdesidlist = new MySQLHandler("SELECT id FROM vizsgak_kerdesek WHERE vizsga = ?;", $vizsgaid);
+        $valasztlist = new MySQLHandler("SELECT kerdes, helyes FROM vizsgak_valaszlehetosegek ORDER BY kerdes ASC, id ASC;");
+        $kerdesdb = $kerdesidlist->sorokszama;
+        $kerdesidlist = $kerdesidlist->AsArray();
+        $valasztlist = $valasztlist->Result();
 
         $vizsgalapkerdesei = array();
         $megoldokulcs = "";
@@ -74,7 +75,7 @@ else
 
     else
     {
-        $kerdeseklistaja = mySQLConnect("SELECT vizsgak_vizsgalapok.azonosito AS azonosito,
+        $kerdeseklistaja = new MySQLHandler("SELECT vizsgak_vizsgalapok.azonosito AS azonosito,
                 vizsgak_kerdesek.id AS kerdesid,
                 vizsgak_kerdesek.kerdes AS kerdes,
                 vizsgak_valaszlehetosegek.valaszszoveg AS valasz,
@@ -84,16 +85,17 @@ else
                 INNER JOIN vizsgak_kerdesek ON vizsgak_vizsgalapkerdesek.kerdesid = vizsgak_kerdesek.id
                 INNER JOIN vizsgak_valaszlehetosegek ON vizsgak_valaszlehetosegek.kerdes = vizsgak_kerdesek.id
                 LEFT JOIN feltoltesek ON vizsgak_kerdesek.kep = feltoltesek.id
-            WHERE vizsgak_vizsgalapkerdesek.vizsgalapid = $id
-            ORDER BY vizsgak_vizsgalapkerdesek.id, vizsgak_valaszlehetosegek.id ASC;");
+            WHERE vizsgak_vizsgalapkerdesek.vizsgalapid = ?
+            ORDER BY vizsgak_vizsgalapkerdesek.id, vizsgak_valaszlehetosegek.id ASC;", $id);
 
-        if(!$kerdeseklistaja || mysqli_num_rows($kerdeseklistaja) == 0)
+        if(!$kerdeseklistaja || $kerdeseklistaja->sorokszama == 0)
         {
             echo "<h2>Nem létezik ilyen azonosítójú vizsgalap!</h2>";
         }
         else
         {
-            $vlapazonosito = mysqli_fetch_assoc($kerdeseklistaja)['azonosito'];
+            $vlapazonosito = $kerdeseklistaja->Fetch()['azonosito'];
+            $kerdeseklistaja = $kerdeseklistaja->Result();
             $sorsz = 0;
             ?><div class="PrintArea">
                 <div class="hiddenid"><small><?=$vlapazonosito?></small></div>

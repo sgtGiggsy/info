@@ -15,6 +15,7 @@ if(@$irhat)
         </div>
         <div>
             <form action="<?=$RootPath?>/vizsga/<?=$vizsgaadatok['url']?>/engedelyezettszerkeszt" method="POST">
+                <input type="hidden" name="vizsgaid" value="<?=$vizsgaid?>" />
                 <div class="felhasznalomultiselect" id="szurendolista"><?php
                     foreach($felhasznalolist as $vizsgazhat)
                     {

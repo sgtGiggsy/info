@@ -8,19 +8,25 @@ else
 {
     $kereses = null;
     $enablekeres = true;
-    $vizsgakorok = mySQLConnect("SELECT * FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid ORDER BY id DESC");
+    $vizsgakorok = new MySQLHandler("SELECT * FROM vizsgak_vizsgakorok WHERE vizsga = ? ORDER BY id DESC", $vizsgaid);
     if(!isset($vizsgakorsorszam))
     {
-        $vizsgakorsorszam = @mysqli_fetch_assoc($vizsgakorok)['sorszam'];
+        $vizsgakorsorszam = $vizsgakorok->Fetch()['sorszam'];
     }
     if(isset($_GET['kereses']))
     {
-        $keres = $_GET['kereses'];
-        $kereses = " AND nev LIKE '%$keres%'";
+        $keres = "%" . $_GET['kereses'] . "%";
+        $kereses = " AND nev LIKE ?";
+        $vizsgaqueryparams[] = $keres;
     }
-
+    if(count($vizsgaqueryparams) == 0)
+    {
+        $vizsgaqueryparams = null;
+    }
+    
+    $vizsgakorok = $vizsgakorok->Result();
     $where = "WHERE vizsgak_kitoltesek.befejezett = 1 AND $korvizsgaszures $kereses $vizsgaelszures";
-    $kitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.folyoszam as sorszam,
+    $kitoltesek = new MySQLHandler("SELECT vizsgak_kitoltesek.folyoszam as sorszam,
             vizsgak_kitoltesek.id as id,
             ROUND(SUM(
                 IF((vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes)
@@ -39,7 +45,8 @@ else
             LEFT JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
         $where
         GROUP BY vizsgak_kitoltesek.id
-        ORDER BY vizsgak_kitoltesek.id DESC;");
+        ORDER BY vizsgak_kitoltesek.id DESC;", $vizsgaqueryparams);
+    $kitoltesek = $kitoltesek->Result();
 
     if(isset($_GET['action']) && $_GET['action'] == 'exportexcel')
     {
@@ -86,7 +93,7 @@ else
             <tbody><?php
                 foreach($kitoltesek as $x)
                 {
-                    if( $x['helyes'] == 0)
+                    if($x['helyes'] == 0)
                     {
                         $szazalek = 0;
                     }

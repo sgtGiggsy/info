@@ -9,13 +9,14 @@ elseif(!$contextmenujogok['engedelyezettek'])
 }
 else
 {
-    $engedelyezettlista = mySQLConnect("SELECT felhasznalok.nev AS felhasznalo,
+    $engedelyezettlista = new MySQLHandler("SELECT felhasznalok.nev AS felhasznalo,
                 felhasznalok.felhasznalonev AS felhasznalonev,
                 felhasznalok.id AS felhasznaloid
             FROM vizsgak_engedelyezettek
                 INNER JOIN felhasznalok ON vizsgak_engedelyezettek.felhasznalo = felhasznalok.id
-            WHERE vizsga = '$vizsgaid'
-            ORDER BY felhasznalok.nev ASC;");
+            WHERE vizsga = ?
+            ORDER BY felhasznalok.nev ASC;", $vizsgaid);
+    $engedelyezettlista = $engedelyezettlista->Result();
 
     if($contextmenujogok['engedelyezettek'])
     {

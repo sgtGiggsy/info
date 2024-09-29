@@ -20,6 +20,7 @@ else
     $oldalcim = "Kérdés hozzáadása";
     $kerdesszoveg = $kep = $magyarazat = null;
     $valaszlehetosegek = array();
+    $szerkparams = array();
     
     $kep = null;
     if(isset($_GET['id']))
@@ -28,8 +29,10 @@ else
         if(!$mindir)
         {
             $jogszukit = "AND vizsgak_kerdesek.vizsga IN (SELECT vizsga FROM vizsgak_adminok WHERE felhasznalo = $felhasznaloid)";
+            $szerkparams[] = $felhasznaloid;
         }
-        $kerdesadat = mySQLConnect("SELECT vizsgak_kerdesek.id AS kerdesid,
+        $szerkparams[] = $_GET['id'];
+        $kerdesadat = new MySQLHandler("SELECT vizsgak_kerdesek.id AS kerdesid,
                     vizsgak_kerdesek.kerdes AS kerdes,
                     feltoltesek.fajl AS kep,
                     valaszszoveg,
@@ -46,16 +49,16 @@ else
                 INNER JOIN felhasznalok letrehoz ON vizsgak_kerdesek.letrehozo = letrehoz.id
                 LEFT JOIN felhasznalok modosit ON vizsgak_kerdesek.modosito = modosit.id
                 LEFT JOIN feltoltesek ON vizsgak_kerdesek.kep = feltoltesek.id
-            WHERE vizsgak_kerdesek.id = $id $jogszukit;");
+            WHERE vizsgak_kerdesek.id = ? $jogszukit;", $szerkparams);
 
-        if(mysqli_num_rows($kerdesadat) == 0)
+        if($kerdesadat->sorokszama == 0)
         {
             echo "<h2>Nincs jogosultságod a kérdés szerkesztésére!</h2>";
             $irhat = false;
         }
         else
         {
-            $kerdes = mysqli_fetch_assoc($kerdesadat);
+            $kerdes = $kerdesadat->Fetch();
             foreach($kerdesadat as $valaszlehetoseg)
             {
                 $temp = array(

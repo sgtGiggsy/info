@@ -7,6 +7,8 @@ class MySQLHandler
     public $siker = false;
     public $hibakod;
     public $sorokszama = 0;
+    private $exception;
+    private $keepalive;
     private $result;
     private $querystring = "";
     private $types = "";
@@ -59,6 +61,7 @@ class MySQLHandler
             elseif(!$this->stmt)
             {
                 echo "<h2>Hibásan megírt SQL query!</h2>";
+                echo $this->exception . "<br>";
                 echo $this->querystring;
             }
             elseif(!$paramszamokay)
@@ -67,6 +70,7 @@ class MySQLHandler
                 echo "Várt paraméter: " . $this->vartparam . "<br>";
                 echo "Típusszám: " . strlen($this->types) . "<br>";
                 echo "Paraméterszám: " . $paramcount . "<br>";
+                echo "Lekérdezés:<br>" . $this->querystring;
             }
             elseif(!$this->querystring)
             {
@@ -141,8 +145,9 @@ class MySQLHandler
         }
     }
 
-    public function InitQuery(string $query)
+    public function Prepare(string $query)
     {
+        $this->keepalive = true;
         $this->querystring = $query;
         $this->types = "";
         if($this->con)
@@ -153,6 +158,7 @@ class MySQLHandler
             }
             catch(Exception $e)
             {
+                $this->exception = $e->getMessage();
                 $prep = false;
             }
             if(!$prep)
@@ -175,13 +181,14 @@ class MySQLHandler
 
     public function Query(string $query, $params = null, $keepalive = false)
     {
-        if($this->InitQuery($query))
+        $this->keepalive = $keepalive;
+        if($this->Prepare($query))
         {
             if($params)
             {
                 $this->SetTypes($params);
             }
-            return $this->Run($params, $keepalive);
+            return $this->Run($params);
         }
         else
         {
@@ -190,7 +197,7 @@ class MySQLHandler
         }
     }
 
-    public function Run($params = null, $keepalive = true)
+    public function Run($params = null)
     {
         $paramszamokay = false;
         $paramcount = 0;
@@ -237,7 +244,7 @@ class MySQLHandler
                 $this->siker = false;
             }
     
-            if(!$keepalive && $this->con)
+            if(!$this->keepalive && $this->con)
             {
                 @mysqli_close($this->con);
                 $this->con = null;

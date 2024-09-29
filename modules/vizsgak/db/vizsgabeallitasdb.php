@@ -2,10 +2,10 @@
 
 if(isset($irhat) && $irhat)
 {
-    $con = mySQLConnect(false);
     purifyPost(true);
 
-    if(isset($_FILES["fejleckep"]))
+    //var_dump($_FILES["fejleckep"]["size"]);
+    if(isset($_FILES["fejleckep"]) && $_FILES["fejleckep"]["size"] > 0)
     {        
         $fajlok = $_FILES["fejleckep"];
         $filetypes = array('.jpg', '.jpeg', '.png', '.bmp');
@@ -25,23 +25,26 @@ if(isset($irhat) && $irhat)
             $fajlid = $fajllista[0];
         }
 
-        $stmt = $con->prepare('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, vendegudvozlo, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, lablec, fejleckep, korlatozott) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('sssssssssssss', $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $_POST['lablec'], $fajlid, $_POST['korlatozott']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $vizsgabeallitas = new MySQLHandler('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, vendegudvozlo, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, lablec, fejleckep, korlatozott) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            array($_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $_POST['lablec'], $fajlid, $_POST['korlatozott']));
+        if(!$vizsgabeallitas->siker)
         {
             echo "<h2>A változás beküldése sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
+        $vizsgaadatok['url'] = $_POST['url'];
+        $last_id = $vizsgabeallitas->last_insert_id;
+
+        $ujkor = new MySQLHandler("INSERT INTO vizsgak_vizsgakorok (vizsga, sorszam) VALUES(?, ?)",
+            array($last_id, 1));
     }
 
     elseif(isset($_GET['action']) && $_GET['action'] == "update")
     {
-        $vizsgaorig = mySQLConnect("SELECT fejleckep FROM vizsgak_vizsgak WHERE id = $vizsgaid");
+        $vizsgaorig = new MySQLHandler("SELECT fejleckep FROM vizsgak_vizsgak WHERE id = ?", $vizsgaid);
+        $vizsgaorig = $vizsgaorig->Bind($fajlid);
         if(!isset($_POST["keptorol"]) && !@$fajllista)
         {
             $vizsgaid = $_POST['vizsgaid'];
-            $fajlid = mysqli_fetch_assoc($vizsgaorig)['fejleckep'];
         }
         elseif(@$fajllista)
         {
@@ -59,26 +62,30 @@ if(isset($irhat) && $irhat)
             }
         }
 
-        $stmt = $con->prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=?, eles=?, lablec=?, korlatozott=? WHERE id=?');
-        $stmt->bind_param('ssssssssssssssi', $_POST['nev'], $vizsgaazonosito, $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['lablec'], $_POST['korlatozott'], $_POST['vizsgaid']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $vizsgaDB = new MySQLHandler();
+        $vizsgaDB->Prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=?, eles=?, lablec=?, korlatozott=? WHERE id=?');
+        $vizsgaDB->Run(array($_POST['nev'], $vizsgaazonosito, $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['lablec'], $_POST['korlatozott'], $_POST['vizsgaid']));
+
+        if(!$vizsgaDB->siker)
         {
             echo "<h2>A viszga szerkesztése sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
 
         if(isset($_POST['ujornyitas']))
         {
-            $jelenkor = mySQLConnect("SELECT * FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid ORDER BY id DESC;");
-            $jelenkor = mysqli_fetch_assoc($jelenkor);
+            $vizsgaDB->Prepare("SELECT * FROM vizsgak_vizsgakorok WHERE vizsga = ? ORDER BY id DESC;");
+            $vizsgaDB->Run($vizsgaid);
+            $jelenkor = $vizsgaDB->Fetch();
 
             $lezardate = timeStampForSQL();
             $jelenkorid = $jelenkor['id'];
             $ujkorsorszam = $jelenkor['sorszam'] + 1;
 
-            mySQLConnect("UPDATE vizsgak_vizsgakorok SET veg = '$lezardate' WHERE id = $jelenkorid;");
-            mySQLConnect("INSERT INTO vizsgak_vizsgakorok (vizsga, sorszam) VALUES($vizsgaid, $ujkorsorszam);");
+            $vizsgaDB->Prepare("UPDATE vizsgak_vizsgakorok SET veg = ? WHERE id = ?");
+            $vizsgaDB->Run(array($lezardate, $jelenkorid));
+            
+            $vizsgaDB->Prepare("INSERT INTO vizsgak_vizsgakorok (vizsga, sorszam) VALUES(?, ?)");
+            $vizsgaDB->Run(array($vizsgaid, $ujkorsorszam));
         }
     }
 

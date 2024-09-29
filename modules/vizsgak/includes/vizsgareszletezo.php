@@ -6,7 +6,7 @@ if(!$felhasznaloid)
 }
 else
 {
-    $teszteredmenyek = mySQLConnect("SELECT vizsgak_kerdesek.kerdes as kerdes,
+    $teszteredmenyek = new MySQLHandler("SELECT vizsgak_kerdesek.kerdes as kerdes,
         vizsgak_kerdesek.id as kerdesid,
         felhasznalo,
         felhasznalonev,
@@ -24,16 +24,17 @@ else
         INNER JOIN vizsgak_kitoltesvalaszok ON vizsgak_kerdesek.id = vizsgak_kitoltesvalaszok.kerdes
         INNER JOIN vizsgak_kitoltesek ON vizsgak_kitoltesvalaszok.kitoltes = vizsgak_kitoltesek.id
         INNER JOIN felhasznalok ON vizsgak_kitoltesek.felhasznalo = felhasznalok.id
-    WHERE vizsgak_kitoltesek.id = $id
-    ORDER BY vizsgak_kitoltesvalaszok.id;");
-
-    $vizsgareszletezes = mysqli_fetch_assoc($teszteredmenyek);
-    if(mysqli_num_rows($teszteredmenyek) < 1)
+    WHERE vizsgak_kitoltesek.id = ?
+    ORDER BY vizsgak_kitoltesvalaszok.id;", $id);
+    $vizsgareszletezes = $teszteredmenyek->Fetch();
+    
+    if($teszteredmenyek->sorokszama < 1)
     {
         echo "<h2>Nem létező vizsgaazonosító!</h2>";
     }
     else
     {
+        $teszteredmenyek = $teszteredmenyek->Result();
         if(!($contextmenujogok['admin'] || ($vizsgareszletezes['felhasznalo'] == $felhasznaloid && $vizsgareszletezes['befejezett'] == 1)))
         {
             echo "<h2>Csak a saját, befejezett eredményei megtekintésére van jogosultsága!</h2>";

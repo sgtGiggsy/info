@@ -2,18 +2,27 @@
 
 if(isset($irhat) && $irhat)
 {
-    $con = mySQLConnect(false);
-
     purifyPost();
 
-    mySQLConnect("DELETE FROM vizsgak_engedelyezettek WHERE vizsga = $vizsgaid;");
+    $torol = new MySQLHandler("DELETE FROM vizsgak_engedelyezettek WHERE vizsga = ?;", $vizsgaid);
 
-    $darab = count($_POST['engedelyezett']);
-
-    for($i = 0; $i < $darab; $i++)
+    $darab = null;
+    try
     {
-        $stmt = $con->prepare('INSERT INTO vizsgak_engedelyezettek (felhasznalo, vizsga) VALUES (?, ?)');
-        $stmt->bind_param('ss', $_POST['engedelyezett'][$i], $vizsgaid);
-        $stmt->execute();
+        if($_POST['engedelyezett'])
+            $darab = count($_POST['engedelyezett']);
+    }
+    catch(Exception $e)
+    {
+    }
+
+    if($darab > 0)
+    {
+        $engedelyezettek = new MySQLHandler();
+        $engedelyezettek->Prepare('INSERT INTO vizsgak_engedelyezettek (felhasznalo, vizsga) VALUES (?, ?)');
+        for($i = 0; $i < $darab; $i++)
+        {
+            $engedelyezettek->Run(array($_POST['engedelyezett'][$i], $vizsgaid));
+        }
     }
 }

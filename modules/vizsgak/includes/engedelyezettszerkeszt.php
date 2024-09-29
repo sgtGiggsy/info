@@ -24,14 +24,16 @@ else
     $button = "Jogosultságok módosítása";
     $form = "modules/vizsgak/forms/engedelyezettform";
 
-    $felhasznalolist = mySQLConnect("SELECT felhasznalok.id AS id,
+    $felhasznalolist = new MySQLHandler("SELECT felhasznalok.id AS id,
                 felhasznalok.nev AS nev,
                 felhasznalok.felhasznalonev AS usernev,
                 vizsgak_engedelyezettek.felhasznalo AS engedelyezve,
                 vizsgak_engedelyezettek.vizsga AS vizsga
             FROM felhasznalok
                 LEFT JOIN vizsgak_engedelyezettek ON vizsgak_engedelyezettek.felhasznalo = felhasznalok.id
-            ORDER BY felhasznalok.nev;");
+            WHERE vizsgak_engedelyezettek.vizsga = ? OR vizsgak_engedelyezettek.vizsga IS NULL
+            ORDER BY felhasznalok.nev;", $vizsgaid);
+    $felhasznalolist = $felhasznalolist->Result();
 
     if(!$irhat)
     {

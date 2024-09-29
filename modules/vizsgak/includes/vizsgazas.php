@@ -7,21 +7,22 @@ else
 {   
     $javascriptfiles[] = "modules/vizsgak/includes/vizsga.js";
     $vizsgafolytat = $debug = false;
+    array_unshift($vizsgaqueryparams, $felhasznaloid);
 
-    $korabbikitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.id AS id,
+    $korabbikitoltesek = new MySQLHandler("SELECT vizsgak_kitoltesek.id AS id,
             vizsgak_kitoltesek.felhasznalo AS felhasznalo,
             vizsgak_kitoltesek.befejezett AS befejezett,
             vizsgak_kitoltesek.kitoltesideje AS kitoltesideje,
             vizsgak_vizsgakorok.id AS vizsgakorid
         FROM vizsgak_kitoltesek
             INNER JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
-        WHERE felhasznalo = $felhasznaloid AND $korvizsgaszures $vizsgaelszures
-        ORDER BY vizsgak_kitoltesek.id DESC;");
-    $kitoltesszam = mysqli_num_rows($korabbikitoltesek);
+        WHERE felhasznalo = ? AND $korvizsgaszures $vizsgaelszures
+        ORDER BY vizsgak_kitoltesek.id DESC;", $vizsgaqueryparams);
+    $kitoltesszam = $korabbikitoltesek->sorokszama;
 
     if($kitoltesszam > 0)
     {
-        $legutobbikitoltes = mysqli_fetch_assoc($korabbikitoltesek);
+        $legutobbikitoltes = $korabbikitoltesek->Fetch();
         
         if(!$legutobbikitoltes['befejezett'])
         {
@@ -39,10 +40,9 @@ else
 
             $targeturl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/vizsgazas";
 
-            $firstquestion = mySQLConnect("SELECT id FROM vizsgak_kerdesek WHERE vizsga = $vizsgaid ORDER BY RAND() LIMIT 1;");
-            $firstquestion = mysqli_fetch_assoc($firstquestion)['id'];
+            $firstquestion = new MySQLHandler("SELECT id FROM vizsgak_kerdesek WHERE vizsga = ? ORDER BY RAND() LIMIT 1;", $vizsgaid);
 
-            mySQLConnect("INSERT INTO vizsgak_kitoltesvalaszok (kitoltes, kerdes) VALUES ($lastinsert, $firstquestion);");
+            $kerdinsert = new MySQLHandler("INSERT INTO vizsgak_kitoltesvalaszok (kitoltes, kerdes) VALUES (?, ?);", array($lastinsert, $firstquestion->Fetch()['id']));
 
             header("Location: $targeturl");
         }
@@ -50,6 +50,7 @@ else
         ?><div class="oldalcim">Vizsgázás</div><?php
         if($kitoltesszam > 0)
         {
+            $korabbikitoltesek = $korabbikitoltesek->Result();
             ?><h2>Korábbi kitöltések</h2><?php
             foreach($korabbikitoltesek as $x)
             {
@@ -128,19 +129,20 @@ else
         $valasznelkul = 0; // Azon feltett kérdések száma, amire a felhasználó még nem adott választ
         $megvalaszoltkerdesek = array(); // Tömb amiben a korábban már megjelent kérdéseket tároljuk az összevetéshez
         $adottvalaszok = array(); // Tömb, hogy a válaszok szerkesztésénél az adott válaszok vizuálisan is ki legyenek jelölve
-        $tesztvalaszok = mySQLConnect("SELECT * FROM vizsgak_kitoltesvalaszok WHERE kitoltes = $kitoltesid ORDER BY id ASC");
-        $tesztvalaszlista = mysqliToArray($tesztvalaszok);
+        $tesztvalaszok = new MySQLHandler("SELECT * FROM vizsgak_kitoltesvalaszok WHERE kitoltes = ? ORDER BY id ASC", $kitoltesid);
+        $tesztvalaszlista = $tesztvalaszok->AsArray();
+        $tesztvalaszok = $tesztvalaszlista;
 
-        $kerdeslista = mySQLConnect("SELECT vizsgak_kerdesek.id AS id,
+        $kerdeslista = new MySQLHandler("SELECT vizsgak_kerdesek.id AS id,
                 vizsgak_kerdesek.kerdes,
                 feltoltesek.fajl AS kepurl
             FROM vizsgak_kerdesek
                 LEFT JOIN feltoltesek ON vizsgak_kerdesek.kep = feltoltesek.id
-            WHERE vizsga = $vizsgaid ORDER BY id DESC;");
-        $kerdeslista = mysqliToArray($kerdeslista);
+            WHERE vizsga = ? ORDER BY id DESC;", $vizsgaid);
+        $kerdeslista = $kerdeslista->AsArray();
 
         // Ha még csak az első kérdés lett feltéve, vagy még nem értük el a max kérdésszámot és egy új kérdés megválaszolása felől érkezünk
-        if(isset($_GET['ujkerdes']) && (mysqli_num_rows($tesztvalaszok) < $vizsgaadatok['kerdesszam']))
+        if(isset($_GET['ujkerdes']) && (count($tesztvalaszok) < $vizsgaadatok['kerdesszam']))
         {
             foreach($tesztvalaszok as $marvolt)
             {
@@ -155,16 +157,13 @@ else
 
             if($loopcount < 50) // Ha a ciklus rendeltetésszerűen ért véget, a kérdés hozzáadása az adatbázishoz
             {
-                $con = mySQLConnect();
-                $stmt = $con->prepare('INSERT INTO vizsgak_kitoltesvalaszok (kitoltes, kerdes)  VALUES (?, ?)');
-                $stmt->bind_param('ss', $kitoltesid, $kovetkezokerdesid);
-                $stmt->execute();
-                if(mysqli_errno($con) != 0)
+                $kerdesment = new MySQLHandler('INSERT INTO vizsgak_kitoltesvalaszok (kitoltes, kerdes)  VALUES (?, ?)',
+                    array($kitoltesid, $kovetkezokerdesid));
+                if(!$kerdesment->siker)
                 {
-                    echo "<h2>A kérdés hozzáadása sikertelen!<br></h2>";
-                    echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+                    echo "<h2>A válasz beküldése sikertelen!<br></h2>";
                 }
-                $kitoltesvalaszid = mysqli_insert_id($con);
+                $kitoltesvalaszid = $kerdesment->last_insert_id;
             }
             else
             {
@@ -174,7 +173,7 @@ else
             }
             //header("Location: ./vizsgazas");
         }
-        elseif(mysqli_num_rows($tesztvalaszok) == $vizsgaadatok['kerdesszam']) // Ha elértük az elvárt kérdésszámot, a vizsga lezárható
+        elseif(count($tesztvalaszok) == $vizsgaadatok['kerdesszam']) // Ha elértük az elvárt kérdésszámot, a vizsga lezárható
         {
             $viszgalezarhato = true;
         }
@@ -231,10 +230,11 @@ else
             }
 
             // Lekérjük a kiválasztott kérdéshez tartozó válaszlehetőségeket
-            $valaszlehetosegek = mySQLConnect("SELECT id, helyes, valaszszoveg, kerdes,
-                    (SELECT COUNT(vizsgak_valaszlehetosegek.helyes = 1) FROM vizsgak_valaszlehetosegek WHERE kerdes = $kivalasztottkerdesid) AS helyesvalaszszam
+            $valaszlehetosegek = new MySQLHandler("SELECT id, helyes, valaszszoveg, kerdes,
+                    (SELECT COUNT(vizsgak_valaszlehetosegek.helyes = 1) FROM vizsgak_valaszlehetosegek WHERE kerdes = ?) AS helyesvalaszszam
                 FROM vizsgak_valaszlehetosegek
-                WHERE kerdes = $kivalasztottkerdesid;");
+                WHERE kerdes = ?;", array($kivalasztottkerdesid, $kivalasztottkerdesid));
+            $valaszlehetosegek = $valaszlehetosegek->Result();
 
             if(isset($_GET['debug']) && $_GET['debug'] == "adminvagyok")
             {

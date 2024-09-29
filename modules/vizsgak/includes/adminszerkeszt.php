@@ -25,22 +25,22 @@ else
 
     if(isset($_GET['id']))
     {
-        $adminlista = mySQLConnect("SELECT beallitasok, kerdesek, adminkijeloles, ujkornyitas,
+        $adminadatok = new MySQLHandler("SELECT beallitasok, kerdesek, adminkijeloles, ujkornyitas,
                 felhasznalok.nev AS felhasznalo,
                 felhasznalok.felhasznalonev AS felhasznalonev,
                 felhasznalok.id AS felhasznaloid
             FROM vizsgak_adminok
                 INNER JOIN felhasznalok ON vizsgak_adminok.felhasznalo = felhasznalok.id
-            WHERE vizsga = '$vizsgaid' AND felhasznalok.id = $id
-            ORDER BY felhasznalok.nev ASC;");
+            WHERE vizsga = ? AND felhasznalok.id = ?
+            ORDER BY felhasznalok.nev ASC;", array($vizsgaid, $id));
 
-        if(mysqli_num_rows($adminlista) == 1)
+        if($adminadatok->sorokszama == 1)
         {
-            $adminadatok = mysqli_fetch_assoc($adminlista);
-            $felhasznalo = $adminadatok['felhasznalo'];
+            $adminadatok = $adminadatok->Fetch();
             $beallitasok = $adminadatok['beallitasok'];
             $kerdesek = $adminadatok['kerdesek'];
             $adminkijeloles = $adminadatok['adminkijeloles'];
+            $felhasznalo = $adminadatok['felhasznalo'];
             $ujkornyitas = $adminadatok['ujkornyitas'];
 
             $oldalcim = "$felhasznalo vizsga adminisztrációs jogainak módosítása";

@@ -6,27 +6,25 @@ if(!$irhat && count($_POST) == 0)
 }
 else
 {
-    $con = mySQLConnect(false);
-
     purifyPost();
 
     if($_GET['action'] == "startnew")
     {
-        $jelenkor = mySQLConnect("SELECT MAX(id) AS maxid FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid;");
-        $jelenkor = mysqli_fetch_assoc($jelenkor)['maxid'];
+        $jelenk = new MySQLHandler("SELECT MAX(id) AS maxid FROM vizsgak_vizsgakorok WHERE vizsga = ?", $vizsgaid);
+        $jelenk->Bind($jelenkor);
+
         if($vizsgaeles)
         {
-            $utolsovizsga = mySQLConnect("SELECT folyoszam,
+            $utolsovizsga = new MySQLHandler("SELECT folyoszam,
                     kezdet
                 FROM vizsgak_kitoltesek
                     LEFT JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
-                WHERE vizsgakor = $jelenkor ORDER BY vizsgak_kitoltesek.id DESC LIMIT 1;");
-            $utolsovizsga = mysqli_fetch_assoc($utolsovizsga);
-            $utfolyoszam = $utolsovizsga['folyoszam'];
+                WHERE vizsgakor = ? ORDER BY vizsgak_kitoltesek.id DESC LIMIT 1;", $jelenkor);
+            $utolsovizsga->Bind($utfolyoszam, $kezdet);
             $segments = explode("/", $utfolyoszam);
             $lastfolyoszam = $segments[2];
             $lastfolyoszam++;
-            $ev = date('Y', strtotime($utolsovizsga['kezdet']));
+            $ev = date('Y', strtotime($kezdet));
             $folyoszam = $ev . "/" . $vizsgaid . "/" . $lastfolyoszam;
         }
         else
@@ -34,15 +32,13 @@ else
             $folyoszam = null;
         }
         
-        $stmt = $con->prepare('INSERT INTO vizsgak_kitoltesek (vizsgakor, felhasznalo, folyoszam) VALUES (?, ?, ?)');
-        $stmt->bind_param('sss', $jelenkor, $felhasznaloid, $folyoszam);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $vizsgakitoltes = new MySQLHandler('INSERT INTO vizsgak_kitoltesek (vizsgakor, felhasznalo, folyoszam) VALUES (?, ?, ?)',
+            array($jelenkor, $felhasznaloid, $folyoszam));
+        if(!$vizsgakitoltes->siker)
         {
             echo "<h2>Vizsga elindítása sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
-        $lastinsert = mysqli_insert_id($con);
+        $lastinsert = $vizsgakitoltes->last_insert_id;
     }
 
     elseif($_GET['action'] == "answerquestion")
@@ -57,13 +53,12 @@ else
             /*var_dump($valasz);
             var_dump($kitoltesvalaszid);
             echo "<br><br>";*/
-            $stmt = $con->prepare('UPDATE vizsgak_kitoltesvalaszok SET valasz=?, valasz2=?, valasz3=? WHERE id =?');
-            $stmt->bind_param('sssi', $valasz, $valasz2, $valasz3, $kitoltesvalaszid);
-            $stmt->execute();
-            if(mysqli_errno($con) != 0)
+            
+            $kitoltesvalasz = new MySQLHandler('UPDATE vizsgak_kitoltesvalaszok SET valasz=?, valasz2=?, valasz3=? WHERE id =?',
+                array($valasz, $valasz2, $valasz3, $kitoltesvalaszid));
+            if(!$kitoltesvalasz->siker)
             {
                 echo "<h2>Válasz beküldése sikertelen!<br></h2>";
-                echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
             }
         }
         
@@ -83,22 +78,22 @@ else
         $kitid = $_POST['kitoltesid'];
         $hashalap = null;
 
-        $stmt = $con->prepare('UPDATE vizsgak_kitoltesek SET befejezett=? WHERE id =?');
-        $stmt->bind_param('si', $befejez, $kitid);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $kitoltes = new MySQLHandler('UPDATE vizsgak_kitoltesek SET befejezett=? WHERE id =?',
+            array($befejez, $kitid));
+        
+        if(!$kitoltes->siker)
         {
             echo "<h2>Válasz beküldése sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
 
         // hashgyártás
-        $hashgyart = mySQLConnect("SELECT kerdes, kitoltes, valasz, felhasznalonev, kitoltesideje
-        FROM vizsgak_kitoltesvalaszok
-            INNER JOIN vizsgak_kitoltesek ON vizsgak_kitoltesvalaszok.kitoltes = vizsgak_kitoltesek.id
-            INNER JOIN felhasznalok ON vizsgak_kitoltesek.felhasznalo = felhasznalok.id
-        WHERE vizsgak_kitoltesek.id = $kitid
-        ORDER BY vizsgak_kitoltesvalaszok.id;");
+        $hashgyart = new MySQLHandler("SELECT kerdes, kitoltes, valasz, felhasznalonev, kitoltesideje
+            FROM vizsgak_kitoltesvalaszok
+                INNER JOIN vizsgak_kitoltesek ON vizsgak_kitoltesvalaszok.kitoltes = vizsgak_kitoltesek.id
+                INNER JOIN felhasznalok ON vizsgak_kitoltesek.felhasznalo = felhasznalok.id
+            WHERE vizsgak_kitoltesek.id = ?
+            ORDER BY vizsgak_kitoltesvalaszok.id;", $kitid);
+        $hashgyart = $hashgyart->Result();
 
         foreach($hashgyart as $x)
         {
@@ -116,6 +111,7 @@ else
         }
         $hash = hash('md5', $hashalap);
         
-        mySQLConnect("UPDATE vizsgak_kitoltesek SET vizsgakod = '$hashalap', hash = '$hash' WHERE id = $kitid");
+        $hashinsert = new MySQLHandler("UPDATE vizsgak_kitoltesek SET vizsgakod = ?, hash = ? WHERE id = ?",
+            array($hashalap, $hash, $kitid));
     }
 }

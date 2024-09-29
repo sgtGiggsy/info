@@ -5,12 +5,11 @@ if(!$irhat)
 }
 else
 {
-    $con = mySQLConnect(false);
 
     if($_GET["action"] == "addnew")
     {
-        $lastid = mySQLConnect("SELECT MAX(id) AS utolso FROM vizsgak_vizsgalapok;");
-        $lastid = mysqli_fetch_assoc($lastid)['utolso'];
+        $last = new MySQLHandler("SELECT MAX(id) AS utolso FROM vizsgak_vizsgalapok");
+        $last->Bind($lastid);
 
         if(!$lastid)
         {
@@ -21,29 +20,23 @@ else
 
         $azonosito = date("Ymd") . $vizsgaid . $felhasznaloid . $lastid;
         
-        $stmt = $con->prepare('INSERT INTO vizsgak_vizsgalapok (vizsgaid, letrehozo, azonosito, megoldokulcs) VALUES (?, ?, ?, ?)');
-        $stmt->bind_param('ssss', $vizsgaid, $felhasznaloid, $azonosito, $megoldokulcs);
-        $stmt->execute();
+        $vizgalap = new MySQLHandler("INSERT INTO vizsgak_vizsgalapok (vizsgaid, letrehozo, azonosito, megoldokulcs) VALUES (?, ?, ?, ?)",
+            array($vizsgaid, $felhasznaloid, $azonosito, $megoldokulcs));
 
-        $vizsgalapid = mysqli_insert_id($con);
+        $vizsgalapid = $vizgalap->last_insert_id;
 
-        $vizsgalapkerdesinsertstring = "INSERT INTO `vizsgak_vizsgalapkerdesek` (`vizsgalapid`, `kerdesid`) VALUES ";
+        $vizsgalapDB = new MySQLHandler();
+        $vizsgalapDB->Prepare("INSERT INTO vizsgak_vizsgalapkerdesek (vizsgalapid, kerdesid) VALUES (?, ?)");
         foreach($vizsgalapkerdesei as $kerdes)
         {
-            $vizsgalapkerdesinsertstring .= "($vizsgalapid, $kerdes), ";
+            $vizsgalapDB->Run(array($vizsgalapid, $kerdes));
         }
-
-        $vizsgalapkerdesinsertstring = rtrim($vizsgalapkerdesinsertstring, ", ");
-        $vizsgalapkerdesinsertstring .= ";";
-
-        mySQLConnect($vizsgalapkerdesinsertstring);
+        $vizsgalapDB->Close();
     }
 
     elseif($_GET["action"] == "delete")
     {
         $disable = 0;
-        $stmt = $con->prepare('UPDATE vizsgak_vizsgalapok SET aktiv = ? WHERE id = ?');
-        $stmt->bind_param('si', $disable, $_GET['lapid']);
-        $stmt->execute();
+        $del = new MySQLHandler("UPDATE vizsgak_vizsgalapok SET aktiv = ? WHERE id = ?", array($disable, $_GET['lapid']));
     }
 }

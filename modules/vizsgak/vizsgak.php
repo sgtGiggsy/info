@@ -1,21 +1,23 @@
 <?php
-$szamlalo = null;
+$szamlalo = $felhasznaloszur = null;
 $oldalcimsor = "Vizsgák listája";
 
-$vizsgak = mySQLConnect("SELECT felhasznalok.id AS szerkesztoid,
+$vizsgak = new MySQLHandler("SELECT GROUP_CONCAT(felhasznalok.id SEPARATOR ';') AS adminidlist,
+		GROUP_CONCAT(felhasznalok.nev SEPARATOR ';') AS adminnevlist,
         vizsgak_vizsgak.url AS vizsgaurl,
-        felhasznalok.nev AS vizsgaadmin,
         vizsgak_vizsgak.nev AS vizsganev,
         eles,
         vizsgak_vizsgak.leiras AS leiras,
         korlatozott,
-        felheng.id AS engedfelh
+        GROUP_CONCAT(felheng.id SEPARATOR ';') AS engedfelh
     FROM vizsgak_vizsgak
         LEFT JOIN vizsgak_adminok ON vizsgak_adminok.vizsga = vizsgak_vizsgak.id
         LEFT JOIN felhasznalok ON vizsgak_adminok.felhasznalo = felhasznalok.id
         LEFT JOIN vizsgak_engedelyezettek ON vizsgak_engedelyezettek.vizsga = vizsgak_vizsgak.id
         LEFT JOIN felhasznalok felheng ON vizsgak_engedelyezettek.felhasznalo = felheng.id
+    GROUP BY vizsgak_vizsgak.id
     ORDER BY vizsgak_vizsgak.id;");
+$vizsgak = $vizsgak->Result();
 
 
 $oszlopok = array(
@@ -56,39 +58,46 @@ if(@$mindir)
             ?></tr>
         </thead>
         <tbody><?php
-            $elozovizsga = 0;
-
             foreach($vizsgak as $vizsga)
             {
-                if($mindir || $vizsga['szerkesztoid'] == $felhasznaloid || ($vizsga['eles'] && (!$vizsga['korlatozott'] || ($vizsga['korlatozott'] && $vizsga['engedfelh'] == $felhasznaloid))))
+                if($mindir
+                    || ($felhasznaloid && $vizsga['adminidlist'] && str_contains($vizsga['adminidlist'], $felhasznaloid))
+                    || ($vizsga['eles'] && !$vizsga['korlatozott'])
+                    || ($felhasznaloid && $vizsga['eles'] && $vizsga['korlatozott'] && str_contains($vizsga['engedfelh'], $felhasznaloid))
+                )
                 {
-                    if($elozovizsga != $vizsga['vizsganev'])
-                    {
-                        $elozovizsga = $vizsga['vizsganev'];
-                        $elozoszerkeszto = "";
-                        $elozoengedelyezett = $vizsga['engedfelh'];
-                    
-                        ?><tr>
-                            <td colspan=<?=count($oszlopok)?> class="telefonkonyvelvalaszto">
-                                <a href="<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/ismerteto" style="width: 100%; height: 100%; display: block;"><?=$vizsga['vizsganev']?><?php
-                                if($vizsga['leiras'])
-                                {
-                                    ?><br>&nbsp;&nbsp;<small style="padding-top: 0; font-weight: normal"><?=$vizsga['leiras']?></small></a><?php
-                                }
-                            ?></td>
-                        </tr><?php
-                        
-                    }
-                }
-                if($mindir && $elozoszerkeszto != $vizsga['szerkesztoid'] && (!$vizsga['engedfelh'] || $elozoengedelyezett == $vizsga['engedfelh']))
-                {
-                    $elozoszerkeszto = $vizsga['szerkesztoid'];
-                    
                     ?><tr>
-                        <td></td>
-                        <td><a href='<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/adminszerkeszt/<?=$vizsga['szerkesztoid']?>'><?=$vizsga['vizsgaadmin']?></td>
-                        <td></td>
+                        <td colspan=<?=count($oszlopok)?> class="telefonkonyvelvalaszto">
+                            <a href="<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/ismerteto" style="width: 100%; height: 100%; display: block;"><?=$vizsga['vizsganev']?><?php
+                            if($vizsga['leiras'])
+                            {
+                                ?><br>&nbsp;&nbsp;<small style="padding-top: 0; font-weight: normal"><?=$vizsga['leiras']?></small></a><?php
+                            }
+                        ?></td>
                     </tr><?php
+                }
+                if($mindir)
+                {
+                    $megjelent = array();
+                    $adminids = explode(";", $vizsga['adminidlist']);
+                    $adminnevs = explode(";", $vizsga['adminnevlist']);
+                    $index = 0;
+                    if($vizsga['adminidlist'])
+                    {
+                        foreach($adminids as $adminid)
+                        {
+                            if(!in_array($adminid, $megjelent))
+                            {
+                                ?><tr>
+                                    <td></td>
+                                    <td><a href='<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/adminszerkeszt/<?=$adminid?>'><?=$adminnevs[$index]?></td>
+                                    <td></td>
+                                </tr><?php
+                                $megjelent[] = $adminid;
+                                $index++;
+                            }
+                        }
+                    }
                 }
             }
         ?></tbody>

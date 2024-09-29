@@ -6,7 +6,7 @@ if(!$contextmenujogok['admin'])
 }
 else
 {
-    $kitoltesek = mySQLConnect("SELECT vizsgak_kitoltesek.folyoszam as sorszam,
+    $kitoltesek = new MySQLHandler("SELECT vizsgak_kitoltesek.folyoszam as sorszam,
             vizsgak_kitoltesek.id as id,
             ROUND(SUM(
                 IF((vizsgak_kitoltesvalaszok.valasz = vizsgak_valaszlehetosegek.id AND vizsgak_valaszlehetosegek.helyes)
@@ -23,9 +23,10 @@ else
             LEFT JOIN vizsgak_valaszlehetosegek ON vizsgak_valaszlehetosegek.kerdes = vizsgak_kerdesek.id
             LEFT JOIN felhasznalok ON vizsgak_kitoltesek.felhasznalo = felhasznalok.id
             LEFT JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
-        WHERE vizsgak_kitoltesek.befejezett IS NULL AND vizsgak_vizsgakorok.vizsga = $vizsgaid AND vizsgak_vizsgakorok.sorszam = (SELECT MAX(sorszam) FROM vizsgak_vizsgakorok WHERE vizsga = $vizsgaid) $vizsgaelszures
+        WHERE vizsgak_kitoltesek.befejezett IS NULL AND vizsgak_vizsgakorok.vizsga = ? AND vizsgak_vizsgakorok.sorszam = (SELECT MAX(sorszam) FROM vizsgak_vizsgakorok WHERE vizsga = ?) $vizsgaelszures
         GROUP BY vizsgak_kitoltesek.id
-        ORDER BY vizsgak_kitoltesek.id DESC;");
+        ORDER BY vizsgak_kitoltesek.id DESC;", array($vizsgaid, $vizsgaid));
+    $kitoltesek = $kitoltesek->Result();
 
     if(isset($_GET['action']) && $_GET['action'] == 'exportexcel')
     {

@@ -21,8 +21,9 @@ else
     $pagename = $vizsgaazonosito;
     $topmenuszoveges = $felhasznaloengedelyezett = true;
     $aloldal = false;
+    $vizsgaqueryparams = array();
 
-    $kivalasztottvizsga = mySQLConnect("SELECT vizsgak_vizsgak.id AS id,
+    $kivalasztottvizsga = new MySQLHandler("SELECT vizsgak_vizsgak.id AS id,
             nev,
             url,
             udvozloszoveg,
@@ -39,15 +40,15 @@ else
             feltoltesek.fajl AS fejleckep
     FROM vizsgak_vizsgak
         LEFT JOIN feltoltesek ON vizsgak_vizsgak.fejleckep = feltoltesek.id
-    WHERE url = '$vizsgaazonosito';");
+    WHERE url = ?;", $vizsgaazonosito);
 
-    if(!$kivalasztottvizsga || mysqli_num_rows($kivalasztottvizsga) == 0)
+    if(!$kivalasztottvizsga->siker || $kivalasztottvizsga->sorokszama == 0)
     {
         echo "<h2>Nem létezik ilyen nevű vizsga!</h2>";
     }
     else
     {
-        $vizsgaadatok = mysqli_fetch_assoc($kivalasztottvizsga);
+        $vizsgaadatok = $kivalasztottvizsga->Fetch();
         $vizsgaid = $vizsgaadatok['id'];
         $vizsgaeles = $vizsgaadatok['eles'];
         if($vizsgaadatok['fejleckep'])
@@ -85,21 +86,26 @@ else
             }
             else
             {
-                $vizsgaadmin = mySQLConnect("SELECT * FROM vizsgak_adminok WHERE felhasznalo = $felhasznaloid AND vizsga = $vizsgaid;");
+                $vizsgaadmin = new MySQLHandler("SELECT * FROM vizsgak_adminok WHERE felhasznalo = ? AND vizsga = ?;", array($felhasznaloid, $vizsgaid));
+
                 if($vizsgaadatok['korlatozott'])
                 {
-                    $felhasznaloengedelyezett = mySQLConnect("SELECT * FROM vizsgak_engedelyezettek WHERE felhasznalo = $felhasznaloid AND vizsga = $vizsgaid;");
-                    if(mysqli_num_rows($felhasznaloengedelyezett) == 0)
+                    $felhasznaloengedelyezett = new MySQLHandler("SELECT * FROM vizsgak_engedelyezettek WHERE felhasznalo = ? AND vizsga = ?;", array($felhasznaloid, $vizsgaid));
+                    if($felhasznaloengedelyezett->sorokszama == 0 && $vizsgaadmin->sorokszama == 0)
                     {
                         $felhasznaloengedelyezett = false;
                     }
+                    else
+                    {
+                        $felhasznaloengedelyezett = true;
+                    }
                 }
-                if(mysqli_num_rows($vizsgaadmin) > 0)
+                if($vizsgaadmin->siker && $vizsgaadmin->sorokszama > 0)
                 {
                     // Ezek az alap jogok, amik minden vizsgaadminnak kiosztásra kerülnek
                     $contextmenujogok['vizsgalista'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['admin'] = $contextmenujogok['vizsgalapok'] = true;
 
-                    $vizsgaadmin = mysqli_fetch_assoc($vizsgaadmin);
+                    $vizsgaadmin = $vizsgaadmin->Fetch();
 
                     if($vizsgaadmin['beallitasok'])
                     {
@@ -144,15 +150,18 @@ else
             }
             else
             {
-                $korvizsgaszures = "vizsgak_vizsgakorok.vizsga = '" . $vizsgaadatok['id'] . "' AND ";
+                $korvizsgaszures = "vizsgak_vizsgakorok.vizsga = ? AND ";
+                $vizsgaqueryparams[] = $vizsgaadatok['id'];
                 if(isset($_GET['vizsgakor']))
                 {
-                    $korvizsgaszures .= "vizsgak_vizsgakorok.sorszam = '" . $_GET['vizsgakor'] . "'";
+                    $korvizsgaszures .= "vizsgak_vizsgakorok.sorszam = ?";
                     $vizsgakorsorszam = $_GET['vizsgakor'];
+                    $vizsgaqueryparams[] = $vizsgakorsorszam;
                 }
                 else
                 {
-                    $korvizsgaszures .= "vizsgak_vizsgakorok.sorszam = (SELECT MAX(sorszam) FROM vizsgak_vizsgakorok WHERE vizsga = '" . $vizsgaadatok['id'] . "')";
+                    $korvizsgaszures .= "vizsgak_vizsgakorok.sorszam = (SELECT MAX(sorszam) FROM vizsgak_vizsgakorok WHERE vizsga = ?)";
+                    $vizsgaqueryparams[] = $vizsgaadatok['id'];
                 }
 
                 include("./modules/vizsgak/includes/$aloldal.php");
