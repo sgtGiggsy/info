@@ -26,7 +26,7 @@ if(isset($irhat) && $irhat)
         }
 
         $vizsgabeallitas = new MySQLHandler('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, vendegudvozlo, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, lablec, fejleckep, korlatozott) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            array($_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $_POST['lablec'], $fajlid, $_POST['korlatozott']));
+            $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $_POST['lablec'], $fajlid, $_POST['korlatozott']);
         if(!$vizsgabeallitas->siker)
         {
             echo "<h2>A változás beküldése sikertelen!<br></h2>";
@@ -34,8 +34,7 @@ if(isset($irhat) && $irhat)
         $vizsgaadatok['url'] = $_POST['url'];
         $last_id = $vizsgabeallitas->last_insert_id;
 
-        $ujkor = new MySQLHandler("INSERT INTO vizsgak_vizsgakorok (vizsga, sorszam) VALUES(?, ?)",
-            array($last_id, 1));
+        $ujkor = new MySQLHandler("INSERT INTO vizsgak_vizsgakorok (vizsga, sorszam) VALUES(?, ?)", $last_id, 1);
     }
 
     elseif(isset($_GET['action']) && $_GET['action'] == "update")
@@ -64,7 +63,7 @@ if(isset($irhat) && $irhat)
 
         $vizsgaDB = new MySQLHandler();
         $vizsgaDB->Prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=?, eles=?, lablec=?, korlatozott=? WHERE id=?');
-        $vizsgaDB->Run(array($_POST['nev'], $vizsgaazonosito, $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['lablec'], $_POST['korlatozott'], $_POST['vizsgaid']));
+        $vizsgaDB->Run($_POST['nev'], $vizsgaazonosito, $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['lablec'], $_POST['korlatozott'], $_POST['vizsgaid']);
 
         if(!$vizsgaDB->siker)
         {
@@ -82,10 +81,10 @@ if(isset($irhat) && $irhat)
             $ujkorsorszam = $jelenkor['sorszam'] + 1;
 
             $vizsgaDB->Prepare("UPDATE vizsgak_vizsgakorok SET veg = ? WHERE id = ?");
-            $vizsgaDB->Run(array($lezardate, $jelenkorid));
+            $vizsgaDB->Run($lezardate, $jelenkorid);
             
             $vizsgaDB->Prepare("INSERT INTO vizsgak_vizsgakorok (vizsga, sorszam) VALUES(?, ?)");
-            $vizsgaDB->Run(array($vizsgaid, $ujkorsorszam));
+            $vizsgaDB->Run($vizsgaid, $ujkorsorszam);
         }
     }
 

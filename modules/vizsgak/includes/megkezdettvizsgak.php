@@ -25,7 +25,7 @@ else
             LEFT JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
         WHERE vizsgak_kitoltesek.befejezett IS NULL AND vizsgak_vizsgakorok.vizsga = ? AND vizsgak_vizsgakorok.sorszam = (SELECT MAX(sorszam) FROM vizsgak_vizsgakorok WHERE vizsga = ?) $vizsgaelszures
         GROUP BY vizsgak_kitoltesek.id
-        ORDER BY vizsgak_kitoltesek.id DESC;", array($vizsgaid, $vizsgaid));
+        ORDER BY vizsgak_kitoltesek.id DESC;", $vizsgaid, $vizsgaid);
     $kitoltesek = $kitoltesek->Result();
 
     if(isset($_GET['action']) && $_GET['action'] == 'exportexcel')

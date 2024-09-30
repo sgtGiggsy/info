@@ -33,7 +33,7 @@ else
             WHERE (beepitesek.aktivbeepites = 0 OR beepitesek.aktivbeepites IS NULL) AND ipcimek.eszkoz IS NULL
         ) AS t
         $where
-        GROUP BY id;", $bindarr, true);
+        GROUP BY id;", ...$bindarr);
     $ipcimek = $ipcimekSQL->NaturalSort('ipcim');
 
     $ipcimelozmenyek = $ipcimekSQL->Query("SELECT id, ipcim, vlan, eszkoz, vlannev, beepitesnev, beepitesideje, kiepitesideje, megjegyzes, leadva, sorozatszam, eszkid, beepid
@@ -44,7 +44,7 @@ else
                     LEFT JOIN beepitesek ON beepitesek.ipcim = ipcimek.id
                     LEFT JOIN eszkozok ON beepitesek.eszkoz = eszkozok.id
         ) AS t
-        $where;", $bindarr);
+        $where;", ...$bindarr);
 
     if($mindir)
     {

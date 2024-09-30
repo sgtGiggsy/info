@@ -46,17 +46,19 @@ else
         {
             $sql = new MySQLHandler();
 
-            $sql->Query("SELECT * FROM fizikairetegek;", null, true);
+            $sql->Query("SELECT * FROM fizikairetegek;");
             $fizikairetegek = $sql->AsArray();
 
-            $sql->Query("SELECT * FROM csatlakozotipusok;", null, true);
+            $sql->Query("SELECT * FROM csatlakozotipusok;");
             $csatlakozok = $sql->AsArray();
 
-            $sql->Query("SELECT * FROM sebessegek;", null, true);
+            $sql->Query("SELECT * FROM sebessegek;");
             $sebessegek = $sql->AsArray();
 
             $sql->Query("SELECT * FROM atviteliszabvanyok;");
             $atviteliszabvanyok = $sql->AsArray();
+
+            $sql->Close();
         }
 
         if(@$tipus > 20 && @$tipus < 26)

@@ -17,7 +17,7 @@ else
         FROM vizsgak_kitoltesek
             INNER JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
         WHERE felhasznalo = ? AND $korvizsgaszures $vizsgaelszures
-        ORDER BY vizsgak_kitoltesek.id DESC;", $vizsgaqueryparams);
+        ORDER BY vizsgak_kitoltesek.id DESC;", ...$vizsgaqueryparams);
     $kitoltesszam = $korabbikitoltesek->sorokszama;
 
     if($kitoltesszam > 0)
@@ -42,7 +42,7 @@ else
 
             $firstquestion = new MySQLHandler("SELECT id FROM vizsgak_kerdesek WHERE vizsga = ? ORDER BY RAND() LIMIT 1;", $vizsgaid);
 
-            $kerdinsert = new MySQLHandler("INSERT INTO vizsgak_kitoltesvalaszok (kitoltes, kerdes) VALUES (?, ?);", array($lastinsert, $firstquestion->Fetch()['id']));
+            $kerdinsert = new MySQLHandler("INSERT INTO vizsgak_kitoltesvalaszok (kitoltes, kerdes) VALUES (?, ?);", $lastinsert, $firstquestion->Fetch()['id']);
 
             header("Location: $targeturl");
         }
@@ -158,7 +158,7 @@ else
             if($loopcount < 50) // Ha a ciklus rendeltetésszerűen ért véget, a kérdés hozzáadása az adatbázishoz
             {
                 $kerdesment = new MySQLHandler('INSERT INTO vizsgak_kitoltesvalaszok (kitoltes, kerdes)  VALUES (?, ?)',
-                    array($kitoltesid, $kovetkezokerdesid));
+                    $kitoltesid, $kovetkezokerdesid);
                 if(!$kerdesment->siker)
                 {
                     echo "<h2>A válasz beküldése sikertelen!<br></h2>";
@@ -233,7 +233,7 @@ else
             $valaszlehetosegek = new MySQLHandler("SELECT id, helyes, valaszszoveg, kerdes,
                     (SELECT COUNT(vizsgak_valaszlehetosegek.helyes = 1) FROM vizsgak_valaszlehetosegek WHERE kerdes = ?) AS helyesvalaszszam
                 FROM vizsgak_valaszlehetosegek
-                WHERE kerdes = ?;", array($kivalasztottkerdesid, $kivalasztottkerdesid));
+                WHERE kerdes = ?;", $kivalasztottkerdesid, $kivalasztottkerdesid);
             $valaszlehetosegek = $valaszlehetosegek->Result();
 
             if(isset($_GET['debug']) && $_GET['debug'] == "adminvagyok")

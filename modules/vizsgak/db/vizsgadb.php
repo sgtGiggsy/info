@@ -33,7 +33,7 @@ else
         }
         
         $vizsgakitoltes = new MySQLHandler('INSERT INTO vizsgak_kitoltesek (vizsgakor, felhasznalo, folyoszam) VALUES (?, ?, ?)',
-            array($jelenkor, $felhasznaloid, $folyoszam));
+            $jelenkor, $felhasznaloid, $folyoszam);
         if(!$vizsgakitoltes->siker)
         {
             echo "<h2>Vizsga elindítása sikertelen!<br></h2>";
@@ -55,7 +55,7 @@ else
             echo "<br><br>";*/
             
             $kitoltesvalasz = new MySQLHandler('UPDATE vizsgak_kitoltesvalaszok SET valasz=?, valasz2=?, valasz3=? WHERE id =?',
-                array($valasz, $valasz2, $valasz3, $kitoltesvalaszid));
+                $valasz, $valasz2, $valasz3, $kitoltesvalaszid);
             if(!$kitoltesvalasz->siker)
             {
                 echo "<h2>Válasz beküldése sikertelen!<br></h2>";
@@ -78,8 +78,7 @@ else
         $kitid = $_POST['kitoltesid'];
         $hashalap = null;
 
-        $kitoltes = new MySQLHandler('UPDATE vizsgak_kitoltesek SET befejezett=? WHERE id =?',
-            array($befejez, $kitid));
+        $kitoltes = new MySQLHandler('UPDATE vizsgak_kitoltesek SET befejezett=? WHERE id =?', $befejez, $kitid);
         
         if(!$kitoltes->siker)
         {
@@ -111,7 +110,6 @@ else
         }
         $hash = hash('md5', $hashalap);
         
-        $hashinsert = new MySQLHandler("UPDATE vizsgak_kitoltesek SET vizsgakod = ?, hash = ? WHERE id = ?",
-            array($hashalap, $hash, $kitid));
+        $hashinsert = new MySQLHandler("UPDATE vizsgak_kitoltesek SET vizsgakod = ?, hash = ? WHERE id = ?", $hashalap, $hash, $kitid);
     }
 }

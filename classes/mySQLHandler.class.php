@@ -16,7 +16,7 @@ class MySQLHandler
     private $stmt;
     private $showdebug = false;
 
-    public function __construct(string $query = null, $params = null)
+    public function __construct(string $query = null, ...$params)
 	{
         if(isset($GLOBALS['felhasznaloid']) && $GLOBALS['felhasznaloid'] == 1)
         {
@@ -40,7 +40,7 @@ class MySQLHandler
 
         if($query)
         {
-            $this->Query($query, $params);
+            $this->Query($query, ...$params);
         }
     }
 
@@ -112,7 +112,7 @@ class MySQLHandler
         }
     }
 
-    private function SetTypes($params)
+    private function SetTypes(...$params)
     {
         $this->types = "";
         if(is_array($params))
@@ -131,6 +131,11 @@ class MySQLHandler
     public function Result()
     {
         return $this->result;
+    }
+
+    public function KeepAlive($keepalive = true)
+    {
+        $this->keepalive = $keepalive;
     }
 
     public function Fetch()
@@ -179,16 +184,15 @@ class MySQLHandler
         return $this->siker;
     }
 
-    public function Query(string $query, $params = null, $keepalive = false)
+    public function Query(string $query, ...$params)
     {
-        $this->keepalive = $keepalive;
         if($this->Prepare($query))
         {
-            if($params)
+            if($params && @$params[0])
             {
-                $this->SetTypes($params);
+                $this->SetTypes(...$params);
             }
-            return $this->Run($params);
+            return $this->Run(...$params);
         }
         else
         {
@@ -197,26 +201,26 @@ class MySQLHandler
         }
     }
 
-    public function Run($params = null)
+    public function Run(...$params)
     {
         $paramszamokay = false;
         $paramcount = 0;
         if($this->stmt && $this->siker)
         {
-            if($params)
+            if($params && $params[0])
             {
                 $paramcount = 1;
                 if(is_array($params))
                     $paramcount = count($params);
                 if(!$this->types)
-                    $this->SetTypes($params);
+                    $this->SetTypes(...$params);
             }
             
             if($paramcount == strlen($this->types) && $this->vartparam == $paramcount)
                 $paramszamokay = true;
             
             
-            if($params != null && $paramszamokay)
+            if($params && $params[0] != null && $paramszamokay)
             {
                 if(is_array($params))
                 {

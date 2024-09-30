@@ -32,7 +32,7 @@ else
             FROM vizsgak_adminok
                 INNER JOIN felhasznalok ON vizsgak_adminok.felhasznalo = felhasznalok.id
             WHERE vizsga = ? AND felhasznalok.id = ?
-            ORDER BY felhasznalok.nev ASC;", array($vizsgaid, $id));
+            ORDER BY felhasznalok.nev ASC;", $vizsgaid, $id);
 
         if($adminadatok->sorokszama == 1)
         {

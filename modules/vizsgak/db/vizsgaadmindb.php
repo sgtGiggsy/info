@@ -6,13 +6,12 @@ if(isset($irhat) && $irhat)
 
     $adminfelhid = $_POST['felhasznalo'];
 
-    $vizsgaadmindel = new MySQLHandler("DELETE FROM vizsgak_adminok WHERE felhasznalo = ? AND vizsga = ?",
-        array($adminfelhid, $vizsgaid));
+    $vizsgaadmindel = new MySQLHandler("DELETE FROM vizsgak_adminok WHERE felhasznalo = ? AND vizsga = ?", $adminfelhid, $vizsgaid);
 
     if($_POST['alapadmin'])
     {
         $vizsgaadmin = new MySQLHandler("INSERT INTO vizsgak_adminok (felhasznalo, vizsga, beallitasok, kerdesek, adminkijeloles, ujkornyitas) VALUES (?, ?, ?, ?, ?, ?)",
-            array($adminfelhid, $vizsgaid, $_POST['beallitasok'], $_POST['kerdesek'], $_POST['adminkijeloles'], $_POST['ujkornyitas']));
+            $adminfelhid, $vizsgaid, $_POST['beallitasok'], $_POST['kerdesek'], $_POST['adminkijeloles'], $_POST['ujkornyitas']);
 
         if(!$vizsgaadmin->siker)
         {

@@ -128,7 +128,7 @@ else
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
             LEFT JOIN aktiveszkozok ON beepitesek.eszkoz = aktiveszkozok.eszkoz
         $where
-        ORDER BY snmp_traps.timestamp DESC;", $paramarr);
+        ORDER BY snmp_traps.timestamp DESC;", ...$paramarr);
     $bejegyzesdb = $allapotjelzesek->sorokszama;
     $allapotjelzesek = $allapotjelzesek->Result();
 

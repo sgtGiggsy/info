@@ -86,11 +86,11 @@ else
             }
             else
             {
-                $vizsgaadmin = new MySQLHandler("SELECT * FROM vizsgak_adminok WHERE felhasznalo = ? AND vizsga = ?;", array($felhasznaloid, $vizsgaid));
+                $vizsgaadmin = new MySQLHandler("SELECT * FROM vizsgak_adminok WHERE felhasznalo = ? AND vizsga = ?;", $felhasznaloid, $vizsgaid);
 
                 if($vizsgaadatok['korlatozott'])
                 {
-                    $felhasznaloengedelyezett = new MySQLHandler("SELECT * FROM vizsgak_engedelyezettek WHERE felhasznalo = ? AND vizsga = ?;", array($felhasznaloid, $vizsgaid));
+                    $felhasznaloengedelyezett = new MySQLHandler("SELECT * FROM vizsgak_engedelyezettek WHERE felhasznalo = ? AND vizsga = ?;", $felhasznaloid, $vizsgaid);
                     if($felhasznaloengedelyezett->sorokszama == 0 && $vizsgaadmin->sorokszama == 0)
                     {
                         $felhasznaloengedelyezett = false;

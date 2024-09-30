@@ -49,7 +49,7 @@ else
                 INNER JOIN felhasznalok letrehoz ON vizsgak_kerdesek.letrehozo = letrehoz.id
                 LEFT JOIN felhasznalok modosit ON vizsgak_kerdesek.modosito = modosit.id
                 LEFT JOIN feltoltesek ON vizsgak_kerdesek.kep = feltoltesek.id
-            WHERE vizsgak_kerdesek.id = ? $jogszukit;", $szerkparams);
+            WHERE vizsgak_kerdesek.id = ? $jogszukit;", ...$szerkparams);
 
         if($kerdesadat->sorokszama == 0)
         {
@@ -59,8 +59,9 @@ else
         else
         {
             $kerdes = $kerdesadat->Fetch();
+            $kerdesadat = $kerdesadat->Result();
             foreach($kerdesadat as $valaszlehetoseg)
-            {
+            {                
                 $temp = array(
                     'valaszid' => $valaszlehetoseg['valaszid'],
                     'valaszszoveg' => $valaszlehetoseg['valaszszoveg'],

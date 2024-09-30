@@ -22,7 +22,7 @@ if(isset($irhat) && $irhat)
         $engedelyezettek->Prepare('INSERT INTO vizsgak_engedelyezettek (felhasznalo, vizsga) VALUES (?, ?)');
         for($i = 0; $i < $darab; $i++)
         {
-            $engedelyezettek->Run(array($_POST['engedelyezett'][$i], $vizsgaid));
+            $engedelyezettek->Run($_POST['engedelyezett'][$i], $vizsgaid);
         }
     }
 }

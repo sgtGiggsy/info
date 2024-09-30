@@ -40,7 +40,7 @@ else
         }
         
         $kerdesek = new MySQLHandler('INSERT INTO vizsgak_kerdesek (vizsga, kerdes, letrehozo, kep) VALUES (?, ?, ?, ?)',
-            array($vizsgaid, $_POST['kerdes'], $felhasznaloid, $fajlid));
+            $vizsgaid, $_POST['kerdes'], $felhasznaloid, $fajlid);
 
         if(!$kerdesek->siker)
         {
@@ -62,7 +62,7 @@ else
                 
                 if($_POST['valasz'][$i-1])
                 {
-                    $valaszlehetosegek->Run(array($kerdesid, $_POST['valasz'][$i-1], $helyes));
+                    $valaszlehetosegek->Run($kerdesid, $_POST['valasz'][$i-1], $helyes);
                     if(!$valaszlehetosegek->siker)
                     {
                         echo "<h2>A válasz hozzáadása sikertelen!<br></h2>";
@@ -87,7 +87,7 @@ else
         }
 
         $vizsgakerdesek = new MySQLHandler("UPDATE vizsgak_kerdesek SET kerdes=?, modosito=?, modositasideje=?, kep=? WHERE id=?",
-            array($_POST['kerdes'], $felhasznaloid, $timestamp, $fajlid, $_POST['id']));
+            $_POST['kerdes'], $felhasznaloid, $timestamp, $fajlid, $_POST['id']);
         
         if(!$vizsgakerdesek->siker)
         {
@@ -117,7 +117,7 @@ else
                 }
                 else
                 {
-                    $frissit->Run(array($_POST['valasz'][$i-1], $helyes, $_POST['vid'][$i]));
+                    $frissit->Run($_POST['valasz'][$i-1], $helyes, $_POST['vid'][$i]);
                     if(!$frissit->siker)
                     {
                         echo "<h2>A válasz hozzáadása sikertelen!<br></h2>";
@@ -126,7 +126,7 @@ else
             }
             else
             {
-                $beszur->Run(array($kerdesid, $_POST['valasz'][$i-1], $helyes));
+                $beszur->Run($kerdesid, $_POST['valasz'][$i-1], $helyes);
                 if(!$beszur->siker)
                 {
                     echo "<h2>A válasz hozzáadása sikertelen!<br></h2>";

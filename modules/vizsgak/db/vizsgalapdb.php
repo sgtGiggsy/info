@@ -21,7 +21,7 @@ else
         $azonosito = date("Ymd") . $vizsgaid . $felhasznaloid . $lastid;
         
         $vizgalap = new MySQLHandler("INSERT INTO vizsgak_vizsgalapok (vizsgaid, letrehozo, azonosito, megoldokulcs) VALUES (?, ?, ?, ?)",
-            array($vizsgaid, $felhasznaloid, $azonosito, $megoldokulcs));
+            $vizsgaid, $felhasznaloid, $azonosito, $megoldokulcs);
 
         $vizsgalapid = $vizgalap->last_insert_id;
 
@@ -29,7 +29,7 @@ else
         $vizsgalapDB->Prepare("INSERT INTO vizsgak_vizsgalapkerdesek (vizsgalapid, kerdesid) VALUES (?, ?)");
         foreach($vizsgalapkerdesei as $kerdes)
         {
-            $vizsgalapDB->Run(array($vizsgalapid, $kerdes));
+            $vizsgalapDB->Run($vizsgalapid, $kerdes);
         }
         $vizsgalapDB->Close();
     }
@@ -37,6 +37,6 @@ else
     elseif($_GET["action"] == "delete")
     {
         $disable = 0;
-        $del = new MySQLHandler("UPDATE vizsgak_vizsgalapok SET aktiv = ? WHERE id = ?", array($disable, $_GET['lapid']));
+        $del = new MySQLHandler("UPDATE vizsgak_vizsgalapok SET aktiv = ? WHERE id = ?", $disable, $_GET['lapid']);
     }
 }

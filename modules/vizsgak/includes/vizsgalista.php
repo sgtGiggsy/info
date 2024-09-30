@@ -11,7 +11,7 @@ else
     $vizsgakorok = new MySQLHandler("SELECT * FROM vizsgak_vizsgakorok WHERE vizsga = ? ORDER BY id DESC", $vizsgaid);
     if(!isset($vizsgakorsorszam))
     {
-        $vizsgakorsorszam = $vizsgakorok->Fetch()['sorszam'];
+        @$vizsgakorsorszam = $vizsgakorok->Fetch()['sorszam'];
     }
     if(isset($_GET['kereses']))
     {
@@ -45,7 +45,7 @@ else
             LEFT JOIN vizsgak_vizsgakorok ON vizsgak_kitoltesek.vizsgakor = vizsgak_vizsgakorok.id
         $where
         GROUP BY vizsgak_kitoltesek.id
-        ORDER BY vizsgak_kitoltesek.id DESC;", $vizsgaqueryparams);
+        ORDER BY vizsgak_kitoltesek.id DESC;", ...$vizsgaqueryparams);
     $kitoltesek = $kitoltesek->Result();
 
     if(isset($_GET['action']) && $_GET['action'] == 'exportexcel')

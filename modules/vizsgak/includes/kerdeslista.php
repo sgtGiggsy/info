@@ -11,6 +11,7 @@ else
         FROM vizsgak_kerdesek
         WHERE vizsga = ?
         ORDER BY id DESC;", $vizsgaid);
+    $kerdessorszam = $kerdeseklistaja->sorokszama;
     $kerdeseklistaja = $kerdeseklistaja->Result();
 
     $oszlopok = array(
@@ -36,7 +37,6 @@ else
             </thead>
             <tbody>
         <?php
-            $kerdessorszam = $kerdeseklistaja->sorokszama;
             foreach ($kerdeseklistaja as $x)
             {
                 $id = $x['kerdid'];

@@ -17,13 +17,13 @@ if($tipusnev)
     {
         $sql = new MySQLHandler();
 
-        $sql->Query("SELECT * FROM fizikairetegek;", null, true);
+        $sql->Query("SELECT * FROM fizikairetegek;");
         $returnarr['fizikairetegek'] = $sql->AsArray();
 
-        $sql->Query("SELECT * FROM csatlakozotipusok;", null, true);
+        $sql->Query("SELECT * FROM csatlakozotipusok;");
         $returnarr['csatlakozok'] = $sql->AsArray();
 
-        $sql->Query("SELECT id, CONCAT(sebesseg, ' Mbit/s') AS nev FROM sebessegek;", null, true);
+        $sql->Query("SELECT id, CONCAT(sebesseg, ' Mbit/s') AS nev FROM sebessegek;");
         $returnarr['sebessegek'] = $sql->AsArray();
 
         $sql->Query("SELECT * FROM atviteliszabvanyok;");

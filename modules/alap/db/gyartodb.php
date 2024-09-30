@@ -12,7 +12,7 @@ if(isset($irhat) && $irhat)
     }
     elseif($_GET["action"] == "update")
     {
-        $gyartosql->Query('UPDATE gyartok SET nev=? WHERE id=?', array($_POST['nev'], $_POST['id']));
+        $gyartosql->Query('UPDATE gyartok SET nev=? WHERE id=?', $_POST['nev'], $_POST['id']);
     }
     elseif($_GET["action"] == "delete")
     {
