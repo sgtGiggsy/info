@@ -291,8 +291,10 @@ else
                                     foreach($valaszlehetosegek as $valasz)
                                     {
                                         $inptype = "radio";
+                                        $inpclassJel = "customradiojelolo customcbleft";
                                         if($valasz['helyesvalaszszam'] > 1)
                                         {
+                                            $inpclassJel = "customcbjelolo customcbleft";
                                             $inptype = "checkbox";
                                         }
                                         if(in_array($valasz['id'], $adottvalaszok))
@@ -304,8 +306,13 @@ else
                                         {
                                             $kivalaszt = "";
                                         }
-                                        ?><div><label <?=($debug && $valasz['helyes'] == 1) ? "style='font-style: italic;'" : "" ?>><input type="<?=$inptype?>" name="valaszok[]" id="valaszok" onclick="halasztKuldSwitch();" value="<?=$valasz['id']?>" <?=$kivalaszt?>><?=$valasz['valaszszoveg']?></label></div><?php
-                                        
+                                        ?><div>
+                                            <label <?=($debug && $valasz['helyes'] == 1) ? "style='font-style: italic;'" : "" ?> class="customcb">
+                                                <input type="<?=$inptype?>" name="valaszok[]" id="valaszok" onclick="halasztKuldSwitch();" value="<?=$valasz['id']?>" <?=$kivalaszt?>>
+                                                    <span class="<?=$inpclassJel?>"></span>    
+                                                    <span><?=nl2br($valasz['valaszszoveg'])?></span>
+                                            </label>
+                                        </div><?php
                                     }
                                 ?><div class="submit"><input type="submit" name="beKuld" id="valaszkuld" value='<?=($voltvalasztas) ? "Válasz beküldése" : "Kérdés későbbre halasztása" ?>'></div>
                             </div>

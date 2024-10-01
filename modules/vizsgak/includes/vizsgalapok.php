@@ -75,7 +75,7 @@ else
                     </tr>
                     <tr class="trlink">
                         <td><a href="<?=$kattinthatolink?>">&nbsp;</a></td>
-                        <td colspan="3"><a href="<?=$kattinthatolink?>"><?=$lap['megoldokulcs']?></a></td>
+                        <td colspan="4"><a href="<?=$kattinthatolink?>"><?=$lap['megoldokulcs']?></a></td>
                     </tr><?php
                 }
             ?></tbody>

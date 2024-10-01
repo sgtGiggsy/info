@@ -6,6 +6,7 @@ includes/greedynav
 *.ttf
 *.eot
 *.csv
+*.txt
 jquery.min.js
 jquery.min.map
 xlsxwriter.class.php

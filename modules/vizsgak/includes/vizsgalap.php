@@ -129,7 +129,7 @@ else
                                     <h3 style="text-align: justify;"><?=$sorsz?>. <?=$kerdes['kerdes']?></h3><?php
                             }
                             
-                            ?><p class="vizsgalapvalasz">(<?=$valasznev++?>) <?=$kerdes['valasz']?></p><?php
+                            ?><p class="vizsgalapvalasz">(<?=$valasznev++?>) <?=nl2br($kerdes['valasz'])?></p><?php
                         }
                         ?></div>
                     </div>
