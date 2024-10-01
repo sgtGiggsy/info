@@ -31,17 +31,17 @@ if(@$irhat)
                     $ind = 0;
                     foreach($ertesitestipusok as $ertesitestipus)
                     {
-                        ?><label class="customcb flexcb">
+                        ?><label class="customcb">
                             <input type="checkbox" name="ertesitesfeliratkozasok[<?=$ind?>]" value="<?=$ertesitestipus['id']?>" <?=($ertesitestipus['feliratkozva'] == 1) ? "checked" : "" ?>>
-                                <span class="customcbjelolo customcbleft"></span>
+                                <span class="customcbjelolo"></span>
                             </input>
-                            <span class="customcbleftlabel">
+                            <span class="customcbrightlabel">
                                 <?=$ertesitestipus['ertesitestipus']?>
-                                <label class="customcb flexcb">
+                                <label class="customcb">
                                     <input type="checkbox" name="emailertesites[<?=$ind?>]" value="1" <?=($ertesitestipus['email'] == 1) ? "checked" : "" ?>>
-                                        <span class="customcbjelolo customcbleft"></span>
+                                        <span class="customcbjelolo"></span>
                                     </input>
-                                    <span class="customcbleftlabel">
+                                    <span class="customcbrightlabel">
                                         E-mail értesítés is
                                     </span>
                                 </label>

@@ -31,7 +31,7 @@ if(@$irhat)
                                 <td>
                                     <label class="customcb">
                                         <input type="checkbox" name="csoport[]" id="csoport" value="<?=$alegyseg['csopid']?>" <?=($alegyseg['felhid']) ? "checked" : "" ?>>
-                                        <span class="customcbjelolo tablejelolo"></span>
+                                        <span class="customcbjelolo"></span>
                                     </label>
                                 </td>
                             </tr><?php
