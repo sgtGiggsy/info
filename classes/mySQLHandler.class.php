@@ -54,36 +54,39 @@ class MySQLHandler
     {
         if($this->showdebug)
         {
+            $message = "";
             if(!$this->con)
             {
-                echo "<h2>A meghívni kísérelt MySQL kapcsolat már lezárult!</h2>";
+                $message = "<h2>A meghívni kísérelt MySQL kapcsolat már lezárult!</h2>";
             }
             elseif(!$this->stmt)
             {
-                echo "<h2>Hibásan megírt SQL query!</h2>";
-                echo $this->exception . "<br>";
-                echo $this->querystring;
+                $message = "<h2>Hibásan megírt SQL query!</h2>" .  $this->exception . "<br>" .  $this->querystring;
             }
             elseif(!$paramszamokay)
             {
-                echo "<h2>Hibás paraméterszám!</h2>";
-                echo "Várt paraméter: " . $this->vartparam . "<br>";
-                echo "Típusszám: " . strlen($this->types) . "<br>";
-                echo "Paraméterszám: " . $paramcount . "<br>";
-                echo "Lekérdezés:<br>" . $this->querystring;
+                $message = "<h2>Hibás paraméterszám!</h2>" . "Várt paraméter: " . $this->vartparam . "<br>Típusszám: " . strlen($this->types)
+                    . "<br>Paraméterszám: " . $paramcount . "<br>Lekérdezés:<br>" . $this->querystring;
             }
             elseif(!$this->querystring)
             {
-                echo "<h2>Nem adtál meg lekérdezést!</h2>";
+                $message = "<h2>Nem adtál meg lekérdezést!</h2>";
             }
             elseif(!$this->siker)
             {
-                echo "<h2>A MySQL lekérdezésbe valamilyen hiba csúszott!</h2>";
-                echo mysqli_error($this->con);
+                $message = "<h2>A MySQL lekérdezésbe valamilyen hiba csúszott!</h2>" . mysqli_error($this->con);
             }
             else
             {   
-                echo "<h2>Ismeretlen hiba a MySQL lekérdezésben!</h2>";
+                $message = "<h2>Ismeretlen hiba a MySQL lekérdezésben!</h2>";
+            }
+            try
+            {
+                throw new Exception($message);
+            }
+            catch(Exception $e)
+            {
+                echo $e;
             }
         }
         else
@@ -272,25 +275,33 @@ class MySQLHandler
     {
         $returnarr = array();
         $tobind = mysqli_fetch_assoc($this->result);
-        $dbelem = count($tobind);
-
-        if($dbelem == count($array))
+        if($tobind)
         {
-            $i = 0;
-            foreach($tobind as $key => $value)
-            {
-                $array[$i] = $value;
-                $returnarr[$key] = $value;
-                $i++;
-            }
+            $dbelem = count($tobind);
             
-            return $returnarr;
+            if($dbelem == count($array))
+            {
+                $i = 0;
+                foreach($tobind as $key => $value)
+                {
+                    $array[$i] = $value;
+                    $returnarr[$key] = $value;
+                    $i++;
+                }
+                
+                return $returnarr;
+            }
+            else
+            {
+                echo "<h2>Az SQL lekérdezés mezőinek, és a kötni kívánt tömb elemeinek száma különbözik!</h2>";
+                echo "SQL adatbázisból vett mezők száma: . $dbelem";
+                echo "A kötni kívánt elemek száma: " . count($array);
+                return false;
+            }
         }
         else
         {
-            echo "<h2>Az SQL lekérdezés mezőinek, és a kötni kívánt tömb elemeinek száma különbözik!</h2>";
-            echo "SQL adatbázisból vett mezők száma: . $dbelem";
-            echo "A kötni kívánt elemek száma: " . count($array);
+            echo "<h2>A lekérdezés sikertelen!</h2>";
             return false;
         }
     }

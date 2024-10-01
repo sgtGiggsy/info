@@ -26,7 +26,7 @@ Class API_Call implements API
     static function Post($object, $tabla)
     {
         $statuscode = 400;
-        $port = $body = $severity = null;
+        $port = $body = $severity = $ismeretleneszkip = null;
         //$jelentes = purifyArray($object);
 
         $eszkoz = new MySQLHandler("SELECT eszkozok.id AS eszkid, snmpcommunity
@@ -74,7 +74,7 @@ Class API_Call implements API
         //$event = $object->event;
         $post = new MySQLHandler();
         $post->Query('INSERT INTO snmp_traps (eszkozid, event, port, systemuptime, severity, message, ismeretleneszkip) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            array($eszkozid, $object->event, $port, $object->sysuptime, $severity, $message, $ismeretleneszkip));
+            $eszkozid, $object->event, $port, $object->sysuptime, $severity, $message, $ismeretleneszkip);
 
         if($post->siker)
         {

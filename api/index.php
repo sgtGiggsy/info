@@ -3,6 +3,7 @@ include("../includes/config.inc.php");
 include("../includes/functions.php");
 include("../Classes/Ertesites.class.php");
 include('../Classes/MailHandler.class.php');
+include('../Classes/MySQLHandler.class.php');
 
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');

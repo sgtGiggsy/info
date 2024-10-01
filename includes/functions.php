@@ -139,16 +139,10 @@ function logLogin($felhasznalo)
 {
 	$gepnev = explode(".", gethostbyaddr($_SERVER['REMOTE_ADDR']))[0];
 	$gepadat = parseUserAgent();
-	$con = mySQLConnect(false);
-	if ($stmt = $con->prepare('INSERT INTO bejelentkezesek (felhasznalo, ipcim, bongeszo, bongeszoverzio, oprendszer, oprendszerverzio, oprendszerarch, gepnev) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'))
-    {
-        $stmt->bind_param('ssssssss', $felhasznalo, $_SERVER['REMOTE_ADDR'], $gepadat['bongeszo'], $gepadat['bongeszover'], $gepadat['oprendszer'], $gepadat['oprendszerver'], $gepadat['architektura'], $gepnev);
-		$stmt->execute();
-	}
-	$last_id = mysqli_insert_id($con);
-	$con->close();
+	$bejelentkezesek = new MySQLHandler('INSERT INTO bejelentkezesek (felhasznalo, ipcim, bongeszo, bongeszoverzio, oprendszer, oprendszerverzio, oprendszerarch, gepnev) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+		$felhasznalo, $_SERVER['REMOTE_ADDR'], $gepadat['bongeszo'], $gepadat['bongeszover'], $gepadat['oprendszer'], $gepadat['oprendszerver'], $gepadat['architektura'], $gepnev);
 
-	return $last_id;
+	return $bejelentkezesek->last_insert_id;
 }
 
 function logActivity($felhasznalo, $params)
@@ -166,15 +160,10 @@ function logActivity($felhasznalo, $params)
 	}
 	
 	$con = mySQLConnect(false);
-	if ($stmt = $con->prepare('INSERT INTO felhasznalotevekenysegek (felhasznalo, ipcim, menupont, almenu, elemid, params) VALUES (?, ?, ?, ?, ?, ?)'))
-    {
-        $stmt->bind_param('ssssss', $felhasznalo, $_SERVER['REMOTE_ADDR'], $menupont, $almenu, $elemid, $params);
-		$stmt->execute();
-	}
-	$last_id = mysqli_insert_id($con);
-	$con->close();
+	$tevekenysegek = new MySQLHandler('INSERT INTO felhasznalotevekenysegek (ipcim, felhasznalo, menupont, almenu, elemid, params) VALUES (?, ?, ?, ?, ?, ?)',
+		$_SERVER['REMOTE_ADDR'], $felhasznalo, $menupont, $almenu, $elemid, $params);
 
-	return $last_id;
+	return $tevekenysegek->last_insert_id;
 }
 
 function csvToArray($csv)
@@ -248,7 +237,8 @@ function szervezetValaszto($ldapres)
 {
 	if($ldapres)
 	{
-		@$szervezet = mySQLConnect("SELECT szervezet FROM `szervezetldap` WHERE '$ldapres' LIKE CONCAT('%', szervezetldap.needle, '%');")->fetch_assoc()['szervezet'];
+		$szervezet = new MySQLHandler("SELECT szervezet FROM `szervezetldap` WHERE ? LIKE CONCAT('%', szervezetldap.needle, '%');", $ldapres);
+		@$szervezet = $szervezet->Fetch()['szervezet'];
 	}
 	else
 	{
@@ -345,18 +335,18 @@ function eszkozTipusValaszto($tipusid)
 	return $eszktip;
 }
 
-function eszkozPicker($current = false, $beepitett)
+function eszkozPicker($current = null, $beepitett)
 {
 	$where = null;
 	if($current)
 	{
-		$where = "WHERE eszkozok.id = $current";
+		$where = "WHERE eszkozok.id = ?";
 	}
 	elseif(!$beepitett)
 	{
 		$where = "WHERE beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL";
 	}
-	$eszkozok = mySQLConnect("SELECT
+	$eszkozok = new MySQLHandler("SELECT
 			eszkozok.id AS id,
 			sorozatszam,
 			gyartok.nev AS gyarto,
@@ -370,10 +360,11 @@ function eszkozPicker($current = false, $beepitett)
 				INNER JOIN eszkoztipusok ON modellek.tipus = eszkoztipusok.id
 				LEFT JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
 		$where
-		ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
+		ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;", $current);
 
 	if(!$current)
 	{
+		$eszkozok = $eszkozok->Result();
 		?><div>
 			<label for="eszkoz">Eszköz:</label><br>
 			<select id="eszkoz" name="eszkoz" required>
@@ -387,7 +378,7 @@ function eszkozPicker($current = false, $beepitett)
 	}
 	else
 	{
-		$eszkoz = mysqli_fetch_assoc($eszkozok);
+		$eszkoz = $eszkozok->Fetch();
 		?><h2><label><?= $eszkoz['gyarto'] . " " . $eszkoz['modell'] . $eszkoz['varians'] . " (" . $eszkoz['sorozatszam'] . ")" ?></h2></label>
 		<input type ="hidden" id="eszkoz" name="eszkoz" value=<?=$current?>><?php
 	}
@@ -395,13 +386,14 @@ function eszkozPicker($current = false, $beepitett)
 
 function epuletPicker($current)
 {
-	$epuletek = mySQLConnect("SELECT epuletek.id AS id,
+	$epuletek = new MySQLHandler("SELECT epuletek.id AS id,
 			szam AS epuletszam,
 			epuletek.nev AS epuletnev,
 			epulettipusok.tipus AS tipus
         FROM epuletek
             LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
 		ORDER BY epuletek.szam;");
+	$epuletek = $epuletek->Result();
 
 	?><div>
 	<label for="epulet">Épület:</label><br>
@@ -417,7 +409,7 @@ function epuletPicker($current)
 
 function helyisegPicker($current, $selectnev)
 {
-	$helyisegek = mySQLConnect("SELECT
+	$helyisegek = new MySQLHandler("SELECT
             helyisegek.id AS id,
             szam AS epuletszam,
             helyisegszam,
@@ -427,6 +419,7 @@ function helyisegPicker($current, $selectnev)
         FROM helyisegek
 			LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
         ORDER BY epuletszam + 0, helyisegszam;");
+	$helyisegek = $helyisegek->Result();
 
 	?><div>
 	<label for="<?=$selectnev?>">Helyiség:</label><br>
@@ -442,7 +435,7 @@ function helyisegPicker($current, $selectnev)
 
 function rackPicker($current)
 {
-	$rackek = mySQLConnect("SELECT
+	$rackek = new MySQLHandler("SELECT
             rackszekrenyek.id AS id,
             szam AS epuletszam,
             helyisegszam,
@@ -454,6 +447,7 @@ function rackPicker($current)
                 helyisegek ON rackszekrenyek.helyiseg = helyisegek.id LEFT JOIN
                 epuletek ON helyisegek.epulet = epuletek.id
         ORDER BY epuletszam, helyisegszam, rackszekrenyek.nev;");
+	$rackek = $rackek->Result();
 
 	?><div>
 	<label for="rack">Rackszekrény:</label><br>
@@ -469,7 +463,8 @@ function rackPicker($current)
 
 function gyartoPicker($current)
 {
-	$gyartok = mySQLConnect("SELECT * FROM gyartok ORDER BY nev");
+	$gyartok = new MySQLHandler("SELECT * FROM gyartok ORDER BY nev");
+	$gyartok = $gyartok->Result();
 
 	?><div>
 	<label for="gyarto">Gyártó:</label><br>
@@ -485,7 +480,8 @@ function gyartoPicker($current)
 
 function priorityPicker($current)
 {
-	$priority = mySQLConnect("SELECT * FROM prioritasok ORDER BY id DESC");
+	$priority = new MySQLHandler("SELECT * FROM prioritasok ORDER BY id DESC");
+	$priority = $priority->Result();
 
 	?><div>
 	<label for="prioritas">Prioritás:</label><br>
@@ -501,7 +497,8 @@ function priorityPicker($current)
 
 function bugTypePicker($current)
 {
-	$bugtype = mySQLConnect("SELECT * FROM bugtipusok ORDER BY nev");
+	$bugtype = new MySQLHandler("SELECT * FROM bugtipusok ORDER BY nev");
+	$bugtype = $bugtype->Result();
 
 	?><div>
 	<label for="tipus">A hiba fajtája:</label><br>
@@ -520,9 +517,10 @@ function felhasznaloPicker($current, $selectnev, $szervezet = null)
 	$where = "WHERE aktiv = 1";
 	if($szervezet)
 	{
-		$where .= " AND szervezet = $szervezet";
+		$where .= " AND szervezet = ?";
 	}
-	$felhasznalok = mySQLConnect("SELECT id, nev FROM felhasznalok $where ORDER BY nev ASC;");
+	$felhasznalok = new MySQLHandler("SELECT id, nev FROM felhasznalok $where ORDER BY nev ASC; $szervezet");
+	$felhasznalok = $felhasznalok->Result();
 
 	?><select id="<?=$selectnev?>" name="<?=$selectnev?>">
 		<option value="" selected></option><?php
@@ -535,7 +533,8 @@ function felhasznaloPicker($current, $selectnev, $szervezet = null)
 
 function szervezetPicker($current, $selectnev = 'szervezet', $hosszu = false)
 {
-	$szervezetek = mySQLConnect("SELECT * FROM szervezetek;");
+	$szervezetek = new MySQLHandler("SELECT * FROM szervezetek;");
+	$szervezetek = $szervezetek->Result();
 
 	?><div>
 		<label for="<?=$selectnev?>">szervezet:</label><br>
@@ -551,7 +550,8 @@ function szervezetPicker($current, $selectnev = 'szervezet', $hosszu = false)
 
 function vlanPicker($current, $selectnev = 'vlan')
 {
-	$vlanok = mySQLConnect("SELECT * FROM vlanok;");
+	$vlanok = new MySQLHandler("SELECT * FROM vlanok;");
+	$vlanok = $vlanok->Result();
 	
 	?><div>
 		<label for="<?=$selectnev?>">VLAN:</label><br>
@@ -566,19 +566,9 @@ function vlanPicker($current, $selectnev = 'vlan')
 }
 
 function cancelForm()
-{
-	$RootPath = getenv('APP_ROOT_PATH');
-	if(isset($_SERVER['HTTP_REFERER']))
-	{
-		$backtosender = $_SERVER['HTTP_REFERER'];
-	}
-	else
-	{
-		$backtosender = $RootPath;
-	}
-	
+{	
 	?><div class="submit">
-		<button type="button" onclick="location.href='<?=$backtosender?>'">Mégsem</button>
+		<button type="button" onclick="location.href='<?=$GLOBALS['backtosender']?>'">Mégsem</button>
    </div><?php
 }
 
@@ -735,14 +725,10 @@ function szerkSor($beepid, $eszkid, $eszktip)
 
 function modId($muvelet, $tipus, $objid)
 {
-	$con = mySQLConnect();
-	$felhasznalo = $_SESSION['id'];
-	$string = "INSERT INTO modositasok (felhasznalo, muvelet, $tipus) VALUES ($felhasznalo, $muvelet, $objid)";
-	mysqli_query($con, $string);
+	$modositas = new MySQLHandler("INSERT INTO modositasok (felhasznalo, muvelet, $tipus) VALUES (?, ?, ?)",
+		$$_SESSION['id'], $muvelet, $objid);
 
-	$last_id = mysqli_insert_id($con);
-
-	return $last_id;
+	return $modositas->last_insert_id;
 }
 
 function getNotifications()
@@ -950,7 +936,7 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
 		$where = "rackszekrenyek.helyiseg = $id";
 	}
 
-	$portok = mySQLConnect("SELECT DISTINCT portok.id AS portid, portok.port AS port,
+	$portok = new MySQLHandler("SELECT DISTINCT portok.id AS portid, portok.port AS port,
                 eszkozok.id AS hasznalatban,
                 tultransz.port AS tulport,
                 epuletek.szam AS epuletszam,
@@ -987,13 +973,15 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
                 LEFT JOIN beepitesek remotebeep ON remoteeszk.id = remotebeep.eszkoz
             WHERE $where AND beepitesek.kiepitesideje IS NULL AND remotebeep.kiepitesideje IS NULL
             GROUP BY portok.id
-            ORDER BY portok.port;");
+            ORDER BY portok.port;, $id");
 	
-	if(mysqli_num_rows($portok) > 0)
+	if($portok->sorokszama > 0)
 	{
+		$elozoport = null;
+		$huroktulportok = $portok->AsArray();
+		$portok = $portok->Result();
+
 		?><div class="transzportlist"><?php
-			$elozoport = null;
-			$huroktulportok = mysqliToArray($portok);
 			foreach($portok as $port)
 			{
 				switch($port['fizikaireteg'])
