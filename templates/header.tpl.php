@@ -22,7 +22,7 @@ if(isset($enablekeres) && $enablekeres)
 if(isset($topmenuszoveges) && $topmenuszoveges)
 {
     ?><div class="topmenuszoveges"><?php
-        $menuterulet = 3; include('./includes/menu.inc.php');
+        ContextMenu();
     ?></div><?php
 }
 
@@ -30,7 +30,7 @@ if(isset($topmenuszoveges) && $topmenuszoveges)
 if($_SESSION['id'])
 {
     $usernev = $_SESSION['nev'];
-    $menuterulet = 2; include('./includes/menu.inc.php');
+    TopMenu();
     $notifications = getNotifications();
     $ujertesites = 0;
     foreach($notifications as $notification)

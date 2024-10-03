@@ -15,7 +15,7 @@ else
     {
         include("./{$currentpage['url']}.php");
     }
-    elseif($gyujtooldal != null && $_GET['page'] == $gyujtooldal)
+    elseif($_GET['page'] == $currentpage['gyujtooldal'])
     {
         include("./{$currentpage['gyujtourl']}.php");
     }

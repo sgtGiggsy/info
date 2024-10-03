@@ -10,6 +10,7 @@ include('./Classes/MailHandler.class.php');
 $RootPath = getenv('APP_ROOT_PATH');
 $dbcallcount = 0;
 $logid = null;
+$sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
 $params = array();
 //$querylist = array();
 
@@ -270,9 +271,7 @@ else
 }
 
 //? Betöldendő oldal kiválasztása, menüterületek feltöltése, és felhasználói jogosultságok megállapítása
-$menu = new MySQLHandler("SELECT * FROM menupontok ORDER BY menuterulet ASC, sorrend ASC, aktiv DESC, id ASC");
-$menu = $menu->Result();
-$sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
+
 
 //? Ha nincs betölteni kívánt oldal, a főoldal kiválasztása betöltésre
 if(!(isset($_GET['page'])))
@@ -284,18 +283,12 @@ else
     $pagetofind = $_GET['page'];
 }
 
-//? Felhasználó jogosultságainak lekérése, a menüpontok is ezalapján jelennek meg,
-//? innentől kezdve a $felhasznaloid változónak bejelentkezett felhasználó esetén léteznie KELL
+//? A menüpontok, valamint a felhasználó jogosultságainak, csoporttagságainak és személyes beálltásainak lekérése.
+//? Innentől kezdve a $felhasznaloid változónak bejelentkezett felhasználó esetén léteznie KELL
+//? A menüpontok lekérése is itt történik meg
 if($_SESSION['id'])
 {
     $felhasznaloid = $_SESSION['id'];
-    $jogosultsagok = new MySQLHandler("SELECT * FROM jogosultsagok WHERE felhasznalo = ?", $felhasznaloid);
-    $jogosultsagok = $jogosultsagok->Result();
-}
-
-//? Felhasználó személyes beállításainak lekérése
-if($_SESSION['id'])
-{
     $szemelyesbeallitasok = new MySQLHandler("SELECT * FROM szemelyesbeallitasok WHERE felhid = ?", $felhasznaloid);
     $szemelyes = $szemelyesbeallitasok->Fetch();
 
@@ -304,82 +297,61 @@ if($_SESSION['id'])
         FROM csoportok
             INNER JOIN csoporttagsagok ON csoportok.id = csoporttagsagok.csoport
             LEFT JOIN csoportjogok ON csoportjogok.csoport = csoporttagsagok.csoport
-        WHERE felhasznalo = ?",$felhasznaloid);
+        WHERE felhasznalo = ?", $felhasznaloid);
     $csoporttagsagok = $csoporttagsagok->Result();
+
+    $menu = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas
+        FROM
+        (
+            SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas
+            FROM menupontok
+                INNER JOIN jogosultsagok ON menupontok.id = jogosultsagok.menupont
+            WHERE jogosultsagok.felhasznalo = ? AND menupontok.aktiv > 0 AND menupontok.aktiv < 4
+        UNION ALL
+            SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL, NULL
+            FROM menupontok
+            WHERE menupontok.aktiv > 1 AND menupontok.aktiv < 4
+        ) AS egyesitett
+    GROUP BY id
+    ORDER BY menuterulet ASC, sorrend ASC;", $felhasznaloid);
 }
-
-//? Menüterületeket tároló tömb elkészítése
-$menuk = array();
-
-foreach($menu as $menupont)
+else
 {
-    if(!isset($menuk[$menupont['menuterulet']]))
-    {
-        $menuk[$menupont['menuterulet']] = array();
-    }
+    $felhasznaloid = false;
+    $szemelyes = false;
+    $menu = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL olvasas
+        FROM menupontok
+        WHERE aktiv > 2
+        ORDER BY menuterulet ASC, sorrend ASC");
+}
+$menu = $menu->Result();
 
-    // Ha megvan a jelenlegi oldal, a hozzá tartozó jogosultságok beállítása
-    $gyujtotemp = $menupont['gyujtooldal'];
-    if($gyujtotemp)
+//? A jelen oldalhoz tartozó jogosultságok megállapítása,
+//? valamint, amennyiben van olyan, a jelen oldal szülőjének megjelölése
+$szulonyit = null;
+$menuterulet = array(array(), array(), array());
+foreach($menu as $oldal)
+{
+    if($oldal['gyujtooldal'] == $_GET['page'] || $oldal['oldal'] == $_GET['page'] || $oldal['szerkoldal'] == $_GET['page'])
     {
-        $gyujtotemp = explode('?', $gyujtotemp)[0];
-    }
-    if($menupont['oldal'] == $pagetofind || $gyujtotemp == $pagetofind || $menupont['dboldal'] == $pagetofind || $menupont['szerkoldal'] == $pagetofind)
-    {
-        if($_SESSION['id'])
-		{
-			foreach($jogosultsagok as $jogosultsag)
-			{
-				if($menupont['id'] == $jogosultsag['menupont'])
-				{
-                    switch($jogosultsag['olvasas'])
-                    {
-                        case 3: $mindolvas = true;
-                        case 2: $csoportolvas = true;
-                        case 1: $sajatolvas = true;
-                    }
-
-                    switch($jogosultsag['iras'])
-                    {
-                        case 3: $mindir = true;
-                        case 2: $csoportir = true;
-                        case 1: $sajatir = true;
-                    }
-					break;
-				}
-			}
-		}
-        $currentpage = $menupont;
-        if($menupont['gyujtourl'])
-            $gyujtooldal = $gyujtotemp;
-    }
-
-    // Ha egy menüpont megjelenése nincs kifejezett joghoz kötve, menüterülethez adása
-    // ha joghoz kötött, a felhasználó jogosultsága szerinti eljárás
-    // Megjelenési jogok:
-    // aktiv 0 = senkinek
-    // aktiv 1 = jogosultaknak
-    // aktiv 2 = bejelentkezetteknek
-    // aktiv 3 = mindenkinek
-    // aktiv 4 = kijelentkezetteknek
-    if($menupont['aktiv'] == 0 || $menupont['aktiv'] == 3 || (($menupont['aktiv'] == 2 && $_SESSION['id'])) || ($menupont['aktiv'] == 4 && !$_SESSION['id']))
-    {
-        array_push($menuk[$menupont['menuterulet']], $menupont);
-    }
-    elseif($menupont['aktiv'] == 1 && $_SESSION['id'])
-    {
-        foreach($jogosultsagok as $jogosultsag)
+        switch($oldal['olvasas'])
         {
-            if($menupont['id'] == $jogosultsag['menupont'])
-            {
-                if($jogosultsag['olvasas'] > 0)
-                {
-                    array_push($menuk[$menupont['menuterulet']], $menupont);
-                    break;
-                }
-            }
+            case 3: $mindolvas = true;
+            case 2: $csoportolvas = true;
+            case 1: $sajatolvas = true;
         }
+
+        switch($oldal['iras'])
+        {
+            case 3: $mindir = true;
+            case 2: $csoportir = true;
+            case 1: $sajatir = true;
+        }
+
+        $currentpage = $oldal;
+        $szulonyit = $oldal['szulo'];
     }
+    $menuterulet[$oldal['menuterulet']][] = $oldal;
 }
 
 //? Fallback megoldás arra az esetre, ha a lekérni próbált oldalhoz nincs adatbázis bejegyzés

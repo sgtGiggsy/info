@@ -1,6 +1,6 @@
 $(".kattinthatotr").click(function() {
     window.document.location = $(this).data("href");
-    console.log("ktr");
+    //console.log("ktr");
 });
 
 function scrollToTop() {
@@ -49,12 +49,21 @@ function verifyExist(datalist, field, tooltipid)
 
 function rejtMutat(id) {
     if(document.getElementById(id).style.display == "")
-    {
         document.getElementById(id).style.display = "none";
-    }
     else
-    {
         document.getElementById(id).style.display = "";
+}
+
+function subRejtMutat(id) {
+    let submenuk = document.getElementsByClassName("leftmenu-sub");
+    let submenuszam = submenuk.length;
+
+    for(let i = 0; i < submenuszam; i++)
+    {
+        if(submenuk[i].id == id && submenuk[i].style.display == "none")
+            submenuk[i].style.display = "";
+        else
+            submenuk[i].style.display = "none";
     }
 }
 

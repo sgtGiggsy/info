@@ -1,5 +1,6 @@
 <?php
 include('./templates/svg.tpl.php');
+include('./includes/menu.inc.php');
 ?><!DOCTYPE HTML>
 <html lang="hu" xml:lang="hu" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -40,7 +41,7 @@ include('./templates/svg.tpl.php');
 		}
 
 		?><!-- Menürész -->
-		<?php $menuterulet = 1; include('./includes/menu.inc.php'); ?>		
+		<?php MainMenu(); ?>		
 
 		<!-- Lábléc -->
 		<div class="bottom-line"><p><a href="mailto:<?=$DEVELOPER_MAIL?>">©<?=$DEVELOPER_NAME?> <?=date("Y")?></a></p><span id="constatus"></span></div>

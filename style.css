@@ -2210,69 +2210,43 @@ td img {
 }
 
 /* ------------------------------- Főmenü ------------------------------- */
-.leftmenuareabase {
+.leftmenuarea {
     background-color: var(--menu);
     width: 200px;
     font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
     font-size: 1rem;
     font-variant: small-caps;
     border-right: 1px solid var(--topborder);
-    grid-column-start: 1;
-    grid-column-end: 2;
-    grid-row-start: 2;
-    grid-row-end: 5;
+    grid-column: 1/2;
+    grid-row: 2/5;
 }
 
-.leftmenuarea {
+.leftmenuarea nav {
     position: sticky;
     top: 0;
-    width: 200px;
-    left: 0;
-    right: 0;
-    /*position: absolute;*/
-    padding-bottom: 0;
 }
 
-.leftmenu{
+.leftmenu {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: column!important;
-    padding-left: 0;
-    list-style: none;
-    border-right: 1px solid var(--topborder);
+    flex-direction: column;
+    width: 200px;
 }
 
-.leftmenuitem, .leftmenuitem a, .leftmenuitem-active, .leftmenuitem-active a, .leftmenuitem p, .leftmenuitem-active p {
+.leftmenuitem a, .leftmenuitem-active a,
+.leftmenuitem p, .leftmenuitem-active p {
+    display: inline-block;
+    position: relative;
     width: 100%;
-    flex-wrap: wrap;
-    list-style: none;
     color: var(--fontlight);
     text-decoration: none;
-    border-radius: 0;
-    display: inline-block;
     cursor: pointer;
     font-weight: bold;
+    margin-bottom: 0;
+    padding: 12px 0px 12px 25px;
 }
 
-.leftmenuitem {
-    background-color: var(--menu);
-}
-
-.leftmenuitem, .leftmenuitem-active, .leftmenusubitem, .leftmenusub-active {
-    position: relative;
-}
-
- .leftmenuitem a:hover, .leftmenuitem a, .leftmenuitem-active a,
- .leftmenuitem p:hover, .leftmenuitem p, .leftmenuitem-active p {
-    padding: 12px 0px 12px 0px;
-}
-
-.leftmenuitem a, .leftmenuitem-active a, .leftmenuitem a:hover,
-.leftmenuitem p, .leftmenuitem-active p, .leftmenuitem p:hover {
-    padding-left: 25px;
-}
-
-.leftmenuitem-active, .leftmenuitem-active a, .leftmenuitem-active p {
+.leftmenuitem-active a, .leftmenuitem-active p {
     color: var(--link);
     background-color: var(--menuhover);
 } 
@@ -2283,7 +2257,7 @@ td img {
 }
 
 .leftmenu-sub {
-    background-color: var(--submenu) !important;
+    background-color: var(--submenu);
 }
 
 .leftmenu-subtop {
@@ -2291,41 +2265,32 @@ td img {
     background-image: linear-gradient(var(--shadow), var(--submenu));
 }
 
-.leftmenu-sub a:hover {
-    padding: 6px 0 6px 0 !important;
-}
-
-.leftmenusubitem, .leftmenusubitem a, .leftmenusub-active, .leftmenusub-active a {
-    width: 100%;
-    flex-wrap: wrap;
-    list-style: none;
-    color: var(--fontlight);
-    text-decoration: none;
-    border-radius: 0;
-    display: block;
-}
-
-.leftmenusubitem a, .leftmenusubitem a:hover, .leftmenusub-active a, .leftmenusub-active a:hover {
-    padding: 12px 0px 12px 25px !important;
-}
-
 .leftmenusubitem a:hover, .leftmenusub-active a:hover {
     color: var(--linkhover);
     background-color: var(--submenuhover);
 }
 
-.leftmenusub-active, .leftmenusub-active a {
+.leftmenusub-active a {
     color: var(--link);
     background-color: var(--submenuhover);
 }
 
 .addnew {
     position: absolute;
-    padding: 7px 5px;
-    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    height: 100%;
     right: 0;
     top: 0;
+}
+
+.addnew svg {
+    fill: var(--fontlight);
     border-left: 1px solid var(--addnewborder);
+}
+
+.addnew svg:hover {
+    fill: var(--linkhover);
 }
 
 #pageloadinfo {
