@@ -157,6 +157,8 @@ class MySQLHandler
     {
         $this->keepalive = true;
         $this->querystring = $query;
+        if(isset($GLOBALS["querylist"]) && $GLOBALS["querylist"])
+            $GLOBALS["querylist"][] = $query;
         $this->types = "";
         if($this->con)
         {

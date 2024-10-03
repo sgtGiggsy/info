@@ -1,7 +1,8 @@
 <?php
 $tevekenysegek = mySQLConnect("SELECT felhasznalotevekenysegek.id AS id,
             felhasznalotevekenysegek.felhasznalo AS felhasznalo,
-            felhasznalok.nev AS nev, felhasznalonev, ipcim, timestamp, menupont, almenu, elemid, params, gyanus
+            felhasznalok.nev AS nev, felhasznalonev, ipcim, timestamp, menupont, almenu, elemid, params, gyanus,
+            dbcallcount, pagegentime
         FROM felhasznalotevekenysegek
         $where
         ORDER BY timestamp DESC
@@ -17,8 +18,13 @@ $tevekenysegek = mySQLConnect("SELECT felhasznalotevekenysegek.id AS id,
             <th class="tsorth" onclick="sortTable(4, 's', 'tevekenysegek')">Almenü</th>
             <th class="tsorth" onclick="sortTable(5, 's', 'tevekenysegek')">Elem azonosító</th>
             <th class="tsorth" onclick="sortTable(6, 's', 'tevekenysegek')">Címsori paraméterek</th>
-            <th class="tsorth" onclick="sortTable(7, 's', 'tevekenysegek')">Gyanús tevékenységek</th>
-        </tr>
+            <th class="tsorth" onclick="sortTable(7, 's', 'tevekenysegek')">Gyanús tevékenységek</th><?php
+            if($felhasznaloid == 1)
+            {
+                ?><th>Adatbázishívások száma</th>
+                <th>Oldalgenerálás ideje</th><?php
+            }
+        ?></tr>
     </thead>
     <tbody><?php
     foreach($tevekenysegek as $x)
@@ -39,8 +45,13 @@ $tevekenysegek = mySQLConnect("SELECT felhasznalotevekenysegek.id AS id,
                     }
                 }
             ?></td>
-            <td><?=$x['gyanus']?></td>
-        </tr><?php
+            <td><?=$x['gyanus']?></td><?php
+            if($felhasznaloid == 1)
+            {
+                ?><td><?=$x['dbcallcount']?></td>
+                <td><?=$x['pagegentime']?></td><?php
+            }
+        ?></tr><?php
     }
     ?></tbody>
 </table>

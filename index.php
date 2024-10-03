@@ -1,5 +1,6 @@
 <?php
-// Alap includolások
+$start_time = microtime(true);
+//? Alap includolások
 include('./includes/config.inc.php');
 include('./includes/functions.php');
 include('./Classes/Ertesites.class.php');
@@ -10,23 +11,39 @@ $RootPath = getenv('APP_ROOT_PATH');
 $dbcallcount = 0;
 $logid = null;
 $params = array();
+//$querylist = array();
 
-// Session indítása, vagy folytatása
+//? Session indítása, vagy folytatása
 if (session_status() == PHP_SESSION_NONE) {
     session_set_cookie_params('604800');
 	session_start();
 }
 
-// Cache beállítása
-header('Cache-Control: no-cache');
-header('Pragma: no-cache');
-//header("Cache-Control: must-revalidate, private, max-age=31536000");
+//? Cache beállítása
+//header('Cache-Control: no-cache');
+//header('Pragma: no-cache');
+header("Content-Encoding: compress");
+header("Cache-Control: must-revalidate, private, max-age=31536000");
 //header("Content-Security-Policy-Report-Only: script-src 'nonce-{RANDOM}' 'strict-dynamic';");
 
-// Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
+//? Primitív "bruteforce" elleni védelem
+if(!isset($_SESSION['badpasscount']) || ($_SESSION['badpasscount'] > 4 && time() - $_SESSION['lastbadpasstime'] > 600))
+{
+    $_SESSION['badpasscount'] = 0;
+    $_SESSION['lastbadpasstime'] = null;
+}
+
+if($_SESSION['badpasscount'] > 4 && time() - $_SESSION['lastbadpasstime'] < 300)
+{
+    echo "<h1>Öt alkalommal is hibás jelszót adtál meg!</h1>";
+    echo "<h2>Ne próbálkozz újra " . timeStampForSQL(time() + 300) . " előtt!</h2>";
+    die;
+}
+
+//? Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
 $page = $id = $userid = $current = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = null; $loginsuccess = false;
 
-// Címsorból vett GET értékek tisztítása nemkívánt karakterektől
+//? Címsorból vett GET értékek tisztítása nemkívánt karakterektől
 foreach($_GET as $key => $value)
 {
     if($key != "page" && $key != "subpage" && $key != "id")
@@ -45,10 +62,9 @@ if(isset($_GET['page']))
     $page = $_GET['page'];
     $current = $page;
 
-	if($page == "kilep")
+	if($page == "kilep" && $_SESSION['id'] && $_SESSION['felhasznalonev'])
 	{
         session_destroy();
-        session_start();
 		header("Location: $RootPath/index.php");
 		die();
 	}
@@ -59,7 +75,7 @@ if(isset($_GET['loginid']))
     $loginid = $_GET['loginid'];
 }
 
-// Az előző oldal helyének kiderítése
+//? Az előző oldal helyének kiderítése
 if(!isset($_SESSION['elozmenyek']))
 {
     $backtosender = @$_SERVER['HTTP_REFERER'];
@@ -83,13 +99,13 @@ else
     }
 }
 
-// Az lekérdezendő elem ID-jének begyüjtése
+//? Az lekérdezendő elem ID-jének begyüjtése
 if(isset($_GET['id']))
 {
 	$id = $_GET['id'];
 }
 
-// Felhasználó beléptetése
+//? Felhasználó beléptetése
 if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev']) && !(isset($_GET['page']) && $_GET['page'] == "kilep"))
 {
     $samaccountname = $_POST['felhasznalonev'];
@@ -176,6 +192,7 @@ if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev
                 $_SESSION['id'] = true;
                 $loginid = logLogin($userid);
                 $loginsuccess = true;
+                $_SESSION['badpasscount'] = 0;
             }
             else
             {
@@ -196,6 +213,8 @@ if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev
         echo "<h2>$hiba</h2>";
         ?><script type='text/javascript'>alert('<?=$hiba?>')</script>
         <head><meta http-equiv="refresh" content="0; URL='./belepes'" /></head><?php
+        $_SESSION['badpasscount']++;
+        $_SESSION['lastbadpasstime'] = time();
         die;
     }
 }
@@ -232,7 +251,7 @@ else
     $_SESSION['id'] = false;
 }
 
-// Oldal működéséhez használt alapbeállítások betöltése
+//? Oldal működéséhez használt alapbeállítások betöltése
 $beallitas = new MySQLHandler("SELECT * FROM beallitasok");
 $beallitas = $beallitas->Result();
 foreach($beallitas as $x)
@@ -250,12 +269,12 @@ else
     $_SESSION['ismetelheto'] = true;
 }
 
-// Betöldendő oldal kiválasztása, menüterületek feltöltése, és felhasználói jogosultságok megállapítása
+//? Betöldendő oldal kiválasztása, menüterületek feltöltése, és felhasználói jogosultságok megállapítása
 $menu = new MySQLHandler("SELECT * FROM menupontok ORDER BY menuterulet ASC, sorrend ASC, aktiv DESC, id ASC");
 $menu = $menu->Result();
 $sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
 
-// Ha nincs betölteni kívánt oldal, a főoldal kiválasztása betöltésre
+//? Ha nincs betölteni kívánt oldal, a főoldal kiválasztása betöltésre
 if(!(isset($_GET['page'])))
 {
     $pagetofind = "fooldal";
@@ -265,8 +284,8 @@ else
     $pagetofind = $_GET['page'];
 }
 
-// Felhasználó jogosultságainak lekérése, a menüpontok is ezalapján jelennek meg,
-// innentől kezdve a $felhasznaloid változónak bejelentkezett felhasználó esetén léteznie KELL
+//? Felhasználó jogosultságainak lekérése, a menüpontok is ezalapján jelennek meg,
+//? innentől kezdve a $felhasznaloid változónak bejelentkezett felhasználó esetén léteznie KELL
 if($_SESSION['id'])
 {
     $felhasznaloid = $_SESSION['id'];
@@ -274,7 +293,7 @@ if($_SESSION['id'])
     $jogosultsagok = $jogosultsagok->Result();
 }
 
-// Felhasználó személyes beállításainak lekérése
+//? Felhasználó személyes beállításainak lekérése
 if($_SESSION['id'])
 {
     $szemelyesbeallitasok = new MySQLHandler("SELECT * FROM szemelyesbeallitasok WHERE felhid = ?", $felhasznaloid);
@@ -289,7 +308,7 @@ if($_SESSION['id'])
     $csoporttagsagok = $csoporttagsagok->Result();
 }
 
-// Menüterületeket tároló tömb elkészítése
+//? Menüterületeket tároló tömb elkészítése
 $menuk = array();
 
 foreach($menu as $menupont)
@@ -363,7 +382,7 @@ foreach($menu as $menupont)
     }
 }
 
-// Fallback megoldás arra az esetre, ha a lekérni próbált oldalhoz nincs adatbázis bejegyzés
+//? Fallback megoldás arra az esetre, ha a lekérni próbált oldalhoz nincs adatbázis bejegyzés
 if(!isset($currentpage))
 {
     $currentpage['url'] = $_GET['page'];
@@ -373,7 +392,7 @@ if(!isset($currentpage))
     $currentpage['aktiv'] = 3;
 }
 
-// Szükség esetén 404-es hibaoldal generálása
+//? Szükség esetén 404-es hibaoldal generálása
 try
 {
     $page = @fopen("./{$currentpage['url']}.php", "r");
@@ -397,7 +416,7 @@ catch(Exception $e)
     $currentpage['gyujtocimszoveg'] = "Oldal nem található!";
 }
 
-// Folyamatértesítés
+//? Folyamatértesítés
 if(@$_GET['sikeres'] == "uj")
 {
     $succesmessage = "Új " . $currentpage['cimszoveg'] . " hozzáadása sikeres";
@@ -411,7 +430,7 @@ elseif(@$_GET['sikeres'] == "bejelentkezes")
     $succesmessage = "Sikeres bejelentkezés";
 }
 
-// JavaScript fájlok listája
+//? JavaScript fájlok listája
 $javascriptfiles = [
     "includes/js/functions.js",
     "includes/js/tableActions.js",
@@ -430,7 +449,7 @@ if(isset($cselect) && $cselect)
 }
 
 
-// PHP változók átadni a JavaScriptnek
+//? PHP változók átadni a JavaScriptnek
 $PHPvarsToJS = [
     array(
         'name' => 'RootPath',
@@ -450,8 +469,27 @@ if($felhasznaloid && @$szemelyes['switchstateshow'])
 }
 
 if($felhasznaloid != 1)
-$activitylogid = logActivity($felhasznaloid, $params);
-// Oldal megjelenítése
+    $activitylogid = logActivity($felhasznaloid, $params);
+
+//? Oldal megjelenítése
 include('./templates/index.tpl.php');
 
+//? Oldal legenerálásának sebessége, kizárólag a root felhasználó részére
+$end_time = microtime(true);
+$pagegentime = round($end_time - $start_time, 2);
+$ftevekenyseg = new MySQLHandler("UPDATE felhasznalotevekenysegek SET dbcallcount=?, pagegentime=? WHERE id=?", $dbcallcount + 1, $pagegentime, $activitylogid);
+if($felhasznaloid == 1)
+{
+    echo "<div id='pageloadinfo'>Oldal generálás ideje: " . $pagegentime . " mp<br />" . "Adatbázis hívások száma: " . $dbcallcount . "</div>";
+    
+    if(@$querylist)
+    {
+        echo "<div class='contentcenter olvashato' style='margin: 0 auto'>";
+        foreach($querylist as $query)
+        {   
+            echo "<p style='padding-bottom: 1em'>" . FormatSQL($query) . "</p>";
+        }
+        echo "</div>";
+    }
+}
 ?>

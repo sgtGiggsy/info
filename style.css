@@ -513,10 +513,6 @@ fieldset {
     font-weight: bold!important;
 }
 
-.modmessage {
-
-}
-
 .modmessagebody {
     padding-bottom: 0.7em !important;
     padding-top: 0.2em !important
@@ -1861,11 +1857,13 @@ td img {
     margin-right: 5px;
 }
 
-.topmenuikonok a {
+.topmenuikonok a, .topmenuikonok p {
     display: block;
     text-decoration: none;
     font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
     font-size: 1.2rem;
+    cursor: pointer;
+    margin-bottom: unset;
 }
 
 .topmenuikonok img {
@@ -2043,7 +2041,7 @@ td img {
     right: 45px;
     width: 410px;
     max-height: 500px;
-    overflow-y: overlay;
+    overflow-y: auto;
     overflow-x: hidden;
     scrollbar-gutter: stable;
 }
@@ -2244,7 +2242,7 @@ td img {
     border-right: 1px solid var(--topborder);
 }
 
-.leftmenuitem, .leftmenuitem a, .leftmenuitem-active, .leftmenuitem-active a {
+.leftmenuitem, .leftmenuitem a, .leftmenuitem-active, .leftmenuitem-active a, .leftmenuitem p, .leftmenuitem-active p {
     width: 100%;
     flex-wrap: wrap;
     list-style: none;
@@ -2252,6 +2250,8 @@ td img {
     text-decoration: none;
     border-radius: 0;
     display: inline-block;
+    cursor: pointer;
+    font-weight: bold;
 }
 
 .leftmenuitem {
@@ -2262,20 +2262,22 @@ td img {
     position: relative;
 }
 
- .leftmenuitem a:hover, .leftmenuitem a, .leftmenuitem-active a {
+ .leftmenuitem a:hover, .leftmenuitem a, .leftmenuitem-active a,
+ .leftmenuitem p:hover, .leftmenuitem p, .leftmenuitem-active p {
     padding: 12px 0px 12px 0px;
 }
 
-.leftmenuitem a, .leftmenuitem-active a, .leftmenuitem a:hover {
+.leftmenuitem a, .leftmenuitem-active a, .leftmenuitem a:hover,
+.leftmenuitem p, .leftmenuitem-active p, .leftmenuitem p:hover {
     padding-left: 25px;
 }
 
-.leftmenuitem-active, .leftmenuitem-active a{
+.leftmenuitem-active, .leftmenuitem-active a, .leftmenuitem-active p {
     color: var(--link);
     background-color: var(--menuhover);
 } 
 
-.leftmenuitem a:hover {
+.leftmenuitem a:hover, .leftmenuitem p:hover {
     color: var(--linkhover);
     background-color: var(--menuhover);
 }
@@ -2324,6 +2326,16 @@ td img {
     right: 0;
     top: 0;
     border-left: 1px solid var(--addnewborder);
+}
+
+#pageloadinfo {
+    position: fixed;
+    bottom: 0.5em;
+    left: 0.5em;
+    font-size: 0.8em;
+    color: var(--greyfont);
+    z-index: 1;
+    user-select: none;
 }
 
 /* ------------------------------- Breadcumbok ------------------------------- */
@@ -2795,11 +2807,6 @@ div[id^=tennivalobody-].close {
     transition: max-height 1s;
 }
 
-@keyframes enlarge {
-    0% { transform: height 0.2s ease-out }
-    100% { transform: rotate(225deg); }
-}
-
 .tennivalocbdiv {
     font-size: 0.7em;
 }
@@ -3254,7 +3261,7 @@ div[id^=tennivalobody-].close {
 
 /* Tooltip */
 .ttipcontainer {
-    -webkit-user-select: none;
+    user-select: none;
     position: relative;
 }
 
@@ -3557,7 +3564,7 @@ div[id^=tennivalobody-].close {
     }
 
     th {
-        color-adjust: exact;
+        print-color-adjust: exact;
         background-color: #888 !important;
     }
 
@@ -3567,30 +3574,29 @@ div[id^=tennivalobody-].close {
 
     tr:nth-child(odd) {
         background-color: #ccc !important;
-        color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     tr:nth-child(even) {
         background-color: #ddd !important;
-        color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .nostripes tr:nth-child(odd) {
         background-color: #FFF !important;
-        color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .nostripes tr:nth-child(even) {
         background-color: #FFF !important;
-        color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     input, select {
         font-size: 0.6rem !important;
         border: none !important;
         color: #0b0b0b !important;
-        -webkit-appearance: none;
-        -moz-appearance: none;
+        appearance: none;
         text-indent: 1px;
         text-overflow: '';
         padding: 0;

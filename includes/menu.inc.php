@@ -33,11 +33,16 @@ if($menuterulet == 1)
 				if($menupont['oldal'] == "#")
 				{
 					$fomenu = $menupont['id'];
-					?><li class="leftmenuitem"><a style="cursor: pointer" onclick="rejtMutat('<?=$menupont['id']?>')"><?=trim($menupont['menupont'])?><?php
-					if($menupont['szerkoldal'] && $addnewjog) { ?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php }
-				?></a>
-						<ul class='leftmenu-sub' id="<?=$menupont['id']?>" style="display: none;">
-						<div class='leftmenu-subtop'></div><?php
+					?><li class="leftmenuitem">
+						<p style="cursor: pointer" onclick="rejtMutat('<?=$menupont['id']?>')">
+							<?=trim($menupont['menupont'])?><?php
+							if($menupont['szerkoldal'] && $addnewjog)
+							{
+								?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew">+</span><?php
+							}
+						?></p>
+					<ul class='leftmenu-sub' id="<?=$menupont['id']?>" style="display: none;">
+					<div class='leftmenu-subtop'></div><?php
 				}
 				elseif($fomenu && $fomenu == $menupont['szulo'] && $menupont['aktiv'] > 0)
 				{
@@ -74,7 +79,7 @@ if($menuterulet == 2)
 {
 	foreach($menuk[2] as $menupont)
 	{
-		?><a href="<?=$RootPath?>/<?=$menupont['gyujtooldal']?>"><?=$icons[$menupont['oldal']]?></a><?php
+		?><a href="<?=$RootPath?>/<?=$menupont['gyujtooldal']?>" aria-label="<?=$menupont['menupont']?>" title="<?=$menupont['menupont']?>"><?=$icons[$menupont['oldal']]?></a><?php
 	}
 }
 

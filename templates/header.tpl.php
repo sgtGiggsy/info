@@ -1,7 +1,7 @@
 <?php
 ?><div class="headlogo" id="headlogo">
     <a href="<?=$RootPath?>">
-        <img src="<?=$RootPath?>/images/headlogo.png" height="45px"></a>
+        <img src="<?=$RootPath?>/images/headlogo.png" height="45px" alt="Oldal logó" title="Oldal logó"></a>
 </div><?php
 
 if(isset($enablekeres) && $enablekeres)
@@ -42,15 +42,15 @@ if($_SESSION['id'])
     }
 
     ?><div id="notifications">
-        <a style="cursor: pointer" onclick="showPopup('notifpopup');updateNotif()">
+        <p onclick="showPopup('notifpopup');updateNotif()">
             <?=$icons['notifications']?>
-        </a>
+        </p>
         <div id="notifcount" onclick="showPopup('notifpopup')" style="display: <?=($ujertesites) ? 'block' : 'none' ?> "><?=$ujertesites?></div>
     </div>
     
-    <a style="cursor: pointer" onclick="showPopup('profilpopup')"> 
+    <p class="profil" onclick="showPopup('profilpopup')"> 
         <img src= <?=($_SESSION['profilkep']) ? "data:image/jpeg;base64," . base64_encode($_SESSION["profilkep"]) : "$RootPath/images/profil.png " ?> title="<?=$usernev?>" alt="<?=$usernev?>">
-    </a><?php
+    </p><?php
 }
 else
 {

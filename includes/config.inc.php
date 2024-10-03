@@ -15,4 +15,7 @@ $ablakcim = 'Informatika';
 
 $UPLOAD_FOLDER = "./uploads/";
 
+$DEVELOPER_MAIL = "a@a.com";
+$DEVELOPER_NAME = "Király Béla";
+
 ?>

@@ -21,6 +21,8 @@ function mySQLConnect($querystring = null)
 	if($querystring && $con)
 	{
 		$result = null;
+		if(isset($GLOBALS["querylist"]) && $GLOBALS["querylist"])
+			$GLOBALS["querylist"][] = $querystring;
 		try
 		{
 			$result = mysqli_query($con, $querystring);
@@ -228,9 +230,10 @@ function dateTimeLocalToTimeStamp($datetimelocal)
 	}
 }
 
-function timeStampForSQL()
+function timeStampForSQL($timestamp = null)
 {
-	return date('Y-m-d H:i:s');
+	
+	return date('Y-m-d H:i:s', $timestamp);
 }
 
 function szervezetValaszto($ldapres)
@@ -519,7 +522,7 @@ function felhasznaloPicker($current, $selectnev, $szervezet = null)
 	{
 		$where .= " AND szervezet = ?";
 	}
-	$felhasznalok = new MySQLHandler("SELECT id, nev FROM felhasznalok $where ORDER BY nev ASC; $szervezet");
+	$felhasznalok = new MySQLHandler("SELECT id, nev FROM felhasznalok $where ORDER BY nev ASC;", $szervezet);
 	$felhasznalok = $felhasznalok->Result();
 
 	?><select id="<?=$selectnev?>" name="<?=$selectnev?>">
@@ -925,15 +928,15 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
 	$where = "";
 	if($tipus == 'epulet')
 	{
-		$where = "transzportportok.epulet = $id";
+		$where = "transzportportok.epulet = ?";
 	}
 	elseif($tipus == 'rack')
 	{
-		$where = "rackportok.rack = $id";
+		$where = "rackportok.rack = ?";
 	}
 	elseif($tipus == 'helyiseg')
 	{
-		$where = "rackszekrenyek.helyiseg = $id";
+		$where = "rackszekrenyek.helyiseg = ?";
 	}
 
 	$portok = new MySQLHandler("SELECT DISTINCT portok.id AS portid, portok.port AS port,
@@ -973,7 +976,7 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
                 LEFT JOIN beepitesek remotebeep ON remoteeszk.id = remotebeep.eszkoz
             WHERE $where AND beepitesek.kiepitesideje IS NULL AND remotebeep.kiepitesideje IS NULL
             GROUP BY portok.id
-            ORDER BY portok.port;, $id");
+            ORDER BY portok.port;", $id);
 	
 	if($portok->sorokszama > 0)
 	{
@@ -2143,4 +2146,17 @@ function ConvertToDistinguishedName($OrganizationalUnit)
 	}
 
     return $forditott; #OU name in DistinguishedName form
+}
+
+function FormatSQL($sql)
+{
+	$sql = str_replace("INNER", "<br>&nbsp&nbsp\n&nbsp&nbspINNER", $sql);
+	$sql = str_replace("LEFT", "<br>&nbsp&nbsp\n&nbsp&nbspLEFT", $sql);
+	$sql = str_replace("FROM", "<br>&nbsp&nbspFROM", $sql);
+	$sql = str_replace("WHERE", "<br>&nbsp&nbspWHERE", $sql);
+	$sql = str_replace("ORDER", "<br>&nbsp&nbspORDER", $sql);
+	$sql = str_replace("GROUP", "<br>&nbsp&nbspGROUP", $sql);
+	$sql = str_replace("(SELECT", "<br>&nbsp&nbsp(SELECT", $sql);
+	$sql = str_replace("UNION", "<br>UNION<br>", $sql);
+	return $sql;
 }

@@ -1,7 +1,7 @@
 <?php
 include('./templates/svg.tpl.php');
 ?><!DOCTYPE HTML>
-<html xml:lang="hu" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="hu" xml:lang="hu" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=0.85">
@@ -23,12 +23,12 @@ include('./templates/svg.tpl.php');
 	}
 	?><div class="wrapper">
 		<!-- Tartalom -->
-		<div class="content">
+		<main class="content">
 			<div class="left">
 				</div>
 			<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$current?>">Hiba jelzése</a></div><?php
 			include('./includes/contentpage.inc.php');
-		?></div>
+		?></main>
 
 		<!-- Fejléc -->
 		<div class="topmenubase" id="topmenuelement"><?php include('./templates/header.tpl.php'); ?></div><?php
@@ -43,7 +43,7 @@ include('./templates/svg.tpl.php');
 		<?php $menuterulet = 1; include('./includes/menu.inc.php'); ?>		
 
 		<!-- Lábléc -->
-		<div class="bottom-line"><p><?=($mindir) ? "Adatbázis hívások száma: " . $dbcallcount . " " : "" ?><a href="mailto:kiraly.bela@mil.hu">© Király Béla ftőrm <script>document.write(new Date().getFullYear())</script></a></p><span id="constatus"></span></div>
+		<div class="bottom-line"><p><a href="mailto:<?=$DEVELOPER_MAIL?>">©<?=$DEVELOPER_NAME?> <?=date("Y")?></a></p><span id="constatus"></span></div>
 
 		<!-- Betöltés során látható területen kívül eső, illetve nem létező tartalmak -->
 		<div id="snackbar"></div>
