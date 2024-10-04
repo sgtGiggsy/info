@@ -1,6 +1,6 @@
 <?php
 
-if(!($globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir)))
+if(!$globaltelefonkonyvadmin)
 {
     getPermissionError();
 }

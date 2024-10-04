@@ -4,7 +4,7 @@ if(@$irhat)
     ?><form action="<?=$RootPath?>/valtozasfelulvizsgalat&action=review" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if($modositasoka)
         {
-            ?><div class="infobox modmessage">
+            ?><div class="infobox">
                 <div class="infoboxtitle">A módosítást végző <?=$modosito?> üzenete:</div>
                 <div class="infoboxbody modmessagebody">
                     <small><?=$modositasideje?></small>

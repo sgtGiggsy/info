@@ -12,11 +12,7 @@ else
     $allapot = 0;
     $nyithelp = true;
     
-    $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
     $javascriptfiles[] = "modules/telefonkonyv/includes/telefonkonyv.js";
-    
-    if(!$globaltelefonkonyvadmin)
-        $csoportjogok = telefonKonyvCsoportjogok();
 
     if(isset($_GET['id']) && $_GET['id'])
         $currbeoid = $_GET['id'];

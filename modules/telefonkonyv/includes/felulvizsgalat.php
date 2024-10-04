@@ -1,10 +1,9 @@
 <?php
 
-$globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
 $nyithelp = true;
 if(!$globaltelefonkonyvadmin)
 {
-    header("Location: $RootPath/telefonszamvaltozas?modid=$id");
+    header("Location: $RootPath/telefonkonyv/valtozas?modid=$id");
     //getPermissionError();
 }
 else
@@ -14,7 +13,7 @@ else
         $irhat = true;
         include("./modules/telefonkonyv/db/telefonkonyvdb.php");
         
-        redirectToGyujto("telefonkonyvvaltozasok");
+        redirectToGyujto("telefonkonyv/valtozasok");
     }
 
     if(isset($_GET['id']))

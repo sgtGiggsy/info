@@ -1,5 +1,4 @@
 <?php
-$globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
 if(!$globaltelefonkonyvadmin)
 {
     echo "Nincs jogosultsága az oldal megtekintésére!";

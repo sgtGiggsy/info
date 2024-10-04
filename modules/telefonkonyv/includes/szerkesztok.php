@@ -1,6 +1,6 @@
 <?php
 
-if(!($globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir)))
+if(!$globaltelefonkonyvadmin)
 {
     getPermissionError();
 }
@@ -8,7 +8,6 @@ else
 {
     $javascriptfiles[] = "includes/js/csoportFilter.js";
     $szamlalo = null;
-    $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
     $oldalcimsor = "Telefonkönyv szerkesztők - ";
     $csoportfilter = "csoportfilter";
 
@@ -63,8 +62,8 @@ else
     }
     ?></datalist>
     <div class="szerkgombsor">
-        <button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyvszerkeszto?action=addnew'">Új szerkesztő felvétele</button>
-        <button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyvszerkesztok<?=$csoplink?>'"><?=$csoportositas?></button>
+        <button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv/szerkeszto?action=addnew'">Új szerkesztő felvétele</button>
+        <button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv/szerkesztok<?=$csoplink?>'"><?=$csoportositas?></button>
     </div>
     <div class="PrintArea">
         <div class="oldalcim"><?=$oldalcimsor?>
@@ -130,7 +129,7 @@ else
                     $csoportnev = $csoportnevalap . $szamlalo;
                     ?><tr id="<?=$csoportnev?>" class="<?=$elozocsoport?>">
                         <td></td>
-                        <td><a href='<?=$RootPath?>/telefonkonyvszerkeszto/<?=$szerkesztoid?>'><?=$szerkeszto['elem']?></td>
+                        <td><a href='<?=$RootPath?>/telefonkonyv/szerkeszto/<?=$szerkesztoid?>'><?=$szerkeszto['elem']?></td>
                         <td></td>
                     </tr><?php
                     $szamlalo++;

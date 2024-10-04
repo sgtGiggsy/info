@@ -19,7 +19,7 @@ else
         $vizsgaazonosito = $_GET['id'];
     }
     $pagename = $vizsgaazonosito;
-    $topmenuszoveges = $felhasznaloengedelyezett = true;
+    $felhasznaloengedelyezett = true;
     $aloldal = false;
     $vizsgaqueryparams = array();
 

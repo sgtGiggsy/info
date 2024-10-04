@@ -1,5 +1,4 @@
 <?php
-$globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
 if($globaltelefonkonyvadmin || $csoportir)
 {   
     $valtozasszures = "minden";
@@ -137,7 +136,7 @@ if($globaltelefonkonyvadmin || $csoportir)
         ?><div class="szerkgombsor"><?php
             if($excelenged)
             {
-                ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyvvaltozasok?action=exportexcel'">Módosítási Excel fájl generálása</button><?php
+                ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv/valtozasok?action=exportexcel'">Módosítási Excel fájl generálása</button><?php
             }
             if($modositasikor['excelexport'])
             {
@@ -152,7 +151,7 @@ if($globaltelefonkonyvadmin || $csoportir)
                 <div id="korabbikorok" onmouseleave="hidePopup('korabbikorok')"><?php
                     foreach($valtozaskorok as $kor)
                     {
-                        ?><a href="<?=$RootPath?>/telefonkonyvvaltozasok?modositasikor=<?=$kor['id']?>"><?=$kor['megkezdve']?> - <?=$kor['lezarva']?></a><?php
+                        ?><a href="<?=$RootPath?>/telefonkonyv/valtozasok?modositasikor=<?=$kor['id']?>"><?=$kor['megkezdve']?> - <?=$kor['lezarva']?></a><?php
                     }
                 ?></div>
             </div>
@@ -226,11 +225,11 @@ if($globaltelefonkonyvadmin || $csoportir)
                     $csoportnev = $csoportnevalap . $szamlalo;
                     if($globaltelefonkonyvadmin)
                     {
-                        $kattinthatolink = $RootPath . "/valtozasfelulvizsgalat/" . $valtozasid;
+                        $kattinthatolink = $RootPath . "/telefonkonyv/felulvizsgalat/" . $valtozasid;
                     }
                     else
                     {
-                        $kattinthatolink = $RootPath . "/telefonszamvaltozas?modid=" . $valtozasid;
+                        $kattinthatolink = $RootPath . "/telefonkonyv/valtozas?modid=" . $valtozasid;
                     } 
 
                     ?><tr class="trlink<?=($telefonszam['torolve']) ? ' mukodeskeptelen' : '' ?>"
