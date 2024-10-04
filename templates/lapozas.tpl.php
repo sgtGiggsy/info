@@ -42,7 +42,7 @@ else
     $megjelenit = 20;
 }
 
-if(isset($_GET['subpage']) && $_GET['subpage'] == 'oldal' && isset($_GET['param']) && verifyWholeNum($_GET['param']))
+if(isset($_GET['subpage']) && $_GET['subpage'] == 'oldal' && isset($_GET['param']) && is_numeric($_GET['param']))
 {
     $oldal = $_GET['param'];
     $start = ($oldal - 1) * $megjelenit;

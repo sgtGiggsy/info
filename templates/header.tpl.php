@@ -19,7 +19,7 @@ if(isset($enablekeres) && $enablekeres)
     </div><?php
 }
 
-if(isset($topmenuszoveges) && $topmenuszoveges)
+if(isset($contextmenujogok))
 {
     ?><div class="topmenuszoveges"><?php
         ContextMenu();

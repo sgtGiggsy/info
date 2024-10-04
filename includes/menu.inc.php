@@ -88,10 +88,10 @@ function ContextMenu()
 	$pagetofind = $GLOBALS['pagetofind'];
 	@$menuterulet = $GLOBALS['menuterulet'][3];
 	@$contextmenujogok = $GLOBALS['contextmenujogok'];
-	@$pagename = $GLOBALS['pagename'];
+	@$GLOBALS['pagename'] ? $pagename = $GLOBALS['pagename'] . '/' : $pagename = null;
 	@$aloldal = $GLOBALS['aloldal'];
 	
-	if($pagename && $contextmenujogok)
+	if($contextmenujogok)
 	{
 		?><nav class="topmenuarea">
 			<ul class="topmenu"><?php
@@ -100,7 +100,7 @@ function ContextMenu()
 				if(@$contextmenujogok[$menupont['oldal']] || @$contextmenujogok[$menupont['gyujtooldal']])
 				{
 					?><li <?=($aloldal && ($menupont['oldal'] == $aloldal || $menupont['gyujtooldal'] == $aloldal)) ? 'class="topmenuitem-active"' : 'class="topmenuitem"' ?>>
-						<a href="<?=$RootPath?>/<?=$pagetofind?>/<?=$pagename?>/<?=$menupont['gyujtooldal']?>">
+						<a href="<?=$RootPath?>/<?=$pagetofind?>/<?=$pagename?><?=$menupont['gyujtooldal']?>">
 							<?=trim($menupont['menupont'])?>
 						</a>
 					</li><?php
