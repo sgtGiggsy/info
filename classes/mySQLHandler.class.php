@@ -341,14 +341,10 @@ class MySQLHandler
         return $result;
     }
 
-    public function AsArray($ondimensional = false, $result = null)
+    public function AsArray($arrkey = null, $ondimensional = false)
     {
-        if(!$result)
-        {
-            $result = $this->result;
-        }
         $returnarr = array();
-        foreach($result as $sor)
+        foreach($this->result as $sor)
         {
             $element = array();
             foreach($sor as $key => $value)
@@ -359,8 +355,14 @@ class MySQLHandler
                     break;
                 }
                 $element[$key] = $value;
+                if($arrkey && $key == $arrkey)
+                    $thiskey = $value;
             }
-            $returnarr[] = $element;
+
+            if($arrkey)
+                $returnarr[$thiskey] = $element;
+            else
+                $returnarr[] = $element;
         }
 
         //echo json_encode($returnarr);

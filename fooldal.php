@@ -1,22 +1,12 @@
-<?php 
+<?php
+$fooldal = $menusql->AsArray('id');
 
-/*
-foreach($_SESSION as $key => $value)
-{
-	echo "$key = $value";
-} 
-*/
-
-//
-if($loginid)
-{
-	$loginid = "?loginid=$loginid";
-}
 if($_SESSION['id'] == 0)
 {
 	if($_SESSION['fooldalkijelentkezve'])
 	{
-		header("Location: ./" . $_SESSION['fooldalkijelentkezve'] . $loginid);
+		include("./{$fooldal[$_SESSION['fooldalkijelentkezve']]['gyujtourl']}.php");
+
 	}
 	else
 	{
@@ -28,7 +18,7 @@ else
 {
 	if($_SESSION['fooldalbejelentkezve'])
 	{
-		header("Location: ./" . $_SESSION['fooldalbejelentkezve'] . $loginid);
+		include("./{$fooldal[$_SESSION['fooldalbejelentkezve']]['gyujtourl']}.php");
 	}
 	else
 	{

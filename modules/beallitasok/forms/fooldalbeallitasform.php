@@ -21,7 +21,7 @@ if(@$irhat)
                         <option value="" selected></option><?php
                         foreach($menu as $x)
                         {
-                            ?><option value="<?=$x['gyujtooldal']?>" <?=($x['gyujtooldal'] && $x['gyujtooldal'] == $beallitas['fooldalkijelentkezve']) ? "selected" : "" ?>><?=$x['menupont']?></option><?php
+                            ?><option value="<?=$x['id']?>" <?=($x['gyujtooldal'] && $x['gyujtooldal'] == $beallitas['fooldalkijelentkezve']) ? "selected" : "" ?>><?=$x['menupont']?></option><?php
                         }
                     ?></select>
                 </div>
@@ -32,7 +32,7 @@ if(@$irhat)
                         <option value="" selected></option><?php
                         foreach($menu as $x)
                         {
-                            ?><option value="<?=$x['gyujtooldal']?>" <?=($x['gyujtooldal'] && $x['gyujtooldal'] == $beallitas['fooldalbejelentkezve']) ? "selected" : "" ?>><?=$x['menupont']?></option><?php
+                            ?><option value="<?=$x['id']?>" <?=($x['gyujtooldal'] && $x['gyujtooldal'] == $beallitas['fooldalbejelentkezve']) ? "selected" : "" ?>><?=$x['menupont']?></option><?php
                         }
                     ?></select>
                 </div>
