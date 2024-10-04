@@ -38,8 +38,8 @@ function MainMenu()
 									?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew"><?=$icons['add']?></span><?php
 								}
 							?></p>
-						<ul class='leftmenu-sub' id="<?=$menupont['id']?>" style="display: <?=($szulonyit == $menupont['id']) ? '' : 'none' ?>">
-						<div class='leftmenu-subtop'></div><?php
+						</li>
+						<ul class='leftmenu-sub' id="<?=$menupont['id']?>" style="display: <?=($szulonyit == $menupont['id']) ? '' : 'none' ?>"><?php
 					}
 					elseif($fomenu && $fomenu == $menupont['szulo'] && $menupont['aktiv'] > 0)
 					{
@@ -86,7 +86,7 @@ function ContextMenu()
 {
 	$RootPath = $GLOBALS['RootPath'];
 	$pagetofind = $GLOBALS['pagetofind'];
-	$menuterulet = $GLOBALS['menuterulet'][3];
+	@$menuterulet = $GLOBALS['menuterulet'][3];
 	@$contextmenujogok = $GLOBALS['contextmenujogok'];
 	@$pagename = $GLOBALS['pagename'];
 	@$aloldal = $GLOBALS['aloldal'];

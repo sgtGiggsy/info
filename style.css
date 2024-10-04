@@ -1560,7 +1560,7 @@ input:checked + .slider:before {
 .customcb input:checked ~ .customradiojelolo {
     background-color: var(--cbchecked);
 }
-  
+
 /* Create the checkmark/indicator (hidden when not checked) */
 .customcbjelolo:after,
 .customradiojelolo:after {
@@ -2234,7 +2234,8 @@ td img {
 }
 
 .leftmenuitem a, .leftmenuitem-active a,
-.leftmenuitem p, .leftmenuitem-active p {
+.leftmenuitem p, .leftmenuitem-active p,
+.leftmenusubitem a, .leftmenusub-active a{
     display: inline-block;
     position: relative;
     width: 100%;
@@ -2251,18 +2252,16 @@ td img {
     background-color: var(--menuhover);
 } 
 
-.leftmenuitem a:hover, .leftmenuitem p:hover {
+.leftmenuitem:hover, .leftmenuitem-active:hover {
     color: var(--linkhover);
     background-color: var(--menuhover);
 }
 
 .leftmenu-sub {
     background-color: var(--submenu);
-}
-
-.leftmenu-subtop {
-    height: 8px;
-    background-image: linear-gradient(var(--shadow), var(--submenu));
+    border-width: 10px 0 0 0;
+    border-style: solid;
+    border-image: linear-gradient(to bottom, var(--shadow), var(--submenu)) 1000 10%;
 }
 
 .leftmenusubitem a:hover, .leftmenusub-active a:hover {

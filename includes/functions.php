@@ -729,7 +729,7 @@ function szerkSor($beepid, $eszkid, $eszktip)
 function modId($muvelet, $tipus, $objid)
 {
 	$modositas = new MySQLHandler("INSERT INTO modositasok (felhasznalo, muvelet, $tipus) VALUES (?, ?, ?)",
-		$$_SESSION['id'], $muvelet, $objid);
+		$_SESSION['id'], $muvelet, $objid);
 
 	return $modositas->last_insert_id;
 }
@@ -835,8 +835,8 @@ function getPermissionError()
 
 function redirectToKuldo($sikeres = null)
 {
-	$RootPath = getenv('APP_ROOT_PATH');
-	$targeturl = $RootPath . "/" . $_GET['kuldooldal'] . ((isset($_GET['kuldooldalid'])) ? "/" . $_GET['kuldooldalid'] : "");
+	$target = $GLOBALS['backtosender'];
+	$targeturl = explode("?", $target)[0];
 
 	if($sikeres == "uj")
 	{

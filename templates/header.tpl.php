@@ -1,7 +1,7 @@
 <?php
 ?><div class="headlogo" id="headlogo">
     <a href="<?=$RootPath?>">
-        <img src="<?=$RootPath?>/images/headlogo.png" height="45px" alt="Oldal logó" title="Oldal logó"></a>
+        <img src="<?=$RootPath?>/images/headlogo.png" width="180px" height="45px" alt="Oldal logó" title="Oldal logó"></a>
 </div><?php
 
 if(isset($enablekeres) && $enablekeres)

@@ -9,8 +9,8 @@ include('./Classes/MailHandler.class.php');
 
 $RootPath = getenv('APP_ROOT_PATH');
 $dbcallcount = 0;
-$logid = null;
-$sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
+$loginsuccess = $sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
+$page = $id = $userid = $current = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = null;
 $params = array();
 //$querylist = array();
 
@@ -41,9 +41,6 @@ if($_SESSION['badpasscount'] > 4 && time() - $_SESSION['lastbadpasstime'] < 300)
     die;
 }
 
-//? Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
-$page = $id = $userid = $current = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = null; $loginsuccess = false;
-
 //? Címsorból vett GET értékek tisztítása nemkívánt karakterektől
 foreach($_GET as $key => $value)
 {
@@ -58,6 +55,7 @@ foreach($_GET as $key => $value)
     $_GET[$key] = $value;
 }
 
+//? Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
 if(isset($_GET['page']))
 {
     $page = $_GET['page'];
@@ -69,6 +67,12 @@ if(isset($_GET['page']))
 		header("Location: $RootPath/index.php");
 		die();
 	}
+}
+
+//? Az lekérdezendő elem ID-jének begyüjtése
+if(isset($_GET['id']))
+{
+    $id = $_GET['id'];
 }
 
 if(isset($_GET['loginid']))
@@ -100,14 +104,8 @@ else
     }
 }
 
-//? Az lekérdezendő elem ID-jének begyüjtése
-if(isset($_GET['id']))
-{
-	$id = $_GET['id'];
-}
-
 //? Felhasználó beléptetése
-if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev']) && !(isset($_GET['page']) && $_GET['page'] == "kilep"))
+if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev']))
 {
     $samaccountname = $_POST['felhasznalonev'];
     $plainpassword = $_POST['jelszo'];
@@ -148,8 +146,6 @@ if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev
                             print_r($x);
                             echo "<br>";
                         }*/
-
-                        //echo $szervezet . " és " . $telefon;
                     }
                     break;
                 }
@@ -184,21 +180,13 @@ if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev
         }
         else
         {
-            $result = new MySQLHandler("SELECT id FROM felhasznalok WHERE felhasznalonev = ?", $samaccountname);
-
             session_regenerate_id();
-            if($result->sorokszama == 1) // Ez az egyedüli "Sikeres bejelentkezés" ág. Bármely más ágra fut ki a modul, a bejelentkezés sikertelen
+            if($login->sorokszama == 1) // Ez az egyedüli "Sikeres bejelentkezés" ág. Bármely más ágra fut ki a modul, a bejelentkezés sikertelen
             {
-                $result = $result->Bind($userid);
                 $_SESSION['id'] = true;
                 $loginid = logLogin($userid);
                 $loginsuccess = true;
                 $_SESSION['badpasscount'] = 0;
-            }
-            else
-            {
-                ?><script type='text/javascript'>alert('Adatbázis elérés hiba!')</script>
-                <head><meta http-equiv="refresh" content="0; URL='./belepes'" /></head><?php
             }
         }
     }
@@ -248,7 +236,6 @@ if(isset($_SESSION['id']) && $_SESSION['id'])
 }
 else
 {
-	parseUserAgent();
     $_SESSION['id'] = false;
 }
 
@@ -261,17 +248,6 @@ foreach($beallitas as $x)
     $ertek = trim($x['ertek']);
     $_SESSION["$nev"] = $ertek;
 }
-if($_SESSION['ismetelheto'] == 0)
-{
-    $_SESSION['ismetelheto'] = false;
-}
-else
-{
-    $_SESSION['ismetelheto'] = true;
-}
-
-//? Betöldendő oldal kiválasztása, menüterületek feltöltése, és felhasználói jogosultságok megállapítása
-
 
 //? Ha nincs betölteni kívánt oldal, a főoldal kiválasztása betöltésre
 if(!(isset($_GET['page'])))
@@ -300,7 +276,7 @@ if($_SESSION['id'])
         WHERE felhasznalo = ?", $felhasznaloid);
     $csoporttagsagok = $csoporttagsagok->Result();
 
-    $menu = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas
+    $menusql = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas
         FROM
         (
             SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas
@@ -319,12 +295,12 @@ else
 {
     $felhasznaloid = false;
     $szemelyes = false;
-    $menu = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL olvasas
+    $menusql = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL olvasas
         FROM menupontok
         WHERE aktiv > 2
         ORDER BY menuterulet ASC, sorrend ASC");
 }
-$menu = $menu->Result();
+$menu = $menusql->Result();
 
 //? A jelen oldalhoz tartozó jogosultságok megállapítása,
 //? valamint, amennyiben van olyan, a jelen oldal szülőjének megjelölése
@@ -332,7 +308,7 @@ $szulonyit = null;
 $menuterulet = array(array(), array(), array());
 foreach($menu as $oldal)
 {
-    if($oldal['gyujtooldal'] == $_GET['page'] || $oldal['oldal'] == $_GET['page'] || $oldal['szerkoldal'] == $_GET['page'])
+    if($oldal['gyujtooldal'] == $pagetofind || $oldal['oldal'] == $pagetofind || $oldal['szerkoldal'] == $pagetofind)
     {
         switch($oldal['olvasas'])
         {
@@ -414,12 +390,6 @@ if(isset($_GET['page']) && ($_GET['page'] != "aktiveszkoz" && $_GET['page'] != "
 {
     $javascriptfiles[] = "includes/js/progressOverlay.js";
 }
-
-if(isset($cselect) && $cselect)
-{
-    $javascriptfiles[] = "includes/js/customSelect.js";
-}
-
 
 //? PHP változók átadni a JavaScriptnek
 $PHPvarsToJS = [

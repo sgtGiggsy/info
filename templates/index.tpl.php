@@ -25,8 +25,7 @@ include('./includes/menu.inc.php');
 	?><div class="wrapper">
 		<!-- Tartalom -->
 		<main class="content">
-			<div class="left">
-				</div>
+			<div class="left"></div>
 			<div class="right"><a href="<?=$RootPath?>/bugreport?oldal=<?=$current?>">Hiba jelzése</a></div><?php
 			include('./includes/contentpage.inc.php');
 		?></main>
