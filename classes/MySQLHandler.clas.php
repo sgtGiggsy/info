@@ -2,11 +2,11 @@
 
 class MySQLHandler
 {
-    public $con;
     public $last_insert_id = null;
     public $siker = false;
-    public $hibakod;
     public $sorokszama = 0;
+    private $hibakod;
+    private $con;
     private $exception;
     private $keepalive;
     private $result;
@@ -42,7 +42,7 @@ class MySQLHandler
         {
             $this->Query($query, ...$params);
         }
-    }
+    } 
 
     public function __destruct()
     {
@@ -343,36 +343,37 @@ class MySQLHandler
 
     public function AsArray($arrkey = null, $ondimensional = false)
     {
-        $returnarr = array();
-        foreach($this->result as $sor)
+        if($arrkey || $ondimensional)
         {
-            $element = array();
-            foreach($sor as $key => $value)
+            $returnarr = array();
+            foreach($this->result as $sor)
             {
                 if($ondimensional)
                 {
-                    $element = $value;
-                    break;
+                    foreach($sor as $value)
+                    {
+                        $returnarr[] = $value;
+                        break;
+                    }
                 }
-                $element[$key] = $value;
-                if($arrkey && $key == $arrkey)
-                    $thiskey = $value;
+                
+                if($arrkey)
+                    $returnarr[$sor[$arrkey]] = $sor;
+                else
+                    $returnarr[] = $sor;
             }
-
-            if($arrkey)
-                $returnarr[$thiskey] = $element;
-            else
-                $returnarr[] = $element;
         }
-
-        //echo json_encode($returnarr);
+        else
+        {
+            $returnarr = mysqli_fetch_all($this->result, MYSQLI_ASSOC);
+        }
         return $returnarr;
     }
 
     public function Close($backtosender = null)
     {
         if($this->con)
-            mysqli_close($this->con);
+            //mysqli_close($this->con);
 
         if($backtosender)
         {
