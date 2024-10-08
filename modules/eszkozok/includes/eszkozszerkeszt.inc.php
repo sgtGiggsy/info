@@ -56,7 +56,7 @@ elseif(isset($_GET['beepites']) && isset($_GET['action']))
     {
 
         $beepid = $beepnev = $beepeszk = $beepip = $beeprack = $beephely = $beeppoz = $beepido = $beepkiep =
-        $admin = $pass = $megjegyzes = $vlan = $magyarazat = $beuszok = $tipus = null;
+        $admin = $pass = $megjegyzes = $vlan = $magyarazat = $beuszok = $tipus = $beepepulet = null;
 
         $switchport = 0;
         $button = "Új beépítés";
@@ -110,6 +110,7 @@ elseif(isset($_GET['beepites']) && isset($_GET['action']))
                     rackszekrenyek.id AS rackid,
                     rackszekrenyek.nev AS rack,
                     beepitesek.helyiseg AS helyisegid,
+                    helyisegek.epulet AS epuletid,
                     (SELECT CONCAT(COALESCE(epuletek.szam, ''), ' (', COALESCE(epuletek.nev, ''), ') épület', COALESCE(helyisegek.helyisegszam, ''), ' (', COALESCE(helyisegek.helyisegnev, ''), ')')
                         FROM helyisegek
                             INNER JOIN epuletek ON helyisegek.epulet = epuletek.id
@@ -142,6 +143,7 @@ elseif(isset($_GET['beepites']) && isset($_GET['action']))
                     LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                     LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
                     LEFT JOIN vlanok ON beepitesek.vlan = vlanok.id
+                    LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id
                 WHERE beepitesek.id = $beepid;");
 
             $beepitve = mysqli_fetch_assoc($beepitve);
@@ -205,6 +207,7 @@ elseif(isset($_GET['beepites']) && isset($_GET['action']))
             $megjegyzes = $beepitve['megjegyzes'];
             $vlan = $beepitve['vlanid'];
             $switchport = $beepitve['switchportid'];
+            $beepepulet = $beepitve['epuletid'];
 
             $button = "Szerkesztés";
             $oldalcim = "Beépítés szerkesztése";

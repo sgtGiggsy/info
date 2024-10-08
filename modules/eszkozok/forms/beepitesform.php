@@ -1,6 +1,8 @@
 <?php
 if(@$irhat)
 {
+    $javascriptfiles[] = "includes/js/epValaszt.js";
+    $PHPvarsToJS[] = array('name' => 'helyisegselect', 'val' => 'helyiseg');
     $currpage = $RootPath . "/" . $_GET['page'] . ((isset($_GET['id'])) ? "/" . $_GET['id'] : "" ) . "?beepites" . (($_GET['beepites']) ? "=" . $beepid : "") . "&action=" . (($_GET['beepites']) ? 'update' : 'new' );
     ?><form action="<?=$currpage?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if($_GET['beepites'])
@@ -47,6 +49,7 @@ if(@$irhat)
                 if(!$tipus || $tipus == "aktiveszkoz" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "mediakonverter" || $tipus == "sohoeszkoz")
                 {
                     
+                    epuletPicker($beepepulet, true);
                     helyisegPicker($beephely, "helyiseg");
                     $magyarazat .= "<strong>Helyiség</strong><p>Csak abban az esetben kell megadni, ha az eszköz <b>nincs</b> rack szekrénybe építve.</p>";
                 }

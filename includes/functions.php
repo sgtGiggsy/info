@@ -400,30 +400,43 @@ function eszkozPicker($current = null, $beepitett)
 	}
 }
 
-function epuletPicker($current)
+function epuletPicker($current, $js = false)
 {
-	$epuletek = new MySQLHandler("SELECT epuletek.id AS id,
+	$epuletek = new MySQLHandler("SELECT telephelyek.telephely AS telephelynev,
+			epuletek.id AS id,
 			szam AS epuletszam,
 			epuletek.nev AS epuletnev,
 			epulettipusok.tipus AS tipus
         FROM epuletek
+			INNER JOIN telephelyek ON epuletek.telephely = telephelyek.id
             LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
-		ORDER BY epuletek.szam;");
+		ORDER BY epuletek.telephely, epuletek.szam + 0;");
 	$epuletek = $epuletek->Result();
+	$elozotelephely = "";
 
 	?><div>
 	<label for="epulet">Épület:</label><br>
-	<select id="epulet" name="epulet">
+	<select id="epulet" name="epulet" <?=($js) ? 'onchange="epValaszt()"' : ""?>>
 		<option value="" selected></option><?php
 		foreach($epuletek as $x)
 		{
-			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?= $x['epuletszam'] . ". " . $x['tipus'] . ($x['epuletnev']) ? " (" . $x['epuletnev'] . ")" : "" ?></option><?php
+			if($elozotelephely != $x['telephelynev'])
+			{
+				if($elozotelephely != "")
+				{
+					?></optgroup><?php
+				}
+
+				?><optgroup label="<?=$x['telephelynev']?>"><?php
+				$elozotelephely = $x['telephelynev'];
+			}
+			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=IntRagValaszt($x['epuletszam'])?> <?=$x['tipus']?> <?=($x['epuletnev']) ? " (" . $x['epuletnev'] . ")" : "" ?></option><?php
 		}
 	?></select>
 	</div><?php
 }
 
-function helyisegPicker($current, $selectnev)
+function helyisegPicker($current, $selectnev, $hideall = false)
 {
 	$helyisegek = new MySQLHandler("SELECT
             helyisegek.id AS id,
@@ -436,6 +449,7 @@ function helyisegPicker($current, $selectnev)
 			LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
         ORDER BY epuletszam + 0, helyisegszam;");
 	$helyisegek = $helyisegek->Result();
+	$elozoepulet = 0;
 
 	?><div>
 	<label for="<?=$selectnev?>">Helyiség:</label><br>
@@ -443,7 +457,17 @@ function helyisegPicker($current, $selectnev)
 		<option value="" selected></option><?php
 		foreach($helyisegek as $x)
 		{
-			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?= $x['epuletszam'] . ". épület" . ", " . $x['helyisegszam'] . " (" . $x['helyisegnev'] . ")" ?></option><?php
+			if($elozoepulet != $x['epuletszam'])
+			{
+				if($elozoepulet != 0)
+				{
+					?></optgroup><?php
+				}
+
+				?><optgroup label="<?=IntRagValaszt($x['epuletszam'])?> épület" class="optgrp" id="<?=$x['epuletid']?>-epulet" <?=($hideall) ? 'style="display: none"' : "" ?>><?php
+				$elozoepulet = $x['epuletszam'];
+			}
+			?><option value="<?php echo $x["id"] ?>" <?= ($current == $x['id']) ? "selected" : "" ?>><?=$x['helyisegszam'] . " (" . $x['helyisegnev'] . ")" ?></option><?php
 		}
 	?></select>
 	</div><?php
@@ -726,17 +750,16 @@ function raktarKeszlet($action, $filter)
 
 function szerkSor($beepid, $eszkid, $eszktip)
 {
-	$RootPath = getenv('APP_ROOT_PATH');
 	include('.\templates\svg.tpl.php');
 
 	?><td class="dontprint"><?php
 	if($beepid)
 	{
-		?><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?beepites=<?=$beepid?>&action=edit'><?=$icons['deploy']?></a><?php
+		?><a href='<?=ROOT_PATH?>/<?=$eszktip?>/<?=$eszkid?>?beepites=<?=$beepid?>&action=edit'><?=$icons['deploy']?></a><?php
 	}
 	?></td>
-	<td class="dontprint"><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?beepites&action=addnew'><?=$icons['deploynew']?></a></td>
-	<td class="dontprint"><a href='<?=$RootPath?>/<?=$eszktip?>/<?=$eszkid?>?action=edit'><?=$icons['edit']?></a></td><?php
+	<td class="dontprint"><a href='<?=ROOT_PATH?>/<?=$eszktip?>/<?=$eszkid?>?beepites&action=addnew'><?=$icons['deploynew']?></a></td>
+	<td class="dontprint"><a href='<?=ROOT_PATH?>/<?=$eszktip?>/<?=$eszkid?>?action=edit'><?=$icons['edit']?></a></td><?php
 }
 
 function modId($muvelet, $tipus, $objid)
@@ -810,7 +833,7 @@ function getCimkek($cimkek)
 
 function afterDBRedirect($con, $last_id = null)
 {
-	$RootPath = getenv('APP_ROOT_PATH');
+	$RootPath = ROOT_PATH;
 	$oldal = $_GET['page'];
 	// Ha új elemet vittünk fel, az átirányításhoz lekérjük az utolsó adatbázisművelet id-ját
     if(!isset($_POST['id']))
@@ -879,7 +902,6 @@ function redirectToGyujto($gyujtonev)
 
 function vegpontLista($portok)
 {
-	$RootPath = getenv('APP_ROOT_PATH');
 	$portok = mysqliNaturalSort($portok, "port");
 	if(count($portok) > 0)
 	{
@@ -902,7 +924,7 @@ function vegpontLista($portok)
 					{
 						$elozovlan = true;
 					}
-					?><a class="<?=($port['hasznalatban'] || $port['szam'] || $port['athurkolas']) ? "foglalt" : "ures" ?>" href='<?=$RootPath?>/port/<?=$port['portid']?>'>
+					?><a class="<?=($port['hasznalatban'] || $port['szam'] || $port['athurkolas']) ? "foglalt" : "ures" ?>" href='<?=ROOT_PATH?>/port/<?=$port['portid']?>'>
 						<div class="vegpont">
 							<div><?=$port['port']?></div>
 							<div>
@@ -935,8 +957,6 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
 	// Az eszközön csak az optikai pár ELSŐ felét kell kiválasztani, a megjelenítésnél a következő szál automatikusan foglaltnak minősül.
 	// Ebből adódóan a jelen megjelenítés nem működik, ha nem egymás melletti optikai szálakra van csatlakoztatva az eszköz.
 	// Másfajta átvitel (réz, mikró) esetén ilyen nincs, ott a rendszer egy portot egy porthoz csatlakozónak vesz
-	
-	$RootPath = getenv('APP_ROOT_PATH');
 
 	$where = "";
 	if($tipus == 'epulet')
@@ -1009,7 +1029,7 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
 					default: $retegtip = "rez";
 				}
 				
-				?><a class="<?=($port['hasznalatban'] || $elozoport || $port['huroktuloldal']) ? "foglalt" : "ures" ?>" href='<?=$RootPath?>/port/<?=$port['portid']?>'>
+				?><a class="<?=($port['hasznalatban'] || $elozoport || $port['huroktuloldal']) ? "foglalt" : "ures" ?>" href='<?=ROOT_PATH?>/port/<?=$port['portid']?>'>
 					<div class="infoboxtitle"><div class="fizikairetegtip <?=$retegtip?>"></div><?=$port['port']?><?=($port['tulport']) ? "<span class='center' style='width: unset'>-</span><span class='right'>" . $port['tulport'] . "</span>" : "" ?></div>
 					<div class="transzport">
 						<div><h4><?=($port['tulport']) ? $port['epuletszam'] . ". épület felé" : "" ?></h4></div><?php
@@ -1415,14 +1435,13 @@ function showEpulet($szam, $tipus = null)
 
 function showBreadcumb($eszkoz, $lastlink = false)
 {
-	$RootPath = getenv('APP_ROOT_PATH');
 	$i = 1;
 
 	?><div class="breadcumblist">
 		<ol vocab="https://schema.org/" typeof="BreadcrumbList">
 			<li property="itemListElement" typeof="ListItem">
 				<a property="item" typeof="WebPage"
-					href="<?=$RootPath?>/">
+					href="<?=ROOT_PATH?>/">
 				<span property="name">Kecskemét Informatika</span></a>
 				<meta property="position" content="<?=$i++?>">
 			</li><?php
@@ -1431,21 +1450,21 @@ function showBreadcumb($eszkoz, $lastlink = false)
 				?><?=($eszkoz['thelyid']) ? "<li><b>></b></li>" : "" ?>
 				<li property="itemListElement" typeof="ListItem">
 					<a property="item" typeof="WebPage"
-						href="<?=$RootPath?>/epuletek/<?=$eszkoz['thelyid']?>">
+						href="<?=ROOT_PATH?>/epuletek/<?=$eszkoz['thelyid']?>">
 					<span property="name"><?=$eszkoz['telephely']?></span></a>
 					<meta property="position" content="<?=$i++?>">
 				</li>
 				<?=($eszkoz['epuletid']) ? "<li><b>></b></li>" : "" ?>
 				<li property="itemListElement" typeof="ListItem">
 					<a property="item" typeof="WebPage"
-						href="<?=$RootPath?>/epulet/<?=$eszkoz['epuletid']?>">
+						href="<?=ROOT_PATH?>/epulet/<?=$eszkoz['epuletid']?>">
 					<span property="name"><?=showEpulet($eszkoz['epuletszam'], $eszkoz['epulettipus'])?></span></a>
 					<meta property="position" content="<?=$i++?>">
 				</li>
 				<?=($eszkoz['helyisegid']) ? "<li><b>></b></li>" : "" ?>
 				<li property="itemListElement" typeof="ListItem">
 					<a property="item" typeof="WebPage"
-						href="<?=$RootPath?>/helyiseg/<?=$eszkoz['helyisegid']?>">
+						href="<?=ROOT_PATH?>/helyiseg/<?=$eszkoz['helyisegid']?>">
 					<span property="name"><?=showHelyiseg($eszkoz['helyisegszam'], $eszkoz['helyisegnev'])?></span></a>
 					<meta property="position" content="<?=$i++?>">
 				</li>
@@ -1454,7 +1473,7 @@ function showBreadcumb($eszkoz, $lastlink = false)
 					?><li><b>></b></li>
 					<li property="itemListElement" typeof="ListItem">
 						<a property="item" typeof="WebPage"
-							href="<?=$RootPath?>/rack/<?=$eszkoz['rackid']?>">
+							href="<?=ROOT_PATH?>/rack/<?=$eszkoz['rackid']?>">
 						<span property="name"><?=$eszkoz['rack']?></span></a>
 						<meta property="position" content="<?=$i++?>">
 					</li><?php
@@ -1471,7 +1490,7 @@ function showBreadcumb($eszkoz, $lastlink = false)
 				?><li><b>></b></li>
 				<li property="itemListElement" typeof="ListItem">
 					<a property="item" typeof="WebPage"
-						href="<?=$RootPath?>/aktiveszkozok">
+						href="<?=ROOT_PATH?>/aktiveszkozok">
 					<span property="name">Aktív eszközök</span></a>
 					<meta property="position" content="<?=$i++?>">
 				</li>
@@ -1723,4 +1742,44 @@ function FormatSQL($sql)
 	$sql = str_replace("(SELECT", "<br>&nbsp&nbsp(SELECT", $sql);
 	$sql = str_replace("UNION", "<br>UNION<br>", $sql);
 	return $sql;
+}
+
+function IntRagValaszt($szam)
+{
+    if($szam == 0)
+    {
+        return $szam . "-s";
+    }
+	elseif(!is_numeric($szam))
+	{
+		return $szam;
+	}
+    else
+    {
+        switch($szam % 10)
+        {
+            case 1: case 2: case 4: case 7: case 9:
+                return $szam . "-es";
+                break;
+            case 3: case 8:
+                return $szam . "-as";
+                break;
+            case 5:
+                return $szam . "-ös";
+                break;
+            case 6:
+                return $szam . "-os";
+                break;
+            case 0:
+                switch($szam / 10)
+                {
+                    case 1: case 4: case 5: case 7: case 9:
+                        return $szam . "-es";
+                        break;
+                    case 2: case 3: case 6: case 8: default:
+                        return $szam . "-as";
+                        break;
+                }
+        }
+    }
 }
