@@ -86,9 +86,9 @@ function ContextMenu()
 {
 	$RootPath = $GLOBALS['RootPath'];
 	$pagetofind = $GLOBALS['pagetofind'];
-	@$menuterulet = $GLOBALS['menuterulet'][3];
+	@$menuterulet = $GLOBALS['contextmenu'];
 	@$contextmenujogok = $GLOBALS['contextmenujogok'];
-	@$GLOBALS['pagename'] ? $pagename = $GLOBALS['pagename'] . '/' : $pagename = null;
+	@$GLOBALS['pagename'] ? $pagename = '/' . $GLOBALS['pagename'] : $pagename = null;
 	@$aloldal = $GLOBALS['aloldal'];
 	
 	if($contextmenujogok)
@@ -97,11 +97,12 @@ function ContextMenu()
 			<ul class="topmenu"><?php
 			foreach($menuterulet as $menupont)
 			{
-				if(@$contextmenujogok[$menupont['oldal']] || @$contextmenujogok[$menupont['gyujtooldal']])
+				if(@$contextmenujogok[$menupont['gyujtooldal']] || @$contextmenujogok[$menupont['oldal']])
 				{
-					?><li <?=($aloldal && ($menupont['oldal'] == $aloldal || $menupont['gyujtooldal'] == $aloldal)) ? 'class="topmenuitem-active"' : 'class="topmenuitem"' ?>>
-						<a href="<?=$RootPath?>/<?=$pagetofind?>/<?=$pagename?><?=$menupont['gyujtooldal']?>">
-							<?=trim($menupont['menupont'])?>
+					$menupont['gyujtooldal'] ? $gyujtooldal = '/' . $menupont['gyujtooldal'] : $gyujtooldal = null;
+					?><li <?=(($aloldal || $menupont['oldal'] == $pagetofind) && ($menupont['oldal'] == $aloldal || $menupont['gyujtooldal'] == $aloldal || (!$aloldal && $menupont['oldal'] == $pagetofind))) ? 'class="topmenuitem-active"' : 'class="topmenuitem"' ?>>
+						<a href="<?=$RootPath?>/<?=$pagetofind?><?=$pagename?><?=$gyujtooldal?>">
+							<?=trim($menupont['gyujtooldalnev'])?>
 						</a>
 					</li><?php
 				}

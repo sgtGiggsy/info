@@ -7,7 +7,9 @@ include('./Classes/Ertesites.class.php');
 include('./Classes/MySQLhandler.class.php');
 include('./Classes/MailHandler.class.php');
 
-$RootPath = getenv('APP_ROOT_PATH');
+define('ROOT_PATH', getenv('APP_ROOT_PATH'));
+
+$RootPath = ROOT_PATH;
 $dbcallcount = 0;
 $loginsuccess = $sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
 $page = $id = $userid = $current = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = null;
@@ -287,9 +289,14 @@ if($_SESSION['id'])
             SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL, NULL
             FROM menupontok
             WHERE menupontok.aktiv > 1 AND menupontok.aktiv < 4
+        UNION ALL
+            SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas
+            FROM menupontok
+                INNER JOIN jogosultsagok ON menupontok.id = jogosultsagok.menupont
+            WHERE jogosultsagok.felhasznalo = ? AND menupontok.aktiv IS NULL OR menupontok.aktiv = 0
         ) AS egyesitett
     GROUP BY id
-    ORDER BY menuterulet ASC, sorrend ASC;", $felhasznaloid);
+    ORDER BY menuterulet ASC, sorrend ASC;", $felhasznaloid, $felhasznaloid);
 }
 else
 {
@@ -308,24 +315,26 @@ $szulonyit = null;
 $menuterulet = array(array(), array(), array());
 foreach($menu as $oldal)
 {
-    if($oldal['gyujtooldal'] == $pagetofind || $oldal['oldal'] == $pagetofind || $oldal['szerkoldal'] == $pagetofind)
+    switch($pagetofind)
     {
-        switch($oldal['olvasas'])
-        {
-            case 3: $mindolvas = true;
-            case 2: $csoportolvas = true;
-            case 1: $sajatolvas = true;
-        }
+        case $oldal['gyujtooldal'] : case $oldal['oldal'] : case $oldal['szerkoldal'] : case $oldal['dboldal'] :
+            switch($oldal['olvasas'])
+            {
+                case 3: $mindolvas = true;
+                case 2: $csoportolvas = true;
+                case 1: $sajatolvas = true;
+            }
 
-        switch($oldal['iras'])
-        {
-            case 3: $mindir = true;
-            case 2: $csoportir = true;
-            case 1: $sajatir = true;
-        }
+            switch($oldal['iras'])
+            {
+                case 3: $mindir = true;
+                case 2: $csoportir = true;
+                case 1: $sajatir = true;
+            }
 
-        $currentpage = $oldal;
-        $szulonyit = $oldal['szulo'];
+            $currentpage = $oldal;
+            $szulonyit = $oldal['szulo'];
+        break;
     }
     $menuterulet[$oldal['menuterulet']][] = $oldal;
 }
@@ -420,6 +429,7 @@ include('./templates/index.tpl.php');
 $end_time = microtime(true);
 $pagegentime = round($end_time - $start_time, 2);
 $ftevekenyseg = new MySQLHandler("UPDATE felhasznalotevekenysegek SET dbcallcount=?, pagegentime=? WHERE id=?", $dbcallcount + 1, $pagegentime, $activitylogid);
+
 if($felhasznaloid == 1)
 {
     echo "<div id='pageloadinfo'>Oldal generálás ideje: " . $pagegentime . " mp<br />" . "Adatbázis hívások száma: " . $dbcallcount . "</div>";
