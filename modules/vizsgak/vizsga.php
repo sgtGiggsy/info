@@ -1,4 +1,15 @@
-﻿<?php
+<?php
+
+$contextmenu = array(
+    'ismerteto' => array('gyujtooldal' => 'ismerteto', 'oldal' => 'ismerteto', 'gyujtooldalnev' => 'Ismertető', 'oldalnev' => 'Ismertető'),
+    'vizsgazas' => array('gyujtooldal' => 'vizsgazas', 'oldal' => 'vizsgazas', 'gyujtooldalnev' => 'Vizsgázás', 'oldalnev' => 'Vizsgázás'),
+    'vizsgalista' => array('gyujtooldal' => 'vizsgalista', 'oldal' => 'vizsgareszletezo', 'gyujtooldalnev' => 'Vizsgalista', 'oldalnev' => 'Vizsgarészletező'),
+    'megkezdettvizsgak' => array('gyujtooldal' => 'megkezdettvizsgak', 'oldal' => '', 'gyujtooldalnev' => 'Megkezdett vizsgák', 'oldalnev' => 'Vizsgarészletező'),
+    'kerdeslista' => array('gyujtooldal' => 'kerdeslista', 'oldal' => 'kerdesszerkeszt', 'gyujtooldalnev' => 'Kérdések listája', 'oldalnev' => 'Kérdés szerkesztése'),
+    'adminlista' => array('gyujtooldal' => 'adminlista', 'oldal' => 'adminszerkeszt', 'gyujtooldalnev' => 'Adminok', 'oldalnev' => 'Admin szerkesztése'),
+    'engedelyezettek' => array('gyujtooldal' => 'engedelyezettek', 'oldal' => 'engedelyezettszerkeszt', 'gyujtooldalnev' => 'Engedélyezettek', 'oldalnev' => 'Engedélyezettek szerkesztése'),
+    'vizsgabeallitasok' => array('gyujtooldal' => 'vizsgabeallitasok', 'oldal' => 'vizsgabeallitasok', 'gyujtooldalnev' => 'Beállitások', 'oldalnev' => 'Beálltások')
+);
 
 if(!isset($_GET['subpage']) && !isset($_GET['id']) && !(isset($_GET['action']) && $_GET['action'] == 'addnew'))
 {
@@ -88,22 +99,19 @@ else
             {
                 $vizsgaadmin = new MySQLHandler("SELECT * FROM vizsgak_adminok WHERE felhasznalo = ? AND vizsga = ?;", $felhasznaloid, $vizsgaid);
 
-                if($vizsgaadatok['korlatozott'])
+                if($vizsgaadatok['korlatozott'] && $vizsgaadmin->sorokszama == 0)
                 {
                     $felhasznaloengedelyezett = new MySQLHandler("SELECT * FROM vizsgak_engedelyezettek WHERE felhasznalo = ? AND vizsga = ?;", $felhasznaloid, $vizsgaid);
-                    if($felhasznaloengedelyezett->sorokszama == 0 && $vizsgaadmin->sorokszama == 0)
+                    if($felhasznaloengedelyezett->sorokszama == 0)
                     {
                         $felhasznaloengedelyezett = false;
-                    }
-                    else
-                    {
-                        $felhasznaloengedelyezett = true;
                     }
                 }
                 if($vizsgaadmin->siker && $vizsgaadmin->sorokszama > 0)
                 {
                     // Ezek az alap jogok, amik minden vizsgaadminnak kiosztásra kerülnek
-                    $contextmenujogok['vizsgalista'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['admin'] = $contextmenujogok['vizsgalapok'] = true;
+                    $felhasznaloengedelyezett = $contextmenujogok['vizsgalista'] = $contextmenujogok['megkezdettvizsgak'] =
+                    $contextmenujogok['admin'] = $contextmenujogok['vizsgalapok'] = true;
 
                     $vizsgaadmin = $vizsgaadmin->Fetch();
 

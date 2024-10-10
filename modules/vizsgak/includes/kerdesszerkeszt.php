@@ -26,12 +26,12 @@ else
     if(isset($_GET['id']))
     {
         $jogszukit = null;
+        $szerkparams[] = $_GET['id'];
         if(!$mindir)
         {
-            $jogszukit = "AND vizsgak_kerdesek.vizsga IN (SELECT vizsga FROM vizsgak_adminok WHERE felhasznalo = $felhasznaloid)";
+            $jogszukit = "AND vizsgak_kerdesek.vizsga IN (SELECT vizsga FROM vizsgak_adminok WHERE felhasznalo = ?)";
             $szerkparams[] = $felhasznaloid;
         }
-        $szerkparams[] = $_GET['id'];
         $kerdesadat = new MySQLHandler("SELECT vizsgak_kerdesek.id AS kerdesid,
                     vizsgak_kerdesek.kerdes AS kerdes,
                     feltoltesek.fajl AS kep,
