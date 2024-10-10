@@ -8,11 +8,13 @@ include('./Classes/MySQLhandler.class.php');
 include('./Classes/MailHandler.class.php');
 
 define('ROOT_PATH', getenv('APP_ROOT_PATH'));
+define('DEBUG_MODE', false);
 
 $RootPath = ROOT_PATH;
 $dbcallcount = 0;
 $loginsuccess = $sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
-$page = $id = $userid = $current = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = null;
+$szulonyit = $id = $userid = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = $selectedurl = null;
+$pagetofind = "fooldal";
 $params = array();
 //$querylist = array();
 
@@ -47,9 +49,7 @@ if($_SESSION['badpasscount'] > 4 && time() - $_SESSION['lastbadpasstime'] < 300)
 foreach($_GET as $key => $value)
 {
     if($key != "page" && $key != "subpage" && $key != "id")
-    {
         $params[$key] = $value;
-    }
     
     $value = trim($value);
     $value = strip_tags($value);
@@ -58,12 +58,12 @@ foreach($_GET as $key => $value)
 }
 
 //? Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
+//? Ha nincs betölteni kívánt oldal, a főoldal marad betöltésre kiválasztva
 if(isset($_GET['page']))
 {
-    $page = $_GET['page'];
-    $current = $page;
+    $pagetofind = $_GET['page'];
 
-	if($page == "kilep" && $_SESSION['id'] && $_SESSION['felhasznalonev'])
+	if($pagetofind == "kilep" && $_SESSION['id'] && $_SESSION['felhasznalonev'])
 	{
         session_destroy();
 		header("Location: $RootPath/index.php");
@@ -73,14 +73,10 @@ if(isset($_GET['page']))
 
 //? Az lekérdezendő elem ID-jének begyüjtése
 if(isset($_GET['id']))
-{
     $id = $_GET['id'];
-}
 
 if(isset($_GET['loginid']))
-{
     $loginid = $_GET['loginid'];
-}
 
 //? Az előző oldal helyének kiderítése
 if(!isset($_SESSION['elozmenyek']))
@@ -96,14 +92,10 @@ else
         $backtosender = $_SERVER['HTTP_REFERER'];
     }
     else
-    {
         $backtosender = end($_SESSION['elozmenyek']);
-    }
 
     if(count($_SESSION['elozmenyek']) > 5)
-    {
         array_shift($_SESSION['elozmenyek']);
-    }
 }
 
 //? Felhasználó beléptetése
@@ -210,6 +202,7 @@ if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev
     }
 }
 
+//? A felhasználó jelen státuszának ellenőrzése (jogos, vagy sem bejelentkezve maradni)
 if(isset($_SESSION['id']) && $_SESSION['id'])
 {
 	if(!isset($samaccountname))
@@ -237,9 +230,7 @@ if(isset($_SESSION['id']) && $_SESSION['id'])
     }
 }
 else
-{
     $_SESSION['id'] = false;
-}
 
 //? Oldal működéséhez használt alapbeállítások betöltése
 $beallitas = new MySQLHandler("SELECT * FROM beallitasok");
@@ -249,16 +240,6 @@ foreach($beallitas as $x)
     $nev = $x['nev'];
     $ertek = trim($x['ertek']);
     $_SESSION["$nev"] = $ertek;
-}
-
-//? Ha nincs betölteni kívánt oldal, a főoldal kiválasztása betöltésre
-if(!(isset($_GET['page'])))
-{
-    $pagetofind = "fooldal";
-}
-else
-{
-    $pagetofind = $_GET['page'];
 }
 
 //? A menüpontok, valamint a felhasználó jogosultságainak, csoporttagságainak és személyes beálltásainak lekérése.
@@ -278,19 +259,19 @@ if($_SESSION['id'])
         WHERE felhasznalo = ?", $felhasznaloid);
     $csoporttagsagok = $csoporttagsagok->Result();
 
-    $menusql = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas
+    $menusql = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas, lathat
         FROM
         (
-            SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas
+            SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas, 1 AS lathat
             FROM menupontok
                 INNER JOIN jogosultsagok ON menupontok.id = jogosultsagok.menupont
             WHERE jogosultsagok.felhasznalo = ? AND menupontok.aktiv > 0 AND menupontok.aktiv < 4
         UNION ALL
-            SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL, NULL
+            SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL, NULL, 1 AS lathat
             FROM menupontok
             WHERE menupontok.aktiv > 1 AND menupontok.aktiv < 4
         UNION ALL
-            SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas
+            SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas, NULL AS lathat
             FROM menupontok
                 INNER JOIN jogosultsagok ON menupontok.id = jogosultsagok.menupont
             WHERE jogosultsagok.felhasznalo = ? AND menupontok.aktiv IS NULL OR menupontok.aktiv = 0
@@ -302,22 +283,36 @@ else
 {
     $felhasznaloid = false;
     $szemelyes = false;
-    $menusql = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL olvasas
-        FROM menupontok
-        WHERE aktiv > 2
+    $menusql = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL olvasas, lathat
+        FROM
+        (
+            SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL olvasas, 1 AS lathat
+            FROM menupontok
+            WHERE aktiv > 2
+        UNION ALL
+            SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL olvasas, NULL ASlathat
+            FROM menupontok
+            WHERE aktiv < 3 OR aktiv IS NULL
+        ) AS egyesitett
+        GROUP BY id
         ORDER BY menuterulet ASC, sorrend ASC");
 }
 $menu = $menusql->Result();
 
 //? A jelen oldalhoz tartozó jogosultságok megállapítása,
 //? valamint, amennyiben van olyan, a jelen oldal szülőjének megjelölése
-$szulonyit = null;
 $menuterulet = array(array(), array(), array());
 foreach($menu as $oldal)
 {
     switch($pagetofind)
     {
-        case $oldal['gyujtooldal'] : case $oldal['oldal'] : case $oldal['szerkoldal'] : case $oldal['dboldal'] :
+        case $oldal['szerkoldal'] :
+        case $oldal['oldal'] :
+            $selectedurl = $oldal['url'];
+        case $oldal['gyujtooldal'] : 
+            ($selectedurl) ? : $selectedurl = $oldal['gyujtourl'];
+        case $oldal['dboldal'] :
+            ($selectedurl) ? : $selectedurl = $oldal['dburl'];
             switch($oldal['olvasas'])
             {
                 case 3: $mindolvas = true;
@@ -342,8 +337,8 @@ foreach($menu as $oldal)
 //? Fallback megoldás arra az esetre, ha a lekérni próbált oldalhoz nincs adatbázis bejegyzés
 if(!isset($currentpage))
 {
-    $currentpage['url'] = $_GET['page'];
-    $currentpage['oldal'] = $_GET['page'];
+    $selectedurl = $pagetofind;
+    $currentpage['oldal'] = $pagetofind;
     $currentpage['cimszoveg'] = "Oldal";
     $currentpage['gyujtocimszoveg'] = "Oldal";
     $currentpage['aktiv'] = 3;
@@ -352,40 +347,24 @@ if(!isset($currentpage))
 //? Szükség esetén 404-es hibaoldal generálása
 try
 {
-    $page = @fopen("./{$currentpage['url']}.php", "r");
-    if (!$page)
-    {
-        $page = @fopen("./{$currentpage['gyujtourl']}.php", "r");
-        if(!$page)
-        {
-            $page = @fopen("./{$currentpage['dburl']}.php", "r");
-            if(!$page)
-            {
-                throw new Exception();
-            }
-        }
-    }
+    $page = @fopen("./{$selectedurl}.php", "r");
+    if(!$page)
+        throw new Exception();
 }
 catch(Exception $e)
 {
     http_response_code(404);
-    $currentpage['url'] = "404";
+    $selectedurl = "404";
     $currentpage['gyujtocimszoveg'] = "Oldal nem található!";
 }
 
 //? Folyamatértesítés
 if(@$_GET['sikeres'] == "uj")
-{
     $succesmessage = "Új " . $currentpage['cimszoveg'] . " hozzáadása sikeres";
-}
 elseif(@$_GET['sikeres'] == "szerkesztes")
-{
     $succesmessage = "A(z) " . $currentpage['cimszoveg'] . " szerkesztése sikerült";
-}
 elseif(@$_GET['sikeres'] == "bejelentkezes")
-{
     $succesmessage = "Sikeres bejelentkezés";
-}
 
 //? JavaScript fájlok listája
 $javascriptfiles = [
@@ -395,23 +374,15 @@ $javascriptfiles = [
     "includes/js/pageload.js"
 ];
 
-if(isset($_GET['page']) && ($_GET['page'] != "aktiveszkoz" && $_GET['page'] != "sohoeszkoz" && $_GET['page'] != "mediakonverter" || ($_GET['page'] == "aktiveszkoz" && isset($_GET['action']))))
-{
+if($pagetofind != "aktiveszkoz" && $pagetofind != "sohoeszkoz" && $pagetofind != "mediakonverter" || ($pagetofind == "aktiveszkoz" && isset($_GET['action'])))
     $javascriptfiles[] = "includes/js/progressOverlay.js";
-}
 
 //? PHP változók átadni a JavaScriptnek
 $PHPvarsToJS = [
-    array(
-        'name' => 'RootPath',
-        'val' => $RootPath
-    )
-];
+    array('name' => 'RootPath', 'val' => $RootPath)];
 
 if($loginid)
-{
     $PHPvarsToJS[] = array('name' => 'loginid', 'val' => $loginid);
-}
 
 if($felhasznaloid && @$szemelyes['switchstateshow'])
 {

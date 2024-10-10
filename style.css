@@ -2252,7 +2252,8 @@ td img {
     background-color: var(--menuhover);
 } 
 
-.leftmenuitem :hover, .leftmenuitem-active :hover {
+.leftmenuitem a:hover, .leftmenuitem-active a:hover,
+.leftmenuitem p:hover, .leftmenuitem-active p:hover {
     color: var(--linkhover);
     background-color: var(--menuhover);
 }

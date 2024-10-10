@@ -27,7 +27,7 @@ function MainMenu()
 						$fomenu = null;
 					}
 					
-					if($menupont['oldal'] == "#")
+					if($menupont['oldal'] == "#" && $menupont['lathat'])
 					{
 						$fomenu = $menupont['id'];
 						?><li class="leftmenuitem">
@@ -41,7 +41,7 @@ function MainMenu()
 						</li>
 						<ul class='leftmenu-sub' id="<?=$menupont['id']?>" style="display: <?=($szulonyit == $menupont['id']) ? '' : 'none' ?>"><?php
 					}
-					elseif($fomenu && $fomenu == $menupont['szulo'] && $menupont['aktiv'] > 0)
+					elseif($fomenu && $fomenu == $menupont['szulo'] && $menupont['aktiv'] > 0 && $menupont['lathat'])
 					{
 						?><li <?=(($menupont['oldal'] == $pagetofind || $menupont['gyujtooldal'] == $pagetofind || $menupont['szerkoldal'] == $pagetofind) ? 'class="leftmenusub-active"' : 'class="leftmenusubitem"')?>>
 							<a href="<?= (($menupont['oldal'] == '/') ? $RootPath : $RootPath."/".$menupont['gyujtooldal']) ?>">
@@ -53,7 +53,7 @@ function MainMenu()
 							?></a>
 						</li><?php
 					}
-					elseif($menupont['aktiv'] > 0)
+					elseif($menupont['aktiv'] > 0 && $menupont['lathat'])
 					{
 						?><li <?=(($menupont['oldal'] == $pagetofind || $menupont['gyujtooldal'] == $pagetofind) ? 'class="leftmenuitem-active"' : 'class="leftmenuitem"')?>>
 							<a href="<?= (($menupont['oldal'] == '/') ? $RootPath : $RootPath."/".$menupont['gyujtooldal']) ?>">

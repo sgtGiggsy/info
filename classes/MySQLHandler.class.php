@@ -14,7 +14,7 @@ class MySQLHandler
     private $types = "";
     private $vartparam = 0;
     private $stmt;
-    private $showdebug = false;
+    private $showdebug = DEBUG_MODE;
 
     public function __construct(string $query = null, ...$params)
 	{
@@ -66,7 +66,7 @@ class MySQLHandler
             elseif(!$paramszamokay)
             {
                 $message = "<h2>Hibás paraméterszám!</h2>" . "Várt paraméter: " . $this->vartparam . "<br>Típusszám: " . strlen($this->types)
-                    . "<br>Paraméterszám: " . $paramcount . "<br>Lekérdezés:<br>" . $this->querystring;
+                    . "<br>Paraméterszám: " . $paramcount . "<br>Lekérdezés:<br>" . FormatSQL($this->querystring) . "<br>";
             }
             elseif(!$this->querystring)
             {
@@ -189,7 +189,7 @@ class MySQLHandler
         return $this->siker;
     }
 
-    public function Query(string $query, ...$params)
+    public function Query(string $query, ...$params) : mysqli_result | false
     {
         if($this->Prepare($query))
         {
@@ -206,7 +206,7 @@ class MySQLHandler
         }
     }
 
-    public function Run(...$params)
+    public function Run(...$params) : mysqli_result | false
     {
         $paramszamokay = false;
         $paramcount = 0;
