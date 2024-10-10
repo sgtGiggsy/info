@@ -85,7 +85,7 @@ class Ertesites
         }
     }
 
-    public static function GetFelhasznalok($tipus, $jointtable = null, $where = null, $params)
+    public static function GetFelhasznalok($tipus, $jointtable = null, $where = null, ...$params)
     {
         $sql = new MySQLHandler("SELECT felhasznalo, IF(ertesitesfeliratkozasok.email, felhasznalok.email, null) AS email
                 FROM ertesitesfeliratkozasok
