@@ -1,7 +1,7 @@
 <?php
 if(@$irhat)
 {
-    ?><form action="<?=$RootPath?>/valtozasfelulvizsgalat&action=review" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+    ?><form action="<?=$RootPath?>/telefonkonyv/felulvizsgalat&action=review" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if($modositasoka)
         {
             ?><div class="infobox">
@@ -13,7 +13,7 @@ if(@$irhat)
             </div><?php
         }
         ?><div class="ketharmad" >
-            <input type ="hidden" id="id" name="id" value="<?=$_GET['id']?>">
+            <input type ="hidden" id="id" name="id" value="<?=$id?>">
             <input type ="hidden" id="allapot" name="allapot" value="3">
             <input type ="hidden" id="eredetisor" name="eredetisor" value="<?=$origsorrend?>"><?php
             if(!$valtozas['torolve'])

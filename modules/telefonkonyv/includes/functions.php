@@ -261,42 +261,6 @@ function getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $settings)
 	return $where;
 }
 
-function telefonKonyvNotify($ertesites, $csoport, $felhasznalo = 0, $admintertesit = false)
-{
-	$con = mySQLConnect(false);
-	$adminnotify = $ertesitendok = null;
-
-	if($admintertesit)
-	{
-		$adminnotify = "OR csoport = 1";
-	}
-
-	$felhasznalolist = mySQLConnect("SELECT felhasznalo FROM telefonkonyvadminok WHERE felhasznalo != $felhasznalo AND (csoport = $csoport $adminnotify);");
-
-	if($ertesites)
-	{
-		$stmt = $con->prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
-		$stmt->bind_param('ssss', $ertesites['cim'], $ertesites['szoveg'], $ertesites['url'], $ertesites['tipus']);
-		$stmt->execute();
-
-		$notifid = mysqli_insert_id($con);
-
-		foreach($felhasznalolist as $felh)
-		{
-			$felhid = $felh['felhasznalo'];
-			$ertesitendok .= " ($notifid, $felhid),";
-		}
-
-		$ertesitendok = rtrim($ertesitendok ,",");
-		$ertesitendok .= ";";
-		if($ertesitendok != ";")
-		{
-			$mysqlcommand = "INSERT INTO ertesites_megjelenik (ertesites, felhasznalo) VALUES $ertesitendok";
-			mySQLConnect($mysqlcommand);
-		}
-	}
-}
-
 function getBeosztasList($where, $beosztas, $modid)
 {
 	$meglevobeo = $zarozar = null;

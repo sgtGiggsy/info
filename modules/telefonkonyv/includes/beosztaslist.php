@@ -2,8 +2,7 @@
 
 if(!isset($novaltozatlan))
 {
-    include("../../../includes/config.inc.php");
-    include("../../../includes/functions.php");
+    include("../../../Classes/MySQLHandler.class.php");
 }
 
 $where = $origvolt = null;
@@ -29,7 +28,7 @@ elseif(isset($csoportid))
 }
 
 
-$telkonyvbeosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.nev AS beosztas,
+$telkonyvbeosztasok = new MySQLHandler("SELECT telefonkonyvbeosztasok.nev AS beosztas,
             telefonkonyvfelhasznalok.nev AS dolgozo,
             telefonkonyvbeosztasok.sorrend AS sorrend,
             telefonkonyvcsoportok.sorrend AS csoportsorrend
@@ -37,8 +36,7 @@ $telkonyvbeosztasok = mySQLConnect("SELECT telefonkonyvbeosztasok.nev AS beoszta
             LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
             LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
         $where");
-
-$telkonyvbeosztasok = mysqliToArray($telkonyvbeosztasok);
+$telkonyvbeosztasok = $telkonyvbeosztasok->AsArray();
 
 $csoportsorrend  = array_column($telkonyvbeosztasok, 'csoportsorrend');
 $sorrendszerint = array_column($telkonyvbeosztasok, 'sorrend');

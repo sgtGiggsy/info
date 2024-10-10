@@ -11,7 +11,7 @@ else
         $irhat = true;
         include("./modules/telefonkonyv/db/telefonkonyvszerkesztodb.php");
         
-        redirectToGyujto("telefonkonyvszerkesztok");
+        redirectToGyujto("szerkesztok");
     }
 
     $magyarazat = $felhasznalolista = null;
@@ -22,7 +22,7 @@ else
     $button = "Jogosultságok módosítása";
     $form = "modules/telefonkonyv/forms/telefonkonyvadminform";
 
-    if(isset($_GET['action']) && !isset($_GET['id']))
+    if(isset($_GET['action']) && !isset($id))
     {
         if($_GET['action'] == "addnew")
         {
@@ -30,7 +30,7 @@ else
         }
     }
 
-    if(isset($_GET['id']))
+    if($id)
     {
         $felhasznalo = mySQLConnect("SELECT nev, felhasznalonev FROM felhasznalok WHERE id = $id");
         $felhasznalo = mysqli_fetch_assoc($felhasznalo);

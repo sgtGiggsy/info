@@ -2,78 +2,57 @@
 
 class Ertesites
 {
-    private $con;
-    private $prepstate;
+    private $sql;
     private $felhasznalok = array();
     private $ertesitesid = null;
     public $tipus = null;
     public $cim = null;
     public $szoveg = null;
     public $url = null;
+    public $mailbody;
 
-    public function __construct()
+    public function __construct($cim = null, $szoveg = null, $url = null, $tipus = null, $mailbody = null)
     {
-        $this->con = mySQLConnect();
-        $this->prepstate = $this->con->prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
-        $arguments = func_get_args();
-        $numberOfArguments = func_num_args();
-
-        if (method_exists($this, $function = '__construct'.$numberOfArguments)) {
-            call_user_func_array(array($this, $function), $arguments);
-        }
-    }
-   
-    public function __construct1($param1)
-    {
-        $this->cim = $param1;
-    }
-   
-    public function __construct2($param1, $param2)
-    {
-        $this->cim = $param1;
-        $this->szoveg = $param2;
-    }
-   
-    public function __construct3($param1, $param2, $param3)
-    {
-        $this->cim = $param1;
-        $this->szoveg = $param2;
-        $this->url = $param3;
-    }
-
-    public function __construct4($param1, $param2, $param3, $param4)
-    {
-        $this->cim = $param1;
-        $this->szoveg = $param2;
-        $this->url = $param3;
-        $this->SetTipus($param4);
+        $this->sql = new MySQLHandler();
+        $this->sql->KeepAlive();
+        $this->sql->Prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
+        $this->cim = $cim;
+        $this->szoveg = $szoveg;
+        $this->url = $url;
+        $this->SetTipus($tipus);
+        $this->mailbody = $mailbody;
     }
 
     public function Ment()
     {
-        $this->prepstate->bind_param('ssss', $this->cim, $this->szoveg, $this->url, $this->tipus);
-        $this->prepstate->execute();
-        $this->ertesitesid = $this->prepstate->insert_id;
+        $this->sql->Run($this->cim, $this->szoveg, $this->url, $this->tipus);
+        $this->ertesitesid = $this->sql->last_insert_id;
 
         if(count($this->felhasznalok) > 0)
         {
-            $mail = new MailHandler($this->szoveg);
+            $mailbody = $this->szoveg;
+            if($this->mailbody)
+                $mailbody = $this->mailbody;
+            $mail = new MailHandler($mailbody);
             $mail->Subject($this->cim);
+
+            $this->sql->Prepare("INSERT INTO ertesites_megjelenik(felhasznalo, ertesites) VALUES (?, ?)");
             foreach($this->felhasznalok as $felhasznalo)
             {
-                $felhid = $felhasznalo['felhasznalo'];
-                mySQLConnect("INSERT INTO ertesites_megjelenik(felhasznalo, ertesites) VALUES ($felhid, $this->ertesitesid);");
+                $this->sql->Run($felhasznalo['felhasznalo'], $this->ertesitesid);
                 if($felhasznalo['email'])
                 {
-                    $mail->addAddress($felhasznalo['email']);
+                    $mail->AddAddress($felhasznalo['email']);
                 }
             }
-            $mail->Send();
+            if($mail->cimzettszam > 0)
+                $mail->Send();
         }
         else
         {
-            mySQLConnect("INSERT INTO ertesites_megjelenik(felhasznalo, ertesites) VALUES (0, $this->ertesitesid);");
+            $this->sql->Query("INSERT INTO ertesites_megjelenik(felhasznalo, ertesites) VALUES (?, ?)", 0, $this->ertesitesid);
         }
+        $this->sql->Close();
     }
 
     public function SetFelhasznalok(array $felhasznalok)
@@ -96,19 +75,24 @@ class Ertesites
     public function SetTipus($tipus)
     {
         $this->tipus = $tipus;
-        $felhasznalok = mySQLConnect("SELECT felhasznalo, IF(ertesitesfeliratkozasok.email, felhasznalok.email, null) AS email
-                FROM ertesitesfeliratkozasok
-                    INNER JOIN felhasznalok ON ertesitesfeliratkozasok.felhasznalo = felhasznalok.id
-                WHERE ertesitestipus = $tipus;");
-        $this->felhasznalok = mysqliToArray($felhasznalok);
+        if($tipus)
+        {
+            $this->sql->Query("SELECT felhasznalo, IF(ertesitesfeliratkozasok.email, felhasznalok.email, null) AS email
+                    FROM ertesitesfeliratkozasok
+                        INNER JOIN felhasznalok ON ertesitesfeliratkozasok.felhasznalo = felhasznalok.id
+                    WHERE ertesitestipus = ?;", $tipus);
+            $this->felhasznalok = $this->sql->AsArray();
+        }
     }
 
-    public static function GetFelhasznalok($tipus)
+    public static function GetFelhasznalok($tipus, $jointtable = null, $where = null, $params)
     {
-        $felhasznalok = mySQLConnect("SELECT felhasznalo, IF(ertesitesfeliratkozasok.email, felhasznalok.email, null) AS email
+        $sql = new MySQLHandler("SELECT felhasznalo, IF(ertesitesfeliratkozasok.email, felhasznalok.email, null) AS email
                 FROM ertesitesfeliratkozasok
                     INNER JOIN felhasznalok ON ertesitesfeliratkozasok.felhasznalo = felhasznalok.id
-                WHERE ertesitestipus = $tipus;");
-        return mysqliToArray($felhasznalok);
+                    $jointtable
+                WHERE ertesitestipus = ?
+                $where;", $tipus, ...$params);
+        return $sql->AsArray('felhasznalo');
     }
 }

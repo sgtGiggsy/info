@@ -6,7 +6,7 @@ if(@$irhat)
     {
         $fieldsetstate = "disabled";
     }
-    ?><form action="<?=$RootPath?>/telefonszamvaltozas&action=new" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+    ?><form action="<?=$RootPath?>/telefonkonyv/valtozas&action=new" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if($adminmegjegyzes)
         {
             ?><div class="infobox modmessage">
@@ -21,7 +21,7 @@ if(@$irhat)
             <fieldset <?=$fieldsetstate?>><?php
                 $magyarazat .= "<strong>Tudnivalók</strong><p>Minden *-gal megjelölt mező kitöltése kötelező.
                     A <i>SÚGÓ</i> bármikor bezárható a felette jobboldalt látható ?-re kattintva.</p>";
-                if(isset($_GET['id']))
+                if($id)
                 {
                     ?><input type ="hidden" id="felhid" name="felhid" value=<?=$telefonszam['felhid']?>>
                     <?php

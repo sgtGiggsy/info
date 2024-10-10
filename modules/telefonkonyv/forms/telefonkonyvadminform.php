@@ -2,7 +2,7 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/telefonkonyvszerkeszto&action=<?=$action?>" method="POST" onsubmit="beKuld.disabled"><?php
+        <form action="<?=$RootPath?>/telefonkonyv/szerkeszto&action=<?=$action?>" method="POST" onsubmit="beKuld.disabled"><?php
         if(!$felhasznalolista)
         {
             ?><input type ="hidden" id="id" name="id" value=<?=$id?> /><?php

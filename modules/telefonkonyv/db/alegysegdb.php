@@ -2,7 +2,8 @@
 
 if(isset($irhat) && $irhat)
 {
-    $con = mySQLConnect(false);
+    $mysql = new MySQLHandler();
+    $mysql->KeepAlive();
 
     purifyPost();
 
@@ -10,19 +11,16 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
-        mySQLConnect("UPDATE telefonkonyvcsoportok SET sorrend = sorrend + 1 WHERE sorrend > $sorrend;");
+        $mysql->Query("UPDATE telefonkonyvcsoportok SET sorrend = sorrend + 1 WHERE sorrend > ?;", $sorrend);
 
         if(!verifyWholeNum($sorrend))
         {
             $sorrend = $sorrend + 0.5;
         }
-        $stmt = $con->prepare('INSERT INTO telefonkonyvcsoportok (nev, sorrend) VALUES (?, ?)');
-        $stmt->bind_param('ss', $_POST['nev'], $sorrend);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $mysql->Query('INSERT INTO telefonkonyvcsoportok (nev, sorrend) VALUES (?, ?)', $_POST['nev'], $sorrend);
+        if(!$mysql->siker)
         {
             echo "<h2>Alegység hozzáadása sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
     }
     elseif($_GET["action"] == "update")
@@ -31,27 +29,20 @@ if(isset($irhat) && $irhat)
 
         if(!verifyWholeNum($sorrend))
         {
-            $origsorrend = mySQLConnect("SELECT sorrend FROM telefonkonyvcsoportok WHERE id = $alegysid;");
-            $origsorrend = mysqli_fetch_assoc($origsorrend)['sorrend'];
-            mySQLConnect("UPDATE telefonkonyvcsoportok SET sorrend = sorrend + 1 WHERE sorrend > $sorrend AND torolve IS NULL;");
+            $mysql->Query("SELECT sorrend FROM telefonkonyvcsoportok WHERE id = ?;", $alegysid);
+            $mysql->Bind($origsorrend);
+            $mysql->Query("UPDATE telefonkonyvcsoportok SET sorrend = sorrend + 1 WHERE sorrend > ? AND torolve IS NULL;", $sorrend);
         }
-
-        //var_dump($sorrend);
-        //var_dump($_POST['nev']);
-        //var_dump($_POST['id']);
         
-        $stmt = $con->prepare('UPDATE telefonkonyvcsoportok SET nev=?, sorrend=? WHERE id=?');
-        $stmt->bind_param('ssi', $_POST['nev'], $sorrend, $_POST['id']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $mysql->Query('UPDATE telefonkonyvcsoportok SET nev=?, sorrend=? WHERE id=?', $_POST['nev'], $sorrend, $_POST['id']);
+        if(!$mysql->siker)
         {
             echo "<h2>Alegység szerkesztése sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
         }
         elseif(isset($origsorrend) && $origsorrend)
         {
             // Mivel egy elemet áthelyeztünk, ahonnan kivettük, képződne egy lyuk, ha nem csökkentenénk a felette lévős sorszámokat
-            mySQLConnect("UPDATE telefonkonyvcsoportok SET sorrend = sorrend - 1 WHERE sorrend > $origsorrend AND torolve IS NULL;");
+            $mysql->Query("UPDATE telefonkonyvcsoportok SET sorrend = sorrend - 1 WHERE sorrend > ? AND torolve IS NULL;", $origsorrend);
         }
     }
     elseif($_GET["action"] == "delete")
@@ -61,14 +52,13 @@ if(isset($irhat) && $irhat)
         $nulled = null;
         if($mindir)
         {
-            $stmt = $con->prepare('UPDATE telefonkonyvcsoportok SET torolve=?, sorrend=? WHERE id=?');
-            $stmt->bind_param('ssi', $torolve, $nulled, $_POST['id']);
-            $stmt->execute();
-            print_r("UPDATE telefonkonyvcsoportok SET sorrend = sorrend - 1 WHERE sorrend > $sorrend AND torolve IS NULL;");
+            $mysql->Query('UPDATE telefonkonyvcsoportok SET torolve=?, sorrend=? WHERE id=?', $torolve, $nulled, $_POST['id']);
+            $mysql->Query("UPDATE telefonkonyvcsoportok SET sorrend = sorrend - 1 WHERE sorrend > ? AND torolve IS NULL;", $sorrend);
         }
         else
         {
             echo "<h2>Nincs jogosultsága az alegység törlésére!</h2>";
         }
     }
+    $mysql->Close();
 }

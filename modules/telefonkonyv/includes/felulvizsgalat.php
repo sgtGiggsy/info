@@ -13,10 +13,10 @@ else
         $irhat = true;
         include("./modules/telefonkonyv/db/telefonkonyvdb.php");
         
-        redirectToGyujto("telefonkonyv/valtozasok");
+        redirectToGyujto("valtozasok");
     }
 
-    if(isset($_GET['id']))
+    if($id)
     {
         $alegysegek = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1;");
 
@@ -44,7 +44,7 @@ else
         $form = "modules/telefonkonyv/forms/telefonszamfelulvizsgalform";
         $oldalcim = "Számváltozás felülvizsgálata";
 
-        $valtozasid = $_GET['id'];
+        $valtozasid = $id;
 
         $valtozas = mySQLConnect("SELECT telefonkonyvvaltozasok.id AS valtozasid,
                 telefonkonyvvaltozasok.origbeoid AS origbeoid,

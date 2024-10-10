@@ -3,7 +3,6 @@
 // ez az állomány, és a módosításhoz szükséges ellenőrzések nem történnek meg
 if(!isset($irhat))
 {
-    $globaltelefonkonyvadmin = telefonKonyvAdminCheck($mindir);
     if($globaltelefonkonyvadmin)
     {
         $irhat = true;
@@ -12,28 +11,34 @@ if(!isset($irhat))
 
 if(isset($irhat) && $irhat)
 {
-    $con = mySQLConnect(false);
-    $bejelento = $_SESSION['id'];
-
     purifyPost();
+    $sql = new MySQLHandler();
+    $sql->KeepAlive();
+    $bejelento = $_SESSION['id'];
+    $modositasid = $_POST['id'];
+    $csoportid = 1;
+    if($_POST['csoport'])
+        $csoportid = $_POST['csoport'];
+    $ertesitendok = Ertesites::GetFelhasznalok(4,
+                "INNER JOIN telefonkonyvadminok ON felhasznalok.id = telefonkonyvadminok.felhasznalo",
+                "AND felhasznalo != ? AND (csoport = ? OR csoport = 1)",
+                array($felhasznaloid, $csoportid));
+
 
 // Szerkesztői akciók //
     if($_GET["action"] == "new" || $_GET["action"] == "update" || $_GET["action"] == "review")
     {
-        $modid = mySQLConnect("SELECT MAX(id) AS id FROM telefonkonyvmodositaskorok;");
-        $modid = mysqli_fetch_assoc($modid)['id'];
-
-        $telefonkonyvcsoportid = 0;
+        $sql->Query("SELECT MAX(id) AS id FROM telefonkonyvmodositaskorok;");
+        $sql->Bind($modid);
 
         if($_POST['csoport'])
         {
-            $telefonkonyvcsoportid = $_POST['csoport'];
-            $alegysegnev = mySQLConnect("SELECT nev FROM telefonkonyvcsoportok WHERE id = $telefonkonyvcsoportid");
-            $alegysegnev = mysqli_fetch_assoc($alegysegnev)['nev'];
+            $sql->Query("SELECT nev FROM telefonkonyvcsoportok WHERE id = ?", $csoportid);
+            $sql->Bind($alegysegnev);
         }
         
-        $bejelentonev = mySQLConnect("SELECT nev FROM felhasznalok WHERE id = $bejelento");
-        $bejelentonev = mysqli_fetch_assoc($bejelentonev)['nev'];
+        $sql->Query("SELECT nev FROM felhasznalok WHERE id = ?", $bejelento);
+        $sql->Bind($bejelentonev);
 
         if(!isset($_POST['torles']) || !$_POST['torles'])
         {
@@ -44,7 +49,7 @@ if(isset($irhat) && $irhat)
         if($_GET['action'] != "review")
         {
             if($_POST['belsoszam'])
-            $belsoszam = $_POST['belsoelohivo'] . $_POST['belsoszam'];
+                $belsoszam = $_POST['belsoelohivo'] . $_POST['belsoszam'];
 
             if($_POST['belsoszam2'])
                 $belsoszam2 = $_POST['belsoelohivo'] . $_POST['belsoszam2'];
@@ -98,24 +103,21 @@ if(isset($irhat) && $irhat)
             // Ezesetben nincs szükség felhasználó adatbáziobjektum létrehozására
             if($nev)
             {
-                $stmt = $con->prepare('INSERT INTO telefonkonyvfelhasznalok (elotag, nev, titulus, rendfokozat, mobil, felhasznalo, allapot) VALUES (?, ?, ?, ?, ?, ?, ?)');
-                $stmt->bind_param('sssssss', $_POST['elotag'], $nev, $_POST['titulus'], $_POST['rendfokozat'], $mobil, $_POST['felhasznalo'], $elemallapot);
-                $stmt->execute();
+                $sql->Query('INSERT INTO telefonkonyvfelhasznalok (elotag, nev, titulus, rendfokozat, mobil, felhasznalo, allapot) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    $_POST['elotag'], $nev, $_POST['titulus'], $_POST['rendfokozat'], $mobil, $_POST['felhasznalo'], $elemallapot);
 
-                $felhid = mysqli_insert_id($con);
+                $felhid = $sql->last_insert_id;
             }
 
-            $stmt = $con->prepare('INSERT INTO telefonkonyvbeosztasok_mod (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, felhid, megjegyzes, allapot, torolve) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-            $stmt->bind_param('ssssssssssss', $_POST['csoport'], $beosztasnev, $_POST['sorrend'], $belsoszam, $belsoszam2, $fax, $kozcelu, $kozcelufax, $felhid, $_POST['megjegyzes'], $elemallapot, $ujtorolve);
-            $stmt->execute();
+            $sql->Query('INSERT INTO telefonkonyvbeosztasok_mod (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, felhid, megjegyzes, allapot, torolve) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                $_POST['csoport'], $beosztasnev, $_POST['sorrend'], $belsoszam, $belsoszam2, $fax, $kozcelu, $kozcelufax, $felhid, $_POST['megjegyzes'], $elemallapot, $ujtorolve);
 
-            $beomodid = mysqli_insert_id($con);
+            $beomodid = $sql->last_insert_id;
 
-            $stmt = $con->prepare('INSERT INTO telefonkonyvvaltozasok (modid, origbeoid, ujbeoid, origfelhid, ujfelhid, bejelento, modositasoka, allapot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-            $stmt->bind_param('ssssssss', $modid, $_POST['beosztas'], $beomodid, $_POST['origfelhid'], $felhid, $bejelento, $_POST['modositasoka'], $valtallapot);
-            $stmt->execute();
+            $sql->Query('INSERT INTO telefonkonyvvaltozasok (modid, origbeoid, ujbeoid, origfelhid, ujfelhid, bejelento, modositasoka, allapot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                $modid, $_POST['beosztas'], $beomodid, $_POST['origfelhid'], $felhid, $bejelento, $_POST['modositasoka'], $valtallapot);
 
-            $tvaltozasid1 = mysqli_insert_id($con);
+            $tvaltozasid1 = $sql->last_insert_id;
 
             // Az ág amire akkor van szükség, hogyha a felhasználó korábbi, és új beosztása különbözik
             if($_POST['origbeoid'] && $_POST['beosztas'] != $_POST['origbeoid'])
@@ -123,102 +125,79 @@ if(isset($irhat) && $irhat)
                 $origbeoid = $_POST['origbeoid'];
                 $null = null;
 
-                mySQLConnect("INSERT INTO telefonkonyvbeosztasok_mod (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, megjegyzes, allapot, torolve)
+                $sql->Query("INSERT INTO telefonkonyvbeosztasok_mod (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, megjegyzes, allapot, torolve)
                     SELECT csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, megjegyzes, $elemallapot, $regitorolve
                     FROM telefonkonyvbeosztasok
-                    WHERE id = $origbeoid;");
+                    WHERE id = ?;", $origbeoid);
                 
-                $beoid = mySQLConnect("SELECT MAX(id) AS id FROM telefonkonyvbeosztasok_mod");
-                $beoid = mysqli_fetch_assoc($beoid)['id'];
+                $sql->Query("SELECT MAX(id) AS id FROM telefonkonyvbeosztasok_mod");
+                $sql->Bind($beoid);
 
-                $stmt = $con->prepare('INSERT INTO telefonkonyvvaltozasok (modid, origbeoid, ujbeoid, origfelhid, ujfelhid, bejelento, modositasoka, allapot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->bind_param('ssssssss', $modid, $_POST['origbeoid'], $beoid, $_POST['origfelhid'], $null, $bejelento, $_POST['modositasoka'], $valtallapot);
-                $stmt->execute();
+                $sql->Query('INSERT INTO telefonkonyvvaltozasok (modid, origbeoid, ujbeoid, origfelhid, ujfelhid, bejelento, modositasoka, allapot) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    $modid, $_POST['origbeoid'], $beoid, $_POST['origfelhid'], $null, $bejelento, $_POST['modositasoka'], $valtallapot);
 
-                $tvaltozasid2 = mysqli_insert_id($con);
+                $sql->Bind($tvaltozasid2);
             }
-            if(mysqli_errno($con) != 0)
+            if(!$sql->siker)
             {
                 echo "<h2>A változás beküldése sikertelen!<br></h2>";
-                echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
             }
 
             // Értesítési rész
-            $valtozas1 = array(
-                'cim' => "A(z) $beosztasnev beosztás módosításra került a telefonkönyvben",
-                'szoveg' => "$bejelentonev felhasználó módosította a(z) $alegysegnev alegység $beosztasnev beosztását",
-                'url' => "valtozasfelulvizsgalat/$tvaltozasid1",
-                'tipus' => '88',
-                'csoportid' => $telefonkonyvcsoportid
-            );
-
-            if(!$globaltelefonkonyvadmin)
-                telefonKonyvNotify($valtozas1, $telefonkonyvcsoportid, $bejelento, true);
+            $ertesites = new Ertesites("A(z) $beosztasnev beosztás módosításra került a telefonkönyvben",
+                "$bejelentonev felhasználó módosította a(z) $alegysegnev alegység $beosztasnev beosztását",
+                "telefonkonyv/felulvizsgalat/$tvaltozasid1");
+            $ertesites->SetFelhasznalok($ertesitendok);
+            $ertesites->Ment();
 
             if(isset($null))
             {
-                $oldbeo = mySQLConnect("SELECT telefonkonyvbeosztasok.nev AS beonev, telefonkonyvcsoportok.nev AS alegyseg, telefonkonyvcsoportok.id AS csoportid
+                $sql->Query("SELECT telefonkonyvbeosztasok.nev AS beonev, telefonkonyvcsoportok.nev AS alegyseg, telefonkonyvcsoportok.id AS csoportid
                     FROM telefonkonyvbeosztasok
                         LEFT JOIN telefonkonyvcsoportok ON telefonkonyvbeosztasok.csoport = telefonkonyvcsoportok.id
-                    WHERE telefonkonyvbeosztasok.id = $origbeoid");
+                    WHERE telefonkonyvbeosztasok.id = ?", $origbeoid);
 
-                $oldbeo = mysqli_fetch_assoc($oldbeo);
-                $beosztasnev = $oldbeo['beonev'];
-                $alegysegnev = $oldbeo['alegyseg'];
-                $oldtelefonkonyvcsoportid = $oldbeo['csoportid'];
+                $sql->Bind($beosztasnev, $alegysegnev, $oldtelefonkonyvcsoportid);
 
-                $valtozas2 = array(
-                    'cim' => "A(z) $beosztasnev beosztás módosításra került a telefonkönyvben",
-                    'szoveg' => "$bejelentonev felhasználó módosította a(z) $alegysegnev alegység $beosztasnev beosztását",
-                    'url' => "valtozasfelulvizsgalat/$tvaltozasid2",
-                    'tipus' => '88',
-                    'csoportid' => $oldtelefonkonyvcsoportid
-                );
+                $ertesites = new Ertesites("A(z) $beosztasnev beosztás módosításra került a telefonkönyvben",
+                    "$bejelentonev felhasználó módosította a(z) $alegysegnev alegység $beosztasnev beosztását",
+                    "telefonkonyv/felulvizsgalat/$tvaltozasid2");
 
-                if(!$globaltelefonkonyvadmin)
-                    telefonKonyvNotify($valtozas2, $oldtelefonkonyvcsoportid, $bejelento, true);
+                $ertesites->SetFelhasznalok($ertesitendok);
+                $ertesites->Ment();
             }
         }
 
         elseif($_GET["action"] == "review" && $globaltelefonkonyvadmin)
         {
             $timestamp = timeStampForSQL();
-            $modositasid = $_POST['id'];
-            $idstomod = mySQLConnect("SELECT ujbeoid, ujfelhid, origbeoid, origfelhid FROM telefonkonyvvaltozasok WHERE id = $modositasid");
-            $idstomod = mysqli_fetch_assoc($idstomod);
+            
+
+            $sql->Query("SELECT ujbeoid, ujfelhid, origbeoid, origfelhid FROM telefonkonyvvaltozasok WHERE id = ?", $modositasid);
+            $idstomod->Bind($felhid, $beoid, $origbeoid, $origfelhid);
     
-            $felhid = $idstomod['ujfelhid'];
-            $beoid = $idstomod['ujbeoid'];
-            $origbeoid = $idstomod['origbeoid'];
-            $origfelhid = $idstomod['origfelhid'];
-            $csoportid = $_POST['csoport'];
-    
-            $stmt = $con->prepare('UPDATE telefonkonyvvaltozasok SET adminmegjegyzes=?, admintimestamp=?, allapot=? WHERE id=?');
-            $stmt->bind_param('sssi', $_POST['adminmegjegyzes'], $timestamp, $_POST['allapot'], $_POST['id']);
-            $stmt->execute();
+            $sql->Prepare("UPDATE telefonkonyvvaltozasok SET adminmegjegyzes=?, admintimestamp=?, allapot=? WHERE id=?");
+            $sql->Run($_POST['adminmegjegyzes'], $timestamp, $_POST['allapot'], $_POST['id']);
     
             if($_POST['allapot'] > 1)
             {
                 $elemallapot = 4;
-                mySQLConnect("UPDATE telefonkonyvfelhasznalok SET allapot = 2 WHERE id = $origfelhid");
-                mySQLConnect("UPDATE telefonkonyvbeosztasok SET allapot = 2 WHERE id = $origbeoid");
+                $sql->Query("UPDATE telefonkonyvfelhasznalok SET allapot = 2 WHERE id = ?", $origfelhid);
+                $sql->Query("UPDATE telefonkonyvbeosztasok SET allapot = 2 WHERE id = ?", $origfelhid);
             }
 
             if(isset($_POST['torles']) && $_POST['torles'])
             {
-                $stmt = $con->prepare('UPDATE telefonkonyvbeosztasok_mod SET allapot=? WHERE id=?');
-                $stmt->bind_param('si', $elemallapot, $idstomod['ujbeoid']);
-                $stmt->execute();
+                $sql->Query('UPDATE telefonkonyvbeosztasok_mod SET allapot=? WHERE id=?',
+                    $elemallapot, $idstomod['ujbeoid']);
             }
             else
             {
-                $stmt = $con->prepare('UPDATE telefonkonyvfelhasznalok SET elotag=?, nev=?, titulus=?, rendfokozat=?, mobil=?, felhasznalo=?, allapot=? WHERE id=?');
-                $stmt->bind_param('sssssssi', $_POST['elotag'], $nev, $_POST['titulus'], $_POST['rendfokozat'], $_POST['mobil'], $_POST['felhasznalo'], $elemallapot, $felhid);
-                $stmt->execute();
+                $sql->Query('UPDATE telefonkonyvfelhasznalok SET elotag=?, nev=?, titulus=?, rendfokozat=?, mobil=?, felhasznalo=?, allapot=? WHERE id=?',
+                    $_POST['elotag'], $nev, $_POST['titulus'], $_POST['rendfokozat'], $_POST['mobil'], $_POST['felhasznalo'], $elemallapot, $felhid);
         
-                $stmt = $con->prepare('UPDATE telefonkonyvbeosztasok_mod SET csoport=?, nev=?, sorrend=?, belsoszam=?, belsoszam2=?, fax=?, kozcelu=?, kozcelufax=?, felhid=?, megjegyzes=?, allapot=? WHERE id=?');
-                $stmt->bind_param('sssssssssssi', $_POST['csoport'], $beosztasnev, $_POST['sorrend'], $_POST['belsoszam'], $_POST['belsoszam2'], $_POST['fax'], $_POST['kozcelu'], $_POST['kozcelufax'], $felhid, $_POST['megjegyzes'], $elemallapot, $idstomod['ujbeoid']);
-                $stmt->execute();
+                $sql->Query('UPDATE telefonkonyvbeosztasok_mod SET csoport=?, nev=?, sorrend=?, belsoszam=?, belsoszam2=?, fax=?, kozcelu=?, kozcelufax=?, felhid=?, megjegyzes=?, allapot=? WHERE id=?',
+                    $_POST['csoport'], $beosztasnev, $_POST['sorrend'], $_POST['belsoszam'], $_POST['belsoszam2'], $_POST['fax'], $_POST['kozcelu'], $_POST['kozcelufax'], $felhid, $_POST['megjegyzes'], $elemallapot, $idstomod['ujbeoid']);
             }
 
             switch($_POST['allapot'])
@@ -238,46 +217,35 @@ if(isset($irhat) && $irhat)
             $allapot = 3;
         }
         $timestamp = timeStampForSQL();
-        $modositasid = $_POST['id'];
         $success = true;
-        $idstomod = mySQLConnect("SELECT ujbeoid, ujfelhid, origbeoid, origfelhid FROM telefonkonyvvaltozasok WHERE id = $modositasid");
-        $idstomod = mysqli_fetch_assoc($idstomod);
+        $sql->Query("SELECT ujbeoid, ujfelhid, origbeoid, origfelhid FROM telefonkonyvvaltozasok WHERE id = ?", $modositasid);
+        $idstomod->Bind($beoid, $felhid, $origbeoid, $origfelhid);
 
-        $felhid = $idstomod['ujfelhid'];
-        $beoid = $idstomod['ujbeoid'];
-        $origbeoid = $idstomod['origbeoid'];
-        $origfelhid = $idstomod['origfelhid'];
-        $csoportid = $_POST['csoport'];
-
-        $stmt = $con->prepare('UPDATE telefonkonyvvaltozasok SET admintimestamp=?, allapot=? WHERE id=?');
-        $stmt->bind_param('ssi', $timestamp, $allapot, $_POST['id']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $sql->Query('UPDATE telefonkonyvvaltozasok SET admintimestamp=?, allapot=? WHERE id=?',
+            $timestamp, $allapot, $_POST['id']);
+        if(!$sql->siker)
             $success = false;
 
         if($allapot == 3)
         {
             $elemallapot = 4;
-            mySQLConnect("UPDATE telefonkonyvfelhasznalok SET allapot = 2 WHERE id = $origfelhid");
-            mySQLConnect("UPDATE telefonkonyvbeosztasok SET allapot = 2 WHERE id = $origbeoid");
+            $sql->Query("UPDATE telefonkonyvfelhasznalok SET allapot = 2 WHERE id = ?", $origfelhid);
+            $sql->Query("UPDATE telefonkonyvbeosztasok SET allapot = 2 WHERE id = ?", $origbeoid);
         }
         else
         {
             $elemallapot = null;
-            mySQLConnect("UPDATE telefonkonyvfelhasznalok SET allapot = 3 WHERE id = $origfelhid");
-            mySQLConnect("UPDATE telefonkonyvbeosztasok SET allapot = 3 WHERE id = $origbeoid");
+            $sql->Query("UPDATE telefonkonyvfelhasznalok SET allapot = 3 WHERE id = ?", $origfelhid);
+            $sql->Query("UPDATE telefonkonyvbeosztasok SET allapot = 3 WHERE id = ?", $origbeoid);
         }
 
-        $stmt = $con->prepare('UPDATE telefonkonyvfelhasznalok SET allapot=? WHERE id=?');
-        $stmt->bind_param('si', $elemallapot, $felhid);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $sql->Query('UPDATE telefonkonyvfelhasznalok SET allapot=? WHERE id=?', $elemallapot, $felhid);
+        if(!$sql->siker)
             $success = false;
 
-        $stmt = $con->prepare('UPDATE telefonkonyvbeosztasok_mod SET allapot=? WHERE id=?');
-        $stmt->bind_param('si', $elemallapot, $idstomod['ujbeoid']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $sql->Query('UPDATE telefonkonyvbeosztasok_mod SET allapot=? WHERE id=?', $elemallapot, $idstomod['ujbeoid']);
+
+        if(!$sql->siker)
             $success = false;
 
         switch($_POST['allapot'] && $success)
@@ -294,29 +262,19 @@ if(isset($irhat) && $irhat)
         if($globaltelefonkonyvadmin)
         {
             $modositasid = $_GET['discardid'];
-
-            $ids = mySQLConnect("SELECT ujbeoid, ujfelhid, telefonkonyvbeosztasok_mod.nev AS beonev, telefonkonyvbeosztasok_mod.csoport AS csoportid
-                FROM telefonkonyvvaltozasok
-                    LEFT JOIN telefonkonyvbeosztasok_mod ON telefonkonyvbeosztasok_mod.id = telefonkonyvvaltozasok.ujbeoid
-                WHERE telefonkonyvvaltozasok.id = $modositasid");
-            $ids = mysqli_fetch_assoc($ids);
-            $ujbeoid = $ids['ujbeoid'];
-            $ujfelhid = $ids['ujfelhid'];
-            $beosztasnev = $ids['beonev'];
-            $csoportid = $ids['csoportid'];
             $adminesemeny = "elvetette";
 
-            mySQLConnect("UPDATE telefonkonyvbeosztasok_mod SET allapot = NULL WHERE id = $ujbeoid");
-            mySQLConnect("UPDATE telefonkonyvfelhasznalok SET allapot = NULL WHERE id = $ujfelhid");
+            $sql->Query("SELECT ujbeoid, ujfelhid, telefonkonyvbeosztasok_mod.nev AS beonev
+                FROM telefonkonyvvaltozasok
+                    LEFT JOIN telefonkonyvbeosztasok_mod ON telefonkonyvbeosztasok_mod.id = telefonkonyvvaltozasok.ujbeoid
+                WHERE telefonkonyvvaltozasok.id = ?", $modositasid);
+            $idstomod->Bind($ujbeoid, $ujfelhid, $beosztasnev);
 
-            $stmt = $con->prepare('UPDATE telefonkonyvvaltozasok SET allapot=?, adminmegjegyzes=? WHERE id=?');
-            $stmt->bind_param('ssi', $allapot, $_GET['adminmegjegyzes'], $_GET['discardid']);
-            $stmt->execute();
-            if(mysqli_errno($con) != 0)
-            {
-                echo "<h2>A változás szerkesztése sikertelen!<br></h2>";
-                echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
-            }
+            $sql->Query("UPDATE telefonkonyvbeosztasok_mod SET allapot = NULL WHERE id = ?", $ujbeoid);
+            $sql->Query("UPDATE telefonkonyvfelhasznalok SET allapot = NULL WHERE id = ?", $ujfelhid);
+
+            $sql->Query('UPDATE telefonkonyvvaltozasok SET allapot=?, adminmegjegyzes=? WHERE id=?',
+                $allapot, $_GET['adminmegjegyzes'], $_GET['discardid']);
         }
         else
         {
@@ -328,15 +286,15 @@ if(isset($irhat) && $irhat)
     {
         if($globaltelefonkonyvadmin)
         {
-            $modlist = mySQLConnect("SELECT origbeoid, ujbeoid, origfelhid, ujfelhid
+            $sql->Query("SELECT origbeoid, ujbeoid, origfelhid, ujfelhid
                     FROM telefonkonyvvaltozasok
-                    WHERE modid = $modkorid AND allapot > 1 AND allapot < 4
-                    ORDER BY ujfelhid");
+                    WHERE modid = ? AND allapot > 1 AND allapot < 4
+                    ORDER BY ujfelhid", $modkorid);
             // Azért kell az új felhasználók szerint rendezni, mert így a NULL értékek kerülnek előre,
             // és ha egy beosztásról törölnek valakit, egy másikat pedig beraknak, akkor nem fordulhat elő,
             // hogy a berakás előbb történik meg, mint a törlés (amely esetben az új dolgozót törölné a rendszer)
 
-            if(mysqli_num_rows($modlist) == 0)
+            if($sql->sorokszama == 0)
             {
                 echo "A megadott körben nem történtek módosítások";
                 die;
@@ -353,34 +311,32 @@ if(isset($irhat) && $irhat)
                     $origfelhid = $modositas['origfelhid'];
                     $ujfelhid = $modositas['ujfelhid'];
 
-                    $beomodositasok = mySQLConnect("SELECT * FROM telefonkonyvbeosztasok_mod WHERE id = $ujbeoid");
-                    $beomodositasok = mysqli_fetch_assoc($beomodositasok);
+                    $sql->Query("SELECT * FROM telefonkonyvbeosztasok_mod WHERE id = ?", $ujbeoid);
+                    $beomodositasok = $sql->Fetch();
                     $ujsorrend = $beomodositasok['sorrend'];
                     $ujelemcsoportja = $beomodositasok['csoport'];
 
                     if($origbeoid)
                     {
-                        $beooriginals = mySQLConnect("SELECT * FROM telefonkonyvbeosztasok WHERE id = $origbeoid");
-                        $beooriginals = mysqli_fetch_assoc($beooriginals);
+                        $$sql->Query("SELECT * FROM telefonkonyvbeosztasok WHERE id = ?", $origbeoid);
+                        $beooriginals = $sql->Fetch();
                         $beoorigsorrend = $beooriginals['sorrend'];
 
                         if($ujsorrend != $beoorigsorrend)
                         {
-                            mySQLConnect("UPDATE telefonkonyvbeosztasok SET sorrend = sorrend + 1 WHERE sorrend > $ujsorrend AND csoport = $ujelemcsoportja;");
+                            $sql->Query("UPDATE telefonkonyvbeosztasok SET sorrend = sorrend + 1 WHERE sorrend > ? AND csoport = ?;", $ujsorrend, $ujelemcsoportja);
                         }
 
-                        $stmt = $con->prepare('UPDATE telefonkonyvbeosztasok SET csoport=?, nev=?, sorrend=?, belsoszam=?, belsoszam2=?, fax=?, kozcelu=?, kozcelufax=?, felhid=?, megjegyzes=?, allapot=?, torolve=? WHERE id=?');
-                        $stmt->bind_param('ssssssssssssi', $beomodositasok['csoport'], $beomodositasok['nev'], $ujsorrend, $beomodositasok['belsoszam'], $beomodositasok['belsoszam2'], $beomodositasok['fax'], $beomodositasok['kozcelu'], $beomodositasok['kozcelufax'], $beomodositasok['felhid'], $beomodositasok['megjegyzes'], $elemallapot, $beomodositasok['torolve'], $origbeoid);
-                        $stmt->execute();
+                        $sql->Query('UPDATE telefonkonyvbeosztasok SET csoport=?, nev=?, sorrend=?, belsoszam=?, belsoszam2=?, fax=?, kozcelu=?, kozcelufax=?, felhid=?, megjegyzes=?, allapot=?, torolve=? WHERE id=?',
+                            $beomodositasok['csoport'], $beomodositasok['nev'], $ujsorrend, $beomodositasok['belsoszam'], $beomodositasok['belsoszam2'], $beomodositasok['fax'], $beomodositasok['kozcelu'], $beomodositasok['kozcelufax'], $beomodositasok['felhid'], $beomodositasok['megjegyzes'], $elemallapot, $beomodositasok['torolve'], $origbeoid);
 
                         // A korábbi eredeti állapotot átteszük a módosításhoz használt rekorba
-                        $stmt = $con->prepare('UPDATE telefonkonyvbeosztasok_mod SET csoport=?, nev=?, sorrend=?, belsoszam=?, belsoszam2=?, fax=?, kozcelu=?, kozcelufax=?, felhid=?, megjegyzes=?, allapot=?, torolve=? WHERE id=?');
-                        $stmt->bind_param('ssssssssssssi', $beooriginals['csoport'], $beooriginals['nev'], $beooriginals['sorrend'], $beooriginals['belsoszam'], $beooriginals['belsoszam2'], $beooriginals['fax'], $beooriginals['kozcelu'], $beooriginals['kozcelufax'], $beooriginals['felhid'], $beooriginals['megjegyzes'], $modelemallapot, $beooriginals['torolve'], $ujbeoid);
-                        $stmt->execute();
+                        $sql->Query('UPDATE telefonkonyvbeosztasok_mod SET csoport=?, nev=?, sorrend=?, belsoszam=?, belsoszam2=?, fax=?, kozcelu=?, kozcelufax=?, felhid=?, megjegyzes=?, allapot=?, torolve=? WHERE id=?',
+                            $beooriginals['csoport'], $beooriginals['nev'], $beooriginals['sorrend'], $beooriginals['belsoszam'], $beooriginals['belsoszam2'], $beooriginals['fax'], $beooriginals['kozcelu'], $beooriginals['kozcelufax'], $beooriginals['felhid'], $beooriginals['megjegyzes'], $modelemallapot, $beooriginals['torolve'], $ujbeoid);
 
                         if($ujsorrend != $beoorigsorrend)
                         {
-                            mySQLConnect("UPDATE telefonkonyvbeosztasok SET sorrend = sorrend - 1 WHERE sorrend > $beoorigsorrend AND csoport = $ujelemcsoportja;");
+                            $sql->Query("UPDATE telefonkonyvbeosztasok SET sorrend = sorrend - 1 WHERE sorrend > ? AND csoport = ?;", $beoorigsorrend, $ujelemcsoportja);
                         }
                     }
                     else
@@ -388,21 +344,22 @@ if(isset($irhat) && $irhat)
                         // Először a legegyszerűbb forgatókönyvet vesszük, mikor az új elem a csoport legutolsó helyére kerül
                         if($ujsorrend == 999999)
                         {
-                            $regicsoportallapot = mySQLConnect("SELECT MAX(sorrend) AS utolsoelem FROM telefonkonyvbeosztasok WHERE csoport = $ujelemcsoportja");
-                            $ujsorrend = mysqli_fetch_assoc($regicsoportallapot)['utolsoelem'];
+                            $sql->Query("SELECT MAX(sorrend) AS utolsoelem FROM telefonkonyvbeosztasok WHERE csoport = ?", $ujelemcsoportja);
+                            $ujsorrend = $sql->Fetch()['utolsoelem'];
                         }
                         else
                         {
-                            mySQLConnect("UPDATE telefonkonyvbeosztasok SET sorrend = sorrend + 1 WHERE sorrend > $ujsorrend AND csoport = $ujelemcsoportja;");
+                            $sql->Query("UPDATE telefonkonyvbeosztasok SET sorrend = sorrend + 1 WHERE sorrend > ? AND csoport = ?;", $ujsorrend, $ujelemcsoportja);
                         }
 
-                        $stmt = $con->prepare('INSERT INTO telefonkonyvbeosztasok (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, felhid, megjegyzes, allapot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-                        $stmt->bind_param('sssssssssss', $ujelemcsoportja, $beomodositasok['nev'], $ujsorrend, $beomodositasok['belsoszam'], $beomodositasok['belsoszam2'], $beomodositasok['fax'], $beomodositasok['kozcelu'], $beomodositasok['kozcelufax'], $beomodositasok['felhid'], $beomodositasok['megjegyzes'], $elemallapot);
-                        $stmt->execute();
+                        $sql->Query('INSERT INTO telefonkonyvbeosztasok (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, felhid, megjegyzes, allapot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                            $ujelemcsoportja, $beomodositasok['nev'], $ujsorrend, $beomodositasok['belsoszam'], $beomodositasok['belsoszam2'], $beomodositasok['fax'], $beomodositasok['kozcelu'], $beomodositasok['kozcelufax'], $beomodositasok['felhid'], $beomodositasok['megjegyzes'], $elemallapot);
                     }
 
-                    if($origfelhid) mySQLConnect("UPDATE telefonkonyvfelhasznalok SET allapot = NULL WHERE id = $origfelhid;");
-                    if($ujfelhid) mySQLConnect("UPDATE telefonkonyvfelhasznalok SET allapot = 4 WHERE id = $ujfelhid;");
+                    if($origfelhid)
+                        $sql->Query("UPDATE telefonkonyvfelhasznalok SET allapot = NULL WHERE id = ?;", $origfelhid);
+                    if($ujfelhid)
+                        $sql->Query("UPDATE telefonkonyvfelhasznalok SET allapot = 4 WHERE id = ?;", $ujfelhid);
                   /*  mySQLConnect("INSERT INTO telefonkonyvbeosztasok (csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, megjegyzes, felhasznalo, allapot)
                         SELECT csoport, nev, sorrend, belsoszam, belsoszam2, fax, kozcelu, kozcelufax, megjegyzes, $elemallapot
                         FROM telefonkonyvbeosztasok_mod
@@ -411,9 +368,9 @@ if(isset($irhat) && $irhat)
             }
             
             $timestamp = timeStampForSQL();
-            mySQLConnect("UPDATE telefonkonyvmodositaskorok SET lezarva = '$timestamp' WHERE id = $modkorid;");
-            mySQLConnect("INSERT INTO telefonkonyvmodositaskorok () VALUES ()");
-            mySQLConnect("UPDATE telefonkonyvvaltozasok SET allapot = 4 WHERE modid = $modkorid AND allapot > 1");
+            $sql->Query("UPDATE telefonkonyvmodositaskorok SET lezarva = ? WHERE id = ?;", $timestamp, $modkorid);
+            $sql->Query("INSERT INTO telefonkonyvmodositaskorok () VALUES ()");
+            $sql->Query("UPDATE telefonkonyvvaltozasok SET allapot = 4 WHERE modid = ? AND allapot > 1", $modkorid);
             //die;
 
             /*
@@ -450,13 +407,11 @@ if(isset($irhat) && $irhat)
 
     if(isset($adminesemeny))
     {
-        $valtozas = array(
-            'cim' => "Változás a(z) $beosztasnev beosztás módosításainak állapotában",
-            'szoveg' => "A telefonkönyv adminisztrátora $adminesemeny a(z) $beosztasnev beosztás módosításait",
-            'url' => "telefonszamvaltozas?modid=$modositasid",
-            'tipus' => '88'
-        );
-
-        telefonKonyvNotify($valtozas, $csoportid);
+        $ertesites = new Ertesites("Változás a(z) $beosztasnev beosztás módosításainak állapotában",
+            "A telefonkönyv adminisztrátora $adminesemeny a(z) $beosztasnev beosztás módosításait",
+            "telefonszamvaltozas?modid=$modositasid");
+        $ertesites->SetFelhasznalok($ertesitendok);
+        $ertesites->Ment();
     }
+    $sql->Close();
 }

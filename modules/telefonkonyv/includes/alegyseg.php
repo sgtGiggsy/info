@@ -12,9 +12,9 @@ else
         $irhat = true;
         include("./modules/telefonkonyv/db/alegysegdb.php");
 
-        redirectToGyujto("telefonkonyvalegysegek");
+        redirectToGyujto("alegysegek");
     }
-    
+
     $button = "Új alegység";
     $irhat = true;
     $form = "modules/telefonkonyv/forms/alegysegszerkesztform";
@@ -22,9 +22,9 @@ else
 
     $alegysegek = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1 AND torolve IS NULL ORDER by sorrend ASC;");
 
-    if(isset($_GET['id']))
+    if(isset($_GET['param']))
     {
-        $alegysegid = $_GET['id'];
+        $alegysegid = $_GET['param'];
         $alegysegszerk = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id = $alegysegid AND torolve IS NULL;");
         $alegysegszerk = mysqli_fetch_assoc($alegysegszerk);
 

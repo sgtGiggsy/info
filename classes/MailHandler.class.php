@@ -20,7 +20,7 @@ class MailHandler
 {
     private $mail;
     private $messageset = false;
-    private $cimzettszam = 0;
+    public $cimzettszam = 0;
 
     public function __construct()
 	{
@@ -82,7 +82,7 @@ class MailHandler
     {
         $this->messageset = true;
         $this->mail->Body = $uzenet;
-        $this->addAddress($cimzett);
+        $this->AddAddress($cimzett);
         $this->mail->Subject = "Értesítés a webes nyilvántartótól";
     }
 
@@ -90,11 +90,11 @@ class MailHandler
     {
         $this->messageset = true;
         $this->mail->Body = $uzenet;
-        $this->addAddress($cimzett);
+        $this->AddAddress($cimzett);
         $this->mail->Subject = $targy;
     }
 
-    public function addAddress($cimzett)
+    public function AddAddress($cimzett)
     {
         if(is_array($cimzett))
         {

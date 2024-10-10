@@ -16,7 +16,7 @@ else
 
     if($globaltelefonkonyvadmin) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyvalegyseg?action=addnew'">Új alegység</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv/alegyseg?action=addnew'">Új alegység</button><?php
     }
     
     ?><div class="oldalcim">Alegységek</div>

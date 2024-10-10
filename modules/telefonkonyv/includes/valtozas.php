@@ -14,8 +14,8 @@ else
     
     $javascriptfiles[] = "modules/telefonkonyv/includes/telefonkonyv.js";
 
-    if(isset($_GET['id']) && $_GET['id'])
-        $currbeoid = $_GET['id'];
+    if($id)
+        $currbeoid = $id;
 
     $tkonyvwhereadmin = array(
         'where' => false,
@@ -49,12 +49,11 @@ else
     $form = "modules/telefonkonyv/forms/telefonszamszerkesztform";
     $oldalcim = "Új szám felvitele";
 
-    if(isset($_GET['id']))
+    if($id)
     {
         $oldalcim = "Telefonszám szerkesztése";
         
-        $telszamid = $_GET['id'];
-        $telefonszam = mySQLConnect("SELECT telefonkonyvbeosztasok.id AS beosztas,
+        $telefonszam = new MySQLHandler("SELECT telefonkonyvbeosztasok.id AS beosztas,
             telefonkonyvbeosztasok.nev AS beosztasnev,
             telefonkonyvfelhasznalok.id AS felhid,
             elotag,
@@ -73,23 +72,23 @@ else
             megjegyzes
         FROM telefonkonyvbeosztasok
             LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok.felhid = telefonkonyvfelhasznalok.id
-        WHERE telefonkonyvbeosztasok.id = $telszamid");
+        WHERE telefonkonyvbeosztasok.id = ?", $id);
 
-        if(mysqli_num_rows($telefonszam) == 0)
+        if($telefonszam->sorokszama == 0)
         {
             echo "<h2>Nincs ilyen azonosítójú telefonszám, vagy nincs jogosultsága a szerkesztéséhez!</h2>";
             $irhat = false;
         }
         else
         {
-            $telefonszam = mysqli_fetch_assoc($telefonszam);
+            $telefonszam = $telefonszam->Fetch();
         }
     }
     elseif(isset($_GET['modid']))
     {
         $modid = $_GET['modid'];
 
-        $modositasok = mySQLConnect("SELECT telefonkonyvvaltozasok.origbeoid AS beosztas,
+        $modositasok = new MySQLHandler("SELECT telefonkonyvvaltozasok.origbeoid AS beosztas,
                 telefonkonyvbeosztasok_mod.nev AS beosztasnev,
                 telefonkonyvfelhasznalok.id AS felhid,
                 elotag,
@@ -111,9 +110,9 @@ else
             FROM telefonkonyvbeosztasok_mod
                 LEFT JOIN telefonkonyvfelhasznalok ON telefonkonyvbeosztasok_mod.felhid = telefonkonyvfelhasznalok.id
                 LEFT JOIN telefonkonyvvaltozasok ON telefonkonyvvaltozasok.ujbeoid = telefonkonyvbeosztasok_mod.id
-            WHERE telefonkonyvvaltozasok.id = $modid
-                $wheremod;");
-        $telefonszam = mysqli_fetch_assoc($modositasok);
+            WHERE telefonkonyvvaltozasok.id = ?
+                $wheremod;", $modid);
+        $telefonszam = $modositasok->Fetch();
         $allapot = $telefonszam['allapot'];
 
         if((!@$telefonszam['beosztas'] && $telefonszam['beosztas'] != 0) || (!$globaltelefonkonyvadmin && !in_array($telefonszam['csoport'], $csoportjogok)))
@@ -122,7 +121,6 @@ else
                 nem létezik, vagy nincs jogosultsága a szerkesztéséhez!</h2>";
             $irhat = false;
         }
-
         
         if(!isset($_GET['veglegesitett']))
         {
@@ -279,7 +277,7 @@ else
             $onloadfelugro = "A kiválasztott felhasználóra, vagy beosztásra már küldött be elfogadásra váró módosítási kérelmet " . $modositasadatok['bejelento'] . " " . $modositasadatok['timestamp'] . "-kor. Biztosan szeretnél másik kérelmet beadni?";
         }
 
-        if(isset($csoportjogok) && !in_array($csoport, $csoportjogok) && !(isset($_GET['action']) && $_GET['action'] == "addnew"))
+        if($csoportjogok && !in_array($csoport, $csoportjogok) && !(isset($_GET['action']) && $_GET['action'] == "addnew"))
         {
             $onloadfelugro = "A kiválasztott felhasználó, vagy beosztás nem egy általad kezelt alegységhez tartozik. Biztosan őt szeretnéd szerkeszteni?";
         }

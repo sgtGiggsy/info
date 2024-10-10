@@ -3,7 +3,7 @@ function confirmFinalize()
     var x = confirm("Biztosan rögzíteni akarod a módosításokat?\nA rögzítést követően nem lehet már a változásjelentési exportot megcsinálni!");
     if (x)
     {
-        window.location.href = RootPath + "/telefonkonyvvaltozasok?action=confirmchanges"
+        window.location.href = RootPath + "/telefonkonyv/valtozasok?action=confirmchanges"
     }
     else
     {
@@ -39,7 +39,7 @@ function confirmDiscard(discardid)
     {
         var x = confirm("Biztosan el akarod vetni a móodításokat?");
         if (x)
-            window.location.href= RootPath + "/valtozasfelulvizsgalat&action=discard&discardid=" + discardid + "&adminmegjegyzes="+admincomment.value
+            window.location.href= RootPath + "/telefonkonyv/felulvizsgalat&action=discard&discardid=" + discardid + "&adminmegjegyzes="+admincomment.value
         else
             return false;
     }
@@ -264,7 +264,7 @@ function refreshSelections() {
 
 function valtozasokSzurese() {
     let listaszur = document.getElementById("valtozasszures")
-    window.location.href = RootPath + "/telefonkonyvvaltozasok?valtozasszures=" + listaszur.value;
+    window.location.href = RootPath + "/telefonkonyv/valtozasok?valtozasszures=" + listaszur.value;
 }
 
 function gyorsJovahagyas(id, action) {
@@ -330,6 +330,6 @@ if(typeof onloadfelugro !== 'undefined')
     window.addEventListener("load", (event) => {
         var x = confirm(onloadfelugro);
         if(!x)
-            window.location.href = RootPath + "/telefonkonyvvaltozasok";
+            window.location.href = RootPath + "/telefonkonyv/valtozasok";
     })
 }

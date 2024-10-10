@@ -1,7 +1,14 @@
 <?php
 include("./modules/telefonkonyv/includes/functions.php");
 // Contextmenujogok
-$contextmenujogok = array('valtozasok' => false, 'szerkesztok' => false, 'alegysegek' => false);
+$contextmenu = array(
+    'telefonkonyv' => array('gyujtooldal' => NULL, 'oldal' => 'telefonkonyv', 'gyujtooldalnev' => 'Telefonkönyv', 'oldalnev' => 'Telefonszám módosítása'),
+    'valtozasok' => array('gyujtooldal' => 'valtozasok', 'oldal' => 'valtozas', 'gyujtooldalnev' => 'Változások', 'oldalnev' => 'Változtatás'),
+    'szerkesztok' => array('gyujtooldal' => 'szerkesztok', 'oldal' => 'szerkeszto', 'gyujtooldalnev' => 'Szerkesztők', 'oldalnev' => 'Szerkesztő'),
+    'alegysegek' => array('gyujtooldal' => 'alegysegek', 'oldal' => 'alegyseg', 'gyujtooldalnev' => 'Alegységek', 'oldalnev' => 'Alegység')
+);
+
+$contextmenujogok = array('telefonkonyv' => false, 'valtozasok' => false, 'szerkesztok' => false, 'alegysegek' => false);
 $globaltelefonkonyvadmin = $szamlalo = $csaksajat = false;
 $searchparams = $csoportjogok = array();
 if(@$felhasznaloid)
@@ -9,7 +16,7 @@ if(@$felhasznaloid)
     // Felhasználó jogosultságainak bekérése
     if($mindir)
     {
-        $contextmenujogok = array('valtozasok' => true, 'szerkesztok' => true, 'alegysegek' => true);
+        $contextmenujogok = array('telefonkonyv' => true, 'valtozasok' => true, 'szerkesztok' => true, 'alegysegek' => true);
         $globaltelefonkonyvadmin = true;
     }
     else
@@ -19,6 +26,7 @@ if(@$felhasznaloid)
         if($telefonkonyvadmin->sorokszama > 0)
         {
             $contextmenujogok['valtozasok'] = true;
+            $contextmenujogok['telefonkonyv'] = true;
             $adminjog = $telefonkonyvadmin->Fetch();
             if($adminjog['csoport'] == 1)
             {
@@ -37,16 +45,20 @@ if(@$felhasznaloid)
 
 if(isset($_GET['id']) || isset($_GET['subpage']))
 {
+    $id = null;
     if(isset($_GET['subpage']))
     {
         $aloldal = $_GET['subpage'];
         if(!isset($_GET['param']))
             $id = $_GET['subpage'];
+        else
+            $id = $_GET['param'];
     }
     else
         $aloldal = $_GET['id'];
 
     $page = @fopen("./modules/telefonkonyv/includes/$aloldal.php", "r");
+
     if(!$page)
     {
         http_response_code(404);
@@ -111,6 +123,8 @@ else
 
     $alegysegek = new MySQLHandler("SELECT * FROM telefonkonyvcsoportok WHERE id > 1;");
     $alegysegek = $alegysegek->Result();
+
+    $oldmethod = microtime(true);
 
     $telefonkonyvorig = new MySQLHandler("SELECT NULL AS modid,
             telefonkonyvbeosztasok.id AS telszamid,

@@ -2,10 +2,10 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/telefonkonyvalegyseg?action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
-            if(isset($_GET['id']))
+        <form action="<?=$RootPath?>/telefonkonyv/alegyseg?action=<?=($id) ? 'update' : 'new' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+            if($id)
             {
-                ?><input type ="hidden" id="id" name="id" value=<?=$_GET['id']?>><?php
+                ?><input type ="hidden" id="id" name="id" value=<?=$id?>><?php
             }   
             ?><div>
                 <label for="nev">Alegység teljes megnevezése:</label><br>

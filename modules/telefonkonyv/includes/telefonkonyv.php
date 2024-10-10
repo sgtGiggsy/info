@@ -3,6 +3,7 @@ $oszlopszam = 0;
 $tipus = "telefonkonyv";
 $enablekeres = true;
 
+
 ?><datalist id="alegysegek"><?php
 foreach($alegysegek as $alegyseg)
 {
@@ -63,6 +64,7 @@ if(isset($_GET['kereses']))
             ?></tr>
         </thead>
         <tbody><?php
+            $output = "";
             $elozocsoport = 0;
             $csoportszamlalo = 0;
 
@@ -86,7 +88,7 @@ if(isset($_GET['kereses']))
                 }
                 $telszamid = $telefonszam['telszamid'];
                 $csoportnev = $csoportnevalap . $szamlalo;
-                $kattinthatolink = './telefonszamvaltozas';
+                $kattinthatolink = './telefonkonyv/valtozas';
                 $szerklink = $szerklinkzar = "";
 
                 if($telefonszam['allapot'] == 4)
