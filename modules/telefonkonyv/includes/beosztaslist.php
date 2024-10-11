@@ -1,9 +1,6 @@
 <?php
 
-if(!isset($novaltozatlan))
-{
-    include("../../../Classes/MySQLHandler.class.php");
-}
+header('Content-Type: Content-Type: text/html; charset=utf-8');
 
 $where = $origvolt = null;
 

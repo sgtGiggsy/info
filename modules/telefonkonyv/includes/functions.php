@@ -196,6 +196,28 @@ function telefonKonyvImport()
 	}
 }
 
+function telefonKonyvAdminCheck($felhid = null)
+{
+	$globaltelefonkonyvadmin = true;
+
+	$sql = new MySQLHandler();
+	$sql->KeepAlive();
+
+	$sql->Query("SELECT * FROM jogosultsagok WHERE felhasznalo = $felhid AND menupont = 88 AND iras = 3;");
+	if($sql->sorokszama == 0)
+	{
+		$sql->Query("SELECT * FROM telefonkonyvadminok WHERE felhasznalo = $felhid AND csoport = 1 ORDER BY csoport ASC LIMIT 1");
+		if($sql->sorokszama == 0)
+		{
+			$globaltelefonkonyvadmin = false;
+		}
+	}
+
+	$sql->Close();
+
+	return $globaltelefonkonyvadmin;
+}
+
 function getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $settings)
 {
 	$where = $current = null;

@@ -1,29 +1,33 @@
 <?php
 // Erre a quickapprove miatt van szükség, mert olyankor direktben kerül meghívásra
 // ez az állomány, és a módosításhoz szükséges ellenőrzések nem történnek meg
-if(!isset($irhat))
-{
-    if($globaltelefonkonyvadmin)
-    {
-        $irhat = true;
-    }
-}
-
 if(isset($irhat) && $irhat)
 {
     purifyPost();
     $sql = new MySQLHandler();
     $sql->KeepAlive();
     $bejelento = $_SESSION['id'];
-    $modositasid = $_POST['id'];
+    @$modositasid = $_POST['id'];
     $csoportid = 1;
     if($_POST['csoport'])
         $csoportid = $_POST['csoport'];
     $ertesitendok = Ertesites::GetFelhasznalok(4,
                 "INNER JOIN telefonkonyvadminok ON felhasznalok.id = telefonkonyvadminok.felhasznalo",
-                "AND felhasznalo != ? AND (csoport = ? OR csoport = 1)",
+                "AND felhasznalok.id != ? AND (csoport = ? OR csoport = 1)",
                 array($felhasznaloid, $csoportid));
+// Változás állapotok:
+    // NULL = Elvetve
+    // 1    = Beküldve, ellenőrizetlenül
+    // 2    = Részlegesen elfogadva
+    // 3    = Elfogadva
+    // 4    = Lezárva
 
+    // Elem állapotok:
+    // NULL = Törölve
+    // 1    = Új, ellenőrizetlen
+    // 2    = Régi, felülírt
+    // 3    = Régi, megjelenik
+    // 4    = Új, megjelenik
 
 // Szerkesztői akciók //
     if($_GET["action"] == "new" || $_GET["action"] == "update" || $_GET["action"] == "review")
@@ -69,20 +73,6 @@ if(isset($irhat) && $irhat)
         
         if($_GET["action"] == "new")
         {
-            // Változás állapotok:
-            // NULL = Elvetve
-            // 1    = Beküldve, ellenőrizetlenül
-            // 2    = Részlegesen elfogadva
-            // 3    = Elfogadva
-            // 4    = Lezárva
-
-            // Elem állapotok:
-            // NULL = Törölve
-            // 1    = Új, ellenőrizetlen
-            // 2    = Régi, felülírt
-            // 3    = Régi, megjelenik
-            // 4    = Új, megjelenik
-
             $valtallapot = 1;
             $elemallapot = 1;
             $ujtorolve = $felhid = null;
@@ -171,10 +161,9 @@ if(isset($irhat) && $irhat)
         elseif($_GET["action"] == "review" && $globaltelefonkonyvadmin)
         {
             $timestamp = timeStampForSQL();
-            
 
             $sql->Query("SELECT ujbeoid, ujfelhid, origbeoid, origfelhid FROM telefonkonyvvaltozasok WHERE id = ?", $modositasid);
-            $idstomod->Bind($felhid, $beoid, $origbeoid, $origfelhid);
+            $sql->Bind($beoid, $felhid, $origbeoid, $origfelhid);
     
             $sql->Prepare("UPDATE telefonkonyvvaltozasok SET adminmegjegyzes=?, admintimestamp=?, allapot=? WHERE id=?");
             $sql->Run($_POST['adminmegjegyzes'], $timestamp, $_POST['allapot'], $_POST['id']);
@@ -189,15 +178,15 @@ if(isset($irhat) && $irhat)
             if(isset($_POST['torles']) && $_POST['torles'])
             {
                 $sql->Query('UPDATE telefonkonyvbeosztasok_mod SET allapot=? WHERE id=?',
-                    $elemallapot, $idstomod['ujbeoid']);
+                    $elemallapot, $beoid);
             }
             else
             {
-                $sql->Query('UPDATE telefonkonyvfelhasznalok SET elotag=?, nev=?, titulus=?, rendfokozat=?, mobil=?, felhasznalo=?, allapot=? WHERE id=?',
-                    $_POST['elotag'], $nev, $_POST['titulus'], $_POST['rendfokozat'], $_POST['mobil'], $_POST['felhasznalo'], $elemallapot, $felhid);
+                $sql->Query('UPDATE telefonkonyvfelhasznalok SET nev=?, elotag=?, titulus=?, rendfokozat=?, mobil=?, felhasznalo=?, allapot=? WHERE id=?',
+                    $nev, $_POST['elotag'], $_POST['titulus'], $_POST['rendfokozat'], $_POST['mobil'], $_POST['felhasznalo'], $elemallapot, $felhid);
         
                 $sql->Query('UPDATE telefonkonyvbeosztasok_mod SET csoport=?, nev=?, sorrend=?, belsoszam=?, belsoszam2=?, fax=?, kozcelu=?, kozcelufax=?, felhid=?, megjegyzes=?, allapot=? WHERE id=?',
-                    $_POST['csoport'], $beosztasnev, $_POST['sorrend'], $_POST['belsoszam'], $_POST['belsoszam2'], $_POST['fax'], $_POST['kozcelu'], $_POST['kozcelufax'], $felhid, $_POST['megjegyzes'], $elemallapot, $idstomod['ujbeoid']);
+                    $_POST['csoport'], $beosztasnev, $_POST['sorrend'], $_POST['belsoszam'], $_POST['belsoszam2'], $_POST['fax'], $_POST['kozcelu'], $_POST['kozcelufax'], $felhid, $_POST['megjegyzes'], $elemallapot, $beoid);
             }
 
             switch($_POST['allapot'])
@@ -219,7 +208,7 @@ if(isset($irhat) && $irhat)
         $timestamp = timeStampForSQL();
         $success = true;
         $sql->Query("SELECT ujbeoid, ujfelhid, origbeoid, origfelhid FROM telefonkonyvvaltozasok WHERE id = ?", $modositasid);
-        $idstomod->Bind($beoid, $felhid, $origbeoid, $origfelhid);
+        $sql->Bind($beoid, $felhid, $origbeoid, $origfelhid);
 
         $sql->Query('UPDATE telefonkonyvvaltozasok SET admintimestamp=?, allapot=? WHERE id=?',
             $timestamp, $allapot, $_POST['id']);
@@ -243,7 +232,7 @@ if(isset($irhat) && $irhat)
         if(!$sql->siker)
             $success = false;
 
-        $sql->Query('UPDATE telefonkonyvbeosztasok_mod SET allapot=? WHERE id=?', $elemallapot, $idstomod['ujbeoid']);
+        $sql->Query('UPDATE telefonkonyvbeosztasok_mod SET allapot=? WHERE id=?', $elemallapot, $beoid);
 
         if(!$sql->siker)
             $success = false;
@@ -257,24 +246,25 @@ if(isset($irhat) && $irhat)
             http_response_code(304);
     }
 
-    elseif($_GET["action"] == "discard")
+    elseif($_GET["action"] == "discard" && isset($_GET['discardid']))
     {
         if($globaltelefonkonyvadmin)
         {
             $modositasid = $_GET['discardid'];
+            @$adminmegjegyzes = $_GET['adminmegjegyzes'];
             $adminesemeny = "elvetette";
 
             $sql->Query("SELECT ujbeoid, ujfelhid, telefonkonyvbeosztasok_mod.nev AS beonev
                 FROM telefonkonyvvaltozasok
                     LEFT JOIN telefonkonyvbeosztasok_mod ON telefonkonyvbeosztasok_mod.id = telefonkonyvvaltozasok.ujbeoid
                 WHERE telefonkonyvvaltozasok.id = ?", $modositasid);
-            $idstomod->Bind($ujbeoid, $ujfelhid, $beosztasnev);
+            $sql->Bind($ujbeoid, $ujfelhid, $beosztasnev);
 
             $sql->Query("UPDATE telefonkonyvbeosztasok_mod SET allapot = NULL WHERE id = ?", $ujbeoid);
             $sql->Query("UPDATE telefonkonyvfelhasznalok SET allapot = NULL WHERE id = ?", $ujfelhid);
 
-            $sql->Query('UPDATE telefonkonyvvaltozasok SET allapot=?, adminmegjegyzes=? WHERE id=?',
-                $allapot, $_GET['adminmegjegyzes'], $_GET['discardid']);
+            $sql->Query('UPDATE telefonkonyvvaltozasok SET allapot = NULL, adminmegjegyzes=? WHERE id=?',
+                $adminmegjegyzes, $modositasid);
         }
         else
         {

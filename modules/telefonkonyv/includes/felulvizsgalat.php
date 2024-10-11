@@ -8,7 +8,7 @@ if(!$globaltelefonkonyvadmin)
 }
 else
 {
-    if(count($_POST) > 0 || (isset($_GET['action']) && $_GET['action'] == "discard"))
+    if(isset($_GET['action']))
     {
         $irhat = true;
         include("./modules/telefonkonyv/db/telefonkonyvdb.php");

@@ -1,10 +1,8 @@
 <?php
 
-if(!isset($novaltozatlan))
-{
-    include("../../../includes/config.inc.php");
-    include("../../../includes/functions.php");
-}
+include("../modules/telefonkonyv/includes/functions.php");
+
+header('Content-Type: Content-Type: text/html; charset=utf-8');
 
 $felhid = $_GET['felhid'];
 $beoid = $_GET['beoid'];
@@ -13,6 +11,7 @@ $csoport = mySQLConnect("SELECT csoport FROM telefonkonyvbeosztasok WHERE id = $
 $csoport = mysqli_fetch_assoc($csoport)['csoport'];
 
 $tkonyvwheresettings = array(
+    'and' => true,
     'where' => false,
     'mezonev' => true,
     'felhasznalo' => $felhid,
@@ -20,8 +19,9 @@ $tkonyvwheresettings = array(
     'modid' => null
 );
 
-$globaltelefonkonyvadmin = telefonKonyvAdminCheck(true, $felhid);
+$globaltelefonkonyvadmin = telefonKonyvAdminCheck($felhid);
 $wherecsoport = getTkonyvszerkesztoWhere($globaltelefonkonyvadmin, $tkonyvwheresettings);
+
 $csoportok = mySQLConnect("SELECT * FROM telefonkonyvcsoportok WHERE id > 1 AND torolve IS NULL $wherecsoport;");
 
 ?><option value=""></option><?php

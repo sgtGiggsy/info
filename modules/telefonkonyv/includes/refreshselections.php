@@ -1,7 +1,6 @@
 <?php
-include("../../../includes/config.inc.php");
-include("../../../includes/functions.php");
 
+header('Content-Type: application/json');
 $beoid = 0;
 if(isset($_GET['beoid']))
     $beoid = $_GET['beoid'];

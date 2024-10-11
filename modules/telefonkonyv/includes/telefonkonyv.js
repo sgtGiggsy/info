@@ -56,7 +56,7 @@ function refreshList() {
             document.getElementById("sorrend").innerHTML = this.responseText;
         }
     };
-    xhttp.open("GET", RootPath + "/modules/telefonkonyv/includes/beosztaslist.php?csoport=" + csopid + "&eredeti=" + eredeti + "&novaltozatlan", true);
+    xhttp.open("GET", RootPath + "/api/unsafe?modulnev=telefonkonyv&tipus=beosztaslist&csoport=" + csopid + "&eredeti=" + eredeti + "&novaltozatlan", true);
     xhttp.send();
 }
 
@@ -139,7 +139,7 @@ function checkIfNew(felhasznaloid)
                 document.getElementById("csoport").innerHTML = this.responseText;
                 }
         };
-        xhttp.open("GET", RootPath + "/modules/telefonkonyv/includes/csoportlist.php?felhid=" + felhasznaloid + "&beoid=" + beoid, true);
+        xhttp.open("GET", RootPath + "/api/unsafe?modulnev=telefonkonyv&tipus=csoportlist&felhid=" + felhasznaloid + "&beoid=" + beoid, true);
         xhttp.send();
         
         setTimeout(() => { refreshList(); }, 500);
@@ -257,7 +257,7 @@ function refreshSelections() {
                 document.getElementById("kozcelufax").value = jsonObj[0].kozcelufax;
             }
         };
-        xhttp.open("GET", RootPath + "/modules/telefonkonyv/includes/refreshselections.php?beoid=" + beoid, true);
+        xhttp.open("GET", RootPath + "/api/unsafe?modulnev=telefonkonyv&tipus=refreshselections&beoid=" + beoid, true);
         xhttp.send();
     }
 }
@@ -288,7 +288,7 @@ function gyorsJovahagyas(id, action) {
         priority.classList.add('kritikus');
     }
     
-    $.post(RootPath + "/telefonkonyvdb?action=quickapprove",
+    $.post(RootPath + "/telefonkonyv/valtozas?action=quickapprove",
         {
             id: id,
             csoport: csoportdata,

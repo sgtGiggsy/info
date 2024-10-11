@@ -6,6 +6,17 @@ include('../Classes/MailHandler.class.php');
 include('../Classes/MySQLHandler.class.php');
 
 header("Access-Control-Allow-Origin: *");
+
+define('ROOT_PATH', getenv('APP_ROOT_PATH'));
+define('DEBUG_MODE', false);
+
+$RootPath = ROOT_PATH;
+
+if(isset($_GET['list']) && $_GET['list'] == "unsafe") {
+	include("../modules/" . $_GET['modulnev'] . "\/includes/" . $_GET['tipus'] . ".php");
+	die;
+}
+
 header('Content-Type: application/json');
 
 interface API
@@ -21,7 +32,6 @@ $requestbody = file_get_contents('php://input');
 $request = json_decode($requestbody);
 $method = $_SERVER['REQUEST_METHOD'];
 $statuscode = 200;
-$RootPath = getenv('APP_ROOT_PATH');
 $valasz = array();
 $egyedioldal = false;
 $apikey = null;
