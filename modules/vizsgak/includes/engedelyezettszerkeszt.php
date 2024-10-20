@@ -31,8 +31,7 @@ else
                 vizsgak_engedelyezettek.vizsga AS vizsga
             FROM felhasznalok
                 LEFT JOIN vizsgak_engedelyezettek ON vizsgak_engedelyezettek.felhasznalo = felhasznalok.id
-            WHERE vizsgak_engedelyezettek.vizsga = ? OR vizsgak_engedelyezettek.vizsga IS NULL
-            ORDER BY felhasznalok.nev;", $vizsgaid);
+            ORDER BY felhasznalok.nev;");
     $felhasznalolist = $felhasznalolist->Result();
 
     if(!$irhat)

@@ -60,10 +60,12 @@ if(@$mindir)
         <tbody><?php
             foreach($vizsgak as $vizsga)
             {
+                $adminlist = explode(";", $vizsga['adminidlist']);
+                $felhasznalolist = explode(";", $vizsga['engedfelh']);
                 if($mindir
-                    || ($felhasznaloid && $vizsga['adminidlist'] && str_contains($vizsga['adminidlist'], $felhasznaloid))
+                    || ($felhasznaloid && $vizsga['adminidlist'] && in_array($felhasznaloid, $adminlist))
                     || ($vizsga['eles'] && !$vizsga['korlatozott'])
-                    || ($felhasznaloid && $vizsga['eles'] && $vizsga['korlatozott'] && str_contains($vizsga['engedfelh'], $felhasznaloid))
+                    || ($felhasznaloid && $vizsga['eles'] && $vizsga['korlatozott'] && in_array($felhasznaloid, $felhasznalolist))
                 )
                 {
                     ?><tr>
