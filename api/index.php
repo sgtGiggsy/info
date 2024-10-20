@@ -13,7 +13,11 @@ define('DEBUG_MODE', false);
 $RootPath = ROOT_PATH;
 
 if(isset($_GET['list']) && $_GET['list'] == "unsafe") {
-	include("../modules/" . $_GET['modulnev'] . "\/includes/" . $_GET['tipus'] . ".php");
+	if (session_status() == PHP_SESSION_NONE) {
+		session_set_cookie_params('604800');
+		session_start();
+	}
+	include("../modules/" . $_GET['modulnev'] . "\/api/index.php");
 	die;
 }
 
