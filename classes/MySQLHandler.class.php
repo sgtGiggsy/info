@@ -15,6 +15,8 @@ class MySQLHandler
     private $vartparam = 0;
     private $stmt;
     private $showdebug = DEBUG_MODE;
+    private $params = array();
+    private $queryruntime;
 
     public function __construct(string $query = null, ...$params)
 	{
@@ -48,6 +50,17 @@ class MySQLHandler
     {
         if($this->con)
             mysqli_close($this->con);
+    }
+
+    public function ShowQueryDetails()
+    {
+        $params = "";
+        foreach($this->params as $p)
+        {
+            $params .= $p . "; ";
+        }
+        $params = trim($params, ";");
+        echo FormatSQL($this->querystring) . "<br><br>Paraméterek: " . $params . "<br><br>Query futásideje: " . round($this->queryruntime, 2) . " mp";
     }
 
     public function ShowException($paramszamokay = true, $paramcount = 0)
@@ -122,6 +135,7 @@ class MySQLHandler
         {   
             foreach($params as $param)
             {
+                $this->params[] = $param;
                 $this->GetType($param);
             }
         }
@@ -208,6 +222,7 @@ class MySQLHandler
 
     public function Run(...$params) : mysqli_result | false
     {
+        $start_time = microtime(true);
         $paramszamokay = false;
         $paramcount = 0;
         if($this->stmt && $this->siker)
@@ -269,6 +284,8 @@ class MySQLHandler
         {
             $this->siker = true;
         }
+
+        $this->queryruntime = microtime(true) - $start_time;
 
         return $this->result;
     }
@@ -373,7 +390,7 @@ class MySQLHandler
     public function Close($backtosender = null)
     {
         if($this->con)
-            //mysqli_close($this->con);
+            mysqli_close($this->con);
 
         if($backtosender)
         {
