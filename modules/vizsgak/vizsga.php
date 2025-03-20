@@ -48,6 +48,7 @@ else
             lablec,
             eles,
             korlatozott,
+            kiertmutat,
             feltoltesek.fajl AS fejleckep
     FROM vizsgak_vizsgak
         LEFT JOIN feltoltesek ON vizsgak_vizsgak.fejleckep = feltoltesek.id
@@ -88,8 +89,8 @@ else
             if($mindir)
             {
                 $contextmenujogok['vizsgabeallitasok'] = $contextmenujogok['kerdeslista'] = $contextmenujogok['vizsgalista'] = 
-                $contextmenujogok['kerdesszerkeszt'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['adminlista'] =
-                $contextmenujogok['adminkijeloles'] = $contextmenujogok['ujkornyitas'] = $contextmenujogok['admin'] = $contextmenujogok['vizsgalapok'] = true;
+                $contextmenujogok['kerdesszerkeszt'] = $contextmenujogok['megkezdettvizsgak'] = $contextmenujogok['adminlista'] = $contextmenujogok['adminkijeloles'] =
+                $contextmenujogok['ujkornyitas'] = $contextmenujogok['admin'] = $contextmenujogok['vizsgalapok'] = $vizsgaadmin = true;
                 if($vizsgaadatok['korlatozott'])
                 {
                     $contextmenujogok['engedelyezettek'] = true;
@@ -139,6 +140,10 @@ else
                     {
                         $contextmenujogok['ujkornyitas'] = true;
                     }
+                }
+                else
+                {
+                    $vizsgaadmin = false;
                 }
             }
         }

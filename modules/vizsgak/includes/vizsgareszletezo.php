@@ -48,13 +48,20 @@ else
                 <div class='contentcenter'>
                     <div class='olvashato'>
                         <h4><?=$vizsgareszletezes['kitoltesideje']?></h4><?php
+                        if($vizsgaadmin || $kiertmutat)
+                        {
+                            $kiertmutat = true;
+                        }
                         foreach($teszteredmenyek as $x)
                         {
                             $stilus = "";
                             if(!isset($kerdesid) || $x['kerdesid'] != $kerdesid)
                             {
                                 $sorsz++;
-                                ?><h3><?=$sorsz?>. <?=$x['kerdes']?></h3><?php
+                                if($kiertmutat)
+                                {
+                                    ?><h3><?=$sorsz?>. <?=$x['kerdes']?></h3><?php
+                                }
                             }
 
                             $kerdesid = $x['kerdesid'];
@@ -78,8 +85,10 @@ else
                                     $stilus = "hibastipp";
                                 }
                             }
-
-                            ?><p <?=($stilus) ? "class=" . $stilus : "" ?>><?=$x['valaszszoveg']?></p><?php
+                            if($kiertmutat)
+                            {
+                                ?><p <?=($stilus) ? "class=" . $stilus : "" ?>><?=$x['valaszszoveg']?></p><?php
+                            }
                         }
 
                         ?><br><h1 style="<?=($helyes < $vizsgaadatok['minimumhelyes']) ? 'color:red' : 'color:green' ?>">

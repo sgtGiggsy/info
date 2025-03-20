@@ -25,7 +25,7 @@ else
         }
         
         $vizsgaid = $nev = $url = $udvozloszoveg = $vendegudvozlo = $kerdesszam = $minimumhelyes = $korlatozott =
-        $vizsgaido = $ismetelheto = $maxismetles = $leiras = $fejleckep = $ujkorurl = $lablecszoveg = $vizsgaeles = null;
+        $vizsgaido = $ismetelheto = $maxismetles = $leiras = $fejleckep = $ujkorurl = $lablecszoveg = $vizsgaeles = $kiertmutat = null;
         $vizsgabeallitasurl = "$RootPath/vizsga?action=addnew";
 
         if(isset($vizsgaadatok))
@@ -45,6 +45,7 @@ else
             $fejleckep =  $vizsgaadatok['fejleckep'];
             $korlatozott = $vizsgaadatok['korlatozott'];
             $vizsgaeles = $vizsgaadatok['eles'];
+            $kiertmutat = $vizsgaadatok['kiertmutat'];
             $vizsgabeallitasurl = "$RootPath/vizsga/" . $vizsgaadatok['url'] . "/vizsgabeallitasok?action=update";
             if($contextmenujogok['ujkornyitas'])
             {

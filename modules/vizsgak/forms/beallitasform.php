@@ -112,6 +112,18 @@ if(@$irhat)
                             Ha nem szeretnénk időkorlátot megszabni, úgy hagyjuk a mezőt üresen, vagy állítsunk be 0-t.</p>"; ?>
 
                 <div>
+                    <label for="kiertmutat">Vizsga eredményének megjelenítése</label><br>
+                    <label class="kapcsolo">
+                        <input type="hidden" name="kiertmutat" id="kiertmutathidden" value="">
+                        <input type="checkbox" name="kiertmutat" id="kiertmutat" value="1" <?=($kiertmutat) ? "checked" : "" ?>>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <?php $magyarazat .= "<strong>Vizsga eredményének megjelenítése</strong><p>Ezt kiválasztva adhatjuk meg, hogy a vizsga után a vizsgázó láthassa,
+                            mely kérdésekre adott helyes, illetve helytelen válaszokat.</p>"; ?>
+
+                <div>
                     <label for="ismetelheto">A vizsga ismételhető</label><br>
                     <select id="ismetelheto" name="ismetelheto">
                         <option value="1" <?=($ismetelheto == 1) ? "selected" : "" ?>>Igen</option>

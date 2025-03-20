@@ -25,8 +25,8 @@ if(isset($irhat) && $irhat)
             $fajlid = $fajllista[0];
         }
 
-        $vizsgabeallitas = new MySQLHandler('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, vendegudvozlo, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, lablec, fejleckep, korlatozott) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $_POST['lablec'], $fajlid, $_POST['korlatozott']);
+        $vizsgabeallitas = new MySQLHandler('INSERT INTO vizsgak_vizsgak (nev, url, udvozloszoveg, vendegudvozlo, kerdesszam, minimumhelyes, vizsgaido, ismetelheto, maxismetles, leiras, lablec, fejleckep, korlatozott, kiertmutat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            $_POST['nev'], $_POST['url'], $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $_POST['lablec'], $fajlid, $_POST['korlatozott'], $_POST['kiertmutat']);
         if(!$vizsgabeallitas->siker)
         {
             echo "<h2>A változás beküldése sikertelen!<br></h2>";
@@ -62,8 +62,8 @@ if(isset($irhat) && $irhat)
         }
 
         $vizsgaDB = new MySQLHandler();
-        $vizsgaDB->Prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=?, eles=?, lablec=?, korlatozott=? WHERE id=?');
-        $vizsgaDB->Run($_POST['nev'], $vizsgaazonosito, $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['lablec'], $_POST['korlatozott'], $_POST['vizsgaid']);
+        $vizsgaDB->Prepare('UPDATE vizsgak_vizsgak SET nev=?, url=?, udvozloszoveg=?, vendegudvozlo=?, kerdesszam=?, minimumhelyes=?, vizsgaido=?, ismetelheto=?, maxismetles=?, leiras=?, fejleckep=?, eles=?, lablec=?, korlatozott=?, kiertmutat=? WHERE id=?');
+        $vizsgaDB->Run($_POST['nev'], $vizsgaazonosito, $_POST['udvozloszoveg'], $_POST['vendegudvozlo'], $_POST['kerdesszam'], $_POST['minimumhelyes'], $_POST['vizsgaido'], $_POST['ismetelheto'], $_POST['maxismetles'], $_POST['leiras'], $fajlid, $_POST['eles'], $_POST['lablec'], $_POST['korlatozott'], $_POST['kiertmutat'], $_POST['vizsgaid']);
 
         if(!$vizsgaDB->siker)
         {
