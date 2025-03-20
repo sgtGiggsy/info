@@ -9,7 +9,7 @@ if(isset($irhat) && $irhat)
     if($_GET["action"] == "new")
     {
         $modelldb->Query('INSERT INTO modellek (gyarto, modell, tipus) VALUES (?, ?, ?)',
-            array($_POST['gyarto'], $_POST['modell'], $_POST['tipus']), true);
+            $_POST['gyarto'], $_POST['modell'], $_POST['tipus']);
 
         if($_POST['tipus'] == "12")
         {
@@ -76,5 +76,5 @@ if(isset($irhat) && $irhat)
     {
     }
 
-    $modelldb->Close($backtosender);
+    $modelldb->Close();
 }
