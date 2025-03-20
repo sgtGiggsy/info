@@ -2038,6 +2038,7 @@ td img {
 }
 
 #notifpopup {
+    position: fixed;
     right: 45px;
     width: 410px;
     max-height: 500px;
@@ -2153,19 +2154,24 @@ td img {
 }
 
 #seenallnotif {
+    position: sticky;
     display: block;
     text-align: center;
-    padding: 10px;
+    width: 100%;
     font-size: 0.9rem;
+    bottom: 0;
 }
 
 #seenallnotif p {
     cursor: pointer;
-    width: fit-content;
+    width: 100%;
+    padding: 10px;
     margin: auto;
+    background-color: var(--tsoro);
 }
 
 #seenallnotif p:hover {
+    background-color: var(--menuhover);
     color: var(--linkhover);
 }
 
