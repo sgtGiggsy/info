@@ -43,7 +43,7 @@ elseif($csoportir)
 {
     if($_GET["action"] == "hasznalt")
     {
-        if($_GET['tempid'] && verifyWholeNum($_GET['tempid']))
+        if($_GET['tempid'] && is_numeric($_GET['tempid']))
         {
             $tempid = $_GET['tempid'];
             mySQLConnect("UPDATE munkalaptemplateek SET hasznalva = hasznalva + 1 WHERE id = $tempid;");
