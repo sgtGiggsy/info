@@ -12,7 +12,7 @@ $allapotjelzesek = mySQLConnect("SELECT snmp_traps.id AS id,
             severity, message
         FROM snmp_traps
         WHERE eszkozid = $id AND DATE(snmp_traps.datum) >= DATE_SUB(NOW(), interval 14 DAY)
-        ORDER BY snmp_traps.timestamp DESC");
+        ORDER BY snmp_traps.id DESC");
 $allapotjelentdb = mysqli_num_rows($allapotjelzesek);
 
 ?><table>

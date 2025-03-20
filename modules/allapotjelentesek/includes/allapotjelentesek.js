@@ -51,3 +51,16 @@ function listaSzur(filterid, filterby) {
         }
     });
 }
+
+function rejtettNyit()
+{
+    let oidszur = document.getElementById('oidszur');
+    if(oidszur.style.height == "unset")
+    {
+        oidszur.style.height = ""
+    }
+    else
+    {
+        oidszur.style.height = "unset"
+    }
+}

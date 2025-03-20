@@ -11,6 +11,7 @@ else
     $nezet = "lista";
     $fontossagszur = $kezdodatum = $zarodatum = $keres = null;
     $paramarr = array();
+    $szurtmegjelenit = OID_LIST;
     $javascriptfiles[] = "modules/allapotjelentesek/includes/allapotjelentesek.js";
     $severityfilter = "minden";
     if(isset($_GET['trapfontossag']))
@@ -31,6 +32,20 @@ else
     elseif(isset($_SESSION['nezet']))
     {
         $nezet = $_SESSION['nezet'];
+    }
+
+    if(isset($_POST['kiszurtoid']))
+    {
+        $_SESSION['kiszurtoids'] = array();
+        foreach($_POST['kiszurtoid'] as $oid)
+        {
+            $_SESSION['kiszurtoids'][] = $oid;
+        }
+    }
+
+    if(isset($_POST['szurTorol']))
+    {
+        $_SESSION['kiszurtoids'] = array();
     }
 
     if($severityfilter != "minden")
@@ -56,6 +71,35 @@ else
         $where = "WHERE (beepitesek.beepitesideje IS NOT NULL AND beepitesek.kiepitesideje IS NULL)";
     }
     $where .= $fontossagszur;
+
+    if(isset($_SESSION['kiszurtoids']) && count($_SESSION['kiszurtoids']) > 0 && !isset($_POST['szurTorol']))
+    {
+        $oidstring = "";
+        foreach($_SESSION['kiszurtoids'] as $oidelem)
+        {
+            $paramarr[] = $oidelem;
+            $oidstring .= "?, ";
+        }
+        $oidstring = trim($oidstring, ", ");
+
+        $where .= " AND (event NOT IN ($oidstring))";
+
+        $szurtmegjelenit = array();
+        foreach(OID_LIST as $key => $value)
+        {
+            if(in_array($key, $_SESSION['kiszurtoids']))
+            {
+                $szurtmegjelenit[$key] = $value;
+            }
+        }
+        foreach(OID_LIST as $key => $value)
+        {
+            if(!in_array($key, $_SESSION['kiszurtoids']))
+            {
+                $szurtmegjelenit[$key] = $value;
+            }
+        }
+    }
     
     if(isset($_GET['nap']) || (isset($_GET['kezdodatum']) && isset($_GET['zarodatum'])))
     {
@@ -67,7 +111,7 @@ else
                 $date = str_replace("-", "", $date);
             }
             $paramarr[] = $date;
-            $where .= " AND DATE(snmp_traps.datum) = DATE(?)";
+            $where .= " AND snmp_traps.datum = DATE(?)";
         }
         else
         {
@@ -97,7 +141,8 @@ else
     }
     elseif(!isset($_GET['kereses']))
     {
-        $where .= " AND DATE(snmp_traps.datum) = CURDATE()";
+        $where .= " AND snmp_traps.datum = ?";
+        $paramarr[] = thisDate();
     }
 
     if(!$mindolvas)
@@ -214,6 +259,31 @@ else
                 <div>
                     <input id="bovitett" name="bovitett" type="text"  onkeyup="listaSzur('bovitett', 'snmpmessage')"/>
                 </div>
+            </div>
+            <div>
+                <label>Elrejtett típusok:</label>
+                <form action = ".\allapotjelentesek" method="post">
+                    <div class="oidszur" id="oidszur"><?php
+                        foreach($szurtmegjelenit as $key => $value)
+                        {
+                            ?><div>
+                                <label>
+                                    <input type="checkbox" name="kiszurtoid[]" value=<?=$key?> <?=(isset($_SESSION['kiszurtoids']) && in_array($key, $_SESSION['kiszurtoids'])) ? "checked" : "" ?>>
+                                    <?=$value?>
+                                </label>
+                            </div><?php
+                        }
+                    ?><div class="boxnyit" onclick="rejtettNyit()"></div>
+                    </div>
+                    <div class="contentleft">
+                        
+                    </div>
+                    <div class="twocolgrid">
+                        <div class="submit"><input type="submit" name="beKuld" value="Szűrés"></div>
+                        <div class="submit"><input type="submit" name="szurTorol" value="Szűrések törlése"></div>
+                    </div>
+                </form>
+
             </div>
             <div class="right">
                 <label for="nezet">Az eredmények megjelenítésének módja</label>

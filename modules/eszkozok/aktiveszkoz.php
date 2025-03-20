@@ -365,14 +365,17 @@ else
                     </div>
                 </div><?php
             }
-        
-        // Az aktuális SNMP állapot
-            if($mindolvas && $eszkoz['snmp'] && $eszkoz['snmpcommunity'] && ($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
+
+            if($mindolvas && $eszkoz['snmp'] && $eszkoz['snmpcommunity'])
             {
                 $PHPvarsToJS[] = array('name' => 'snmp', 'val' => $eszkoz['snmp']);
                 $PHPvarsToJS[] = array('name' => 'deviceip', 'val' => $eszkoz['ipcim']);
                 $PHPvarsToJS[] = array('name' => 'snmpcommunity', 'val' => $eszkoz['snmpcommunity']);
-                
+            }
+        
+        // Az aktuális SNMP állapot
+            if($mindolvas && $eszkoz['snmp'] && $eszkoz['snmpcommunity'] && ($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje']))
+            {
                 ?><div class="infobox">
                     <div class="infoboxtitle">Eszköz portjainak aktuális állapota</div>
                     <div class="infoboxbody" id="snmpdata">
@@ -382,7 +385,7 @@ else
             }
 
         // Az eszközről gyűjtött SNMP trapek az elmúlt 14 napból
-            if($mindolvas)
+            if($mindolvas && $eszkoz['snmp'] && $eszkoz['snmpcommunity'])
             {
                 $PHPvarsToJS[] = array('name' => 'devid', 'val' => $id);
                 

@@ -259,13 +259,9 @@ fieldset {
     display: flex;
 }
 
-.contentleft div {
-    padding: 1em 0 0 0;
-}
-
 .twocolgrid {
     display: grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 1fr 1fr;
 }
 
 .twocolgrid div {
@@ -289,6 +285,20 @@ fieldset {
     grid-template-columns: 1fr minmax(0, max-content);
     gap: 1em;
     /*width: fit-content;*/
+}
+
+.boxnyit {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    border-top: 10px solid transparent;
+    border-left: 10px solid transparent;
+    border-right: 10px solid var(--fontlight);
+    border-bottom: 10px solid var(--fontlight);
+    height: 10px;
+    width: 10px;
+    content: "";
+    cursor: pointer;
 }
 
 .help {
@@ -348,6 +358,7 @@ fieldset {
 }
 
 .doublecolumnnormalpad {
+    align-items: top;
     grid-gap: unset;
     margin: unset;
 }
@@ -1237,8 +1248,7 @@ input:checked + .slider:before {
   
 .toggle::after {
     content: "⨯";
-    line-height: 225px;
-    ;
+    /*line-height: 225px;*/
     font-size: 8px;
     color: white;
     display: block;
@@ -1806,6 +1816,20 @@ td img {
 
 .warning, .warning a {
     color: var(--warning);
+}
+
+.oidszur {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 200px));
+    column-gap: 0.5em;
+    height: 150px;
+    overflow: hidden;
+}
+
+.oidszur label {
+    font-weight: normal;
+    font-size: 0.8em;
 }
 
 /* ------------------------------- Egyszerű igazításhoz használt típusok ------------------------------- */
@@ -2559,6 +2583,11 @@ td img {
 .allapotjelentesek {
     display: grid;
     row-gap: 0.5em;
+}
+
+.tripplecolumn {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
 }
 
 .szuresoptions {

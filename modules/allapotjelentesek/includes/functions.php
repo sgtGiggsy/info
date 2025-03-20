@@ -152,6 +152,52 @@
     /* "1.3.6.1.4.1.9.2.1.2" = ?
 */
 
+define('OID_LIST', array(
+    "1.3.6.1.6.3.1.1.5.5"=>"Autentikációs hiba",
+    "1.3.6.1.6.3.1.1.5"=>"Általános SNMP üzenet",
+    "1.3.6.1.4.1.9.0.0"=>"A rendszer újraindul",
+    "1.3.6.1.4.1.9.9.43.2.0.2"=>"Az eszköz konfigurációja frissült",
+    "1.3.6.1.4.1.9.9.221.0.1"=>"Az eszköz új memória kihasználtság csúcsértéket regisztrált",
+    "1.3.6.1.4.1.9.9.831.1.1"=>"Cisco Smart Licensing beállítás megváltozott",
+    "1.3.6.1.4.1.9.9.831.1.9"=>"Cisco Smart Licensing ID tanusítvány megújítása sikertelen",
+    "1.3.6.1.4.1.9.9.831.1.11"=>"Cisco Smart License megújítása sikertelen",
+    "1.3.6.1.4.1.9.9.831.1.12"=>"Cisco Smart License megújítása sikeres",
+    "1.3.6.1.4.1.9.9.831.1.12"=>"Cisco Smart License, kapcsolat a CSSM szerverrel helyreállt",
+    "1.3.6.1.4.1.9.9.831.1.15"=>"Cisco Smart Licensing beállítás megváltozott",
+    "1.3.6.1.4.1.9.9.831.1.44"=>"Cisco Smart Licensing, az eszköz nem kapott RUM megerősítést a beállított időn belül",
+    "1.3.6.1.4.1.9.9.10.1.3.0.5"=>"Cserélhető FLASH eszköz csatlakoztatva",
+    "1.3.6.1.4.1.9.9.91.2.0.1"=>"Egy érzékelő a beállított riasztási szinten kívül eső értéket regisztrált",
+    "1.3.6.1.4.1.9.6.1.101.0.218"=>"Egyetlen eszköz van csatlakoztatva a porthoz",
+    "1.3.6.1.2.1.105.0.1"=>"Eszközt csatlakoztattak, vagy távolítottak el a PoE portról",
+    "1.3.6.1.4.1.9.9.82.2.0.1"=>"Feszítőfa (STP) inkonzisztens VLAN érzékelve egy porton",
+    "1.3.6.1.2.1.17.0.2"=>"Feszítőfa (STP) topológia változás",
+    "1.3.6.1.2.1.17.0.1"=>"Feszítőfa (STP) gyökér (root) eszköz változás a topológiában",
+    "1.3.6.1.4.1.9.9.13.3.0.4"=>"Hűtőventillátor hiba",
+    "1.3.6.1.4.1.9.9.41.2.0.1"=>"Log bejegyzés készült az eszközön",
+    "1.3.6.1.4.1.9.9.215.2.0.2"=>"MAC-Flapping két különböző interface között",
+    "1.3.6.1.4.1.9.6.1.101.0.180"=>"Másolási folyamat befejeződött",
+    "1.3.6.1.4.1.9.9.117.2.0.4"=>"Modul eltávolításra került az eszközből",
+    "1.3.6.1.2.1.14.16.2.10"=>"OSPF csomag került továbbításra egy nem-virtuális interface-en keresztül",
+    "1.3.6.1.6.3.1.1.5.3"=>"Port állapota offline",
+    "1.3.6.1.6.3.1.1.5.4"=>"Port állapota online",
+    "1.3.6.1.4.1.9.9.46.2.0.7"=>"Port dinamikus trunk állapotának változása",
+    "1.3.6.1.4.1.9.9.548.0.1.1"=>"Port ErrorDisable állapotba került",
+    "1.3.6.1.4.1.9.9.548.0.2"=>"Port ErrorDisable állapotba került",
+    "1.3.6.1.4.1.9.6.1.101.0.151"=>"Port STP állapota tanulásról továbbításra váltott",
+    "1.3.6.1.4.1.9.6.1.101.0.152"=>"Port STP állapota továbbításról blokkolásra váltott",
+    "1.3.6.1.4.1.9.9.13.3.0.5"=>"Redundáns táp hibája",
+    "1.3.6.1.6.3.1.1.5.2"=>"Rendszer újraindításra került",
+    "1.3.6.1.6.3.1.1.5.1"=>"Rendszer váratlanul újraindult",
+    "1.3.6.1.2.1.47.2.0.1"=>"Rendszerelem inicializáció",
+    "1.3.6.1.4.1.9.6.1.101.0.217"=>"Több eszköz van csatlakoztatva a porthoz",
+    "1.3.6.1.4.1.9.9.117.2.0.3"=>"Új modult került csatlakoztatásra az eszközhöz",
+    "1.3.6.1.4.1.9.9.46.2.0.10"=>"Új VLAN került létrehozásra az eszközön",
+    "1.3.6.1.4.1.9.10.56.2.0.1"=>"Változás az autentikációs beállításokban",
+    "1.3.6.1.4.1.9.9.43.2.0.1"=>"Változás az eszköz beállításaiban",
+    "1.3.6.1.4.1.9.9.10.1.3.0.4"=>"Változás egy cserélhető FLASH eszköz állapotában",
+    "1.3.6.1.4.1.9.0.1"=>"Virtuális konzol kapcsolat lezárult"
+));
+
 function kapcsolatTipus($tipus)
 {
     switch($tipus)
@@ -348,35 +394,13 @@ function portOperativeState($state)
 
 function OIDs($oid)
 {
-    switch($oid)
+    if(isset(OID_LIST[$oid]))
     {
-        case "1.3.6.1.6.3.1.1.5.1" : return "Rendszer újraindult";
-        case "1.3.6.1.6.3.1.1.5.2" : return "Rendszer újraindult";
-        case "1.3.6.1.6.3.1.1.5.3" : return "Port állapota offline";
-        case "1.3.6.1.6.3.1.1.5.4" : return "Port állapota online";
-        case "1.3.6.1.6.3.1.1.5.5" : return "Autentikációs hiba";
-        case "1.3.6.1.6.3.1.1.5" : return "Általános SNMP üzenet";
-        case "1.3.6.1.4.1.9.10.56.2.0.1" : return "Változás az autentikációs beállításokban";
-        case "1.3.6.1.4.1.9.9.41.2.0.1": return "Log bejegyzés készült az eszközön";
-        case "1.3.6.1.4.1.9.6.1.101.0.151": return "Port STP állapota tanulásról továbbításra váltott";
-        case "1.3.6.1.4.1.9.6.1.101.0.152": return "Port STP állapota továbbításról blokkolásra váltott";
-        case "1.3.6.1.4.1.9.9.43.2.0.1": return "Változás az eszköz beállításaiban";
-        case "1.3.6.1.4.1.9.0.1": return "Virtuális konzol kapcsolat lezárult";
-        case "1.3.6.1.4.1.9.6.1.101.0.218": return "Egyetlen eszköz van csatlakoztatva a porthoz";
-        case "1.3.6.1.4.1.9.6.1.101.0.217": return "Több eszköz van csatlakoztatva a porthoz";
-        case "1.3.6.1.4.1.9.9.43.2.0.2": return "Az eszköz konfigurációja frissült";
-        case "1.3.6.1.4.1.9.6.1.101.0.180": return "Másolási folyamat befejeződött";
-        case "1.3.6.1.4.1.9.9.13.3.0.5": return "Redundáns táp hibája";
-        case "1.3.6.1.4.1.9.9.46.2.0.7": return "Port dinamikus trunk állapotának változása";
-        case "1.3.6.1.2.1.47.2.0.1": return "Rendszerelem inicializáció";
-        case "1.3.6.1.4.1.9.0.0": return "A rendszer újraindul";
-        case "1.3.6.1.2.1.17.0.2": return "Feszítőfa (STP) topológia változás";
-        case "1.3.6.1.4.1.9.9.10.1.3.0.5": return "Cserélhető FLASH eszköz csatlakoztatva";
-        case "1.3.6.1.4.1.9.9.10.1.3.0.4": return "Változás egy cserélhető FLASH eszköz állapotában";
-        case "": return "";
-        case "": return "";
-        case "": return "";
-        default : return $oid;
+        return OID_LIST[$oid];
+    }
+    else
+    {
+        return $oid;
     }
 }
 

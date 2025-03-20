@@ -243,6 +243,11 @@ function dateTimeLocalToTimeStamp($datetimelocal)
 	}
 }
 
+function thisDate()
+{
+	return date('Y-m-d');
+}
+
 function timeStampForSQL($timestamp = null)
 {
 	
@@ -1683,15 +1688,16 @@ function secondsToFullFormat($seconds)
 	$ora = "$ora óra, ";
 	$napok = floor($seconds / 3600 / 24);
 	$evek = floor($napok / 365);
+	$napok = $napok - ($evek * 365);
 
 	if($napok > 0)
 	{
 		$nap = "$napok nap, ";
 	}
 
-	if($napok > 364)
+	if($evek > 0)
 	{
-		$ev = "$evek ev, ";
+		$ev = "$evek év, ";
 	}
 
 	return $ev . $nap . $ora . "$perc perc, $masodperc másodperc";
