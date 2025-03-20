@@ -78,4 +78,15 @@ if(typeof snmp !== 'undefined')
     xhttp.open("GET", RootPath + "/modules/eszkozok/includes/snmp_portdata.php?ip=" + deviceip + "&community=" + snmpcommunity, true);
     //xhttp.setRequestHeader(header, value);
     xhttp.send();
+
+    let trapdata = new XMLHttpRequest();
+    
+    trapdata.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("traplist").innerHTML = this.responseText;
+        }
+    };
+    trapdata.open("GET", RootPath + "/modules/eszkozok/includes/snmp_traps.php?devid=" + devid, true);
+    trapdata.send();
+
 }
