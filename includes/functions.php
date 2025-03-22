@@ -1259,6 +1259,150 @@ function csoportWhere($csoporttagsagok, $csopwhereset)
 	return $where;
 }
 
+function csoportWhere_new($csoporttagsagok, $csopwhereset)
+{
+	$szervezetek = array();
+    $telephelyek = array();
+	$paramarr = array();
+
+	foreach($csoporttagsagok as $csoportjog)
+    {
+        if($csoportjog['szervezet'] && !in_array($csoportjog['szervezet'], $szervezetek))
+		{
+			$szervezetek[] = $csoportjog['szervezet'];
+		}
+		elseif($csoportjog['telephely'] && !in_array($csoportjog['telephely'], $telephelyek))
+		{
+			$telephelyek[] = $csoportjog['telephely'];
+		}
+    }
+
+	$where = "(";
+
+	if($csopwhereset['and'])
+	{
+		$where = "AND (";
+	}
+
+	if($csopwhereset['szervezetelo'])
+	{
+		$csopwhereset['szervezetelo'] = $csopwhereset['szervezetelo'] . ".";
+	}
+
+	if($csopwhereset['telephelyelo'])
+	{
+		$csopwhereset['telephelyelo'] = $csopwhereset['telephelyelo'] . ".";
+	}
+
+	$szervezetdb = count($szervezetek);
+	$telepehelydb = count($telephelyek);
+
+	$wherealak = "";
+	$wheretelep = "";
+	
+	for($i = 0; $i < $szervezetdb; $i++)
+	{
+		if($i == 0)
+		{
+			$wherealak .= $csopwhereset['szervezetelo'] . $csopwhereset['szervezetmegnevezes'] . " IS IN (";
+		}
+		
+		$wherealak .= "?";
+		$paramarr[] = $szervezetek[$i];
+
+		if($i != $szervezetdb - 1)
+		{
+			$wherealak .= ", ";
+		}
+
+		if($i == $szervezetdb - 1)
+		{
+			$wherealak .= ")";
+		}
+	}
+
+	if($csopwhereset['szervezetnull'])
+	{
+		if($szervezetdb > 0)
+		{
+			$wherealak .= " OR ";
+		}
+		$wherealak .= $csopwhereset['szervezetelo'] . $csopwhereset['szervezetmegnevezes'] . " IS NULL";
+	}
+
+	for($i = 0; $i < $telepehelydb; $i++)
+	{
+		if($i == 0)
+		{
+			$wheretelep .= $csopwhereset['telephelyelo'] . "telephely IS IN (";
+		}
+
+		$wheretelep .= "?";
+		$paramarr[] = $telephelyek[$i];
+
+		if($i != $telepehelydb - 1)
+		{
+			$wheretelep .= ", ";
+		}
+		if($i == $telepehelydb - 1)
+		{
+			$wheretelep .= ")";
+		}
+	}
+
+	if($csopwhereset['telephelynull'])
+	{
+		if($telepehelydb > 0)
+		{
+			$wheretelep .= " OR ";
+		}
+		$wheretelep .= $csopwhereset['telephelyelo'] . "telephely IS NULL";
+	}
+
+	if(!$csopwhereset['tipus'])
+	{
+		if($telepehelydb == 0 && $szervezetdb == 0)
+		{
+			$where .= $csopwhereset['telephelyelo'] . "telephely = 999 AND " . $csopwhereset['szervezetelo'] . $csopwhereset['szervezetmegnevezes'] . " = 999";
+		}
+		else
+		{		
+			$where .= $wherealak;
+			if($wherealak)
+			{
+				$where .= " OR ";
+			}
+			$where .= $wheretelep;
+		}
+	}
+	elseif($csopwhereset['tipus'] == "szervezet")
+	{
+		if($szervezetdb == 0)
+		{
+			$where .= $csopwhereset['szervezetelo'] . $csopwhereset['szervezetmegnevezes'] . " = 999";
+		}
+		else
+		{
+			$where .= $wherealak;
+		}
+	}
+	elseif($csopwhereset['tipus'] == "telephely")
+	{
+		if($telepehelydb == 0)
+		{
+			$where .= $csopwhereset['telephelyelo'] . "telephely = 999";
+		}
+		else
+		{
+			$where .= $wheretelep;
+		}
+	}
+
+	$where .= ") ";
+
+	return array($where, $paramarr);
+}
+
 function mysqliToArray($mysqlires, $ondimensional = false)
 {
 	$returnarr = array();
@@ -1677,7 +1821,7 @@ function roundUp99($value)
 	}
 }
 
-function secondsToFullFormat($seconds)
+function secondsToFullFormat($seconds, $showseconds = true)
 {
 	if($seconds < 0)
 		$seconds = $seconds * - 1;
@@ -1700,7 +1844,16 @@ function secondsToFullFormat($seconds)
 		$ev = "$evek év, ";
 	}
 
-	return $ev . $nap . $ora . "$perc perc, $masodperc másodperc";
+	if($showseconds)
+	{
+		$masodperc = ", $masodperc másodperc";
+	}
+	else
+	{
+		$masodperc = "";
+	}
+
+	return $ev . $nap . $ora . "$perc perc$masodperc";
 }
 
 function ConvertToDistinguishedName($OrganizationalUnit)
@@ -1788,4 +1941,57 @@ function IntRagValaszt($szam)
                 }
         }
     }
+}
+
+function concatToAssocArray($fields, ...$concats)
+{
+	if(count($fields) != count($concats))
+	{
+		echo "A mezőnevek és értékmezők száma nem egyezik!";
+		return false;
+	}
+
+	if(!$concats[0])
+	{
+		return array();
+	}
+
+	$duplicatedarray = array();
+	$assoc = array();
+
+	$mezoindex = 0;
+
+	foreach($concats as $concat)
+	{
+		$temparr = explode(",;,", $concat);
+
+		$elemszam = count($temparr);
+
+		for($i = 0; $i < $elemszam; $i++)
+		{
+			$duplicatedarray[$i][$fields[$mezoindex]] = $temparr[$i];
+		}
+		$mezoindex++;
+	}
+
+	foreach($duplicatedarray as $duplicate)
+	{
+		if(!in_array($duplicate, $assoc))
+		{
+			$assoc[] = $duplicate;
+		}
+	}
+
+	return $assoc;
+}
+
+function str_contains_any($haystack, $needles): bool
+{
+	return array_reduce($needles, fn($a, $n) => $a || str_contains($haystack, $n), false);
+}
+
+function fajlnevFromPath($path)
+{
+	$ut = explode("/", $path);
+	return end($ut);
 }
