@@ -2612,6 +2612,7 @@ td img {
 
 .allapotelem, .feladatelem {
     display: block;
+    position: relative;
     overflow: hidden;
     text-decoration: none;
     background-color: var(--tsore);
@@ -2674,10 +2675,6 @@ td img {
     font-size: 0.75em;
 }
 
-.feladatelem {
-    height: 9em;
-}
-
 .feladatelemdiv {
     display: grid;
     grid-template-columns: 7em 2fr 1fr;
@@ -2687,11 +2684,16 @@ td img {
 
 .feladatid {
     grid-row: 1/4;
-    z-index: 99;
+    display: flex;
+    flex-direction: column;
+}
+
+.feladatid > :first-child {
+    flex-grow: 1;
 }
 
 .feladatnev {
-    padding-top: calc((9em - 4px - 1.5em) / 2);;
+    padding: calc((9em - 4px - 1.5em) / 2) 0;
 }
 
 .feladatleiras {
@@ -2710,10 +2712,18 @@ td img {
     margin: 0 0.5em;
 }
 
+.feladatmain, .fullelem {
+    cursor: pointer;
+}
+
 .feladatkommentek {
     grid-column: 2/3;
     grid-row: 3/4;
     margin: 1em 0.5em;
+}
+
+.feladatkommenteles {
+    width: 60ch;
 }
 
 .feladatfajlok, .basedeets {
@@ -2730,10 +2740,6 @@ td img {
     grid-auto-rows: 1fr;
 }
 
-.feladatnyithato {
-    cursor: pointer;
-}
-
 .basedeets {
     grid-template-columns: auto auto auto;
 }
@@ -2744,13 +2750,12 @@ td img {
     justify-content: center;
 }
 
-.completed {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+.feladatactions {
+    display: flex;
+    width: 100%;
 }
 
-.completed .customcb {
+.feladatactions .customcb {
     padding: 0 0 0.2em 0;
 }
 
