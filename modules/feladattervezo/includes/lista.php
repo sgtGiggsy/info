@@ -85,10 +85,10 @@ elseif($csoportir)
                         <p><small><?=$feladatelem['szaknev']?></small></p>
                     </div>
                     <div class="feladatactions">
-                        <label class="customcb">
-                        <input type="checkbox">
-                            <span class="customcbjelolo"></span>
-                        </input>
+                        <button title="Befejezettként jelöl"><?=$icons['checkcircle']?></button>
+                        <button title="Szerkeszt" onclick="elemFelkeres('<?=$feladatelem['feladat_id']?>?action=edit')"><?=$icons['edit']?></button>
+                        <button title="Alfeladat hozzáadása" onclick="szerkesztNyit('ujfeladat-<?=$newelemid?>')"><?=$icons['add']?></button>
+                        <button title="Törlés"><?=$icons['delete']?></button>
                     </div>
                 </div>
                 <div class="feladatmain" <?=($egyenioldal) ? 'onclick="elemNyit(' . $feladatelem['feladat_id'] . ')"' : 'onclick="elemFelkeres(' . $feladatelem['feladat_id'] .')"' ?>>
@@ -96,7 +96,7 @@ elseif($csoportir)
                         <h2><?=$feladatelem['rovid']?></h2>
                     </div>
                     <div class="feladatleiras" id="leiras-<?=$feladatelem['feladat_id']?>" style="display: none">
-                        <?=nl2br($feladatelem['leiras'])?>
+                        <?=$feladatelem['leiras']?>
                     </div>
                 </div>
                 
@@ -125,7 +125,7 @@ elseif($csoportir)
                         if($untildeadline) {
                             //$urgentdeadline = true;
                             ?><div class="vertflex <?=($urgentdeadline) ? "warning" : "" ?>">
-                                <div><h2><?=($urgentdeadline) ? "KÖZELI HATÁRIDŐ!" : "Határidőig hátravan:" ?></h2></div>
+                                <div><h2><?=($urgentdeadline) ? (($untildeadline < 0 ) ? "LEJÁRT HATÁRIDŐ" : "KÖZELI HATÁRIDŐ!") : "Határidőig hátravan:" ?></h2></div>
                                 <p><?=secondsToFullFormat($untildeadline, false)?></p>
                             </div><?php
                         }
@@ -153,8 +153,8 @@ elseif($csoportir)
                             ?></div><?php
                         }
                         ?><div class="feladatkommenteles">
-                            <form action="<?=ROOT_PATH?>/feladattervezo/<?=$feladatelem['feladat_id']?>/komment" method="post">
-                                <textarea name="komment" placeholder="Új megjegyzés írása..."></textarea>
+                            <form action="<?=ROOT_PATH?>/feladatterv/<?=$feladatelem['feladat_id']?>?action=komment" method="post">
+                                <textarea name="szoveg" placeholder="Új megjegyzés írása..."></textarea>
                                 <input type="submit" value="Küldés">
                             </form>
                         </div>
@@ -198,9 +198,10 @@ elseif($csoportir)
         if(!$feladatelem['szulo'])
         {
             $szulo = $feladatelem['feladat_id'];
-            ?><div class="feladatelem" id="ujfeladat-<?=$feladatelem['feladat_id']?>"><?php
+            ?><div class="feladatelem" id="ujfeladat-<?=$newelemid?>" style="display: none"><?php
                 include("./modules/feladattervezo/includes/feladattervform.php");
             ?></div><?php
+            $newelemid++;
         }
     }
 ?></div>

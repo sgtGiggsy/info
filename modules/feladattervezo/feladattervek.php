@@ -22,7 +22,12 @@ else
     // Ha a $feladatterv változó false állapotó, hiba adása, és kilépés
     if(!$feladatterv)
     {
-        echo "<br><h2>Nincs ilyen sorszámú feladat, vagy nincs jogosultsága a megtekintéséhez!</h2>";
+        echo "<br><h2>Nincs olyan létező feladat, aminek a megtekintéséhez rendelkezik jogosultsággal!</h2>";
+        ?><div class="feladatelem" id="ujfeladat-<?=$newelemid?>"><?php
+            $irhat = true;
+            $szulo = null;
+            include("./modules/feladattervezo/includes/feladattervform.php");
+        ?></div><?php
     }
 
     // Ha ide futunk ki, az adott feladatterv megjelenítése következik

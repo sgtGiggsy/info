@@ -16,7 +16,10 @@ function elemNyit(id) {
     }
 }
 
-function elemFelkeres(id)
-{
+function elemFelkeres(id) {
     window.location.href = RootPath + "/feladatterv/" + id;
+}
+
+function szerkesztNyit(id) {
+    document.getElementById(id).style.display = "";
 }

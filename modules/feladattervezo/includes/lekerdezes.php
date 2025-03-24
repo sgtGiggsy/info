@@ -6,8 +6,11 @@ elseif($csoportolvas)
     $where .= " AND (felvivo.szervezet = ?)";
     $paramarr[] = $szervezet;
 }
-$feladatterv = $untildeadline = $currpri = $currbuild = $ido_tervezett = $ido_hatarido = $ido_tenyleges = null;
+$feladatterv = $untildeadline = $leiras = $rovid = $currpri = $currbuild = $ido_tervezett = $ido_hatarido = $ido_tenyleges = $szakid = null;
 $csoportwhere = null;
+$newelemid = 0;
+$selectedfelelosok = array();
+
 if(!$mindolvas)
 {
     // A CsoportWhere űrlapja
@@ -33,6 +36,8 @@ if(!$csoportir)
 
 $szakok = new MySQLHandler("SELECT id, nev FROM szakok ORDER BY nev ASC;");
 $szakok = $szakok->Result();
+$felhasznalok = new MySQLHandler("SELECT id, nev FROM felhasznalok WHERE szervezet = ? AND aktiv = 1 ORDER BY nev ASC;", $szervezet);
+$felhasznalok = $felhasznalok->Result();
 
 $feladatterv  = new MySQLHandler("SELECT rovid, leiras, prioritas, allapot, szulo, szakid, epulet, felvitte, modositotta,
             ido_letrehoz, ido_tervezett, ido_tenyleges, ido_hatarido,

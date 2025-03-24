@@ -6,6 +6,8 @@ if(!$_SESSION['id'] || !$csoportolvas)
 }
 else
 {
+    $feladatterv = false;
+    $where = null;
     $paramarr = array();
     $javascriptfiles[] = "modules/feladattervezo/includes/feladatterv.js";
     // Amíg nem tudjuk, hogy a folyamat jár-e tényleges írással, a változót false-ra állítjuk
@@ -18,7 +20,7 @@ else
     if(isset($_GET['action']))
     {
         // Ha a kért művelet nem a szerkesztő oldal betöltése, az adatbázis változót true-ra állítjuk
-        if($mindir && ($_GET['action'] == "new" || $_GET['action'] == "update" || $_GET['action'] == "stateupdate"))
+        if($mindir && ($_GET['action'] == "new" || $_GET['action'] == "update" || $_GET['action'] == "stateupdate" || $_GET['action'] == "komment" ))
         {
             $irhat = true;
             $dbir = true;
@@ -52,7 +54,6 @@ else
     // ez nincs kihatással
     $egyenioldal = true;
 
-    $button = "Feladat mentése";
     $oldalcim = "Feladat tervezése";
     $form = "modules/feladattervezo/forms/feladattervform";
 
@@ -65,8 +66,8 @@ else
         $paramarr[] = $id;
         $paramarr[] = $id;
 
-        include("./modules/feladattervezo/includes/lekerdezes.php");
     }
+    include("./modules/feladattervezo/includes/lekerdezes.php");
 
     // Ha a $feladatterv változó false állapotó, hiba adása, és kilépés
     if(!$feladatterv)
@@ -78,5 +79,13 @@ else
     elseif($id)
     {
         include("./modules/feladattervezo/includes/lista.php");
+    }
+
+    elseif(isset($_GET['action']) && $_GET['action'] == 'addnew')
+    {
+        ?><div class="feladatelem" id="ujfeladat-<?=$newelemid?>"><?php
+            $szulo = null;
+            include("./modules/feladattervezo/includes/feladattervform.php");
+        ?></div><?php
     }
 }

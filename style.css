@@ -378,7 +378,7 @@ fieldset {
 
 .ketharmad input[type="submit"], .ketharmad input[type="text"], .ketharmad textarea, .ketharmad select,
 .doublecolumn input[type="submit"], .doublecolumn input[type="text"], .doublecolumn textarea, .doublecolumn select,
-.fullsizebutton {
+.fullsizebutton, .feladatformgrid input[type="submit"], .feladatformgrid input[type="text"], .feladatformgrid select {
     max-width: 100%;
     width: 100%;
 }
@@ -1640,6 +1640,61 @@ input:checked + .slider:before {
     transform: rotate(45deg);
 }
 
+.msdropdownparent {
+    position: relative;
+}
+
+.msdropdownparent input[type="text"] {
+    user-select: none;
+    cursor: default;
+}
+
+.msdropdown {
+    top: 1.65em;
+    right: 0;
+    position: absolute;
+    display: grid;
+    background-color: var(--toasterbg);
+    color: var(--fontlight2);
+    grid-template-columns: 1fr 1fr;
+    visibility: hidden;
+    transform: scale(0);
+    z-index: 99;
+    border-radius: 0.5em;
+    overflow: hidden;
+}
+
+.msdropdown.hidden {
+    visibility: visible;
+    animation: smoothshrink ease-out 0.3s;
+    transform-origin: top right;
+}
+
+.msdropdown.visible {
+    visibility: visible;
+    width: 56ch;
+    animation: smoothgrow ease-out 0.3s;
+    transform: scale(1);
+    transform-origin: top right;
+}
+
+.msdropdown label {
+    display: flex;
+    font-size: 0.9em;
+    font-weight: normal;
+    width: 30ch;
+}
+
+.msdropdown .customcb {
+    padding: 0.2em;
+    border-top: var(--shadow) 1px solid;
+    border-bottom: var(--shadow) 1px solid;
+}
+
+.msddlabel {
+    flex-grow: 1;
+}
+
 @keyframes rubbery {
     0%{
         transform: scale(0);
@@ -1655,6 +1710,24 @@ input:checked + .slider:before {
     }
     100%{
         transform: scaleX(1);
+    }
+}
+
+@keyframes smoothgrow {
+    0%{
+        transform: scale(0);
+    }
+    100%{
+        transform: scale(1);
+    }
+}
+
+@keyframes smoothshrink {
+    0%{
+        transform: scale(1);
+    }
+    100%{
+        transform: scale(0);
     }
 }
 
@@ -2675,11 +2748,58 @@ td img {
     font-size: 0.75em;
 }
 
-.feladatelemdiv {
+.feladatelemdiv, .feladatformgrid {
     display: grid;
-    grid-template-columns: 7em 2fr 1fr;
     height: 100%;
     gap: 0.5em;
+}
+
+.feladatelemdiv {
+    grid-template-columns: 7em 2fr 1fr;
+}
+
+.feladatformgrid {
+    grid-template-columns: 3fr auto 1.5em;
+    margin: 0.6em;
+}
+
+.feladatform-textdiv {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 0.5em;
+}
+
+.feladatform-datetimecol {
+    display: flex;
+    flex-direction: column;
+}
+
+.feladatform-datetimecol input[type="datetime-local"] {
+    flex-grow: 1; /* A szülőhöz igazodik */
+    width: 100%;
+}
+
+.feladatform-selects {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em
+}
+
+.sidebutton {
+    width: 2.5em;
+    overflow: hidden;
+    position: relative;
+}
+
+.vertbutton {
+    transform: rotate(90deg);
+    position: absolute;
+    transform-origin: top left;
+    width: 50ch;
+    max-width: unset;
+    height: 2.5em;
+    top: 0;
+    left: 2.5em;
 }
 
 .feladatid {
@@ -2755,8 +2875,11 @@ td img {
     width: 100%;
 }
 
-.feladatactions .customcb {
-    padding: 0 0 0.2em 0;
+.feladatactions button {
+    padding: 0.1em;
+    font-size: 0.9em;
+    background-color: unset;
+    border: 0;
 }
 
 .gyermek {

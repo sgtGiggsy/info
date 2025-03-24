@@ -39,6 +39,11 @@ else
     // Ha a kért művelet nem jár adatbázisművelettel, a szerkesztési felület meghívása
     if($irhat || $beallitasful)
     {
+        $con = mySQLConnect();
+        print_r(mysqli_stat($con));
+        //echo "<br>";
+        //print_r(mysqli_get_connection_stats($con));
+
         $sugo = array();
         $magyarazat = null;
         $mindir = true;

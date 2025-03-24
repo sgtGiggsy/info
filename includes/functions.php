@@ -1995,3 +1995,26 @@ function fajlnevFromPath($path)
 	$ut = explode("/", $path);
 	return end($ut);
 }
+
+function multiSelectDropdown($elements, array $selected, string $selectnev, string $label, $selectid = null)
+{
+	//TODO: Ha a szülőelemen van overflow:hidden, úgy a legördülő menü nem tud "megszökni" a szülőelem határain kívülre
+
+	?><div>
+		<label><?=$label?></label>
+		<div class="msdropdownparent">
+			<div onclick="dropdownMutat('<?=$selectid?>')"><input type="text" readonly value="<?=$label?> listája"></input></div>
+			<div <?=($selectid) ? "id=" . $selectid : "" ?> class="msdropdown" onmouseleave="dropdownRejt('<?=$selectid?>')"><?php
+			foreach($elements as $element)
+			{
+				?><label class="customcb">
+					<input type="checkbox" name="<?=$selectnev?>[]" value="<?=$element['id']?>" <?=(in_array($element['id'], $selected)) ? "checked" : ""?>>
+						<span class="msddlabel"><?=$element['nev']?></span>
+					<span class="customcbjelolo"></span>
+					</input>
+				</label><?php
+			}
+			?></div>
+		</div>
+   </div><?php
+}

@@ -349,3 +349,42 @@ function userDeviceParams(loginid) {
         felbontas: window.screen.width + "x" + window.screen.height
     });
 }
+
+function dropdownRejt(selectid) {
+    let x = document.getElementById(selectid);
+    x.classList.remove("visible");
+    x.classList.add("hidden");
+}
+
+function dropdownMutat(selectid) {
+    let x = document.getElementById(selectid);
+    if(!x.classList.contains("visible")){
+        x.classList.add("visible");
+        if(x.classList.contains("hidden"))
+        {
+            x.classList.remove("hidden");
+        }
+    }
+    else
+    {
+        x.classList.remove("visible");
+        x.classList.add("hidden");
+    }
+}
+
+function vertButton(id, buttonid) {
+    let elem = document.getElementById(id);
+    let button = document.getElementById(buttonid);
+    if(elem.style.width == '0px')
+    {
+        elem.style.width = 'unset';
+        elem.style.visibility = 'visible';
+        button.innerHTML = button.getAttribute('data-open');
+    }
+    else
+    {
+        elem.style.width = '0px';
+        elem.style.visibility = 'hidden';
+        button.innerHTML = button.getAttribute('data-closed');
+    }
+}
