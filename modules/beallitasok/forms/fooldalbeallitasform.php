@@ -1,10 +1,7 @@
 <?php
 if(@$irhat)
 {
-    $PHPvarsToJS[] = array(
-            'name' => 'selectors',
-            'val' => array('udvozloszoveg', 'udvozloszovegbelepve')
-        );
+    $PHPvarsToJS['selectors'] = array('udvozloszoveg', 'udvozloszovegbelepve');
     $javascriptfiles[] = "includes/tinymce/tinymce.min.js";
 	$javascriptfiles[] = "includes/js/tinyMCEinitializer.js";
     

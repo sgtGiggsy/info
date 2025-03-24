@@ -2,8 +2,8 @@
 if(@$irhat)
 {
     $javascriptfiles[] = "modules/alap/includes/gettipusok.js";
-    $PHPvarsToJS[] = array('name' => 'modellid', 'val' => $modellid);
-    $PHPvarsToJS[] = array('name' => 'tipus', 'val' => $tipusnev);
+    $PHPvarsToJS['modellid'] = $modellid;
+    $PHPvarsToJS['tipus'] = $tipusnev;
 
     ?><div class="contentcenter">
         <form action="<?=$RootPath?>/modellszerkeszt?action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?>&tipus=<?=$tipusnev?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php

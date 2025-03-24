@@ -117,14 +117,8 @@ else
         
         if(isset($kinyit))
         {
-            $PHPvarsToJS[] = array(
-                'name' => 'fulszoveg',
-                'val' => $fulszoveg
-            );
-            $PHPvarsToJS[] = array(
-                'name' => 'kinyit',
-                'val' => $kinyit
-            );
+            $PHPvarsToJS['fulszoveg'] = $fulszoveg;
+            $PHPvarsToJS['kinyit'] = $kinyit;
         }
     }
 }

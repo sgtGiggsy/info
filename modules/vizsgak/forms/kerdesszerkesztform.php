@@ -1,10 +1,7 @@
 <?php
 if(@$irhat)
 {
-    $PHPvarsToJS[] = array(
-            'name' => 'selectors',
-            'val' => 'kerdes'
-        );
+    $PHPvarsToJS['selectors'] = 'kerdes';
     $javascriptfiles[] = "modules/vizsgak/includes/kerdesszerkeszt.js";
 
     $nyithelp = true;
@@ -138,8 +135,5 @@ if(@$irhat)
         </div>
         <div id='pluszcbdel'></div>
     </div><?php
-    $PHPvarsToJS[] = array(
-            'name' => 'kovetkezokerdesszama',
-            'val' => "$i"
-        );
+    $PHPvarsToJS['kovetkezokerdesszama'] = "$i";
 }

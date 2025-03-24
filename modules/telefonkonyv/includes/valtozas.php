@@ -284,18 +284,12 @@ else
 
         if(@$onloadfelugro)
         {
-            $PHPvarsToJS[] = array(
-                    'name' => 'onloadfelugro',
-                    'val' => $onloadfelugro
-                );
+            $PHPvarsToJS['onloadfelugro'] = $onloadfelugro;
         }
 
         if(@$beosztas)
         {
-            $PHPvarsToJS[] = array(
-                'name' => 'beosztaskapcs',
-                'val' => $beosztas
-            );
+            $PHPvarsToJS['beosztaskapcs'] = $beosztas;
         }
 
         include('././templates/edit.tpl.php');

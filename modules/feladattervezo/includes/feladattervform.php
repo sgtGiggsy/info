@@ -1,12 +1,9 @@
 <?php
 if(@$irhat)
 {
-    /*$PHPvarsToJS[] = array(
-        'name' => 'selectors',
-        'val' => array('leiras')
-    );
-    //$javascriptfiles[] = "includes/tinymce/tinymce.min.js";
-	//$javascriptfiles[] = "includes/js/tinyMCEinitializer.js";*/
+    $PHPvarsToJS['selectors'][] = 'leiras-' . $newelemid;
+    $javascriptfiles[] = "includes/tinymce/tinymce.min.js";
+	$javascriptfiles[] = "includes/js/tinyMCEinitializer.js";
     $formnew = true;
     $button = "Új feladat létrehozása";
     if(isset($_GET['action']) && $_GET['action'] == "edit")
@@ -57,7 +54,7 @@ if(@$irhat)
 
                 <div>
                     <label for="leiras">Részletes leírás</label><br>
-                    <textarea name="leiras"id="leiras" placeholder="Feladat részletes leírása"><?=$leiras?></textarea>
+                    <textarea name="leiras" id='leiras-<?=$newelemid?>' placeholder="Feladat részletes leírása"><?=$leiras?></textarea>
                 </div>
             </div>
             

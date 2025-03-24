@@ -251,10 +251,7 @@ else
                             {
                                 if($eszkoz['web'])
                                 {
-                                    $PHPvarsToJS[] = array(
-                                        'name' => 'webeszkoz',
-                                        'val' => true
-                                    );
+                                    $PHPvarsToJS['webeszkoz'] = true;
                                     ?><div><a style="cursor: pointer;" id="manage"><?=$eszkoz['ipcim']?></a></div><?php
                                 }
                                 else
@@ -368,9 +365,9 @@ else
 
             if($mindolvas && $eszkoz['snmp'] && $eszkoz['snmpcommunity'])
             {
-                $PHPvarsToJS[] = array('name' => 'snmp', 'val' => $eszkoz['snmp']);
-                $PHPvarsToJS[] = array('name' => 'deviceip', 'val' => $eszkoz['ipcim']);
-                $PHPvarsToJS[] = array('name' => 'snmpcommunity', 'val' => $eszkoz['snmpcommunity']);
+                $PHPvarsToJS['snmp'] = $eszkoz['snmp'];
+                $PHPvarsToJS['deviceip'] = $eszkoz['ipcim'];
+                $PHPvarsToJS['snmpcommunity'] = $eszkoz['snmpcommunity'];
             }
         
         // Az aktuális SNMP állapot
@@ -387,7 +384,7 @@ else
         // Az eszközről gyűjtött SNMP trapek az elmúlt 14 napból
             if($mindolvas && $eszkoz['snmp'] && $eszkoz['snmpcommunity'])
             {
-                $PHPvarsToJS[] = array('name' => 'devid', 'val' => $id);
+                $PHPvarsToJS['devid'] = $id;
                 
                 ?><div class="infobox">
                     <div class="infoboxtitle">Az eszköztől kapott üzenetek</div>

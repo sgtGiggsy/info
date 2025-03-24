@@ -2,7 +2,7 @@
 if(@$irhat)
 {
     $javascriptfiles[] = "includes/js/epValaszt.js";
-    $PHPvarsToJS[] = array('name' => 'helyisegselect', 'val' => 'helyiseg');
+    $PHPvarsToJS['helyisegselect'] = 'helyiseg';
     $currpage = $RootPath . "/" . $_GET['page'] . ((isset($_GET['id'])) ? "/" . $_GET['id'] : "" ) . "?beepites" . (($_GET['beepites']) ? "=" . $beepid : "") . "&action=" . (($_GET['beepites']) ? 'update' : 'new' );
     ?><form action="<?=$currpage?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
         if($_GET['beepites'])

@@ -1,10 +1,7 @@
 <?php
 if(@$irhat)
 {
-    $PHPvarsToJS[] = array(
-            'name' => 'selectors',
-            'val' => array('bevezetes', 'szovegtorzs')
-        );
+    $PHPvarsToJS['selectors'] = array('bevezetes', 'szovegtorzs');
     $javascriptfiles[] = "includes/tinymce/tinymce.min.js";
 	$javascriptfiles[] = "includes/js/tinyMCEinitializer.js";
     ?><form action="<?=$RootPath?>/kozlemeny&action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?>" method="post">

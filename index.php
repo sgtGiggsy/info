@@ -378,15 +378,14 @@ if($pagetofind != "aktiveszkoz" && $pagetofind != "sohoeszkoz" && $pagetofind !=
     $javascriptfiles[] = "includes/js/progressOverlay.js";
 
 //? PHP változók átadni a JavaScriptnek
-$PHPvarsToJS = [
-    array('name' => 'RootPath', 'val' => $RootPath)];
+$PHPvarsToJS['RootPath'] = $RootPath;
 
 if($loginid)
-    $PHPvarsToJS[] = array('name' => 'loginid', 'val' => $loginid);
+    $PHPvarsToJS['loginid'] = $loginid; 
 
 if($felhasznaloid && @$szemelyes['switchstateshow'])
 {
-    $PHPvarsToJS[] = array('name' => 'Felhasznaloid', 'val' => $felhasznaloid);
+    $PHPvarsToJS['Felhasznaloid'] = $felhasznaloid;
     $javascriptfiles[] = "modules/eszkozok/includes/eszkozonlinecheck.js";
 }
 

@@ -2,12 +2,12 @@
 <script src="<?=$RootPath?>/includes/jquery.min.js"></script>
 <script type="text/javascript">
     const urlParams = new URLSearchParams(window.location.search);
-    <?php foreach($PHPvarsToJS as $var)
+    <?php foreach($PHPvarsToJS as $key => $value)
     {
-		if(is_array($var['val']))
+		if(is_array($value))
 		{
-			?>const <?=$var['name']?> = [ <?php
-			foreach($var['val'] as $val)
+			?>const <?=$key?> = [ <?php
+			foreach($value as $val)
 			{
 				echo '"' . $val . '", ';
 			}
@@ -15,7 +15,7 @@
 		}	
 		else
 		{
-			?>const <?=$var['name']?> = '<?=$var['val']?>'; <?php
+			?>const <?=$key?> = '<?=$value?>'; <?php
 		}
 
     }

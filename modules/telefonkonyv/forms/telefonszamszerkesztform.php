@@ -295,8 +295,5 @@ if(@$irhat)
             </fieldset>
         </div>
     </form><?php
-    $PHPvarsToJS[] = array(
-            'name' => 'jelenbeo',
-            'val' => $indexnumber
-        );
+    $PHPvarsToJS['jelenbeo'] = $indexnumber;
 }
