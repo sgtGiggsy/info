@@ -88,5 +88,6 @@ if($feladatterv->sorokszama == 0)
 }
 else
 {
-    $feladattervszuloszerv = $feladatterv->Fetch()['szervezet'];
+    $elsofeladat = $feladatterv->Fetch();
+    $feladattervszuloszerv = $elsofeladat['szervezet'];
 }

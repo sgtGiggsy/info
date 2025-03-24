@@ -26,7 +26,7 @@ else
         ?><div class="feladatelem" id="ujfeladat-<?=$newelemid?>"><?php
             $irhat = true;
             $szulo = null;
-            include("./modules/feladattervezo/includes/feladattervform.php");
+            include("./modules/feladattervezo/forms/feladattervform.php");
         ?></div><?php
     }
 

@@ -85,10 +85,15 @@ elseif($csoportir)
                         <p><small><?=$feladatelem['szaknev']?></small></p>
                     </div>
                     <div class="feladatactions">
-                        <button title="Befejezettként jelöl"><?=$icons['checkcircle']?></button>
-                        <button title="Szerkeszt" onclick="elemFelkeres('<?=$feladatelem['feladat_id']?>?action=edit')"><?=$icons['edit']?></button>
-                        <button title="Alfeladat hozzáadása" onclick="szerkesztNyit('ujfeladat-<?=$newelemid?>')"><?=$icons['add']?></button>
-                        <button title="Törlés"><?=$icons['delete']?></button>
+                        <button title="Befejezettként jelöl"><?=$icons['checkmark']?></button>
+                        <button title="Szerkeszt" onclick="elemFelkeres('<?=$feladatelem['feladat_id']?>?action=edit')"><?=$icons['edit']?></button><?php
+                        if(!$feladatelem['szulo'])
+                        {
+                            ?><button title="Alfeladat hozzáadása" onclick="szerkesztNyit('ujfeladat-<?=$newelemid?>', <?=$newelemid?>)">
+                                <span id="addbutton-<?=$newelemid?>"><?=$icons['add']?></span><span id="removebutton-<?=$newelemid?>" style="display: none"><?=$icons['remove']?></span>
+                            </button><?php
+                        }
+                        ?><button title="Törlés" onclick="confirmSend('Biztosan törölni szeretnéd ezt az elemet?', '<?=$RootPath?>/feladatterv/<?=$feladatelem['feladat_id']?>?action=delete')"><?=$icons['delete']?></button>
                     </div>
                 </div>
                 <div class="feladatmain" <?=($egyenioldal) ? 'onclick="elemNyit(' . $feladatelem['feladat_id'] . ')"' : 'onclick="elemFelkeres(' . $feladatelem['feladat_id'] .')"' ?>>
@@ -199,7 +204,7 @@ elseif($csoportir)
         {
             $szulo = $feladatelem['feladat_id'];
             ?><div class="feladatelem" id="ujfeladat-<?=$newelemid?>" style="display: none"><?php
-                include("./modules/feladattervezo/includes/feladattervform.php");
+                include("./modules/feladattervezo/forms/feladattervform.php");
             ?></div><?php
             $newelemid++;
         }

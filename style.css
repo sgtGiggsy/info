@@ -2882,6 +2882,10 @@ td img {
     border: 0;
 }
 
+.feladatactions button:hover svg {
+    fill: var(--greyfont);
+}
+
 .gyermek {
     margin-left: 5em;
 }

@@ -20,6 +20,18 @@ function elemFelkeres(id) {
     window.location.href = RootPath + "/feladatterv/" + id;
 }
 
-function szerkesztNyit(id) {
-    document.getElementById(id).style.display = "";
+function szerkesztNyit(id, btnid) {
+    let szerk = document.getElementById(id);
+    let addbtn = document.getElementById('addbutton-' + btnid);
+    let removebtn = document.getElementById('removebutton-' + btnid);
+    if(szerk.style.display == 'none') {
+        szerk.style.display = '';
+        addbtn.style.display = 'none';
+        removebtn.style.display = '';
+    }
+    else {
+        szerk.style.display = 'none';
+        addbtn.style.display = '';
+        removebtn.style.display = 'none';
+    }
 }

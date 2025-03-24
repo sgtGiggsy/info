@@ -6,12 +6,15 @@
     {
 		if(is_array($value))
 		{
-			?>const <?=$key?> = [ <?php
-			foreach($value as $val)
+			?>const <?=$key?> = [<?php
+			$cval = count($value);
+			for($i = 0; $i < $cval; $i++)
 			{
-				echo '"' . $val . '", ';
+				echo '"' . $value[$i] . '"';
+				if($i < $cval - 1)
+				echo ', ';
 			}
-			?> ] <?php
+			?>] <?php
 		}	
 		else
 		{

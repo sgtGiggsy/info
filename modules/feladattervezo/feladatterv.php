@@ -75,17 +75,25 @@ else
         echo "<br><h2>Nincs ilyen sorszámú feladat, vagy nincs jogosultsága a megtekintéséhez!</h2>";
     }
 
-    // Ha ide futunk ki, az adott feladatterv megjelenítése következik
-    elseif($id)
-    {
-        include("./modules/feladattervezo/includes/lista.php");
-    }
-
     elseif(isset($_GET['action']) && $_GET['action'] == 'addnew')
     {
         ?><div class="feladatelem" id="ujfeladat-<?=$newelemid?>"><?php
             $szulo = null;
-            include("./modules/feladattervezo/includes/feladattervform.php");
+            include("./modules/feladattervezo/forms/feladattervform.php");
         ?></div><?php
+    }
+
+    if(isset($_GET['action']) && $id && $_GET['action'] == 'edit')
+    {
+        ?><div class="feladatelem" id="ujfeladat-<?=$newelemid?>"><?php
+            $szulo = null;
+            include("./modules/feladattervezo/forms/feladattervform.php");
+        ?></div><?php
+    }
+
+    // Ha ide futunk ki, az adott feladatterv megjelenítése következik
+    elseif($id)
+    {
+        include("./modules/feladattervezo/includes/lista.php");
     }
 }

@@ -2,25 +2,31 @@
 if(@$irhat)
 {
     $PHPvarsToJS['selectors'][] = 'leiras-' . $newelemid;
-    $javascriptfiles[] = "includes/tinymce/tinymce.min.js";
-	$javascriptfiles[] = "includes/js/tinyMCEinitializer.js";
+    if($newelemid == 0)
+    {    
+        $javascriptfiles[] = "includes/tinymce/tinymce.min.js";
+	    $javascriptfiles[] = "includes/js/tinyMCEinitializer.js";
+    }
     $formnew = true;
     $button = "Új feladat létrehozása";
     if(isset($_GET['action']) && $_GET['action'] == "edit")
     {
-        $feladatterv = $feladatterv->Fetch();
-        $szulo = $feladatterv['szulo'];
-        $rovid = $feladatterv['rovid'];
-        $ido_tervezett = $feladatterv['ido_tervezett'];
-        $ido_hatarido = $feladatterv['ido_hatarido'];
-        $leiras = $feladatterv['leiras'];
-        $currpri = $feladatterv['prioritas'];
-        $currbuild = $feladatterv['epulet'];
-        $szakid = $feladatterv['szakid'];
-        $ido_tenyleges = $feladatterv['ido_tenyleges'];
-        foreach($felelosok as $felelos)
+        $szulo = $elsofeladat['szulo'];
+        $rovid = $elsofeladat['rovid'];
+        $ido_tervezett = $elsofeladat['ido_tervezett'];
+        $ido_hatarido = $elsofeladat['ido_hatarido'];
+        $leiras = $elsofeladat['leiras'];
+        $currpri = $elsofeladat['prioritas'];
+        $currbuild = $elsofeladat['epulet'];
+        $szakid = $elsofeladat['szakid'];
+        $ido_tenyleges = $elsofeladat['ido_tenyleges'];
+        $felelosok = concatToAssocArray(array('id', 'nev'), $elsofeladat['felelosids'], $elsofeladat['felelosnevek']);
+        if($felelosok)
         {
-            $selectedfelelosok[] = $felelos['id'];
+            foreach($felelosok as $felelos)
+            {
+                $selectedfelelosok[] = $felelos['id'];
+            }
         }
         $formnew = false;
         $button = "Feladat szerkesztése";
