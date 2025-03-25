@@ -25,7 +25,7 @@ if(!$mindolvas)
     );
 
     $csopwhere = csoportWhere_new($csoporttagsagok, $csopwhereset);
-    $csoportwhere = "OR " . $csopwhere[0] . ")";
+    $csoportwhere = "OR " . $csopwhere[0];
     $paramarr = array_merge($paramarr, $csopwhere[1]);
 }
 
@@ -40,7 +40,7 @@ $felhasznalok = new MySQLHandler("SELECT id, nev FROM felhasznalok WHERE szervez
 $felhasznalok = $felhasznalok->Result();
 
 $feladatterv  = new MySQLHandler("SELECT rovid, leiras, prioritas, allapot, szulo, szakid, epulet, felvitte, modositotta,
-            ido_letrehoz, ido_tervezett, ido_tenyleges, ido_hatarido,
+            ido_letrehoz, ido_tervezett, ido_tenyleges, ido_hatarido, ido_modositas,
             szakok.nev AS szaknev,
             feladatterv_feladatok.feladat_id AS feladat_id,
             felvivo.nev AS felvivo_nev,

@@ -2886,6 +2886,20 @@ td img {
     fill: var(--greyfont);
 }
 
+.feladatelemwrap {
+    position: relative;
+}
+
+.feladatstates {
+    position: absolute;
+    background-color: var(--topbase);
+    height: 1.8em;
+    width: 5.2em;
+    bottom: -1.8em;
+    left: 0;
+    z-index: 99;
+}
+
 .gyermek {
     margin-left: 5em;
 }

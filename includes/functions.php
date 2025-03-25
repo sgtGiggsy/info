@@ -1304,7 +1304,7 @@ function csoportWhere_new($csoporttagsagok, $csopwhereset)
 	{
 		if($i == 0)
 		{
-			$wherealak .= $csopwhereset['szervezetelo'] . $csopwhereset['szervezetmegnevezes'] . " IS IN (";
+			$wherealak .= $csopwhereset['szervezetelo'] . $csopwhereset['szervezetmegnevezes'] . " IN (";
 		}
 		
 		$wherealak .= "?";
@@ -1334,11 +1334,11 @@ function csoportWhere_new($csoporttagsagok, $csopwhereset)
 	{
 		if($i == 0)
 		{
-			$wheretelep .= $csopwhereset['telephelyelo'] . "telephely IS IN (";
+			$wheretelep .= $csopwhereset['telephelyelo'] . "telephely IN (";
 		}
 
 		$wheretelep .= "?";
-		$paramarr[] = $telephelyek[$i];
+		//$paramarr[] = $telephelyek[$i];
 
 		if($i != $telepehelydb - 1)
 		{
@@ -2017,4 +2017,45 @@ function multiSelectDropdown($elements, array $selected, string $selectnev, stri
 			?></div>
 		</div>
    </div><?php
+}
+
+function isVerifiedToWrite($querystring, $needle, $haystack, $params = null)
+{
+	$verify = new mySQLHandler();
+	$verify->KeepAlive();
+	
+	if(!MINDIR)
+	{
+		if(CSOPORTIR)
+		{
+			if(isset($_POST['id']) && isset($_GET['id']))
+			{
+				$f_id = (isset($_POST['id'])) ? $_POST['id'] : $_GET['id'];
+			
+				$verify->Query($querystring, $f_id, ...$params);
+				if($verify->Fetch()[$haystack] == $needle)
+				{
+					$irhat = true;
+				}
+				else
+				{
+					$irhat = false;
+				}
+			}
+			else
+			{
+				$irhat = true;
+			}
+		}
+		else
+		{
+			$irhat = false;
+		}
+	}
+	else
+	{
+		$irhat = true;
+	}
+
+	return $irhat;
 }

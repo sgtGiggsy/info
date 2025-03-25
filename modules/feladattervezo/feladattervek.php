@@ -15,7 +15,7 @@ else
     $egyenioldal = false;
 
     // Először kiválasztjuk a megjelenítendő feladatok listáját.
-    $where = "WHERE feladatterv_feladatok.szulo IS NULL";
+    $where = "WHERE feladatterv_feladatok.szulo IS NULL AND feladatterv_feladatok.aktiv = 1";
 
     include("./modules/feladattervezo/includes/lekerdezes.php");
 

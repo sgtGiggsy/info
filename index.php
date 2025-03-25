@@ -334,6 +334,13 @@ foreach($menu as $oldal)
     $menuterulet[$oldal['menuterulet']][] = $oldal;
 }
 
+define('MINDIR', $mindir);
+define('CSOPORTIR', $csoportir);
+define('SAJATIR', $sajatir);
+define('MINDOLVAS', $mindolvas);
+define('CSOPORTOLVAS', $csoportolvas);
+define('SAJATOLVAS', $sajatolvas);
+
 //? Fallback megoldás arra az esetre, ha a lekérni próbált oldalhoz nincs adatbázis bejegyzés
 if(!isset($currentpage))
 {
