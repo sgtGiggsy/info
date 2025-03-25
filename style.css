@@ -2891,13 +2891,20 @@ td img {
 }
 
 .feladatstates {
+    padding: 0 0.2em;
     position: absolute;
     background-color: var(--topbase);
-    height: 1.8em;
-    width: 5.2em;
-    bottom: -1.8em;
+    height: 2.5em;
+    width: max-content;
+    bottom: -2.5em;
     left: 0;
     z-index: 99;
+}
+
+.feladatstates button svg {
+    padding: 0.2em 0.2em 0 0.2em;
+    height: 2.5em;
+    width: 2.5em;
 }
 
 .gyermek {

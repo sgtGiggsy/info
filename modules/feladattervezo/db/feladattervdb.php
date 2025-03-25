@@ -62,6 +62,33 @@ if($irhat)
         }
     }
 
+    if(isset($_FILES["fajlok"]))
+    {        
+        $fajlok = $_FILES["fajlok"];
+        $filetypes = array('.jpg', '.jpeg', '.png', '.bmp', 'doc', 'docx', 'xls', 'xlsx', 'pdf', 'zip', 'rar');
+        $mediatype = array('image/jpeg', 'image/png',
+            'image/bmp', 'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/pdf',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/zip',
+            'application/x-zip-compressed',
+            'application/vnd.rar');
+
+        $gyokermappa = "./uploads/";
+        $egyedimappa = "feladattervek/$feladatid";
+
+        $fajllista = fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimappa);
+
+        $feladatdb->Prepare('INSERT INTO feladatterv_fajlok (feladat_id, feltoltes_id, felhasznalo_id) VALUES (?, ?, ?)');
+        foreach($fajllista as $fajl)
+        {
+            $feladatdb->Run($feladatid, $fajl, $_SESSION['id']);
+        }
+    }
+
     //TODO Jobb átiránytás.
     $feladatdb->Close($backtosender);
 }

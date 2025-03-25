@@ -1743,7 +1743,7 @@ function exportExcel($data, $fajlnev)
 function arrayMultiDimension($array)
 {
    rsort($array);
-   return isset($my_arr[0]) && is_array($my_arr[0]);
+   return isset($array[0]) && is_array($array[0]);
 }
 
 function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimappa)
@@ -1752,6 +1752,7 @@ function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimap
 	$feltoltesimappa = "$gyokermappa/$egyedimappa/";
 	$feltoltottfajlok = array();
     $uploadids = array();
+	$single = false;
 
 	if(arrayMultiDimension($fajlok))
 	{
@@ -1759,16 +1760,22 @@ function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimap
 	}
 	else
 	{
-		$fajl = $fajlok;
-		$fajlok = array($fajl);
+		$single = true;
 		$db = 1;
 	}
 
 	for($i = 0; $i < $db; $i++)
 	{
-		if (!in_array($fajlok[$i]['type'], $mediatype))
+		if($single)
 		{
-			$uzenet = "A fájl típusa nem megengedett: " . $fajlok[$i]['name'];
+			$fajlok['name'] = array($fajlok['name']);
+			$fajlok['type'] = array($fajlok['type']);
+			$fajlok['tmp_name'] = array($fajlok['tmp_name']);
+		}
+
+		if (!in_array($fajlok['type'][$i], $mediatype))
+		{
+			$uzenet = "A fájl típusa nem megengedett: " . $fajlok['name'][$i];
 		}
 		else
 		{
@@ -1777,7 +1784,7 @@ function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimap
 				mkdir($feltoltesimappa, 0777, true);
 			}
 
-			$fajlnev = strtolower(str_replace(".", time() . ".", $fajlok[$i]['name']));
+			$fajlnev = strtolower(str_replace(".", time() . ".", $fajlok['name'][$i]));
 			$finalfile = $feltoltesimappa . $fajlnev;
 			if(file_exists($finalfile))
 			{
@@ -1785,7 +1792,7 @@ function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimap
 			}
 			else
 			{
-				move_uploaded_file($fajlok[$i]['tmp_name'], $finalfile);
+				move_uploaded_file($fajlok['tmp_name'][$i], $finalfile);
 				$uzenet = 'A fájl feltöltése sikeresen megtörtént: ' . $fajlnev;
 				$feltoltottfajlok[] = "$egyedimappa/" . "$fajlnev";
 			}
@@ -1804,6 +1811,8 @@ function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimap
 			$uploadids[] = $fajlid;
 		}
 	}
+
+	echo $uzenet;
 
 	return $uploadids;
 }

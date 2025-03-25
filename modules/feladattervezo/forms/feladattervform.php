@@ -31,7 +31,7 @@ if(@$irhat)
         $formnew = false;
         $button = "Feladat szerkesztése";
     }
-    ?><form action="<?=$RootPath?>/feladatterv&action=<?=(!$formnew) ? 'update' : 'new' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+    ?><form action="<?=$RootPath?>/feladatterv&action=<?=(!$formnew) ? 'update' : 'new' ?>" method="post" enctype="multipart/form-data" onsubmit="beKuld.disabled = true; return true;"><?php
         if(isset($id))
         {
             ?><input type ="hidden" id="id" name="id" value=<?=$id?>><?php
@@ -80,6 +80,21 @@ if(@$irhat)
                             ?><option value="<?=$szak['id']?>" <?=($szak['id'] == $szakid) ? "selected" : "" ?>><?=$szak['nev']?></option><?php
                         }
                     ?></select>
+                </div>
+                
+                <div>
+                    <label for="fajlok">Csatolni kívánt képek/dokumentumok</label><br>
+                    <input type="file" name="fajlok[]"
+                            accept="image/jpeg, image/png,
+                                    image/bmp, application/msword,
+                                    application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                    application/vnd.ms-excel application/pdf,
+                                    application/vnd.ms-excel,
+                                    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                                    application/zip,
+                                    application/x-zip-compressed,
+                                    application/vnd.rar"
+                    multiple>
                 </div><?php
 
                 if(!$formnew)
