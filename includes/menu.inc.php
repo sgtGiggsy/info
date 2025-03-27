@@ -10,64 +10,67 @@ function MainMenu()
 	$icons = $GLOBALS['icons'];
 
 	?><div class="leftmenuarea">
-		<nav>
-			<ul class="leftmenu"><?php
-				$fomenu = null;
-				foreach($menuterulet as $menupont)
-				{
-					$addnewjog = false;
-					if(isset($felhasznaloid) && $menupont['iras'] > 1)
+		<div class="mainmenu">
+			<nav>
+				<ul class="leftmenu"><?php
+					$fomenu = null;
+					foreach($menuterulet as $menupont)
 					{
-						$addnewjog = true;
+						$addnewjog = false;
+						if(isset($felhasznaloid) && $menupont['iras'] > 1)
+						{
+							$addnewjog = true;
+						}
+						
+						if($fomenu && $fomenu != $menupont['szulo'])
+						{
+							?></ul><?php
+							$fomenu = null;
+						}
+						
+						if($menupont['oldal'] == "#" && $menupont['lathat'])
+						{
+							$fomenu = $menupont['id'];
+							?><li class="leftmenuitem">
+								<p onclick="subRejtMutat('<?=$menupont['id']?>')">
+									<?=trim($menupont['menupont'])?><?php
+									if($menupont['szerkoldal'] && $addnewjog)
+									{
+										?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew"><?=$icons['add']?></span><?php
+									}
+								?></p>
+							</li>
+							<ul class='leftmenu-sub' id="<?=$menupont['id']?>" style="display: <?=($szulonyit == $menupont['id']) ? '' : 'none' ?>"><?php
+						}
+						elseif($fomenu && $fomenu == $menupont['szulo'] && $menupont['aktiv'] > 0 && $menupont['lathat'])
+						{
+							?><li <?=(($menupont['oldal'] == $pagetofind || $menupont['gyujtooldal'] == $pagetofind || $menupont['szerkoldal'] == $pagetofind) ? 'class="leftmenusub-active"' : 'class="leftmenusubitem"')?>>
+								<a href="<?= (($menupont['oldal'] == '/') ? $RootPath : $RootPath."/".$menupont['gyujtooldal']) ?>">
+									<?=trim($menupont['menupont'])?><?php
+									if($menupont['szerkoldal'] && $addnewjog)
+									{
+										?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew"><?=$icons['add']?></span><?php
+									}
+								?></a>
+							</li><?php
+						}
+						elseif($menupont['aktiv'] > 0 && $menupont['lathat'])
+						{
+							?><li <?=(($menupont['oldal'] == $pagetofind || $menupont['gyujtooldal'] == $pagetofind) ? 'class="leftmenuitem-active"' : 'class="leftmenuitem"')?>>
+								<a href="<?= (($menupont['oldal'] == '/') ? $RootPath : $RootPath."/".$menupont['gyujtooldal']) ?>">
+									<?=trim($menupont['menupont'])?><?php
+									if($menupont['szerkoldal'] && $addnewjog)
+									{
+										?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew"><?=$icons['add']?></span><?php
+									}
+								?></a>
+							</li><?php
+						}
 					}
-					
-					if($fomenu && $fomenu != $menupont['szulo'])
-					{
-						?></ul><?php
-						$fomenu = null;
-					}
-					
-					if($menupont['oldal'] == "#" && $menupont['lathat'])
-					{
-						$fomenu = $menupont['id'];
-						?><li class="leftmenuitem">
-							<p onclick="subRejtMutat('<?=$menupont['id']?>')">
-								<?=trim($menupont['menupont'])?><?php
-								if($menupont['szerkoldal'] && $addnewjog)
-								{
-									?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew"><?=$icons['add']?></span><?php
-								}
-							?></p>
-						</li>
-						<ul class='leftmenu-sub' id="<?=$menupont['id']?>" style="display: <?=($szulonyit == $menupont['id']) ? '' : 'none' ?>"><?php
-					}
-					elseif($fomenu && $fomenu == $menupont['szulo'] && $menupont['aktiv'] > 0 && $menupont['lathat'])
-					{
-						?><li <?=(($menupont['oldal'] == $pagetofind || $menupont['gyujtooldal'] == $pagetofind || $menupont['szerkoldal'] == $pagetofind) ? 'class="leftmenusub-active"' : 'class="leftmenusubitem"')?>>
-							<a href="<?= (($menupont['oldal'] == '/') ? $RootPath : $RootPath."/".$menupont['gyujtooldal']) ?>">
-								<?=trim($menupont['menupont'])?><?php
-								if($menupont['szerkoldal'] && $addnewjog)
-								{
-									?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew"><?=$icons['add']?></span><?php
-								}
-							?></a>
-						</li><?php
-					}
-					elseif($menupont['aktiv'] > 0 && $menupont['lathat'])
-					{
-						?><li <?=(($menupont['oldal'] == $pagetofind || $menupont['gyujtooldal'] == $pagetofind) ? 'class="leftmenuitem-active"' : 'class="leftmenuitem"')?>>
-							<a href="<?= (($menupont['oldal'] == '/') ? $RootPath : $RootPath."/".$menupont['gyujtooldal']) ?>">
-								<?=trim($menupont['menupont'])?><?php
-								if($menupont['szerkoldal'] && $addnewjog)
-								{
-									?><span onclick="window.open('<?=$RootPath?>/<?=$menupont['szerkoldal']?>', '_self'); return false;" class="addnew"><?=$icons['add']?></span><?php
-								}
-							?></a>
-						</li><?php
-					}
-				}
-				?></ul>
-		</nav>
+					?></ul>
+			</nav>
+			<div id="leftmenudata" style="display: none"></div>
+		</div>
 	</div><?php
 }
 

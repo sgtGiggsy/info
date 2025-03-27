@@ -207,7 +207,7 @@ class MySQLHandler
     {
         if($this->Prepare($query))
         {
-            if($params && @$params[0])
+            if($params && @$params[0] !== null)
             {
                 $this->SetTypes(...$params);
             }
@@ -227,7 +227,7 @@ class MySQLHandler
         $paramcount = 0;
         if($this->stmt && $this->siker)
         {
-            if($params && $params[0])
+            if($params && $params[0] !== null)
             {
                 $paramcount = 1;
                 if(is_array($params))
@@ -240,7 +240,7 @@ class MySQLHandler
                 $paramszamokay = true;
             
             
-            if($params && $params[0] != null && $paramszamokay)
+            if($params && $params[0] !== null && $paramszamokay)
             {
                 if(is_array($params))
                 {
@@ -390,7 +390,7 @@ class MySQLHandler
     public function Close($backtosender = null)
     {
         if($this->con)
-            mysqli_close($this->con);
+            //mysqli_close($this->con);
 
         if($backtosender)
         {

@@ -381,7 +381,7 @@ $javascriptfiles = [
     "includes/js/pageload.js"
 ];
 
-if($pagetofind != "aktiveszkoz" && $pagetofind != "sohoeszkoz" && $pagetofind != "mediakonverter" || ($pagetofind == "aktiveszkoz" && isset($_GET['action'])))
+if(!in_array($pagetofind, array("aktiveszkoz", "sohoeszkoz", "mediakonverter")) || ($pagetofind == "aktiveszkoz" && isset($_GET['action'])))
     $javascriptfiles[] = "includes/js/progressOverlay.js";
 
 //? PHP változók átadni a JavaScriptnek
@@ -390,10 +390,13 @@ $PHPvarsToJS['RootPath'] = $RootPath;
 if($loginid)
     $PHPvarsToJS['loginid'] = $loginid; 
 
-if($felhasznaloid && @$szemelyes['switchstateshow'])
+if($felhasznaloid)
 {
     $PHPvarsToJS['Felhasznaloid'] = $felhasznaloid;
-    $javascriptfiles[] = "modules/eszkozok/includes/eszkozonlinecheck.js";
+    if(@$szemelyes['switchstateshow'])
+        $javascriptfiles[] = "modules/eszkozok/includes/eszkozonlinecheck.js";
+    if(!in_array($pagetofind, array('feladattervek', 'feladatterv')))
+        $javascriptfiles[] = "modules/feladattervezo/includes/feladatwidget.js";
 }
 
 if($felhasznaloid != 1)
@@ -407,7 +410,7 @@ $end_time = microtime(true);
 $pagegentime = round($end_time - $start_time, 2);
 $ftevekenyseg = new MySQLHandler("UPDATE felhasznalotevekenysegek SET dbcallcount=?, pagegentime=? WHERE id=?", $dbcallcount + 1, $pagegentime, $activitylogid);
 
-if($felhasznaloid == 1)
+if($felhasznaloid == 0)
 {
     echo "<div id='pageloadinfo'>Oldal generálás ideje: " . $pagegentime . " mp<br />" . "Adatbázis hívások száma: " . $dbcallcount . "</div>";
     

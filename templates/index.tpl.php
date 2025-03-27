@@ -40,7 +40,7 @@ include('./includes/menu.inc.php');
 		}
 
 		?><!-- Menürész -->
-		<?php MainMenu(); ?>		
+		<?php MainMenu(); ?>
 
 		<!-- Lábléc -->
 		<div class="bottom-line"><p><a href="mailto:<?=$DEVELOPER_MAIL?>">©<?=$DEVELOPER_NAME?> <?=date("Y")?></a></p><span id="constatus"></span></div>

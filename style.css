@@ -102,7 +102,7 @@ body {
 .wrapper {
     display: grid;
     justify-content: center;
-    background-color: var(--menu);
+    /*background-color: var(--menu);*/
     grid-template-columns: minmax(50px, 200px) 1fr 1fr;
     grid-template-rows: 50px minmax(0, max-content) minmax(500px, 2fr) minmax(0px, 200px) 30px;
     min-height: 100vh;
@@ -122,6 +122,7 @@ p {
 a {
     color: var(--basefont);
     font-weight: bold;
+    text-decoration: none;
 }
 
 img {
@@ -211,8 +212,8 @@ fieldset {
     flex: 1;
     padding: 1em;
     background-color: var(--contentbg);
-    /*justify-content: center;*/
-    overflow: auto;
+    /*justify-content: center;
+    overflow: auto;*/
     box-shadow: 2px 2px 5px var(--shadow);
     grid-column-start: 2;
     grid-column-end: 4;
@@ -2328,25 +2329,30 @@ td img {
 /* ------------------------------- Főmenü ------------------------------- */
 .leftmenuarea {
     background-color: var(--menu);
-    width: 200px;
+    /*display: flex;
+    flex-direction: column;
+    width: 200px;*/
     font-family: "inter","Source Sans Pro",Helvetica,Arial,sans-serif;
     font-size: 1rem;
     font-variant: small-caps;
     border-right: 1px solid var(--topborder);
-    grid-column: 1/2;
+    /*grid-column: 1/2;*/
     grid-row: 2/5;
 }
 
-.leftmenuarea nav {
+.mainmenu {
     position: sticky;
     top: 0;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: max-content auto;
 }
 
 .leftmenu {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
-    width: 200px;
+    margin-top: 0;
 }
 
 .leftmenuitem a, .leftmenuitem-active a,
@@ -2410,9 +2416,9 @@ td img {
 }
 
 #pageloadinfo {
-    position: fixed;
+    position: static;
     bottom: 0.5em;
-    left: 0.5em;
+    right: 0.5em;
     font-size: 0.8em;
     color: var(--greyfont);
     z-index: 1;
@@ -2891,20 +2897,27 @@ td img {
 }
 
 .feladatstates {
-    padding: 0 0.2em;
     position: absolute;
-    background-color: var(--topbase);
+    background-color: var(--menu);
+    border: 1px var(--topbase) solid;
     height: 2.5em;
     width: max-content;
     bottom: -2.5em;
     left: 0;
     z-index: 99;
+    box-shadow: 3px 3px 3px var(--shadow);;
+}
+
+.feladatstates button {
+    border: 1px var(--topbase) solid;
+    border-radius: 0;
 }
 
 .feladatstates button svg {
     padding: 0.2em 0.2em 0 0.2em;
     height: 2.5em;
     width: 2.5em;
+    
 }
 
 .gyermek {
@@ -2925,7 +2938,6 @@ td img {
 
 .felelosok div {
     display: flex;
-    
     align-items: center;
 }
 
@@ -2943,6 +2955,60 @@ td img {
 .fullwidthfajl {
     grid-column: 1/3;
 }
+
+#leftmenudata {
+    margin-left: 0.7em;
+    padding: 0 0.7em 1.5em 0;
+    font-variant: normal;
+    height: 100%;
+    overflow-y: auto;
+    font-size: 0.7em;
+}
+
+@supports (-moz-appearance: none) {
+    /* Csak Firefoxon alkalmazott stílusok */
+    #leftmenudata {
+        scrollbar-width: thin;
+    }
+}
+
+#leftmenudata h1 {
+    font-size: 1.4em;
+    padding-bottom: 0.8em;
+}
+
+#leftmenudata h2 {
+    font-size: 1.2em;
+    font-weight: normal;
+    text-align: justify;
+}
+
+#leftmenudata h2::before {
+    content: "• ";
+}
+
+.feladatwidgetelem {
+    margin: 0 0 1em 0.5em;
+    display: flex;
+    flex-direction: column;
+}
+
+.feladatwidgetelem > :first-child {
+    margin-left: 0;
+}
+
+.feladatwidgetelem div {
+    margin-left: 1.5em;
+}
+
+.feladatwidgetchild {
+    margin-left: 2em;
+}
+
+.feladatwidgetchild h2::before {
+    content: "◦ "!important;
+}
+
 /* ------------------------------- Speciális oldalak ------------------------------- */
 /* -- Tennivalók -- */
 .tennivalokwrap {
