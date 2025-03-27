@@ -26,16 +26,24 @@ function PrevNext($firstid, $previd, $nextid, $lastid, $RootPath, $oldalnev, $ke
     </div><?php
 }
 
-$count = mySQLConnect("SELECT count(*) AS db FROM $adattabla $where")->fetch_assoc()['db'];
+if(isset($countquery))
+{
+    $c = new MySQLHandler($countquery, ...$cqueryparams);
+    $count = $c->Fetch()['db'];
+}
+else
+{
+    $count = mySQLConnect("SELECT count(*) AS db FROM $adattabla $where")->fetch_assoc()['db'];
+}
 $firstid = $previd = $nextid = $lastid = null;
 
 if(isset($_POST['oldalankent']))
 {
-    $_SESSION['oldalankent'] = $_POST['oldalankent'];
+    $_SESSION[$pagetofind . '-oldalankent'] = $_POST['oldalankent'];
 }
-if(isset($_SESSION['oldalankent']))
+if(isset($_SESSION[$pagetofind . '-oldalankent']))
 {
-    $megjelenit = $_SESSION['oldalankent'];
+    $megjelenit = $_SESSION[$pagetofind . '-oldalankent'];
 }
 else
 {
@@ -69,7 +77,7 @@ if($oldal * $megjelenit < $count)
 
 ?><div class='oldalcim'><?=$oldalcim?>
     <div class="szuresvalaszto">
-        <form action="tevekenysegek" method="POST">
+        <form action="<?=$pagetofind?>" method="POST">
             <label for="oldalankent" style="font-size: 14px">Oldalanként</label>
                 <select id="oldalankent" name="oldalankent" onchange="this.form.submit()">
                     <option value="10" <?=($megjelenit == 10) ? "selected" : "" ?>>10</option>

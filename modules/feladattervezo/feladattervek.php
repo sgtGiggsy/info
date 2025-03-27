@@ -6,13 +6,15 @@ if(!$csoportolvas)
 }
 else
 {
+    $adattabla = "feladatterv_feladatok";
+    $oldalnev = "feladatterv_feladatok";
+    $oldalcim = "Feladatok listája";
     $paramarr = array();
     $javascriptfiles[] = "modules/feladattervezo/includes/feladatterv.js";
-    
-    // Mivel ehhez a menüponthoz mindenki hozzáfér legalább saját jogosultsággal a legegegyszerűbb
-    // itt jogosultságot adni nekik. Olyanokra, akik magasabb jogosultsággal rendelkeznek
-    // ez nincs kihatással
-    $egyenioldal = false;
+    $table = "modules/feladattervezo/includes/lista";
+    $countquery = 'SELECT count(*) AS db FROM feladatterv_feladatok LEFT JOIN felhasznalok felvivo ON feladatterv_feladatok.felvitte = felvivo.id WHERE feladatterv_feladatok.szulo IS NULL AND feladatterv_feladatok.aktiv = 1 AND felvivo.szervezet = ?';
+    $cqueryparams = array($szervezet);
+    $egyenioldal = $keres = false;
 
     // Először kiválasztjuk a megjelenítendő feladatok listáját.
     $where = "WHERE feladatterv_feladatok.szulo IS NULL AND feladatterv_feladatok.aktiv = 1";
@@ -35,6 +37,14 @@ else
     {
         // Megállapítjuk, hogy a felhasználó írhatja-e a feladatot
 
-        include("./modules/feladattervezo/includes/lista.php");
+        //include("./modules/feladattervezo/includes/lista.php");
+        if($csoportir)
+        {
+            ?><div class="szerkgombsor">
+                <button type="button" onclick="location.href='<?=$RootPath?>/feladatterv?action=addnew'">Új feladat létrehozása</button>
+            </div><?php
+        }
+
+        include('././templates/lapozas.tpl.php');
     }
 }

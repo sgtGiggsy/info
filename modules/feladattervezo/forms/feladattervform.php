@@ -77,7 +77,7 @@ if(@$irhat)
                         <option value=""></option><?php
                         foreach($szakok as $szak)
                         {
-                            ?><option value="<?=$szak['id']?>" <?=($szak['id'] == $szakid) ? "selected" : "" ?>><?=$szak['nev']?></option><?php
+                            ?><option value="<?=$szak['id']?>" <?=($szak['id'] == $szakid) ? "selected" : "" ?>><?=ucfirst($szak['nev'])?></option><?php
                         }
                     ?></select>
                 </div>

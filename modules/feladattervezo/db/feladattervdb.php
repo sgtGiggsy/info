@@ -5,12 +5,12 @@ $qs = 'SELECT szervezet
     WHERE feladatterv_feladatok = ?';
 $irhat = isVerifiedToWrite($qs, $szervezet, 'szervezet');
 
-if($irhat)
+if($irhat && isset($_GET['action']))
 {
     $feladatdb = new mySQLHandler();
     $feladatdb->KeepAlive();
-
     $timestamp = timeStampForSQL();
+    $targetid = null;
     
     if(isset($_POST['leiras']))
         $leirasHTML = $_POST['leiras'];
@@ -22,33 +22,43 @@ if($irhat)
             $_POST['rovid'], $leirasHTML, $_POST['prioritas'], $_POST['szulo'], $_POST['szakid'], $_POST['epulet'], $_SESSION['id'], $_POST['ido_tervezett'], $_POST['ido_hatarido']);
 
         $feladatid = $feladatdb->last_insert_id;
+        $targetid = ($_POST['szulo']) ? $_POST['szulo'] : $feladatid;
     }
 
     elseif($_GET["action"] == "update")
     {
-        $feladatdb->Query('UPDATE feladatterv_feladatok SET rovid=?, leiras=?, prioritas=?, szakid=?, epulet=?, modositotta=?, ido_tervezett=?, ido_hatarido=?, ido_modositas=? WHERE feladat_id=?',
-            $_POST['rovid'], $leirasHTML, $_POST['prioritas'], $_POST['szakid'], $_POST['epulet'], $_SESSION['id'], $_POST['ido_tervezett'], $_POST['ido_hatarido'], $timestamp, $_POST['id']);
         $feladatid = $_POST['id'];
+        $feladatdb->Query('UPDATE feladatterv_feladatok SET rovid=?, leiras=?, prioritas=?, szakid=?, epulet=?, modositotta=?, ido_tervezett=?, ido_hatarido=?, ido_modositas=? WHERE feladat_id=?',
+            $_POST['rovid'], $leirasHTML, $_POST['prioritas'], $_POST['szakid'], $_POST['epulet'], $_SESSION['id'], $_POST['ido_tervezett'], $_POST['ido_hatarido'], $timestamp, $feladatid);
     }
 
     elseif($_GET["action"] == "delete")
     {
-        $feladatdb->Query('UPDATE feladatterv_feladatok SET aktiv = 0 WHERE feladat_id=?', $_GET['id']);
+        $feladatid = $_GET['id'];
+        $feladatdb->Query('UPDATE feladatterv_feladatok SET aktiv = 0 WHERE feladat_id=?', $feladatid);
     }
 
     elseif($_GET["action"] == "stateupdate" && isset($_GET["state"]))
     {
         //TODO Kibővíteni ellenőrzésekkel: ha kész és főfeladat, minden folyamatban lévő, vagy megkezdett folyamat készre állítása (a sikertelen állapotúak nem)
         //TODO Módosítás/tényleges végrehajtás idejének hozzáadása
-        $feladatdb->Query('UPDATE feladatterv_feladatok SET allapot = ? WHERE feladat_id=?', $_GET["state"], $_GET['id']);
+
+        $feladatid = $_GET['id'];
+        $feladatdb->Query('UPDATE feladatterv_feladatok SET allapot=?, ido_tenyleges=? WHERE feladat_id=?', $_GET["state"], $timestamp, $feladatid);
     }
 
     elseif($_GET["action"] == "komment")
     {
-        $feladatdb->Query('INSERT INTO feladatterv_kommentek (felhasznalo_id, feladat_id, szoveg) VALUES (?, ?, ?)', $_SESSION['id'], $_GET['id'], $_POST['szoveg']);
+        $feladatid = $_GET['id'];
+        $feladatdb->Query('INSERT INTO feladatterv_kommentek (felhasznalo_id, feladat_id, szoveg) VALUES (?, ?, ?)', $_SESSION['id'], $feladatid, $_POST['szoveg']);
     }
 
-    //TODO Fájlfeltöltés megoldása
+    if($_GET["action"] != "new")
+    {
+        $feladatdb->Query('SELECT szulo FROM feladatterv_feladatok WHERE feladat_id = ?', $feladatid);
+        $targetid = $feladatdb->Fetch()['szulo'];
+        $targetid = ($targetid) ? $targetid : $_GET['id'];
+    }
 
     if(isset($_POST['felelosok']) && $_POST['felelosok'])
     {
@@ -89,6 +99,6 @@ if($irhat)
         }
     }
 
-    //TODO Jobb átiránytás.
-    $feladatdb->Close($backtosender);
+    $felurl = $RootPath . "/feladatterv/" . $targetid;
+    $feladatdb->Close($felurl);
 }

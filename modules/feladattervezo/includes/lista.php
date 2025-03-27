@@ -42,12 +42,9 @@ elseif($csoportir)
         $fajlszam = $feladatelem['fajlszam'];
         $kommentszam = $feladatelem['kommentszam'];
         
-        $feladatelem['epulet'];
-        $feladatelem['felvitte'];
-        $feladatelem['modositotta'];
         $feladatelem['ido_tenyleges'];
         $feladatelem['szervezet'];
-        
+
         switch($feladatelem['prioritas'])
         {
             case 2 : $urgclass = "halaszthato"; break;
@@ -55,6 +52,16 @@ elseif($csoportir)
             case 4 : $urgclass = "surgos"; break;
             case 5 : $urgclass = "kritikus"; break;
             default: $urgclass = "allapotsorszam";
+        }
+
+        if($urgentdeadline)
+        {
+            $urgclass = "surgos";
+        }
+
+        if($untildeadline < 0 )
+        {
+            $urgclass = "kritikus";
         }
 
         switch($feladatelem['allapot'])
@@ -78,7 +85,7 @@ elseif($csoportir)
                         <div class="allapotelemparent">
                             <strong><?=$feladatelem['ido_tervezett']?></strong>
                             <p><small><?=$allapot?></small></p>
-                            <p><small><?=$feladatelem['szaknev']?></small></p>
+                            <p><small><?=ucfirst($feladatelem['szaknev'])?></small></p>
                         </div>
                         <div class="feladatactions">
                             <button title="Állapotváltás" onclick="rejtMutat('actions-<?=$feladatelem['feladat_id']?>')"><?=$gombikon?></button>
@@ -96,7 +103,7 @@ elseif($csoportir)
                         <div class="feladatnev" id="feladatnev-<?=$feladatelem['feladat_id']?>">
                             <h2><?=nl2br($feladatelem['rovid'])?></h2>
                         </div>
-                        <div class="feladatleiras" id="leiras-<?=$feladatelem['feladat_id']?>" style="display: none">
+                        <div class="feladatleiras" id="leiras-<?=$feladatelem['feladat_id']?>" style="<?=(!$feladatelem['szulo'] && $egyenioldal) ? '' : 'display: none' ?>">
                             <?=$feladatelem['leiras']?>
                         </div>
                     </div>
@@ -139,7 +146,7 @@ elseif($csoportir)
 
                     if($egyenioldal)
                     {
-                        ?><div class="feladatkommentek" id="kommentek-<?=$feladatelem['feladat_id']?>" style="display: none"><?php
+                        ?><div class="feladatkommentek" id="kommentek-<?=$feladatelem['feladat_id']?>" style="<?=($feladatelem['szulo']) ? 'display: none' : '' ?>"><?php
                             if($kommentszam > 0)
                             {
                                 ?><h2>Megjegyzések</h2>
@@ -160,7 +167,7 @@ elseif($csoportir)
                                 </form>
                             </div>
                         </div>
-                        <div class="feladatfajlok" id="fajlok-<?=$feladatelem['feladat_id']?>" style="display: none"><?php
+                        <div class="feladatfajlok" id="fajlok-<?=$feladatelem['feladat_id']?>" style="<?=($feladatelem['szulo']) ? 'display: none' : '' ?>"><?php
                             if($fajlszam > 0)
                             {
                                 ?><div><h2>Feltöltött fájlok</h2></div><?php

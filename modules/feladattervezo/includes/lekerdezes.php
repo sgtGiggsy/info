@@ -79,7 +79,7 @@ $feladatterv  = new MySQLHandler("SELECT rovid, leiras, prioritas, allapot, szul
         LEFT JOIN szakok ON feladatterv_feladatok.szakid = szakok.id
     $where $csoportwhere
     GROUP BY feladatterv_feladatok.feladat_id
-    ORDER BY feladatterv_feladatok.feladat_id ASC, ido_tervezett ASC;", ...$paramarr);
+    ORDER BY feladatterv_feladatok.szulo ASC, FIELD(feladatterv_feladatok.allapot, 3, 0), ido_tervezett IS NULL, ido_tervezett ASC;", ...$paramarr);
 
 // Ha nincs feladatterv, akkor letiltjuk a hozzáférést
 if($feladatterv->sorokszama == 0)
