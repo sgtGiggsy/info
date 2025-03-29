@@ -40,11 +40,12 @@ if($irhat && isset($_GET['action']))
 
     elseif($_GET["action"] == "stateupdate" && isset($_GET["state"]))
     {
-        //TODO Kibővíteni ellenőrzésekkel: ha kész és főfeladat, minden folyamatban lévő, vagy megkezdett folyamat készre állítása (a sikertelen állapotúak nem)
-        //TODO Módosítás/tényleges végrehajtás idejének hozzáadása
-
         $feladatid = $_GET['id'];
         $feladatdb->Query('UPDATE feladatterv_feladatok SET allapot=?, ido_tenyleges=? WHERE feladat_id=?', $_GET["state"], $timestamp, $feladatid);
+        if($_GET["state"] == "0" || $_GET["state"] == "3")
+        {
+            $feladatdb->Query('UPDATE feladatterv_feladatok SET allapot=?, ido_tenyleges=? WHERE szulo=? AND allapot IN(1, 2)', $_GET["state"], $timestamp, $feladatid);
+        }
     }
 
     elseif($_GET["action"] == "komment")
