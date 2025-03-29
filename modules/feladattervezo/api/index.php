@@ -41,7 +41,7 @@ if($felhasznaloid)
                 ORDER BY path, vegrehajt ASC, prioritas DESC, feladat_id ASC", $felhasznaloid, $felhasznaloid);
     if($feladatok->sorokszama > 0)
     {
-        ?><div><h1>Feladatok</h1><?php
+        ?><div><?php
         foreach($feladatok->Result() as $feladat)
         {
             $urgentdeadline = false;

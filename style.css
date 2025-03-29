@@ -2345,7 +2345,7 @@ td img {
     top: 0;
     height: 100vh;
     display: grid;
-    grid-template-rows: max-content auto;
+    grid-template-rows: max-content auto auto;
 }
 
 .leftmenu {
@@ -2353,6 +2353,7 @@ td img {
     flex-wrap: wrap;
     flex-direction: column;
     margin-top: 0;
+    margin-bottom: 0.5em;
 }
 
 .leftmenuitem a, .leftmenuitem-active a,
@@ -2954,6 +2955,12 @@ td img {
 
 .fullwidthfajl {
     grid-column: 1/3;
+}
+
+#leftmenudtitle h1 {
+    font-size: 1.2em;
+    font-variant: normal;
+    margin-bottom: 0.4em;
 }
 
 #leftmenudata {

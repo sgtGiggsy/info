@@ -69,6 +69,7 @@ function MainMenu()
 					}
 					?></ul>
 			</nav>
+			<div id="leftmenudtitle" style="display: none"></div>
 			<div id="leftmenudata" style="display: none"></div>
 		</div>
 	</div><?php
