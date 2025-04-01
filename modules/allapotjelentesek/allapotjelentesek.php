@@ -41,11 +41,22 @@ else
         {
             $_SESSION['kiszurtoids'][] = $oid;
         }
+        $oidtodb = json_encode($_POST['kiszurtoid']);
+        $szemelyes = new MySQLHandler('UPDATE szemelyesbeallitasok SET snmp_filter = ? WHERE felhid = ?', $oidtodb, $felhasznaloid);
+    }
+
+    if(isset($szemelyes['snmp_filter']) && !isset($_SESSION['kiszurtoids']))
+    {
+        foreach(json_decode($szemelyes['snmp_filter']) as $oid)
+        {
+            $_SESSION['kiszurtoids'][] = $oid;
+        }
     }
 
     if(isset($_POST['szurTorol']))
     {
         $_SESSION['kiszurtoids'] = array();
+        $szemelyes = new MySQLHandler('UPDATE szemelyesbeallitasok SET snmp_filter = ? WHERE felhid = ?', null, $felhasznaloid);
     }
 
     if($severityfilter != "minden")
