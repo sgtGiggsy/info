@@ -59,8 +59,8 @@ if($felhasznaloid)
                 case 3 : $allapot = "Befejezve"; break;
             }
             
-            ?><a href="<?=$RootPath?>/feladatterv/<?=($feladat['szulo']) ? $feladat['szulo'] : $feladat['feladat_id'] ?>"><div class="feladatwidgetelem <?=($feladat['szulo']) ? 'feladatwidgetchild' : '' ?>">
-                <div <?=($urgentdeadline) ? "class='kritikus-font'" : "" ?>><h2><?=$feladat['rovid']?></h2></div>
+            ?><a href="<?=$RootPath?>/feladatterv/<?=($feladat['szulo']) ? $feladat['szulo'] : $feladat['feladat_id'] ?>"><div class="feladatwidgetelem <?=($feladat['szulo']) ? 'feladatwidgetchild' : '' ?> <?=($urgentdeadline) ? "kritikus-font" : "" ?>">
+                <div><h2><?=$feladat['rovid']?></h2></div>
                 <div><i><?=($feladat['vegrehajt'] != "2099-12-31 23:59:59") ? $feladat['vegrehajt'] : "" ?></i></div>
                 <div><small><?=$feladat['prioritasnev']?> - <?=$allapot?></small></div>
             </div></a><?php

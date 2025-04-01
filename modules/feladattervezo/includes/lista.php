@@ -83,7 +83,7 @@ elseif($csoportir)
                 <div class="feladatelemdiv">
                     <div class="<?=$urgclass?> feladatid" title="<?=$feladatelem['prioritasnev']?>">
                         <div class="allapotelemparent">
-                            <strong><?=$feladatelem['ido_tervezett']?></strong>
+                            <strong><?=($feladatelem['ido_tervezett']) ? $feladatelem['ido_tervezett'] : $feladatelem['ido_hatarido']?></strong>
                             <p><small><?=$allapot?></small></p>
                             <p><small><?=ucfirst($feladatelem['szaknev'])?></small></p>
                         </div>

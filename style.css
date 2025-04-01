@@ -2345,7 +2345,7 @@ td img {
     top: 0;
     height: 100vh;
     display: grid;
-    grid-template-rows: max-content auto auto;
+    grid-template-rows: max-content min-content auto;
 }
 
 .leftmenu {
@@ -2961,6 +2961,7 @@ td img {
     font-size: 1.2em;
     font-variant: normal;
     margin-bottom: 0.4em;
+    margin-left: 0.3em;
 }
 
 #leftmenudata {
