@@ -21,4 +21,10 @@ window.onload = function()
 {
     if(typeof menunyit !== 'undefined' && document.getElementById(menunyit) != null)
         document.getElementById(menunyit).style.display = "";
+
+    let plinf = document.getElementById('pageloadinfo');
+    if(plinf)
+    {
+        document.getElementById('dbinf').innerHTML = plinf.innerHTML;
+    }
 }

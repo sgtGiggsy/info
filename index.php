@@ -331,7 +331,8 @@ foreach($menu as $oldal)
             $szulonyit = $oldal['szulo'];
         break;
     }
-    $menuterulet[$oldal['menuterulet']][] = $oldal;
+    if($oldal['olvasas'] > 0)
+        $menuterulet[$oldal['menuterulet']][] = $oldal;
 }
 
 define('MINDIR', $mindir);
@@ -410,9 +411,9 @@ $end_time = microtime(true);
 $pagegentime = round($end_time - $start_time, 2);
 $ftevekenyseg = new MySQLHandler("UPDATE felhasznalotevekenysegek SET dbcallcount=?, pagegentime=? WHERE id=?", $dbcallcount + 1, $pagegentime, $activitylogid);
 
-if($felhasznaloid == 0)
+if($felhasznaloid == 1)
 {
-    echo "<div id='pageloadinfo'>Oldal generálás ideje: " . $pagegentime . " mp<br />" . "Adatbázis hívások száma: " . $dbcallcount . "</div>";
+    echo "<div id='pageloadinfo' style='display: none'>Oldal generálás ideje: " . $pagegentime . " mp; " . "Adatbázis hívások száma: " . $dbcallcount . "</div>";
     
     if(@$querylist)
     {

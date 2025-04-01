@@ -309,7 +309,7 @@ else
                                         ?><div>
                                             <label <?=($debug && $valasz['helyes'] == 1) ? "style='font-style: italic;'" : "" ?> class="customcb">
                                                 <input type="<?=$inptype?>" name="valaszok[]" id="valaszok" onclick="halasztKuldSwitch();" value="<?=$valasz['id']?>" <?=$kivalaszt?>>
-                                                    <span class="<?=$inpclassJel?>"></span>    
+                                                    <span class="<?=$inpclassJel?>"></span>
                                                     <span><?=nl2br($valasz['valaszszoveg'])?></span>
                                             </label>
                                         </div><?php
@@ -350,10 +350,7 @@ else
                         <p>Átirányítunk a vizsga kiértékelése oldalra.</p>
                     </div>
                 </div><?php
-                $PHPvarsToJS[] = array(
-                        'name' => 'hatralevoido',
-                        'val' => $hatralevoido
-                    );
+                $PHPvarsToJS['hatralevoido'] = $hatralevoido;
             }
         }
     }

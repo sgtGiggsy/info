@@ -153,6 +153,11 @@ function logActivity($felhasznalo, $params)
 	@$menupont = $_GET['page'];
 	@$elemid = $_GET['id'];
 
+	if($felhasznalo == 0)
+	{
+		$felhasznalo = null;
+	}
+
 	if(isset($_GET['id']) && is_string($_GET['id']) && !isset($_GET['subpage']))
 	{
 		@$almenu = $_GET['id'];
