@@ -46,7 +46,7 @@ else
         if(isset($_POST['valaszok'][0]) && $_POST['valaszok'][0])
         {
             $kitoltesvalaszid = $_POST['kitoltesvalaszid'];
-            $valasz = $_POST['valaszok'][0];
+            $valasz = $_POST['valaszok'][0] ?? null;
             $valasz2 = $_POST['valaszok'][1] ?? null;
             $valasz3 = $_POST['valaszok'][2] ?? null;
 

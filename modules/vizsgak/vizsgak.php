@@ -83,20 +83,19 @@ if(@$mindir)
                     $megjelent = array();
                     $adminids = explode(";", $vizsga['adminidlist']);
                     $adminnevs = explode(";", $vizsga['adminnevlist']);
-                    $index = 0;
+                    $adminidcount = count($adminids);
                     if($vizsga['adminidlist'])
                     {
-                        foreach($adminids as $adminid)
+                        for($i = 0; $i < $adminidcount; $i++)
                         {
-                            if(!in_array($adminid, $megjelent))
+                            if(!in_array($adminids[$i], $megjelent))
                             {
                                 ?><tr>
                                     <td></td>
-                                    <td><a href='<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/adminszerkeszt/<?=$adminid?>'><?=$adminnevs[$index]?></td>
+                                    <td><a href='<?=$RootPath?>/vizsga/<?=$vizsga['vizsgaurl']?>/adminszerkeszt/<?=$adminids[$i]?>'><?=$adminnevs[$i]?></td>
                                     <td></td>
                                 </tr><?php
-                                $megjelent[] = $adminid;
-                                $index++;
+                                $megjelent[] = $adminids[$i];
                             }
                         }
                     }
