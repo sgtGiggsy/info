@@ -75,6 +75,11 @@ if($oldal * $megjelenit < $count)
         $lastid = floor($lastid) + 1;
 }
 
+if(isset($lekerdezes))
+{
+    include($lekerdezes);
+}
+
 ?><div class='oldalcim'><?=$oldalcim?>
     <div class="szuresvalaszto">
         <form action="<?=$pagetofind?>" method="POST">

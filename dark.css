@@ -4,6 +4,7 @@
     --basefont: #c4cccc !important;
     --fontlight: #c4cccc !important;
     --fontlight2: #c4cccc !important;
+    --fontlight3: #f5f5f5 !important;
     --greyfont: #a1a1a1 !important;
     --contentbg: #222328 !important;
     --menu: #1e1f23 !important;
@@ -38,7 +39,7 @@
     --thead: #1d1d20 !important;
     --tsoro: #2c2c31 !important;
     --tsore: #252528 !important;
-    --hibas: #666666;
+    --hibas: #666666 !important;
     --hibasoffline: #990000ac;
     --online: #018216 !important;
     --offline: #990000 !important;
@@ -58,10 +59,10 @@
     --loadercolor: #3498db !important;
     --warning: #990000 !important;
     --addnewborder: #33343a !important;
-    --alacsony: #3fbb01;
-    --halaszthato: #b4fc00;
-    --urgent: #c04d00;
-    --important: #e1bc00;
+    --alacsony: #3fbb01 !important;
+    --halaszthato: #93c90b !important;
+    --urgent: #c04d00 !important;
+    --important: #e1bc00 !important;
 }
 
 .dontprint img, .infoboxtitle img, td img{

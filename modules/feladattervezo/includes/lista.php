@@ -47,6 +47,7 @@ elseif($csoportir)
 
         switch($feladatelem['prioritas'])
         {
+            case 1 : $urgclass = "minimalis"; break;
             case 2 : $urgclass = "halaszthato"; break;
             case 3 : $urgclass = "alacsony"; break;
             case 4 : $urgclass = "surgos"; break;

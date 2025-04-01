@@ -28,6 +28,7 @@
     --basefont: #000000;
     --fontlight: #e0e0e0;
     --fontlight2: #f7f7f7;
+    --fontlight3: #f5f5f5;
     --greyfont: #a1a1a1;
     --contentbg: #ededed;
     --menu: #2d373c;
@@ -83,7 +84,7 @@
     --warning: #990000;
     --addnewborder: #33343a;
     --alacsony: #3fbb01;
-    --halaszthato: #b4fc00;
+    --halaszthato: #93c90b;
     --urgent: #c04d00;
     --important: #e1bc00;
 }
@@ -2313,7 +2314,9 @@ td img {
 }
 
 /* ------------------------------- Lábléc ------------------------------- */
-.bottom-line, .bottom-line a {
+.bottom-line {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     height: 30px;
     padding: 5px 0;
     text-align: center;
@@ -2324,6 +2327,16 @@ td img {
     grid-column-end: 4;
     grid-row-start: 5;
     grid-row-end: 6;
+}
+
+.bottom-line a {
+    color: var(--fontlight);
+}
+
+#dbinf {
+    font-size: 0.8em;
+    text-align: left;
+    padding: 0.2em 0 0 0.3em;
 }
 
 /* ------------------------------- Főmenü ------------------------------- */
@@ -2417,9 +2430,9 @@ td img {
 }
 
 #pageloadinfo {
-    position: static;
+    position: fixed;
     bottom: 0.5em;
-    right: 0.5em;
+    left: 0.5em;
     font-size: 0.8em;
     color: var(--greyfont);
     z-index: 1;
@@ -2813,6 +2826,11 @@ td img {
     grid-row: 1/4;
     display: flex;
     flex-direction: column;
+    color: var(--fontlight3);
+}
+
+.feladatid svg {
+    fill: var(--fontlight3);
 }
 
 .feladatid > :first-child {
@@ -2901,9 +2919,9 @@ td img {
     position: absolute;
     background-color: var(--menu);
     border: 1px var(--topbase) solid;
-    height: 2.5em;
     width: max-content;
-    bottom: -2.5em;
+    /*height: 2.5em;
+    bottom: -2.5em;*/
     left: 0;
     z-index: 99;
     box-shadow: 3px 3px 3px var(--shadow);;
@@ -2957,6 +2975,10 @@ td img {
     grid-column: 1/3;
 }
 
+#leftmenudtitle a, #leftmenudata a {
+    color: var(--basefont);
+}
+
 #leftmenudtitle h1 {
     font-size: 1.2em;
     font-variant: normal;
@@ -2964,13 +2986,20 @@ td img {
     margin-left: 0.3em;
 }
 
+#leftmenudtitle {
+    padding-top: 0.5em;
+}
+
 #leftmenudata {
-    margin-left: 0.7em;
-    padding: 0 0.7em 1.5em 0;
+    padding: 0 0.7em 1.5em 0.3em;
     font-variant: normal;
     height: 100%;
     overflow-y: auto;
     font-size: 0.7em;
+}
+
+#leftmenudtitle, #leftmenudata {
+    background-color: var(--tsore);
 }
 
 @supports (-moz-appearance: none) {
@@ -3380,6 +3409,10 @@ div[id^=tennivalobody-].close {
 
 .kesz {
     background-color: var(--toasterbg);
+}
+
+.minimalis {
+    background-color: var(--loadercolor);
 }
 
 .alacsony {

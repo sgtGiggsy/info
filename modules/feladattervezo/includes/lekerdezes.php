@@ -34,6 +34,15 @@ if(!$csoportir)
     $csoportwhere = ")";
 }
 
+if(isset($lapozas))
+{
+    $lapozas = "LIMIT $start, $megjelenit";
+}
+else
+{
+    $lapozas = null;
+}
+
 $szakok = new MySQLHandler("SELECT id, nev FROM szakok ORDER BY nev ASC;");
 $szakok = $szakok->Result();
 $felhasznalok = new MySQLHandler("SELECT id, nev FROM felhasznalok WHERE szervezet = ? AND aktiv = 1 ORDER BY nev ASC;", $szervezet);
@@ -79,7 +88,8 @@ $feladatterv  = new MySQLHandler("SELECT rovid, leiras, prioritas, allapot, szul
         LEFT JOIN szakok ON feladatterv_feladatok.szakid = szakok.id
     $where $csoportwhere
     GROUP BY feladatterv_feladatok.feladat_id
-    ORDER BY feladatterv_feladatok.szulo ASC, FIELD(feladatterv_feladatok.allapot, 3, 0), vegrehajt;", ...$paramarr);
+    ORDER BY feladatterv_feladatok.szulo ASC, FIELD(feladatterv_feladatok.allapot, 3, 0), vegrehajt
+    $lapozas;", ...$paramarr);
 
 // Ha nincs feladatterv, akkor letiltjuk a hozzáférést
 if($feladatterv->sorokszama == 0)
