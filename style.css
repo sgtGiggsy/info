@@ -83,8 +83,9 @@
     --loadercolor: #3498db;
     --warning: #990000;
     --addnewborder: #33343a;
+    --minimal: #36d395;
     --alacsony: #3fbb01;
-    --halaszthato: #93c90b;
+    --halaszthato: #19994e;
     --urgent: #c04d00;
     --important: #e1bc00;
 }
@@ -1894,8 +1895,16 @@ td img {
     font-weight: bold;
 }
 
+.online svg {
+    fill: var(--online)!important;
+}
+
 .offline, .offline a {
     color: var(--offline);
+}
+
+.offline svg {
+    fill: var(--offline)!important;
 }
 
 .warning, .warning a {
@@ -2936,7 +2945,6 @@ td img {
     padding: 0.2em 0.2em 0 0.2em;
     height: 2.5em;
     width: 2.5em;
-    
 }
 
 .gyermek {
@@ -2963,6 +2971,10 @@ td img {
 .felelosok a {
     text-decoration: none;
     padding: 0.3em 0;
+}
+
+.feladatlink {
+    grid-column: 1/4;
 }
 
 .feladatkepek {
@@ -3412,7 +3424,7 @@ div[id^=tennivalobody-].close {
 }
 
 .minimalis {
-    background-color: var(--loadercolor);
+    background-color: var(--minimal);
 }
 
 .alacsony {
@@ -3421,6 +3433,10 @@ div[id^=tennivalobody-].close {
 
 .halaszthato {
     background-color: var(--halaszthato);
+}
+
+.normal {
+    background-color: var(--online);
 }
 
 .fontos {

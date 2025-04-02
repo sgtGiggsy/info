@@ -18,8 +18,8 @@ if($irhat && isset($_GET['action']))
 
     if($_GET["action"] == "new")
     {
-        $feladatdb->Query('INSERT INTO feladatterv_feladatok (rovid, leiras, prioritas, szulo, szakid, epulet, felvitte, ido_tervezett, ido_hatarido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            $_POST['rovid'], $leirasHTML, $_POST['prioritas'], $_POST['szulo'], $_POST['szakid'], $_POST['epulet'], $_SESSION['id'], $_POST['ido_tervezett'], $_POST['ido_hatarido']);
+        $feladatdb->Query('INSERT INTO feladatterv_feladatok (rovid, leiras, prioritas, szulo, szakid, epulet, felvitte, hivatkozas, ido_tervezett, ido_hatarido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            $_POST['rovid'], $leirasHTML, $_POST['prioritas'], $_POST['szulo'], $_POST['szakid'], $_POST['epulet'], $_SESSION['id'], $_POST['hivatkozas'], $_POST['ido_tervezett'], $_POST['ido_hatarido']);
 
         $feladatid = $feladatdb->last_insert_id;
         $targetid = ($_POST['szulo']) ? $_POST['szulo'] : $feladatid;
@@ -28,8 +28,8 @@ if($irhat && isset($_GET['action']))
     elseif($_GET["action"] == "update")
     {
         $feladatid = $_POST['id'];
-        $feladatdb->Query('UPDATE feladatterv_feladatok SET rovid=?, leiras=?, prioritas=?, szakid=?, epulet=?, modositotta=?, ido_tervezett=?, ido_hatarido=?, ido_modositas=? WHERE feladat_id=?',
-            $_POST['rovid'], $leirasHTML, $_POST['prioritas'], $_POST['szakid'], $_POST['epulet'], $_SESSION['id'], $_POST['ido_tervezett'], $_POST['ido_hatarido'], $timestamp, $feladatid);
+        $feladatdb->Query('UPDATE feladatterv_feladatok SET rovid=?, leiras=?, prioritas=?, szakid=?, epulet=?, modositotta=?, hivatkozas=?, ido_tervezett=?, ido_hatarido=?, ido_modositas=? WHERE feladat_id=?',
+            $_POST['rovid'], $leirasHTML, $_POST['prioritas'], $_POST['szakid'], $_POST['epulet'], $_SESSION['id'], $_POST['hivatkozas'], $_POST['ido_tervezett'], $_POST['ido_hatarido'], $timestamp, $feladatid);
     }
 
     elseif($_GET["action"] == "delete")
@@ -58,7 +58,7 @@ if($irhat && isset($_GET['action']))
     {
         $feladatdb->Query('SELECT szulo FROM feladatterv_feladatok WHERE feladat_id = ?', $feladatid);
         $targetid = $feladatdb->Fetch()['szulo'];
-        $targetid = ($targetid) ? $targetid : $_GET['id'];
+        $targetid = ($targetid) ? $targetid : $feladatid;
     }
 
     if(isset($_POST['felelosok']) && $_POST['felelosok'])

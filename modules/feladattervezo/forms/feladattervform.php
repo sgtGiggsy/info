@@ -20,6 +20,7 @@ if(@$irhat)
         $currbuild = $elsofeladat['epulet'];
         $szakid = $elsofeladat['szakid'];
         $ido_tenyleges = $elsofeladat['ido_tenyleges'];
+        $hivatkozas = $elsofeladat['hivatkozas'];
         $felelosok = concatToAssocArray(array('id', 'nev'), $elsofeladat['felelosids'], $elsofeladat['felelosnevek']);
         if($felelosok)
         {
@@ -80,6 +81,11 @@ if(@$irhat)
                             ?><option value="<?=$szak['id']?>" <?=($szak['id'] == $szakid) ? "selected" : "" ?>><?=ucfirst($szak['nev'])?></option><?php
                         }
                     ?></select>
+                </div>
+
+                <div>
+                    <label for="hivatkozas">Hivatkozás</label>
+                    <input type="text" id="hivatkozas" name="hivatkozas" value="<?=$hivatkozas?>">
                 </div>
                 
                 <div>

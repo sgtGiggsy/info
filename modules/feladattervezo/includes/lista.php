@@ -12,7 +12,7 @@ elseif($csoportir)
 }
 
 ?><div class="allapotjelentesek"><?php
-    $kattinthatolink = null;
+    $kattinthatolink = $gombikonclass = null;
     foreach($feladatterv->Result() as $feladatelem)
     {
         $felelosok = concatToAssocArray(array('id', 'nev'), $feladatelem['felelosids'], $feladatelem['felelosnevek']);
@@ -49,7 +49,7 @@ elseif($csoportir)
         {
             case 1 : $urgclass = "minimalis"; break;
             case 2 : $urgclass = "halaszthato"; break;
-            case 3 : $urgclass = "alacsony"; break;
+            case 3 : $urgclass = "normal"; break;
             case 4 : $urgclass = "surgos"; break;
             case 5 : $urgclass = "kritikus"; break;
             default: $urgclass = "allapotsorszam";
@@ -67,10 +67,10 @@ elseif($csoportir)
 
         switch($feladatelem['allapot'])
         {
-            case 0 : $allapot = "Sikertelen"; $gombikon = $icons['taskfailed']; break;
+            case 0 : $allapot = "Sikertelen"; $gombikon = $icons['taskfailed']; $gombikonclass = "class='offline'"; $urgclass = "allapotsorszam"; break;
             case 1 : $allapot = "Megkezdetlen"; $gombikon = $icons['checkmark']; break;
             case 2 : $allapot = "Folyamatban"; $gombikon = $icons['taskprogress']; break;
-            case 3 : $allapot = "Befejezve"; $gombikon = $icons['taskdone']; $untildeadline = false; $urgclass = "allapotsorszam"; break;
+            case 3 : $allapot = "Befejezve"; $gombikon = $icons['taskdone']; $untildeadline = false; $gombikonclass = "class='online'"; $urgclass = "allapotsorszam"; break;
         }
 
         ?><div class="feladatelemwrap">
@@ -84,12 +84,13 @@ elseif($csoportir)
                 <div class="feladatelemdiv">
                     <div class="<?=$urgclass?> feladatid" title="<?=$feladatelem['prioritasnev']?>">
                         <div class="allapotelemparent">
-                            <strong><?=($feladatelem['ido_tervezett']) ? $feladatelem['ido_tervezett'] : $feladatelem['ido_hatarido']?></strong>
+                            <strong><?=($feladatelem['ido_tenyleges']) ? $feladatelem['ido_tenyleges'] : 
+                                            (($feladatelem['ido_tervezett']) ? $feladatelem['ido_tervezett'] : $feladatelem['ido_hatarido'])?></strong>
                             <p><small><?=$allapot?></small></p>
                             <p><small><?=ucfirst($feladatelem['szaknev'])?></small></p>
                         </div>
                         <div class="feladatactions">
-                            <button title="Állapotváltás" onclick="rejtMutat('actions-<?=$feladatelem['feladat_id']?>')"><?=$gombikon?></button>
+                            <button title="Állapotváltás" <?=$gombikonclass?> onclick="rejtMutat('actions-<?=$feladatelem['feladat_id']?>')"><?=$gombikon?></button>
                             <button title="Szerkeszt" onclick="elemFelkeres('<?=$feladatelem['feladat_id']?>?action=edit')"><?=$icons['edit']?></button><?php
                             if(!$feladatelem['szulo'])
                             {
@@ -143,6 +144,7 @@ elseif($csoportir)
                                 <div id="megjegyzesdb-<?=$feladatelem['feladat_id']?>">Megjegyzések: <?=$kommentszam?></div>
                             </div>
                         </div>
+                        <div class="feladatlink"><a href='<?=$feladatelem['hivatkozas']?>' target='_blank'><?=$feladatelem['hivatkozas']?></a></div>
                     </div><?php
 
                     if($egyenioldal)

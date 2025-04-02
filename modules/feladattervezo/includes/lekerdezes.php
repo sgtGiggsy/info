@@ -6,7 +6,7 @@ elseif($csoportolvas)
     $where .= " AND (felvivo.szervezet = ?)";
     $paramarr[] = $szervezet;
 }
-$feladatterv = $untildeadline = $leiras = $rovid = $currpri = $currbuild = $ido_tervezett = $ido_hatarido = $ido_tenyleges = $szakid = null;
+$feladatterv = $untildeadline = $leiras = $rovid = $currpri = $currbuild = $ido_tervezett = $ido_hatarido = $ido_tenyleges = $szakid = $hivatkozas = null;
 $csoportwhere = null;
 $newelemid = 0;
 $selectedfelelosok = array();
@@ -49,7 +49,7 @@ $felhasznalok = new MySQLHandler("SELECT id, nev FROM felhasznalok WHERE szervez
 $felhasznalok = $felhasznalok->Result();
 
 $feladatterv  = new MySQLHandler("SELECT rovid, leiras, prioritas, allapot, szulo, szakid, epulet, felvitte, modositotta,
-            ido_letrehoz, ido_tervezett, ido_tenyleges, ido_hatarido, ido_modositas,
+            ido_letrehoz, ido_tervezett, ido_tenyleges, ido_hatarido, ido_modositas, hivatkozas,
             szakok.nev AS szaknev,
             feladatterv_feladatok.feladat_id AS feladat_id,
             felvivo.nev AS felvivo_nev,
@@ -88,7 +88,11 @@ $feladatterv  = new MySQLHandler("SELECT rovid, leiras, prioritas, allapot, szul
         LEFT JOIN szakok ON feladatterv_feladatok.szakid = szakok.id
     $where $csoportwhere
     GROUP BY feladatterv_feladatok.feladat_id
-    ORDER BY feladatterv_feladatok.szulo ASC, FIELD(feladatterv_feladatok.allapot, 3, 0), vegrehajt
+    ORDER BY feladatterv_feladatok.szulo ASC, feladatterv_feladatok.befejezett ASC,
+        CASE WHEN feladatterv_feladatok.befejezett = 1
+            THEN ido_tenyleges
+        END DESC,
+        vegrehajt ASC
     $lapozas;", ...$paramarr);
 
 // Ha nincs feladatterv, akkor letiltjuk a hozzáférést
