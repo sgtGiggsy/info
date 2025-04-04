@@ -25,19 +25,17 @@ elseif(isset($_GET['action']) && ($_GET['action'] == "addnew" || $_GET['action']
         $rackhely = $rack['helyiseg'];
         $rackgyarto = $rack['gyarto'];
         $rackunitszam = $rack['unitszam'];
-        $epulet = $rack['epulet'];
+        $epid = $rack['epulet'];
 
         $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port
             FROM portok
                 INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-                LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
-            WHERE epulet = $epulet
+            WHERE epulet = $epid
             UNION
             SELECT portok.id AS id, portok.port AS port
             FROM portok
                 INNER JOIN transzportportok ON transzportportok.port = portok.id
-                LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
-            WHERE epulet = $epulet;");
+            WHERE epulet = $epid;");
 
         $button = "Szerkesztés";
         $oldalcim = "Rack szerkesztése";

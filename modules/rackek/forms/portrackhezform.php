@@ -3,6 +3,7 @@ if(@$irhat)
 {
     ?><div class="contentcenter">
         <form action="<?=$RootPath?>/portdb?action=generate&tipus=rack" method="post" onsubmit="beKuld.disabled = true; return true;">
+            <input type="hidden" name="epulet" value="<?=$epid?>">
             <input type ="hidden" id="rack" name="rack" value=<?=$id?>>
 
             <div>

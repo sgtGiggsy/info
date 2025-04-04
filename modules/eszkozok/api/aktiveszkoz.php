@@ -87,15 +87,7 @@ Class API_Call implements API
             raktarak.nev AS raktar,
             hibas,
             eszkozok.megjegyzes AS megjegyzes,
-            beepitesek.megjegyzes AS beepmegjegyz,
-            (SELECT MIN(id) FROM modositasok WHERE eszkoz = eszkid) AS elsomodositas,
-            (SELECT felhasznalo FROM modositasok WHERE id = elsomodositas) AS letrehozoid,
-            (SELECT nev FROM felhasznalok WHERE id = letrehozoid) AS letrehozo,
-            (SELECT MAX(id) FROM modositasok WHERE eszkoz = eszkid) AS utolsomodositas,
-            (SELECT felhasznalo FROM modositasok WHERE id = utolsomodositas) AS utolsomodositoid,
-            (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
-            (SELECT timestamp FROM modositasok WHERE id = utolsomodositas) AS utolsomodositasideje,
-            (SELECT timestamp FROM modositasok WHERE id = elsomodositas) AS letrehozasideje
+            beepitesek.megjegyzes AS beepmegjegyz
         FROM eszkozok
                 INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
                 INNER JOIN modellek ON eszkozok.modell = modellek.id

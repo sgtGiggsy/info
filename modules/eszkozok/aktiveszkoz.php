@@ -26,20 +26,11 @@ if($id)
     }
 
     // Adatbázis műveletek rész    
-    $aktiveszkozok = mySQLConnect("SELECT
-            eszkozok.id AS eszkid,
-            beepitesek.id AS beepid,
-            sorozatszam,
-            mac,
-            poe,
-            ssh,
-            web,
-            portszam,
-            uplinkportok,
-            szoftver,
+    $aktiveszkozok = mySQLConnect("SELECT eszkozok.id AS eszkid, beepitesek.id AS beepid, sorozatszam,
+            mac, poe, ssh, web, portszam, uplinkportok, szoftver, snmp, snmpcommunity, helyisegszam,
+            helyisegnev, beepitesideje, kiepitesideje, varians, hibas,
             gyartok.nev AS gyarto,
             modellek.modell AS modell,
-            varians,
             epuletek.id AS epuletid,
             eszkoztipusok.nev AS tipus,
             epuletek.nev AS epuletnev,
@@ -48,10 +39,6 @@ if($id)
             telephelyek.telephely AS telephely,
             telephelyek.id AS thelyid,
             helyisegek.id AS helyisegid,
-            helyisegszam,
-            helyisegnev,
-            beepitesideje,
-            kiepitesideje,
             eszkozok.tulajdonos AS tulajid,
             szervezetek.rovid AS tulajdonos,
             rackszekrenyek.id AS rackid,
@@ -60,19 +47,8 @@ if($id)
             ipcimek.ipcim AS ipcim,
             raktarak.id AS raktarid,
             raktarak.nev AS raktar,
-            hibas,
             eszkozok.megjegyzes AS megjegyzes,
-            beepitesek.megjegyzes AS beepmegjegyz,
-            snmp,
-            snmpcommunity,
-            (SELECT MIN(id) FROM modositasok WHERE eszkoz = eszkid) AS elsomodositas,
-            (SELECT felhasznalo FROM modositasok WHERE id = elsomodositas) AS letrehozoid,
-            (SELECT nev FROM felhasznalok WHERE id = letrehozoid) AS letrehozo,
-            (SELECT MAX(id) FROM modositasok WHERE eszkoz = eszkid) AS utolsomodositas,
-            (SELECT felhasznalo FROM modositasok WHERE id = utolsomodositas) AS utolsomodositoid,
-            (SELECT nev FROM felhasznalok WHERE id = utolsomodositoid) AS utolsomodosito,
-            (SELECT timestamp FROM modositasok WHERE id = utolsomodositas) AS utolsomodositasideje,
-            (SELECT timestamp FROM modositasok WHERE id = elsomodositas) AS letrehozasideje
+            beepitesek.megjegyzes AS beepmegjegyz
         FROM eszkozok
                 INNER JOIN aktiveszkozok ON eszkozok.id = aktiveszkozok.eszkoz
                 INNER JOIN modellek ON eszkozok.modell = modellek.id
@@ -127,95 +103,87 @@ else
         $javascriptfiles[] = "includes/js/customSelect.js";
         $epuletid = $eszkoz['epuletid'];
         $helyisegid = $eszkoz['helyisegid'];
-        $vlanok = mySQLConnect("SELECT * FROM vlanok;");
-        $sebessegek = mySQLConnect("SELECT * FROM sebessegek;");
-        $switchportok = mySQLConnect("SELECT switchportok.id AS id, allapot, eszkoz, mode, nev, sebesseg, tipus, vlan, portok.port, csatlakozo, portok.id AS portid, csatlakozas
+        $vlanok = new MySQLHandler("SELECT * FROM vlanok;");
+        $vlanok = $vlanok->Result();
+        $sebessegek = new MySQLHandler("SELECT * FROM sebessegek;");
+        $sebessegek = $sebessegek->Result();
+        $switchportok = new MySQLHandler("SELECT portok.id AS id, allapot, eszkoz, mode, nev, sebesseg,
+                tipus, vlan, portok.port, csatlakozo, szomszedport_id
             FROM switchportok
                 INNER JOIN portok ON switchportok.port = portok.id
-                WHERE eszkoz = $id;");
-        $bovitok = mySQLConnect("SELECT eszkozok.id AS bovid, portok.id AS portid, portok.port AS port, modellek.modell AS modell, gyartok.nev AS gyarto, sorozatszam, atviteliszabvanyok.nev AS szabvany, sebessegek.sebesseg AS sebessegek
+                LEFT JOIN port_kapcsolat_view ON portok.id = port_kapcsolat_view.port_id
+                WHERE eszkoz = ?;", $id);
+        $switchportok = $switchportok->Result();
+        $bovitok = new MySQLHandler("SELECT eszkozok.id AS bovid, portok.id AS portid, portok.port AS port, modellek.modell AS modell, gyartok.nev AS gyarto, sorozatszam, atviteliszabvanyok.nev AS szabvany, sebessegek.sebesseg AS sebessegek
                 FROM eszkozok
-                INNER JOIN modellek ON eszkozok.modell = modellek.id
-                INNER JOIN bovitomodellek ON modellek.id = bovitomodellek.modell
-                INNER JOIN sebessegek ON bovitomodellek.transzpsebesseg = sebessegek.id
-                INNER JOIN atviteliszabvanyok ON bovitomodellek.transzpszabvany = atviteliszabvanyok.id
-                INNER JOIN gyartok ON modellek.gyarto = gyartok.id
-                INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
-                INNER JOIN portok ON beepitesek.switchport = portok.id
-                INNER JOIN switchportok ON portok.id = switchportok.port
-            WHERE switchportok.eszkoz = $id AND beepitesek.kiepitesideje IS NULL
-            ORDER BY portok.id;");
+                    INNER JOIN modellek ON eszkozok.modell = modellek.id
+                    INNER JOIN bovitomodellek ON modellek.id = bovitomodellek.modell
+                    INNER JOIN sebessegek ON bovitomodellek.transzpsebesseg = sebessegek.id
+                    INNER JOIN atviteliszabvanyok ON bovitomodellek.transzpszabvany = atviteliszabvanyok.id
+                    INNER JOIN gyartok ON modellek.gyarto = gyartok.id
+                    INNER JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+                    INNER JOIN portok ON beepitesek.switchport = portok.id
+                    INNER JOIN switchportok ON portok.id = switchportok.port
+                WHERE switchportok.eszkoz = ? AND beepitesek.kiepitesideje IS NULL
+                ORDER BY portok.id;", $id);
+        $bovitok = $bovitok->Result();
 
         if($_SESSION['onlinefigyeles'])
         {
-            $allapotelozmenyek = mySQLConnect("SELECT * FROM aktiveszkoz_allapot WHERE eszkozid = $id
-                /*UNION
-                    SELECT * FROM aktiveszkoz_allapot_history WHERE eszkozid = $id*/
-                    ORDER BY timestamp DESC");
+            $allapotelozmenyek = new MySQLHandler("SELECT * FROM aktiveszkoz_allapot WHERE eszkozid = ?
+                    ORDER BY timestamp DESC", $id);
+            $allapotelozmenyek = $allapotelozmenyek->Result();
         }
 
         if($epuletid)
         {
-            $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
-                    FROM portok
-                        INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-                    WHERE epulet = $epuletid
-                UNION
-                    SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozas
-                    FROM portok
-                        INNER JOIN transzportportok ON transzportportok.port = portok.id
-                    WHERE epulet = $epuletid
-                UNION
-                    SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
-                    FROM portok
-                        INNER JOIN switchportok ON portok.id = switchportok.port
-                        INNER JOIN eszkozok ON switchportok.eszkoz = eszkozok.id
-                        INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
-                        INNER JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
-                        INNER JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
-                    WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
-                UNION
-                    SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, csatlakozas
-                    FROM portok
-                        INNER JOIN mediakonverterportok ON portok.id = mediakonverterportok.port
-                        INNER JOIN eszkozok ON mediakonverterportok.eszkoz = eszkozok.id
-                        INNER JOIN beepitesek ON eszkozok.id = beepitesek.eszkoz
-                        LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
-                        LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
-                    WHERE helyisegek.id = $helyisegid AND eszkozok.id != $id AND beepitesek.kiepitesideje IS NULL
-                    ORDER BY aktiveszkoz, port;");
+            $epuletportok = new MySQLHandler('SELECT id, port, aktiveszkoz, csatlakozo, szomszedport_id, szomszedporttipus
+                    FROM
+                        (SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozo
+                            FROM portok
+                                INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
+                            WHERE epulet = ?
+                        UNION
+                            SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozo
+                            FROM portok
+                                INNER JOIN transzportportok ON transzportportok.port = portok.id
+                            WHERE epulet = ?
+                        UNION
+                            SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, portok.csatlakozo
+                            FROM portok
+                                INNER JOIN switchportok ON portok.id = switchportok.port
+                                INNER JOIN beepitesek ON switchportok.eszkoz = beepitesek.eszkoz
+                                LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                            WHERE (rackszekrenyek.helyiseg = ? OR beepitesek.helyiseg = ?) AND beepitesek.eszkoz != ? AND beepitesek.kiepitesideje IS NULL
+                        UNION
+                            SELECT portok.id AS id, portok.port AS port, beepitesek.nev AS aktiveszkoz, portok.csatlakozo
+                            FROM portok
+                                INNER JOIN mediakonverterportok ON portok.id = mediakonverterportok.port
+                                INNER JOIN beepitesek ON mediakonverterportok.eszkoz = beepitesek.eszkoz
+                                LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                            WHERE (rackszekrenyek.helyiseg = ? OR beepitesek.helyiseg = ?) AND beepitesek.eszkoz != ? AND beepitesek.kiepitesideje IS NULL)
+                        AS elerhetoportok
+                    LEFT JOIN port_kapcsolat_view ON elerhetoportok.id = port_kapcsolat_view.port_id
+                    GROUP BY port
+                ORDER BY aktiveszkoz, port;', $epuletid, $epuletid, $helyisegid, $helyisegid, $id, $helyisegid, $helyisegid, $id);
 
-            $epuletportok = mysqliNaturalSort($epuletportok, 'port');
+            $epuletportok = $epuletportok->NaturalSort('port');
         }
 
-        $csatlakozotipusok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
-        $elozmenyek = mySQLConnect("SELECT eszkozid,
-                akteszkid,
+        $csatlakozotipusok = new MySQLHandler("SELECT * FROM csatlakozotipusok;");
+        $csatlakozotipusok = $csatlakozotipusok->Result();
+        $elozmenyek = new MySQLHandler("SELECT eszkozid, akteszkid, sorozatszam, varians, megjegyzes, leadva, hibas,
+                muvelet, mac, web, ssh, snmp, snmpcommunity, poe, portszam, uplinkportok, szoftver,
                 eszkozok_history.modell AS modellid,
                 modellek.modell AS modell,
                 gyartok.nev AS gyarto,
-                sorozatszam,
                 tulajdonos AS tulajid,
                 szervezetek.rovid AS tulajdonos,
-                varians,
-                megjegyzes,
-                leadva,
-                hibas,
                 raktar AS raktarid,
                 raktarak.nev AS raktar,
                 modositasok.felhasznalo AS modositoid,
-                (SELECT nev FROM felhasznalok WHERE id = modositoid) AS modosito,
-                modositasok.timestamp AS modositasideje,
-                muvelet,
-                mac,
-                web,
-                ssh,
-                snmp,
-                snmpcommunity,
-                poe,
-                portszam,
-                uplinkportok,
-                szoftver
+                felhasznalok.nev AS modosito,
+                modositasok.timestamp AS modositasideje
             FROM eszkozok_history
                 INNER JOIN aktiveszkozok_history ON eszkozok_history.modid = aktiveszkozok_history.modid
                 LEFT JOIN modositasok ON eszkozok_history.modid = modositasok.id
@@ -223,10 +191,10 @@ else
                 LEFT JOIN modellek ON eszkozok_history.modell = modellek.id
                 LEFT JOIN gyartok ON modellek.gyarto = gyartok.id
                 LEFT JOIN szervezetek ON eszkozok_history.tulajdonos = szervezetek.id
-            WHERE eszkozok_history.eszkozid = $id
-            ORDER BY eszkozok_history.modid");
-
-        
+                LEFT JOIN felhasznalok ON modositasok.felhasznalo = felhasznalok.id
+            WHERE eszkozok_history.eszkozid = ?
+            ORDER BY eszkozok_history.modid;", $id);
+        $elozmenyek = $elozmenyek->Result();
 
         // Megjelenés rész
         ?><div class="oldalcim"><?=(!($eszkoz['beepitesideje'] && !$eszkoz['kiepitesideje'])) ? "" : $eszkoz['ipcim'] ?> <?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?> (<?=$eszkoz['sorozatszam']?>)</div><?php
@@ -447,7 +415,6 @@ else
                                 <!--<form action="">-->
                                 <form action="?page=portdb&action=update&tipus=switch" method="post">
                                     <input type ="hidden" id="id" name="id" value=<?=$port['id']?>>
-                                    <input type ="hidden" id="portid" name="portid" value=<?=$port['portid']?>>
                                     <td><input style="width: 10ch;" type="text" name="port" value="<?=$port['port']?>"></td>
                                     <td class="portnev"><input style="width: max-content;" type="text" name="nev" value="<?=$port['nev']?>"></td>
                                     <td>
@@ -499,19 +466,19 @@ else
                                         <div class="custom-select"><?php
                                             if(isset($epuletportok))
                                             {
-                                                ?><select name="csatlakozas">
+                                                ?><input type="hidden" name="jelenport" value="<?=$port['szomszedport_id']?>">
+                                                <select name="csatlakozas">
                                                     <option value="" selected>&nbsp;</option>
                                                     <option value="" selected>&nbsp;</option><?php
                                                     $elozo = null;
                                                     foreach($epuletportok as $x)
                                                     {
-                                                        // Bug, de egyelőre így marad. Ha egy portra előbb kerül kirendezésre a végpont, mint a switchre,
-                                                        // duplán jelenik meg itt a listában. Használatot nem befolyásolja.
-                                                        if($x['id'] != $elozo /*|| $x['kapcsolat'] && $x['kapcsolat'] == $port['kapcsolat'] */)
+                                                        if(connectorCompatibility($x['csatlakozo'], $port['csatlakozo']))
                                                         {
-                                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['csatlakozas']) ? "selected" : "" ?>><?=$x['aktiveszkoz'] . " " . $x['port']?></option><?php
+                                                            ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['szomszedport_id']) ? "selected" : "" ?>>
+                                                                <?=$x['aktiveszkoz'] . " " . $x['port']?><?=($x['szomszedport_id'] && $x['id'] != $port['szomszedport_id']) ? " *" : "" ?>
+                                                            </option><?php
                                                         }
-                                                        $elozo = $x['id'];
                                                     }
                                                 ?></select><?php
                                             }
@@ -556,7 +523,7 @@ else
                                         {
                                             if($x['id'] != $elozo)
                                             {
-                                                ?><?=($x['id'] == $port['csatlakozas']) ? $x['aktiveszkoz'] . " " . $x['port'] : "" ?><?php
+                                                ?><?=($x['id'] == $port['szomszedport_id']) ? $x['aktiveszkoz'] . " " . $x['port'] : "" ?><?php
                                             }
                                             $elozo = $x['id'];
                                         }
@@ -714,8 +681,8 @@ else
                                     $elozoverzio = $x;
                                 }
                                 ?><tr style="font-style: italic;">
-                                    <td><?=$eszkoz['utolsomodositasideje']?></td>
-                                    <td><?=$eszkoz['utolsomodosito']?></td>
+                                    <td><?=(isset($eszkoz['utolsomodositasideje'])) ? $eszkoz['utolsomodositasideje'] : "" ?></td>
+                                    <td><?=(isset($eszkoz['utolsomodosito'])) ? $eszkoz['utolsomodosito'] : "" ?></td>
                                     <td <?=($elozoverzio['gyarto'] != $eszkoz['gyarto'] && $elozoverzio['modell'] != $eszkoz['modell'] && $elozoverzio['varians'] != $eszkoz['varians']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['gyarto']?> <?=$eszkoz['modell']?><?=$eszkoz['varians']?></td>
                                     <td <?=($elozoverzio['sorozatszam'] != $eszkoz['sorozatszam']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['sorozatszam']?></td>
                                     <td <?=($elozoverzio['mac'] != $eszkoz['mac']) ? "style='font-weight: bold;'" : "" ?>><?=$eszkoz['mac']?></td>

@@ -320,44 +320,30 @@ else
 	}
 }
 /*
+DROP VIEW port_kapcsolat_view;
 CREATE VIEW port_kapcsolat_view AS
-SELECT port_kapcsolatok.portkapcsolat_id AS portkapcsolat_id,
-		portok.id AS port_id,
-		IF(portok.id = port_kapcsolatok.port_1, port_kapcsolatok.port_2,port_kapcsolatok.port_1) AS szomszedport_id,	
-        IF(vegpontiportok.id, 1,
-			IF(transzportportok.id, 2,
-				IF(tkozpontportok.id, 3,
-					IF(switchportok.id, 4,
-						IF(mediakonverterportok.id, 5,
-							IF(sohoportok.id, 6, 0)))))) AS szomszedporttipus
-		FROM portok
-			INNER JOIN port_kapcsolatok ON portok.id = port_kapcsolatok.port_1
-            LEFT JOIN transzportportok ON port_kapcsolatok.port_2 = transzportportok.port
-			LEFT JOIN switchportok ON port_kapcsolatok.port_2 = switchportok.port
-			LEFT JOIN vegpontiportok ON port_kapcsolatok.port_2 = vegpontiportok.port
-			LEFT JOIN rackportok ON port_kapcsolatok.port_2 = rackportok.port
-			LEFT JOIN tkozpontportok ON port_kapcsolatok.port_2 = tkozpontportok.port
-			LEFT JOIN mediakonverterportok ON port_kapcsolatok.port_2 = mediakonverterportok.port
-			LEFT JOIN sohoportok ON port_kapcsolatok.port_2 = sohoportok.port
-            
-UNION ALL
-
-	SELECT port_kapcsolatok.portkapcsolat_id AS portkapcsolat_id,
-		portok.id AS port_id,
-		IF(portok.id = port_kapcsolatok.port_2, port_kapcsolatok.port_1,port_kapcsolatok.port_2) AS szomszedport_id,	
-        IF(vegpontiportok.id, 1,
-			IF(transzportportok.id, 2,
-				IF(tkozpontportok.id, 3,
-					IF(switchportok.id, 4,
-						IF(mediakonverterportok.id, 5,
-							IF(sohoportok.id, 6, 0)))))) AS szomszedporttipus
-		FROM portok
-			INNER JOIN port_kapcsolatok ON portok.id = port_kapcsolatok.port_2
-            LEFT JOIN transzportportok ON port_kapcsolatok.port_1 = transzportportok.port
-			LEFT JOIN switchportok ON port_kapcsolatok.port_1 = switchportok.port
-			LEFT JOIN vegpontiportok ON port_kapcsolatok.port_1 = vegpontiportok.port
-			LEFT JOIN rackportok ON port_kapcsolatok.port_1 = rackportok.port
-			LEFT JOIN tkozpontportok ON port_kapcsolatok.port_1 = tkozpontportok.port
-			LEFT JOIN mediakonverterportok ON port_kapcsolatok.port_1 = mediakonverterportok.port
-			LEFT JOIN sohoportok ON port_kapcsolatok.port_1 = sohoportok.port;
+SELECT portkapcsolat_id, port_id, szomszedport_id,
+       IF(vegpontiportok.id, 1,
+          IF(transzportportok.id, 2,
+             IF(tkozpontportok.id, 3,
+                IF(switchportok.id, 4,
+                   IF(mediakonverterportok.id, 5,
+                      IF(sohoportok.id, 6, 0)))))) AS szomszedporttipus
+    FROM (SELECT port_kapcsolatok.portkapcsolat_id AS portkapcsolat_id,
+       portok.id AS port_id, port_kapcsolatok.port_2 AS szomszedport_id
+        FROM portok
+         INNER JOIN port_kapcsolatok ON portok.id = port_kapcsolatok.port_1
+    UNION ALL
+    SELECT port_kapcsolatok.portkapcsolat_id AS portkapcsolat_id,
+       portok.id AS port_id, port_kapcsolatok.port_1 AS szomszedport_id
+    FROM portok
+         INNER JOIN port_kapcsolatok ON portok.id = port_kapcsolatok.port_2
+    ) AS kapcsolat
+        LEFT JOIN transzportportok ON kapcsolat.szomszedport_id = transzportportok.port
+        LEFT JOIN switchportok ON kapcsolat.szomszedport_id = switchportok.port
+        LEFT JOIN vegpontiportok ON kapcsolat.szomszedport_id = vegpontiportok.port
+        LEFT JOIN rackportok ON kapcsolat.szomszedport_id = rackportok.port
+        LEFT JOIN tkozpontportok ON kapcsolat.szomszedport_id = tkozpontportok.port
+        LEFT JOIN mediakonverterportok ON kapcsolat.szomszedport_id = mediakonverterportok.port
+        LEFT JOIN sohoportok ON kapcsolat.szomszedport_id = sohoportok.port
 		*/

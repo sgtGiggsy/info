@@ -2083,3 +2083,38 @@ function portDBsorrend($port_1, $port_2)
 	else
 		return array($port_2, $port_1);
 }
+
+function connectorCompatibility($csatlakozo1, $csatlakozo2)
+{
+	/*
+		1,RJ45
+		2,MTRJ
+		3,ST
+		4,SC
+		5,LC
+		6,RJ11
+		8,SFP
+		9,SFP/RJ45 kombó
+	*/
+
+	if($csatlakozo1 == $csatlakozo2)
+	{
+		return true;
+	}
+	elseif($csatlakozo1 == 6 && $csatlakozo2 == 6)
+	{
+		return true;
+	}
+	elseif($csatlakozo1 != 1 && $csatlakozo2 != 1 && $csatlakozo1 != 6 && $csatlakozo2 != 6)
+	{
+		return true;
+	}
+	elseif(in_array($csatlakozo1, array(1, 8, 9)) && in_array($csatlakozo2, array(1, 8, 9)))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}

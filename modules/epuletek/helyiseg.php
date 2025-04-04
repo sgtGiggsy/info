@@ -138,16 +138,14 @@ else
             $emelet = $helyiseg['emelet'];
 
             $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port
-            FROM portok
-                INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-                LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
-            WHERE epulet = $epid AND vegpontiportok.helyiseg IS NULL
+                FROM portok
+                    INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
+                WHERE epulet = $epid AND vegpontiportok.helyiseg IS NULL
             UNION
-            SELECT portok.id AS id, portok.port AS port
-            FROM portok
-                INNER JOIN transzportportok ON transzportportok.port = portok.id
-                LEFT JOIN kapcsolatportok ON portok.id = kapcsolatportok.port
-            WHERE epulet = $epid;");
+                SELECT portok.id AS id, portok.port AS port
+                FROM portok
+                    INNER JOIN transzportportok ON transzportportok.port = portok.id
+                WHERE epulet = $epid;");
 
             $helyisegbutton = "Helyiség módosítása";
             $oldalcim = "Helyiség szerkesztése";

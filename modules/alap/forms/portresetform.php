@@ -19,6 +19,7 @@ if(@$irhat)
 {
     ?><div class="contentcenter">
         <form action="<?=$RootPath?>/portdb?action=reset" method="post" id="portresetform">
+            <input type="hidden" name="epulet" value="<?=$epid?>">
             <div>
                 <label for="elsoport">Első port:</label><br>
                 <select id="elsoport" name="elsoport"><?php

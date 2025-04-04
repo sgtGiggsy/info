@@ -13,13 +13,17 @@ if(isset($csoportir) && $csoportir)
         $portdb->Query('UPDATE portok SET port=?, csatlakozo=? WHERE id=?',
             $_POST['port'], $_POST['csatlakozo'], $_POST['id']);
         
+        // TODO: Megoldani, hogy optikai portok esetén egy switch/médiakonverter port csatlakoztatható legyen két transzport porthoz
+        
+        // Ha van jelenport, és nem egyezik a FORM-ból kapottal, akkor töröljük a port_kapcsolatok táblából
         if($_POST['jelenport'] && $_POST['csatlakozas'] != $_POST['jelenport'])
         {
             $portok = portDBsorrend($_POST['id'], $_POST['jelenport']);
             $portdb->Query('DELETE FROM port_kapcsolatok WHERE port_1=? AND port_2=?', $portok[0], $portok[1]);
         }
 
-        if($_POST['csatlakozas'])
+        // Ha van csatlakozás, és nem egyezik a jelenlegi porttal, akkor új port_kapcsolatok bejegyzést hozunk létre
+        if($_POST['csatlakozas'] && $_POST['csatlakozas'] != $_POST['jelenport'])
         {
             $portok = portDBsorrend($_POST['id'], $_POST['csatlakozas']);
             $portdb->Query('INSERT INTO port_kapcsolatok (port_1, port_2) VALUES (?, ?)',
@@ -29,12 +33,14 @@ if(isset($csoportir) && $csoportir)
         if($_GET["tipus"] == "switch")
         {
             $portdb->Query('UPDATE switchportok SET mode=?, vlan=?, sebesseg=?, nev=?, allapot=?, tipus=?, modid=? WHERE port=?',
-            $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $modif_id, $_POST['id']);
+                $_POST['mode'], $_POST['vlan'], $_POST['sebesseg'], $_POST['nev'], $_POST['allapot'], $_POST['tipus'], $modif_id, $_POST['id']);
         }
+
         elseif($_GET["tipus"] == "soho")
         {
             $portdb->Query('UPDATE sohoportok SET sebesseg=? WHERE port=?', $_POST['sebesseg'], $_POST['id']);
         }
+
         elseif($_GET["tipus"] == "mediakonverter")
         {
             $portdb->Query('UPDATE mediakonverterportok SET sebesseg=?, szabvany=? WHERE port=?',
