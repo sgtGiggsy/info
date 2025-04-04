@@ -1430,6 +1430,8 @@ function mysqliToArray($mysqlires, $ondimensional = false)
 
 function atHurkolas($helyiportid, $hurok, $con, $jelenportmod)
 {
+	//! TODO az új portDB kezelésre átállás után törölni ezt a függvényt!!!
+	
 	$null = null;
 
 	// Kezdetként annak ellenőrzése, hogy a jelenlegi port szerepel-e hurokként valahol,
@@ -2072,4 +2074,12 @@ function isVerifiedToWrite($querystring, $needle, $haystack, $params = null)
 	}
 
 	return $irhat;
+}
+
+function portDBsorrend($port_1, $port_2)
+{
+	if($port_1 < $port_2)
+		return array($port_1, $port_2);
+	else
+		return array($port_2, $port_1);
 }

@@ -139,7 +139,7 @@ else
 			if($port['helyisegid'] || $port['rackhelyiseg'])
 			{
 				$helyisegid = $port['helyisegid'];
-				if($port['helyisegid'])
+				if(!$port['helyisegid'])
 				{
 					$helyisegid = $port['rackhelyiseg'];
 				}
@@ -237,7 +237,7 @@ else
 						<div><?=($port['szomszport'] || $port['telefonszam']) ? "Kirendezve" : "Használaton kívül" ?></div>
 						<div>Port típus</div>
 						<div><?=$porttipus?></div><?php
-						if($port['porttipus'] < 3 && $port['rack'])
+						if($port['porttipus'] < 4 && $port['rack'])
 						{
 							?><div>Központi oldal</div>
 							<div><?=$port['rack']?> rack, <?=$port['rackhelyszam']?>. helyiség (<?=$port['rackhelynev']?>)</div><?php
