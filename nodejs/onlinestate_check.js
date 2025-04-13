@@ -8,7 +8,11 @@
 
 
 var ping = require ("net-ping");
-var session = ping.createSession ();
+var options = {
+	retries: 4,
+	timeout: 3000
+};
+var session = ping.createSession(options);
 var settings = require('./onlinestate_check.json');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0; // Erre azért van szükség, mert máskülönben csak érvényes CERT-eket fogad el HTTPS-es API-knál
 var timestamp = createTimestamp();
@@ -41,6 +45,7 @@ async function pingHost(dev)
                 messageitem.online = error ? 0 : 1;
                 messageitem.cim = "A(z) " + dev.nev + (error ? " elérhetetlen" : " elérhető");
                 messageitem.szoveg = "A(z) " + dev.nev + " (" + dev.ipcim + ") eszköz " + (error ? "elérhetetlenné" : "elérhetővé") + " vált " + timestamp + "-kor.";
+                messageitem.mailbody = "A(z) " + dev.nev + " (" + dev.ipcim + ") eszköz " + (error ? "elérhetetlenné" : "elérhetővé") + " vált " + timestamp + "-kor.";
             }
             console.log("A(z) " + dev.nev + (error ? " elérhetetlen" : " elérhető"));
             resolve(messageitem);
