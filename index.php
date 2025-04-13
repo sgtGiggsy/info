@@ -275,6 +275,10 @@ if($_SESSION['id'])
             FROM menupontok
                 INNER JOIN jogosultsagok ON menupontok.id = jogosultsagok.menupont
             WHERE jogosultsagok.felhasznalo = ? AND menupontok.aktiv IS NULL OR menupontok.aktiv = 0
+        UNION
+            SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL, NULL, NULL AS lathat
+            FROM menupontok
+            WHERE oldal = 'felhasznalo'
         ) AS egyesitett
     GROUP BY id
     ORDER BY menuterulet ASC, sorrend ASC;", $felhasznaloid, $felhasznaloid);
@@ -286,11 +290,11 @@ else
     $menusql = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL olvasas, lathat
         FROM
         (
-            SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL olvasas, 1 AS lathat
+            SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL AS olvasas, 1 AS lathat
             FROM menupontok
             WHERE aktiv > 2
         UNION ALL
-            SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL olvasas, NULL ASlathat
+            SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL AS iras, NULL AS olvasas, NULL AS lathat
             FROM menupontok
             WHERE aktiv < 3 OR aktiv IS NULL
         ) AS egyesitett
@@ -315,32 +319,25 @@ foreach($menu as $oldal)
             ($selectedurl) ? : $selectedurl = $oldal['dburl'];
             switch($oldal['olvasas'])
             {
-                case 3: $mindolvas = true;
-                case 2: $csoportolvas = true;
-                case 1: $sajatolvas = true;
+                case 3: $mindolvas = true; define('MINDOLVAS', $mindolvas);
+                case 2: $csoportolvas = true; define('CSOPORTOLVAS', $csoportolvas);
+                case 1: $sajatolvas = true; define('SAJATOLVAS', $sajatolvas);
             }
 
             switch($oldal['iras'])
             {
-                case 3: $mindir = true;
-                case 2: $csoportir = true;
-                case 1: $sajatir = true;
+                case 3: $mindir = true; define('MINDIR', $mindir);
+                case 2: $csoportir = true; define('CSOPORTIR', $csoportir);
+                case 1: $sajatir = true; define('SAJATIR', $sajatir);
             }
 
             $currentpage = $oldal;
             $szulonyit = $oldal['szulo'];
         break;
     }
-    if($oldal['olvasas'] > 0)
-        $menuterulet[$oldal['menuterulet']][] = $oldal;
-}
 
-define('MINDIR', $mindir);
-define('CSOPORTIR', $csoportir);
-define('SAJATIR', $sajatir);
-define('MINDOLVAS', $mindolvas);
-define('CSOPORTOLVAS', $csoportolvas);
-define('SAJATOLVAS', $sajatolvas);
+    $menuterulet[$oldal['menuterulet']][] = $oldal;
+}
 
 //? Fallback megoldás arra az esetre, ha a lekérni próbált oldalhoz nincs adatbázis bejegyzés
 if(!isset($currentpage))

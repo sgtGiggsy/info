@@ -806,10 +806,10 @@ function getNotifications()
 		FROM ertesitesek
 			INNER JOIN ertesites_megjelenik ON ertesitesek.id = ertesites_megjelenik.ertesites
 		WHERE felhasznalo = $felhasznaloid
-			AND ertesitesek.id = (SELECT MAX(ic.id) FROM ertesitesek ic WHERE ic.cim = ertesitesek.cim)
 			AND ertesitesek.timestamp > date_sub(now(), INTERVAL 7 DAY)
 		ORDER BY latta ASC, timestamp DESC");
 
+//AND ertesitesek.id = (SELECT MAX(ic.id) FROM ertesitesek ic WHERE ic.cim = ertesitesek.cim)
 	foreach($ertesitesek as $ertesites)
 	{
 		$latta = false;

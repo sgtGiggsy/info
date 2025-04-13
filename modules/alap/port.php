@@ -270,12 +270,12 @@ else
 							<div>Eszköz portja</div>
 							<div><?=$port['szomszport']?></div><?php
 						}
-						elseif($port['szomszedporttipus'] != 2 && ($port['helyisegszam'] || $port['szomszedport_id']))
+						if($port['szomszedporttipus'] != 2 && ($port['helyisegszam'] || $port['szomszedport_id']))
 						{
 							?><div>Végponti oldal</div><?php
 							if($port['helyisegszam'])
 							{
-								?><div><?=$port['helyisegszam']?>. helyiség <?=($port['helyisegnev']) ? "(" . $port['helyisegnev'] . ")" : "" ?></div><?php
+								?><div><?=IntRagValaszt($port['helyisegszam'])?> helyiség <?=($port['helyisegnev']) ? "(" . $port['helyisegnev'] . ")" : "" ?></div><?php
 							}
 							elseif($port['szomszedport_id'])
 							{

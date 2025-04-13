@@ -65,9 +65,14 @@ if(isset($irhat) && $irhat)
             }
             else
             {
+                //TODO Újraírás során UPDATE helyett DELETE FROM, ha az írás és olvasás is NULL
+                $olvasas = $_POST["olvasas-$menuid"];
+                $iras = $_POST["iras-$menuid"];
+                $iras = ($iras == 0) ? null : $iras;
+                $olvasas = ($olvasas == 0) ? null : $olvasas;
                 $jogid = mysqli_fetch_assoc($xjogosultsag)['id'];
                 $stmt = $con->prepare('UPDATE jogosultsagok SET olvasas=?, iras=? WHERE id=?');
-                $stmt->bind_param('ssi', $_POST["olvasas-$menuid"], $_POST["iras-$menuid"], $jogid);
+                $stmt->bind_param('ssi', $olvasas, $iras, $jogid);
                 $stmt->execute();
                 if(mysqli_errno($con) != 0)
                 {

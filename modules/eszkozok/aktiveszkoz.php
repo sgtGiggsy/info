@@ -137,7 +137,8 @@ else
 
         if($epuletid)
         {
-            $epuletportok = new MySQLHandler('SELECT id, port, aktiveszkoz, csatlakozo, szomszedport_id, szomszedporttipus
+            $epuletportok = new MySQLHandler('SELECT elerhetoportok.id AS id, elerhetoportok.port AS port, aktiveszkoz,
+                        csatlakozo, szomszedport_id, szomszedporttipus, szam
                     FROM
                         (SELECT portok.id AS id, portok.port AS port, null AS aktiveszkoz, csatlakozo
                             FROM portok
@@ -164,6 +165,7 @@ else
                             WHERE (rackszekrenyek.helyiseg = ? OR beepitesek.helyiseg = ?) AND beepitesek.eszkoz != ? AND beepitesek.kiepitesideje IS NULL)
                         AS elerhetoportok
                     LEFT JOIN port_kapcsolat_view ON elerhetoportok.id = port_kapcsolat_view.port_id
+                    LEFT JOIN telefonszamok ON elerhetoportok.id = telefonszamok.port
                     GROUP BY port
                 ORDER BY aktiveszkoz, port;', $epuletid, $epuletid, $helyisegid, $helyisegid, $id, $helyisegid, $helyisegid, $id);
 
@@ -476,7 +478,7 @@ else
                                                         if(connectorCompatibility($x['csatlakozo'], $port['csatlakozo']))
                                                         {
                                                             ?><option value="<?=$x['id']?>" <?=($x['id'] == $port['szomszedport_id']) ? "selected" : "" ?>>
-                                                                <?=$x['aktiveszkoz'] . " " . $x['port']?><?=($x['szomszedport_id'] && $x['id'] != $port['szomszedport_id']) ? " *" : "" ?>
+                                                                <?=$x['aktiveszkoz'] . " " . $x['port']?><?=($x['szam'] || ($x['szomszedport_id'] && $x['id'] != $port['szomszedport_id'])) ? " *" : "" ?>
                                                             </option><?php
                                                         }
                                                     }
