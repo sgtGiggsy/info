@@ -4,12 +4,16 @@ Class API_Call implements API
     static function GetList($mezo, $ertek) : array
     {
         $telephelyszures = null;
+        $ertekek = array();
         if($mezo && $ertek)
         {
-            $telephelyszures = "AND telephely = $ertek";
+            $telephelyszures = "AND (epuletek.telephely = ? OR beepulet.telephely = ?)";
+            $ertekek = array($ertek, $ertek);
+            ///$telephelyszures = "AND telephely = $ertek";
         }
         
         // Szó szerint százszoros sebességkülönbség van ezesetben az OR-ral joinolás, illetve az unióképzés között
+        /*
         $query = mySQLConnect("SELECT eszkozok.id, ipcimek.ipcim, beepitesek.nev, online
                 FROM eszkozok
                     INNER JOIN modellek ON eszkozok.modell = modellek.id
@@ -42,11 +46,29 @@ Class API_Call implements API
                         OR aktiveszkoz_allapot.id IS NULL)
                     AND ipcimek.vlan = 1
                     $telephelyszures
-                ORDER BY ipcim;");
-        
-        $eredmeny = mysqliToArray($query);
+                ORDER BY ipcim;");*/
 
-        return $eredmeny;
+        $aktiveszkozdb = new MySQLHandler("SELECT eszkozok.id, ipcimek.ipcim, beepitesek.nev, online
+                FROM eszkozok
+                    INNER JOIN modellek ON eszkozok.modell = modellek.id
+                    LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
+                    LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
+                    LEFT JOIN aktiveszkoz_allapot ON eszkozok.id = aktiveszkoz_allapot.eszkozid
+                    LEFT JOIN rackszekrenyek ON beepitesek.rack = rackszekrenyek.id
+                    LEFT JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id
+                    LEFT JOIN helyisegek beephely ON beepitesek.helyiseg = beephely.id
+                    LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
+                    LEFT JOIN epuletek beepulet ON beephely.epulet = beepulet.id
+                WHERE (modellek.tipus = 1 OR modellek.tipus = 2)
+                    AND aktivbeepites = 1
+                    AND (aktiveszkoz_allapot.id = (SELECT MAX(ac.id) FROM aktiveszkoz_allapot ac WHERE ac.eszkozid = aktiveszkoz_allapot.eszkozid)
+                        OR aktiveszkoz_allapot.id IS NULL)
+                    AND ipcimek.vlan = 1
+                    $telephelyszures;", ...$ertekek);
+        
+        //$eredmeny = mysqliToArray($query);
+
+        return $aktiveszkozdb->AsArray();
     }
 
     static function GetItem($objid)
@@ -135,7 +157,7 @@ Class API_Call implements API
                     
                     if($eszkoz->cim)
                     {
-                        $ertesites = new Ertesites($eszkoz->cim, $eszkoz->szoveg, "aktiveszkoz/" . $eszkoz->eszkid);
+                        $ertesites = new Ertesites($eszkoz->cim, $eszkoz->szoveg, "aktiveszkoz/" . $eszkoz->eszkid, 1);
                         $ertesites->SetFelhasznalok($felhasznalok);
                         $ertesites->Ment();
                     }
