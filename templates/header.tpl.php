@@ -31,21 +31,13 @@ if($_SESSION['id'])
 {
     $usernev = $_SESSION['nev'];
     TopMenu();
-    $notifications = getNotifications();
-    $ujertesites = 0;
-    foreach($notifications as $notification)
-    {
-        if(!$notification['latta'])
-        {
-            $ujertesites++;
-        }
-    }
+    $notifications = Ertesites::GetErtesitesek();
 
     ?><div id="notifications">
         <p onclick="showPopup('notifpopup');updateNotif()">
             <?=$icons['notifications']?>
         </p>
-        <div id="notifcount" onclick="showPopup('notifpopup')" style="display: <?=($ujertesites) ? 'block' : 'none' ?> "><?=$ujertesites?></div>
+        <div id="notifcount" onclick="showPopup('notifpopup')" style="display: <?=($notifications['olvasatlanszam'] > 0) ? 'block' : 'none' ?> "><?=$notifications['olvasatlanszam']?></div>
     </div>
     
     <p class="profil" onclick="showPopup('profilpopup')"> 
@@ -63,7 +55,7 @@ else
 if($_SESSION['id'])
 {
     ?><div id="notifpopup" onmouseleave="hidePopup('notifpopup')"><?php
-        foreach($notifications as $notification)
+        foreach($notifications['ertesitesek'] as $notification)
         {
             $kotkarakter = "?";
             if(str_contains($notification['url'], "?"))

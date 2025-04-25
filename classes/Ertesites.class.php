@@ -15,7 +15,6 @@ class Ertesites
     {
         $this->sql = new MySQLHandler();
         $this->sql->KeepAlive();
-        $this->sql->Prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
         $this->cim = $cim;
         $this->szoveg = $szoveg;
         $this->url = $url;
@@ -25,6 +24,7 @@ class Ertesites
 
     public function Ment()
     {
+        $this->sql->Prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
         $this->sql->Run($this->cim, $this->szoveg, $this->url, $this->tipus);
         $this->ertesitesid = $this->sql->last_insert_id;
 
@@ -94,5 +94,67 @@ class Ertesites
                 WHERE ertesitestipus = ?
                 $where;", $tipus, ...$params);
         return $sql->AsArray('felhasznalo');
+    }
+
+    public static function GetErtesitesek($napszam = 7)
+    {
+        $felhasznaloid = $_SESSION['id'];
+        $notifications = array();
+        $olvasatlanszam = 0;
+
+        $ertesitessql = new MySQLHandler();
+        $ertesitessql->KeepAlive();
+
+        if(OLDALAK['Aktív eszközök']['olvasas'] > 0)
+        {
+            $ertesitessql->Query("SELECT ertek
+                FROM `beallitasok`
+                WHERE nev = 'last_switch_check'
+                    AND ertek < date_sub(now(), INTERVAL 15 MINUTE)
+                    AND ertek > date_sub((SELECT lastseennotif FROM felhasznalok WHERE id = ?), INTERVAL 15 MINUTE)", $felhasznaloid);
+
+            if($ertesitessql->sorokszama > 0)
+            {
+                $switchutolso = $ertesitessql->Fetch()['ertek'];
+                $cim = 'Switch ellenőrző leállt';
+                $szoveg = 'A switchek állapotát ellenőrző script utolsó futása: ' . $switchutolso;
+                $ertesitessql->Query("SELECT id FROM ertesitesek WHERE timestamp = '$switchutolso' AND cim = 'Switch ellenőrző leállt'");
+                if($ertesitessql->sorokszama == 0)
+                {
+                    $ertesites = new Ertesites($cim, $szoveg, 'aktiveszkozok', 1);
+                    $ertesites->Ment();
+                }
+            }
+        }
+
+        $ertesitessql->Query("SELECT ertesitesek.id AS id, cim, szoveg, url, timestamp, latta
+            FROM ertesitesek
+                INNER JOIN ertesites_megjelenik ON ertesitesek.id = ertesites_megjelenik.ertesites
+            WHERE felhasznalo = ?
+                AND ertesitesek.timestamp > date_sub(now(), INTERVAL ? DAY)
+
+            ORDER BY latta ASC, timestamp DESC", $felhasznaloid, $napszam);
+
+        //GROUP BY ertesitesek.cim
+
+        foreach($ertesitessql->Result() as $ertesites)
+        {
+            $latta = true;
+            if($ertesites["latta"] == 0)
+            {
+                $latta = false;
+                $olvasatlanszam++;
+            }
+
+            $notifications[] = array('id' => $ertesites['id'],
+                'cim' => $ertesites["cim"],
+                'szoveg' => $ertesites["szoveg"],
+                'url' => $ertesites["url"],
+                'timestamp' => $ertesites["timestamp"],
+                'latta' => $latta
+            );
+        }
+
+        return array('olvasatlanszam' => $olvasatlanszam, 'ertesitesek' => $notifications);
     }
 }
