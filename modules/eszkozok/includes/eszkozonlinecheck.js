@@ -39,5 +39,5 @@ function getSwitchState() {
 
 window.addEventListener("load", (event) => {
     getSwitchState();
-    setInterval(getSwitchState, 3000);
+    setInterval(getSwitchState, 60000);
 });

@@ -301,12 +301,12 @@ else
         GROUP BY id
         ORDER BY menuterulet ASC, sorrend ASC");
 }
-$menu = $menusql->Result();
+define('OLDALAK', $menusql->AsArray('menupont'));
 
 //? A jelen oldalhoz tartozó jogosultságok megállapítása,
 //? valamint, amennyiben van olyan, a jelen oldal szülőjének megjelölése
 $menuterulet = array(array(), array(), array());
-foreach($menu as $oldal)
+foreach(OLDALAK as $oldal)
 {
     switch($pagetofind)
     {
@@ -393,7 +393,7 @@ if($felhasznaloid)
     $PHPvarsToJS['Felhasznaloid'] = $felhasznaloid;
     if(@$szemelyes['switchstateshow'])
         $javascriptfiles[] = "modules/eszkozok/includes/eszkozonlinecheck.js";
-    if(!in_array($pagetofind, array('feladattervek', 'feladatterv')))
+    if(!in_array($pagetofind, array('feladattervek', 'feladatterv')) && isset(OLDALAK['Feladatok']) && OLDALAK['Feladatok']['olvasas'] > 0)
         $javascriptfiles[] = "modules/feladattervezo/includes/feladatwidget.js";
 }
 

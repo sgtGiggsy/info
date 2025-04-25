@@ -78,7 +78,7 @@ else
 
                     <div>
                         <label for="tipus">Igénylő:</label><br>
-                        <?=felhasznaloPicker($igenylo, "igenylo", false)?>
+                        <?=felhasznaloPicker($igenylo, "igenylo", null)?>
                     </div>
 
                     <div>

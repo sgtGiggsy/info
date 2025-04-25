@@ -780,6 +780,7 @@ function modId($muvelet, $tipus, $objid)
 	return $modositas->last_insert_id;
 }
 
+//! Törlésre kijelölve!!!
 function getNotifications()
 {
 	$felhasznaloid = $_SESSION['id'];
@@ -807,9 +808,11 @@ function getNotifications()
 			INNER JOIN ertesites_megjelenik ON ertesitesek.id = ertesites_megjelenik.ertesites
 		WHERE felhasznalo = $felhasznaloid
 			AND ertesitesek.timestamp > date_sub(now(), INTERVAL 7 DAY)
+		GROUP BY ertesitesek.cim
 		ORDER BY latta ASC, timestamp DESC");
 
 //AND ertesitesek.id = (SELECT MAX(ic.id) FROM ertesitesek ic WHERE ic.cim = ertesitesek.cim)
+// 
 	foreach($ertesitesek as $ertesites)
 	{
 		$latta = false;
@@ -2035,16 +2038,15 @@ function multiSelectDropdown($elements, array $selected, string $selectnev, stri
    </div><?php
 }
 
-function isVerifiedToWrite($querystring, $needle, $haystack, $params = null)
+function isVerifiedToWrite($querystring, $needle, $haystack, $params = array())
 {
 	$verify = new mySQLHandler();
-	$verify->KeepAlive();
 	
-	if(!MINDIR)
+	if(!defined('MINDIR') || !MINDIR)
 	{
-		if(CSOPORTIR)
+		if(defined('CSOPORTIR') && CSOPORTIR)
 		{
-			if(isset($_POST['id']) && isset($_GET['id']))
+			if(isset($_POST['id']) || isset($_GET['id']))
 			{
 				$f_id = (isset($_POST['id'])) ? $_POST['id'] : $_GET['id'];
 			

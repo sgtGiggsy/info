@@ -157,7 +157,8 @@ Class API_Call implements API
                     
                     if($eszkoz->cim)
                     {
-                        $ertesites = new Ertesites($eszkoz->cim, $eszkoz->szoveg, "aktiveszkoz/" . $eszkoz->eszkid, 1);
+                        $ertesites = new Ertesites($eszkoz->cim, $eszkoz->szoveg, "aktiveszkoz/" . $eszkoz->eszkid);
+                        $ertesites->tipus = 1;
                         $ertesites->SetFelhasznalok($felhasznalok);
                         $ertesites->Ment();
                     }

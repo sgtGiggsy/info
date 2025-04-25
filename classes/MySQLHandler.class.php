@@ -5,6 +5,7 @@ class MySQLHandler
     public $last_insert_id = null;
     public $siker = false;
     public $sorokszama = 0;
+    private $hibauzenet;
     private $hibakod;
     private $con;
     private $exception;
@@ -74,7 +75,7 @@ class MySQLHandler
             }
             elseif(!$this->stmt)
             {
-                $message = "<h2>Hibásan megírt SQL query!</h2>" .  $this->exception . "<br>" .  $this->querystring;
+                $message = "<h2>Hibásan megírt SQL query!</h2>" .  $this->exception . "<br>" .  $this->querystring . "<br>Hibakód: " . $this->hibakod . ": " . $this->hibauzenet . "<br>";;
             }
             elseif(!$paramszamokay)
             {
@@ -187,6 +188,8 @@ class MySQLHandler
             }
             if(!$prep)
             {
+                $this->hibauzenet = $this->con->error_list[0]['error'];
+                $this->hibakod = $this->con->errno;
                 $this->stmt = null;
                 $this->siker = false;
             }
@@ -198,6 +201,7 @@ class MySQLHandler
         }
         else
         {
+            
             $this->ShowException();
         }
         return $this->siker;

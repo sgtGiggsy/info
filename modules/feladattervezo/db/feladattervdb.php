@@ -2,7 +2,7 @@
 
 $qs = 'SELECT szervezet
     FROM feladatterv_feladatok INNER JOIN felhasznalok ON feladatterv_feladatok.felvitte = felhasznalok.id
-    WHERE feladatterv_feladatok = ?';
+    WHERE feladatterv_feladatok.feladat_id = ?';
 $irhat = isVerifiedToWrite($qs, $szervezet, 'szervezet');
 
 if($irhat && isset($_GET['action']))
