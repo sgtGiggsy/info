@@ -105,7 +105,7 @@ class Ertesites
         $ertesitessql = new MySQLHandler();
         $ertesitessql->KeepAlive();
 
-        if(OLDALAK['Aktív eszközök']['olvasas'] > 0)
+        if(isset(OLDALAK['Aktív eszközök']) && OLDALAK['Aktív eszközök']['olvasas'] > 0)
         {
             $ertesitessql->Query("SELECT ertek
                 FROM `beallitasok`
