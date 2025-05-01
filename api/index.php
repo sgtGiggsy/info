@@ -72,14 +72,14 @@ else
 	// A következő lépés az API kulcs ellenőrzése az adatbázisban. Ha nem létezik, 401-es hiba dobása
 	if($apikey)
 	{
-		$dbapi = mySQLConnect("SELECT apikey, jogosultsagszint AS jog, api.aktiv AS aktiv, apiurl, oldal, gyujtooldal
+		$dbapi = new MySQLHandler("SELECT apikey, jogosultsagszint AS jog, api.aktiv AS aktiv, apiurl, oldal, gyujtooldal
 				FROM api
 					LEFT JOIN menupontok ON api.menupont = menupontok.id
-				WHERE apikey = '$apikey'");
+				WHERE apikey = ?", $apikey);
 		
-		if(mysqli_num_rows($dbapi) > 0)
+		if($dbapi->sorokszama > 0)
 		{
-			$dbapi = mysqli_fetch_assoc($dbapi);
+			$dbapi = $dbapi->Fetch();
 			
 			// Most az API kulcs szintjének ellenőrzése következik
 			// 4 = Teljeskörű

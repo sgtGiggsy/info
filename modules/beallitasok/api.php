@@ -25,7 +25,8 @@ else
         }
     }
     
-    $menupontok = mySQLConnect("SELECT * FROM menupontok ORDER BY menupont ASC");
+    $menupontok = new MySQLHandler("SELECT * FROM menupontok ORDER BY menupont ASC");
+    $menupontok = $menupontok->Result();
 
     // Ha a felhasználó valótlan műveletet akart folytatni, letilt
     if(!$irhat && !$dbir)
@@ -42,7 +43,8 @@ else
     // Ha a kért művelet nem jár adatbázisművelettel, a szerkesztési felület meghívása
     if($irhat)
     {
-        $apilista = mySQLConnect("SELECT * FROM api ORDER BY menupont ASC");
+        $apilista = new MySQLHandler("SELECT * FROM api ORDER BY menupont ASC");
+        $apilista = $apilista->Result();
         $button = "API szerkesztése";
         $oldalcim = "API kulcsok";
         $magyarazat = "<h2>API kulcsok</h2><p></p>";

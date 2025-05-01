@@ -36,10 +36,10 @@ class MailHandler
         }
         else
         {
-            $beallitasokdb = mySQLConnect("SELECT * FROM beallitasok;");
+            $beallitasokdb = new MySQLHandler("SELECT * FROM beallitasok;");
 
             $beallitasok = array();
-            foreach($beallitasokdb as $beallitas)
+            foreach($beallitasokdb->Result() as $beallitas)
             {
                 $beallitasok[$beallitas['nev']] = $beallitas['ertek'];
             }
