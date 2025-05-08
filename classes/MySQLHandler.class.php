@@ -391,6 +391,31 @@ class MySQLHandler
         return $returnarr;
     }
 
+    public function ToTable()
+    {
+        ?><table>
+            <thead>
+                <tr><?php
+                    foreach($this->Fetch() as $key => $value)
+                    {
+                        ?><th><?=ucfirst($key)?></th><?php
+                    }
+                ?></tr>
+            </thead>
+            <tbody><?php
+                foreach($this->Result() as $row)
+                {
+                    ?><tr><?php
+                        foreach($row as $val)
+                        {
+                            ?><td><?=$val?></td><?php
+                        }
+                    ?></tr><?php
+                }
+            ?></tbody>
+        </table><?php
+    }
+
     public function Close($backtosender = null)
     {
         if($this->con)
