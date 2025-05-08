@@ -105,7 +105,7 @@ class Ertesites
         $ertesitessql = new MySQLHandler();
         $ertesitessql->KeepAlive();
 
-        if(isset(OLDALAK['Aktív eszközök']) && OLDALAK['Aktív eszközök']['olvasas'] > 0)
+        if(defined('OLDALAK') && isset(OLDALAK['Aktív eszközök']) && OLDALAK['Aktív eszközök']['olvasas'] > 0)
         {
             $ertesitessql->Query("SELECT ertek
                 FROM `beallitasok`
@@ -155,6 +155,6 @@ class Ertesites
             );
         }
 
-        return array('olvasatlanszam' => $olvasatlanszam, 'ertesitesek' => $notifications);
+        return array('olvasatlanszam' => $olvasatlanszam, 'ertesitesek' => $notifications, 'lastnotif' => @$notifications[0]['timestamp']);
     }
 }
