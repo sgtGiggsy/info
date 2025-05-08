@@ -9,6 +9,7 @@ else
     $oldalnev = "felhasznalok";
     $oldalcim = "Felhasználók listája";
     $table = "modules/felhasznalok/includes/felhasznalotable";
+    $javascriptfiles[] = "modules/felhasznalok/includes/passwordgen.js";
 
     $where = $csoportwhere = $keres = null;
     $enablekeres = true;
@@ -48,6 +49,7 @@ else
             <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=addnew'">Új felhasználó</button>
             <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=sync'">Meglévő felhasználók AD-val szinkronizálása</button>
             <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=syncou'">Kiválasztott OU szinkronizálása</button>
+            <button type="button" onclick="generatePassword()">Jelszó generálása</button>
         </div><?php
     }
 

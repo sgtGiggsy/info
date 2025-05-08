@@ -226,7 +226,10 @@ else
     }
     else
     {
-        ?><div class="dyntripplecol">
+        ?><div class="szerkgombsor">
+            <button type="button" onclick="generatePassword()">Jelszó generálása</button>
+          </div>
+        <div class="dyntripplecol">
             <div class="infobox">
                 <div class="infoboxtitle">Felhasználó adatai<?php
                     if($mindir)
@@ -304,6 +307,7 @@ else
                 ?></div>
             </div>
         </div><?php
+        $javascriptfiles[] = "modules/felhasznalok/includes/passwordgen.js";
     }
 }
 ?>
