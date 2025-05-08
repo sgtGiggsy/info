@@ -306,7 +306,7 @@ function sortTableHeader($oszlopok, $tablazatnev, $filterinput = false, $sortinp
 				{
 					if(!$sortbyurl)
 					{
-						?><span onclick="sortTable(<?=$oszlopszam?>, '<?=$oszlop['tipus']?>', '<?=$tablazatnev?>')"><?=$oszlop['nev']?></span><?php
+						?><span onclick="tableQuickSort(<?=$oszlopszam?>, '<?=$oszlop['tipus']?>', '<?=$tablazatnev?>')"><?=$oszlop['nev']?></span><?php
 					}
 					else
 					{

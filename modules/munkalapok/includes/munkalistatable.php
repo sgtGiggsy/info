@@ -52,16 +52,16 @@ else
     ?><table id="munkalista">
         <thead>
             <tr>
-                <th class="tsorth" onclick="sortTable(0, 'i', 'munkalista')">Azonos.</th>
-                <th class="tsorth" onclick="sortTable(1, 's', 'munkalista')">Megrendelő</th>
-                <th class="tsorth" onclick="sortTable(2, 's', 'munkalista')">Telefon</th>
-                <th class="tsorth" onclick="sortTable(3, 's', 'munkalista')">Szervezet</th>
-                <th class="tsorth" onclick="sortTable(4, 's', 'munkalista')">Munkavégzés helye</th>
-                <th class="tsorth" onclick="sortTable(5, 's', 'munkalista')">Igénylés ideje</th>
-                <th class="tsorth" onclick="sortTable(6, 's', 'munkalista')">Végrehajtás ideje</th>
-                <th class="tsorth" onclick="sortTable(7, 's', 'munkalista')">Elvégzett munka</th>
-                <th class="tsorth" onclick="sortTable(8, 's', 'munkalista')">Anyag/eszköz</th>
-                <th class="tsorth" onclick="sortTable(9, 's', 'munkalista')">Munkavégző</th>
+                <th class="tsorth" onclick="tableQuickSort(0, 'i', 'munkalista')">Azonos.</th>
+                <th class="tsorth" onclick="tableQuickSort(1, 's', 'munkalista')">Megrendelő</th>
+                <th class="tsorth" onclick="tableQuickSort(2, 's', 'munkalista')">Telefon</th>
+                <th class="tsorth" onclick="tableQuickSort(3, 's', 'munkalista')">Szervezet</th>
+                <th class="tsorth" onclick="tableQuickSort(4, 's', 'munkalista')">Munkavégzés helye</th>
+                <th class="tsorth" onclick="tableQuickSort(5, 's', 'munkalista')">Igénylés ideje</th>
+                <th class="tsorth" onclick="tableQuickSort(6, 's', 'munkalista')">Végrehajtás ideje</th>
+                <th class="tsorth" onclick="tableQuickSort(7, 's', 'munkalista')">Elvégzett munka</th>
+                <th class="tsorth" onclick="tableQuickSort(8, 's', 'munkalista')">Anyag/eszköz</th>
+                <th class="tsorth" onclick="tableQuickSort(9, 's', 'munkalista')">Munkavégző</th>
                 <th></th>
                 <th></th>
             </tr>
