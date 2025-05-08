@@ -2,7 +2,8 @@
 
 function mySQLConnect($querystring = null)
 {
-	## MySQL connect ##
+	// Egyszerű MySQL feladatokat lebonyolító függvény
+	// Törlésre kijelölve, de még sok helyen van használatban, így egyelőre marad
 	include('config.inc.php');
 
 	@$GLOBALS['dbcallcount']++;
@@ -48,6 +49,7 @@ function mySQLConnect($querystring = null)
 
 function checkLDAPConnection($host)
 {
+	// Függvény, ami azt ellenőrzi hogy a megadott LDAP szerver elérhető-e
 	include('config.inc.php');
 
 	if(@fsockopen("$host", $LDAP_PORT, $errno, $errstr, 30))
@@ -62,6 +64,7 @@ function checkLDAPConnection($host)
 
 function parseUserAgent()
 {
+	// Függvény, ami a $_SERVER['HTTP_USER_AGENT']-ből kinyeri a böngésző és az operációs rendszer adatait
 	$uastring = $_SERVER['HTTP_USER_AGENT'];
 	$arch = null;
 	$browser = explode(" ", $uastring);
@@ -139,6 +142,7 @@ function parseUserAgent()
 
 function logLogin($felhasznalo)
 {
+	// Függvény, ami a bejelentkezéskor rögzíti a felhasználó adatait a bejelentkezesek táblába
 	$gepnev = explode(".", gethostbyaddr($_SERVER['REMOTE_ADDR']))[0];
 	$gepadat = parseUserAgent();
 	$bejelentkezesek = new MySQLHandler('INSERT INTO bejelentkezesek (felhasznalo, ipcim, bongeszo, bongeszoverzio, oprendszer, oprendszerverzio, oprendszerarch, gepnev) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
@@ -149,6 +153,7 @@ function logLogin($felhasznalo)
 
 function logActivity($felhasznalo, $params)
 {
+	// Függvény, ami a felhasználó által végzett tevékenységeket rögzíti a felhasznalotevekenysegek táblába
 	@$almenu = $_GET['subpage'];
 	@$menupont = $_GET['page'];
 	@$elemid = $_GET['id'];
@@ -178,27 +183,34 @@ function logActivity($felhasznalo, $params)
 	{
 		$params = null;
 	}
-	
-	$con = mySQLConnect(false);
+
 	$tevekenysegek = new MySQLHandler('INSERT INTO felhasznalotevekenysegek (ipcim, felhasznalo, menupont, almenu, elemid, params) VALUES (?, ?, ?, ?, ?, ?)',
 		$_SERVER['REMOTE_ADDR'], $felhasznalo, $menupont, $almenu, $elemid, $params);
 
 	return $tevekenysegek->last_insert_id;
 }
 
-function csvToArray($csv)
+function csvToArray($csv, $fejleccel = true)
 {
 	$bom = pack('CCC', 0xEF, 0xBB, 0xBF);
 	$bemenet = file($csv);
 	$bomnelkul = str_replace($bom, '', $bemenet); // Arra az esetre, ha a fájl rendelkezne BOM-mal
 
 	$rows = array_map(function($row) { return str_getcsv($row, ';'); }, $bomnelkul);
-	$fejlec = array_shift($rows);
 
-	$array = array();
-	foreach($rows as $row)
+	if($fejleccel)
 	{
-		$array[] = array_combine($fejlec, $row);
+		$fejlec = array_shift($rows);
+	
+		$array = array();
+		foreach($rows as $row)
+		{
+			$array[] = array_combine($fejlec, $row);
+		}
+	}
+	else
+	{
+		$array = $rows;
 	}
 
 	return $array;
@@ -233,7 +245,6 @@ function timeStampToDateTimeLocal($timestamp)
 	{
 		return null;
 	}
-	
 }
 
 function dateTimeLocalToTimeStamp($datetimelocal)
@@ -255,7 +266,6 @@ function thisDate()
 
 function timeStampForSQL($timestamp = null)
 {
-	
 	return date('Y-m-d H:i:s', $timestamp);
 }
 
@@ -1096,6 +1106,7 @@ function transzportPortLista($id, $tipus = 'epulet', $xlsexport = false)
 
 function hibajegyErtesites($ertesites, $szoveg, $hibajegyid, $felhasznalo, $szervezet, $szak = null)
 {
+	//! Totális újraírás, még a régi értesítési megoldásokat használja
 	$url = "hibajegy/$hibajegyid";
 	$tipus = "11";
 	$con = mySQLConnect(false);
@@ -1756,9 +1767,10 @@ function arrayMultiDimension($array)
    return isset($array[0]) && is_array($array[0]);
 }
 
-function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimappa)
+function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimappa, $csakurl = false)
 {
-	$con = mySQLConnect(false);
+	$feltoltdb = new MySQLHandler();
+	$feltoltdb->KeepAlive();
 	$feltoltesimappa = "$gyokermappa/$egyedimappa/";
 	$feltoltottfajlok = array();
     $uploadids = array();
@@ -1785,7 +1797,7 @@ function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimap
 
 		if (!in_array($fajlok['type'][$i], $mediatype))
 		{
-			$uzenet = "A fájl típusa nem megengedett: " . $fajlok['name'][$i];
+			$uzenet = "A fájl típusa nem megengedett: " . $fajlok['name'][$i] . " A feltöltött fájl típusa: " . $fajlok['type'][$i];
 		}
 		else
 		{
@@ -1811,18 +1823,20 @@ function fajlFeltoltes($fajlok, $filetypes, $mediatype, $gyokermappa, $egyedimap
 
 	if(count($feltoltottfajlok) > 0)
 	{
+		$feltoltdb->Prepare("INSERT INTO feltoltesek (fajl, felhasznalo) VALUES (?, ?)");
 		foreach($feltoltottfajlok as $fajl)
 		{
-			$stmt = $con->prepare('INSERT INTO feltoltesek (fajl) VALUES (?)');
-			$stmt->bind_param('s', $fajl);
-			$stmt->execute();
-
-			$fajlid = mysqli_insert_id($con);
-			$uploadids[] = $fajlid;
+			$feltoltdb->Run($fajl, $_SESSION['id']);
+			$uploadids[] = $feltoltdb->last_insert_id;
 		}
 	}
 
-	echo $uzenet;
+	if($csakurl)
+	{
+		$uploadids = $feltoltottfajlok;
+	}
+
+	//echo $uzenet;
 
 	return $uploadids;
 }
@@ -2119,4 +2133,22 @@ function connectorCompatibility($csatlakozo1, $csatlakozo2)
 	{
 		return false;
 	}
+}
+
+function compareObjects($obj1, $obj2)
+{
+	$vars1 = get_object_vars($obj1);
+	$vars2 = get_object_vars($obj2);
+
+	$elteresek = array();
+
+	foreach($vars1 as $key => $value)
+	{
+		if(!array_key_exists($key, $vars2) || $vars1[$key] !== $vars2[$key])
+		{
+			$elteresek[$key] = $key;
+		}
+	}
+
+	return $elteresek;
 }

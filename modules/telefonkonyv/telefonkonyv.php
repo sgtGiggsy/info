@@ -5,7 +5,8 @@ $contextmenu = array(
     'telefonkonyv' => array('gyujtooldal' => NULL, 'oldal' => 'telefonkonyv', 'gyujtooldalnev' => 'Telefonkönyv', 'oldalnev' => 'Telefonszám módosítása'),
     'valtozasok' => array('gyujtooldal' => 'valtozasok', 'oldal' => 'valtozas', 'gyujtooldalnev' => 'Változások', 'oldalnev' => 'Változtatás'),
     'szerkesztok' => array('gyujtooldal' => 'szerkesztok', 'oldal' => 'szerkeszto', 'gyujtooldalnev' => 'Szerkesztők', 'oldalnev' => 'Szerkesztő'),
-    'alegysegek' => array('gyujtooldal' => 'alegysegek', 'oldal' => 'alegyseg', 'gyujtooldalnev' => 'Alegységek', 'oldalnev' => 'Alegység')
+    'alegysegek' => array('gyujtooldal' => 'alegysegek', 'oldal' => 'alegyseg', 'gyujtooldalnev' => 'Alegységek', 'oldalnev' => 'Alegység'),
+    'osszevetes' => array('gyujtooldal' => 'telefonkonyvosszevet', 'oldal' => 'telefonkonyvosszevet', 'gyujtooldalnev' => 'Összevetés', 'oldalnev' => 'Összevetés')
 );
 
 $contextmenujogok = array('telefonkonyv' => false, 'valtozasok' => false, 'szerkesztok' => false, 'alegysegek' => false);
@@ -16,7 +17,7 @@ if(@$felhasznaloid)
     // Felhasználó jogosultságainak bekérése
     if($mindir)
     {
-        $contextmenujogok = array('telefonkonyv' => true, 'valtozasok' => true, 'szerkesztok' => true, 'alegysegek' => true);
+        $contextmenujogok = array('telefonkonyv' => true, 'valtozasok' => true, 'szerkesztok' => true, 'telefonkonyvosszevet' => true, 'alegysegek' => true);
         $globaltelefonkonyvadmin = true;
     }
     else
@@ -32,6 +33,7 @@ if(@$felhasznaloid)
             {
                 $contextmenujogok['szerkesztok'] = true;
                 $contextmenujogok['alegysegek'] = true;
+                $contextmenujogok['telefonkonyvosszevet'] = true;
                 $globaltelefonkonyvadmin = true;
             }
             else

@@ -305,6 +305,35 @@ function checkAll(sor, ertek)
     }
 }
 
+function copyTableToClipboard(idtocopy) {
+    const table = document.getElementById(idtocopy);
+
+    // Klónozzuk a táblát, hogy manipulálhassuk
+    const clonedTable = table.cloneNode(true);
+    let css = "";
+
+    // Hozzáfűzzük a stílusokat egy <style> blokkban
+    const htmlWithStyles = `
+      <html>
+        <head>
+          <style>${css}</style>
+        </head>
+        <body>${clonedTable.outerHTML}</body>
+      </html>
+    `;
+  
+    // A Clipboard API-hoz HTML formátumban
+    navigator.clipboard.write([
+      new ClipboardItem({
+        "text/html": new Blob([htmlWithStyles], { type: "text/html" })
+      })
+    ]).then(() => {
+        showToaster("A táblázat sikeresen vágólapra másolva!");
+    }).catch(err => {
+      showToaster("Hiba történt a vágólapra másolás során:", err);
+    });
+  }
+
 function copyToClipboard(idtocopy) {
     var copyText = document.getElementById(idtocopy);
     copyText.select();
