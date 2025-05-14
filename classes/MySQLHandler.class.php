@@ -64,10 +64,11 @@ class MySQLHandler
         echo FormatSQL($this->querystring) . "<br><br>Paraméterek: " . $params . "<br><br>Query futásideje: " . round($this->queryruntime, 2) . " mp";
     }
 
-    public function ShowException($paramszamokay = true, $paramcount = 0)
+    public function ShowException()
     {
         if($this->showdebug)
         {
+            
             $message = "";
             if(!$this->con)
             {
@@ -77,10 +78,13 @@ class MySQLHandler
             {
                 $message = "<h2>Hibásan megírt SQL query!</h2>" .  $this->exception . "<br>" .  $this->querystring . "<br>Hibakód: " . $this->hibakod . ": " . $this->hibauzenet . "<br>";;
             }
-            elseif(!$paramszamokay)
+            elseif(count($this->params) != strlen($this->types)
+                || count($this->params) != $this->vartparam
+                || strlen($this->types) != $this->vartparam
+            )
             {
                 $message = "<h2>Hibás paraméterszám!</h2>" . "Várt paraméter: " . $this->vartparam . "<br>Típusszám: " . strlen($this->types)
-                    . "<br>Paraméterszám: " . $paramcount . "<br>Lekérdezés:<br>" . FormatSQL($this->querystring) . "<br>";
+                    . "<br>Paraméterszám: " . count($this->params) . "<br>Lekérdezés:<br>" . FormatSQL($this->querystring) . "<br>";
             }
             elseif(!$this->querystring)
             {
@@ -132,17 +136,12 @@ class MySQLHandler
     private function SetTypes(...$params)
     {
         $this->types = "";
-        if(is_array($params))
+        if(count($params) > 0)
         {   
             foreach($params as $param)
             {
-                $this->params[] = $param;
                 $this->GetType($param);
             }
-        }
-        else
-        {
-            $this->GetType($params);
         }
     }
 
@@ -201,7 +200,6 @@ class MySQLHandler
         }
         else
         {
-            
             $this->ShowException();
         }
         return $this->siker;
@@ -210,13 +208,7 @@ class MySQLHandler
     public function Query(string $query, ...$params) : mysqli_result | false
     {
         if($this->Prepare($query))
-        {
-            if($params && @$params[0] !== null)
-            {
-                $this->SetTypes(...$params);
-            }
             return $this->Run(...$params);
-        }
         else
         {
             $this->ShowException();
@@ -227,49 +219,32 @@ class MySQLHandler
     public function Run(...$params) : mysqli_result | false
     {
         $start_time = microtime(true);
-        $paramszamokay = false;
         $paramcount = 0;
+        $this->params = $params;
         if($this->stmt && $this->siker)
         {
-            if($params && $params[0] !== null)
-            {
-                $paramcount = 1;
-                if(is_array($params))
-                    $paramcount = count($params);
-                if(!$this->types)
-                    $this->SetTypes(...$params);
-            }
-            
+            $this->siker = false;
+            $paramcount = count($params);
+            if(!$this->types)
+                $this->SetTypes(...$params);
+
             if($paramcount == strlen($this->types) && $this->vartparam == $paramcount)
-                $paramszamokay = true;
-            
-            
-            if($params && $params[0] !== null && $paramszamokay)
             {
-                if(is_array($params))
-                {
+                if($paramcount > 0)
                     $this->stmt->bind_param($this->types, ...$params);
-                }
-                else
-                {
-                    $this->stmt->bind_param($this->types, $params);
-                }
-            }
-            
-            if($paramszamokay)
-            {
-                @$GLOBALS['dbcallcount']++;
                 $this->stmt->execute();
+
+                @$GLOBALS['dbcallcount']++;
                 $this->last_insert_id = mysqli_insert_id($this->con);
                 $this->result = $this->stmt->get_result();
+
                 if(!is_bool($this->result))
                     $this->sorokszama = mysqli_num_rows($this->result);
-            }
-    
-            if($this->con && mysqli_errno($this->con) != 0)
-            {
-                $this->hibakod = mysqli_errno($this->con);
-                $this->siker = false;
+                
+                if($this->con && mysqli_errno($this->con) != 0)
+                    $this->hibakod = mysqli_errno($this->con);
+                else
+                    $this->siker = true;
             }
     
             if(!$this->keepalive && $this->con)
@@ -278,18 +253,11 @@ class MySQLHandler
                 $this->con = null;
             }
         }
-        
-        if(!$this->stmt || !$this->siker || !$paramszamokay)
-        {
-            $this->ShowException($paramszamokay, $paramcount);
-            $this->result = false;
-        }
-        else
-        {
-            $this->siker = true;
-        }
 
         $this->queryruntime = microtime(true) - $start_time;
+        
+        if(!$this->siker)
+            $this->ShowException();
 
         return $this->result;
     }
