@@ -91,7 +91,7 @@ else
 
     $tipus = 'eszkozok';
     $oszlopok = array(
-        array('nev' => 'IP cím', 'tipus' => 's'),
+        array('nev' => 'IP cím', 'tipus' => 'ip'),
         array('nev' => 'Eszköznév', 'tipus' => 's'),
         array('nev' => 'Gyártó', 'tipus' => 's'),
         array('nev' => 'Modell', 'tipus' => 's'),

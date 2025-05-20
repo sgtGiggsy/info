@@ -137,7 +137,7 @@ function sortTable(n, t, tname)
     }
 }
 
-function tableQuickSort(coln, colt, tablename)
+function tableQuickSortOld(coln, colt, tablename)
 {
     let table, rows;
     colnum = coln;
@@ -233,4 +233,82 @@ function mutatOszlop(osztalynev) {
             elemek[i].style.display = "none";
         }
     }
+}
+
+function ipToNumber(ip) {
+    if(ip === "zzzzzzz") return 999999999999999; // Ha nulllast, akkor az üres IP a sor végére kerül
+    return ip.split('.')
+        .map(seg => parseInt(seg, 10))
+        .reduce((acc, val) => (acc << 8) + val, 0);
+}
+
+function tableQuickSortNewer(colIndex, colType, tableId) {
+    const table = document.getElementById(tableId);
+    const tbody = table.tBodies[0] || table; // fallback, ha nincs <tbody>
+    const rows = Array.from(tbody.rows).filter(row => row.cells.length); // kihagyja az üres vagy fejléc sorokat
+
+    // Rendezési irány beállítása
+    direction = (utrendez === colIndex && direction === "asc") ? "desc" : "asc";
+    utrendez = colIndex;
+
+    // Előkészítés: tömbbe mentjük a sorokat és értékeket
+    const sortable = rows.map(row => {
+        const cell = row.cells[colIndex];
+        let raw = cell.textContent.trim();
+        let value;
+
+        if (colType === "i") {
+            value = parseFloat(raw) || 0;
+        } else if (colType === "s") {
+            value = raw.toLowerCase();
+        } else if (colType === "ip") {
+            value = ipToNumber(raw);
+        }
+
+        return { row, value };
+    });
+
+    // Rendezzük a JavaScript tömböt
+    sortable.sort((a, b) => {
+        if (a.value < b.value) return direction === "asc" ? -1 : 1;
+        if (a.value > b.value) return direction === "asc" ? 1 : -1;
+        return 0;
+    });
+
+    // DOM újraépítése egyszer, a végén
+    const frag = document.createDocumentFragment();
+    sortable.forEach(({ row }) => frag.appendChild(row));
+    tbody.appendChild(frag); // a DOM mostantól rendezett
+}
+
+function tableQuickSort(colIndex, colType, tableId, nulllast = true) {
+    const table = document.getElementById(tableId);
+    const tbody = table.tBodies[0] || table;
+    const rows = Array.from(tbody.rows).filter(row => row.cells.length);
+    const nullval = nulllast ? "zzzzzzz" : ""; // üres értékek kezelése
+
+    direction = (utrendez === colIndex && direction === "asc") ? "desc" : "asc";
+    utrendez = colIndex;
+
+    // Előkészítés rendezéshez
+    const sortable = rows.map(row => {
+        const text = row.cells[colIndex]?.textContent.trim() || nullval;
+        let value;
+        if (colType === "ip") value = ipToNumber(text);
+        else if (colType === "i") value = parseFloat(text) || 0;
+        else value = text.toLowerCase();
+        return { row, value };
+    });
+
+    // Stabil rendezés
+    sortable.sort((a, b) => {
+        if (a.value < b.value) return direction === "asc" ? -1 : 1;
+        if (a.value > b.value) return direction === "asc" ? 1 : -1;
+        return 0;
+    });
+
+    // DOM frissítése
+    const frag = document.createDocumentFragment();
+    sortable.forEach(({ row }) => frag.appendChild(row));
+    tbody.appendChild(frag);
 }
