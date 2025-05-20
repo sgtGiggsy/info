@@ -87,7 +87,7 @@ elseif($csoportir)
                             <strong><?=($feladatelem['ido_tenyleges']) ? $feladatelem['ido_tenyleges'] : 
                                             (($feladatelem['ido_tervezett']) ? $feladatelem['ido_tervezett'] : $feladatelem['ido_hatarido'])?></strong>
                             <p><small><?=$allapot?></small></p>
-                            <p><small><?=ucfirst($feladatelem['szaknev'])?></small></p>
+                            <p><small><?=($feladatelem['szaknev']) ? ucfirst($feladatelem['szaknev']) : "" ?></small></p>
                         </div>
                         <div class="feladatactions">
                             <button title="Állapotváltás" <?=$gombikonclass?> onclick="rejtMutat('actions-<?=$feladatelem['feladat_id']?>')"><?=$gombikon?></button>

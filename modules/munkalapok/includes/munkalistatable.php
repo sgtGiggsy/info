@@ -76,8 +76,8 @@ else
                     <td><?=$munka['igenylotelefon']?></td>
                     <td><?=$munka['igenyloszervezet']?></td>
                     <td><?=$munka['telephely']?> <?=$munka['epulet']?>.  <?=$munka['eptipus']?> <?=$munka['helyiseg']?>.</td>
-                    <td nowrap><?=str_replace("-", ".", $munka['igenylesideje'])?></td>
-                    <td nowrap><?=str_replace("-", ".", $munka['vegrehajtasideje'])?></td>
+                    <td nowrap><?=($munka['igenylesideje']) ? str_replace("-", ".", $munka['igenylesideje']) : "" ?></td>
+                    <td nowrap><?=($munka['igenylesideje']) ? str_replace("-", ".", $munka['vegrehajtasideje']) :  "" ?></td>
                     <td><?=$munka['leiras']?></td>
                     <td><?=$munka['eszkoz']?></td>
                     <td><?=$munka['munkavegzo1nev']?></td>

@@ -19,7 +19,7 @@ class MySQLHandler
     private $params = array();
     private $queryruntime;
 
-    public function __construct(string $query = null, ...$params)
+    public function __construct(string | null $query = null, ...$params)
 	{
         if(isset($GLOBALS['felhasznaloid']) && $GLOBALS['felhasznaloid'] == 1)
         {
@@ -219,14 +219,22 @@ class MySQLHandler
     public function Run(...$params) : mysqli_result | false
     {
         $start_time = microtime(true);
-        $paramcount = 0;
+        $paramcount = count($params);
         $this->params = $params;
         if($this->stmt && $this->siker)
         {
             $this->siker = false;
-            $paramcount = count($params);
-            if(!$this->types)
-                $this->SetTypes(...$params);
+            // Erre azért van szükség, mert bizonyos generált lekérdezésekből érkezhet hibásan egyetlen NULL mint paraméter
+            // Így kizárjuk, hogy az egyetlen NULL átadódjon paraméterként, de a korábbi verzóval ellentétben az engedélyezett
+            // mikor egy több paraméteres tömb első eleme NULL.
+            // Az a feltételezés, hogy nincs eset, mikor egyetlen NULL-t akarunk átadni mint paramétert.
+            if($paramcount > 1 || ($paramcount == 1 && !is_null($params[0])))
+            {
+                if(!$this->types)
+                    $this->SetTypes(...$params);
+            }
+            else
+                $paramcount = 0;
 
             if($paramcount == strlen($this->types) && $this->vartparam == $paramcount)
             {

@@ -371,7 +371,7 @@ function eszkozTipusValaszto($tipusid)
 	return $eszktip;
 }
 
-function eszkozPicker($current = null, $beepitett)
+function eszkozPicker($current = null, $beepitett = null)
 {
 	$where = null;
 	if($current)
@@ -1860,11 +1860,11 @@ function secondsToFullFormat($seconds, $showseconds = true)
 		$seconds = $seconds * - 1;
 	$nap = $ev = null;
 	$masodperc = str_pad(($seconds % 60), 2, "0", STR_PAD_LEFT);
-	$perc = str_pad(($seconds / 60 % 60), 2, "0", STR_PAD_LEFT);
-	$ora = str_pad((floor($seconds / 3600 % 24)), 2, "0", STR_PAD_LEFT);
+	$perc = str_pad((intdiv($seconds, 60) % 60), 2, "0", STR_PAD_LEFT);
+	$ora = str_pad((floor(intdiv($seconds, 3600) % 24)), 2, "0", STR_PAD_LEFT);
 	$ora = "$ora óra, ";
-	$napok = floor($seconds / 3600 / 24);
-	$evek = floor($napok / 365);
+	$napok = floor(intdiv(intdiv($seconds, 3600), 24));
+	$evek = floor(intdiv($napok, 365));
 	$napok = $napok - ($evek * 365);
 
 	if($napok > 0)

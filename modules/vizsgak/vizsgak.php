@@ -60,8 +60,11 @@ if(@$mindir)
         <tbody><?php
             foreach($vizsgak as $vizsga)
             {
+                $felhasznalolist = array();
                 $adminlist = explode(";", $vizsga['adminidlist']);
-                $felhasznalolist = explode(";", $vizsga['engedfelh']);
+                if($vizsga['engedfelh'])
+                    $felhasznalolist = explode(";", $vizsga['engedfelh']);    
+
                 if($mindir
                     || ($felhasznaloid && $vizsga['adminidlist'] && in_array($felhasznaloid, $adminlist))
                     || ($vizsga['eles'] && !$vizsga['korlatozott'])

@@ -86,7 +86,7 @@ if(!isset($_SESSION['elozmenyek']))
 }
 else
 {
-    if(@$_SERVER['HTTP_REFERER'] && !str_contains(@$_SERVER['HTTP_REFERER'], @$_SERVER['REDIRECT_URL']) && !str_contains(@$_SERVER['HTTP_REFERER'], "belepes"))
+    if(@$_SERVER['HTTP_REFERER'] && !str_contains(@$_SERVER['HTTP_REFERER'], @$_SERVER['REDIRECT_URL'] ?? '') && !str_contains(@$_SERVER['HTTP_REFERER'], "belepes"))
     {
         array_push($_SESSION['elozmenyek'], $_SERVER['HTTP_REFERER']);
         $backtosender = $_SERVER['HTTP_REFERER'];
@@ -238,7 +238,7 @@ $beallitas = $beallitas->Result();
 foreach($beallitas as $x)
 {
     $nev = $x['nev'];
-    $ertek = trim($x['ertek']);
+    $ertek = ($x['ertek']) ? trim($x['ertek']) : null;
     $_SESSION["$nev"] = $ertek;
 }
 
