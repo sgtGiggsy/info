@@ -22,7 +22,7 @@ class Ertesites
         $this->mailbody = $mailbody;
     }
 
-    public function Ment()
+    public function Ment(bool $mail = true)
     {
         $this->sql->Prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
         $this->sql->Run($this->cim, $this->szoveg, $this->url, $this->tipus);
@@ -30,22 +30,26 @@ class Ertesites
 
         if(count($this->felhasznalok) > 0)
         {
-            $mailbody = $this->szoveg;
-            if($this->mailbody)
+            if($mail)
+            {
+
+                $mailbody = $this->szoveg;
+                if($this->mailbody)
                 $mailbody = $this->mailbody;
-            $mail = new MailHandler($mailbody);
-            $mail->Subject($this->cim);
+                $mail = new MailHandler($mailbody);
+                $mail->Subject($this->cim);
+            }
 
             $this->sql->Prepare("INSERT INTO ertesites_megjelenik(felhasznalo, ertesites) VALUES (?, ?)");
             foreach($this->felhasznalok as $felhasznalo)
             {
                 $this->sql->Run($felhasznalo['felhasznalo'], $this->ertesitesid);
-                if($felhasznalo['email'])
+                if($felhasznalo['email'] && $mail)
                 {
                     $mail->AddAddress($felhasznalo['email']);
                 }
             }
-            if($mail->cimzettszam > 0)
+            if($mail && $mail->cimzettszam > 0)
                 $mail->Send();
         }
         else
@@ -122,7 +126,7 @@ class Ertesites
                 if($ertesitessql->sorokszama == 0)
                 {
                     $ertesites = new Ertesites($cim, $szoveg, 'aktiveszkozok', 1);
-                    $ertesites->Ment();
+                    $ertesites->Ment(false);
                 }
             }
         }
