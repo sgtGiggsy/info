@@ -46,15 +46,14 @@ if(@$irhat)
                     $magyarazat .= "<strong>IP cím</strong><p>Az eszköz jelenlegi IP címe.</p>";
                 }
 
-                if(!$tipus || $tipus == "aktiveszkoz" || $tipus == "nyomtato" || $tipus == "telefonkozpont" || $tipus == "mediakonverter" || $tipus == "sohoeszkoz")
+                if(!$tipus || in_array($tipus, array("aktiveszkoz", "nyomtato", "telefonkozpont", "mediakonverter", "sohoeszkoz", "szunetmentes")))
                 {
-                    
                     epuletPicker($beepepulet, true);
                     helyisegPicker($beephely, "helyiseg");
                     $magyarazat .= "<strong>Helyiség</strong><p>Csak abban az esetben kell megadni, ha az eszköz <b>nincs</b> rack szekrénybe építve.</p>";
                 }
 
-                if(!$tipus || $tipus == "aktiveszkoz" || $tipus == "mediakonverter" || $tipus == "sohoeszkoz")
+                if(!$tipus || in_array($tipus, array("aktiveszkoz", "mediakonverter", "sohoeszkoz", "szunetmentes")))
                 {
                     rackPicker($beeprack);
                     $magyarazat .= "<strong>Rackszekrény</strong><p>Amennyiben az eszköz rackszekrénybe van építve, csak ezt kell megadni.</p>";

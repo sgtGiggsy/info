@@ -8,6 +8,7 @@ if(isset($irhat) && $irhat)
 
     if($_GET["action"] == "new")
     {
+        //TODO átírni tranzakcióra, hogy csak akkor fusson le, ha mindkét beszúrás sikeres
         $stmt = $con->prepare('INSERT INTO eszkozok (modell, sorozatszam, tulajdonos, varians, megjegyzes, raktar) VALUES (?, ?, ?, ?, ?, ?)');
         $stmt->bind_param('ssssss', $_POST['modell'], $_POST['sorozatszam'], $_POST['tulajdonos'], $_POST['varians'], $_POST['megjegyzes'], $_POST['raktar']);
         try{
@@ -58,6 +59,13 @@ if(isset($irhat) && $irhat)
             {
                 $stmt = $con->prepare('INSERT INTO simkartyak (eszkoz, telefonszam, pinkod, pukkod, tipus, felhasznaloszam, modid) VALUES (?, ?, ?, ?, ?, ?, ?)');
                 $stmt->bind_param('sssssss', $last_id, $_POST['telefonszam'], $_POST['pinkod'], $_POST['pukkod'], $_POST['tipus'], $_POST['felhasznaloszam'], $modif_id);
+                $stmt->execute();
+            }
+
+            elseif($eszkoztipus == "szunetmentes")
+            {
+                $stmt = $con->prepare('INSERT INTO szunetmentesek (eszkoz, teljesitmeny, tipus) VALUES (?, ?, ?)');
+                $stmt->bind_param('iss', $last_id, $_POST['teljesitmeny'], $_POST['tipus']);
                 $stmt->execute();
             }
         }
@@ -126,6 +134,13 @@ if(isset($irhat) && $irhat)
 
                 $stmt = $con->prepare('UPDATE simkartyak SET telefonszam=?, pinkod=?, pukkod=?, tipus=?, felhasznaloszam=?, modid=? WHERE eszkoz=?');
                 $stmt->bind_param('ssssssi', $_POST['telefonszam'], $_POST['pinkod'], $_POST['pukkod'], $_POST['tipus'], $_POST['felhasznaloszam'], $modif_id, $_POST['id']);
+                $stmt->execute();
+            }
+
+            elseif($eszkoztipus == "szunetmentes")
+            {
+                $stmt = $con->prepare('UPDATE szunetmentesek SET teljesitmeny=?, tipus=? WHERE eszkoz=?');
+                $stmt->bind_param('ssi', $_POST['teljesitmeny'], $_POST['tipus'], $_POST['id']);
                 $stmt->execute();
             }
         }

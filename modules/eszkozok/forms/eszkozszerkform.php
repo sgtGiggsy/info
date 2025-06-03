@@ -105,6 +105,27 @@ if(@$irhat)
                     $magyarazat .= "<strong>Firmware</strong><p>Az eszközön futó szoftver verziószáma.</p>";
                 }
 
+                if($eszkoztipus == "szunetmentes")
+                {
+                    ?><div>
+                        <label for="tipus">Tipus</label><br>
+                        <select name="tipus">
+                            <option value="" selected></option>
+                            <option value="1" <?=($tipus == 1) ? "selected" : ""?>>Asztali</option>
+                            <option value="2" <?=($tipus == 2) ? "selected" : ""?>>Rack-be építhető</option>
+                        </select>
+                    </div>
+
+                    <?php $magyarazat .= "<strong>Tipus</strong><p>A szünetmentes felépítését határozza meg.</p>"; ?>
+
+                    <div>
+                        <label for="teljesitmeny">Teljesítmény:</label><br>
+                        <input type="text" accept-charset="utf-8" name="teljesitmeny" id="teljesitmeny" value="<?=$teljesitmeny?>"></input>
+                    </div>
+
+                    <?php $magyarazat .= "<strong>Teljesítmény</strong><p>A szünetmentes kapacitása Watt-ban megadva. Ha az eszközön csak a VA (VoltAmper) van feltüntetve, rá kell keresni a neten.</p>";
+                }
+
                 if($eszkoztipus == "mediakonverter")
                 {
                     ?><div>
