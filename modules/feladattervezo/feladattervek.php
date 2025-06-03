@@ -6,7 +6,6 @@ if(!$csoportolvas)
 }
 else
 {
-   
     $adattabla = "feladatterv_feladatok";
     $oldalnev = "feladattervek";
     $oldalcim = "Feladatok listája";
@@ -50,5 +49,4 @@ else
             include("./modules/feladattervezo/forms/feladattervform.php");
         ?></div><?php
     }
-
 }

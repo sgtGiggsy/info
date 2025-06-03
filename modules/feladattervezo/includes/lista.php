@@ -11,7 +11,7 @@ elseif($csoportir)
         $irhat = true;
 }
 
-?><div class="allapotjelentesek"><?php
+?><div class="allapotjelentesek PrintArea"><?php
     $kattinthatolink = $gombikonclass = null;
     foreach($feladatterv->Result() as $feladatelem)
     {

@@ -28,8 +28,8 @@ if($irhat && isset($_GET['action']))
     elseif($_GET["action"] == "update")
     {
         $feladatid = $_POST['id'];
-        $feladatdb->Query('UPDATE feladatterv_feladatok SET rovid=?, leiras=?, prioritas=?, szakid=?, epulet=?, modositotta=?, hivatkozas=?, ido_tervezett=?, ido_hatarido=?, ido_modositas=? WHERE feladat_id=?',
-            $_POST['rovid'], $leirasHTML, $_POST['prioritas'], $_POST['szakid'], $_POST['epulet'], $_SESSION['id'], $_POST['hivatkozas'], $_POST['ido_tervezett'], $_POST['ido_hatarido'], $timestamp, $feladatid);
+        $feladatdb->Query('UPDATE feladatterv_feladatok SET rovid=?, leiras=?, prioritas=?, szakid=?, epulet=?, modositotta=?, hivatkozas=?, ido_tervezett=?, ido_hatarido=?, ido_modositas=?, ido_tenyleges=? WHERE feladat_id=?',
+            $_POST['rovid'], $leirasHTML, $_POST['prioritas'], $_POST['szakid'], $_POST['epulet'], $_SESSION['id'], $_POST['hivatkozas'], $_POST['ido_tervezett'], $_POST['ido_hatarido'], $timestamp, $_POST['ido_tenyleges'], $feladatid);
     }
 
     elseif($_GET["action"] == "delete")

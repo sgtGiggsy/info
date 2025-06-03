@@ -3949,7 +3949,11 @@ div[id^=tennivalobody-].close {
         background: white !important;
         position: absolute;
         left: 0;
-        top: 0;
+        top: 1em;
+    }
+
+    .contentcenter {
+        position: unset;
     }
 
     .hiddenid {
@@ -3962,8 +3966,16 @@ div[id^=tennivalobody-].close {
         border: 0px;
     }
 
-    .oldalcim {
+    .feladatelemwrap {
+        font-size: 0.5em;
+    }
+
+    .oldalcim, .allapotelem, .feladatelem  {
         background-color: #aaaaaa !important;
+    }
+
+    .feladatelem a {
+        color: #0b0b0b !important;
     }
 
     .dontprint, .dontprint td, .dontprint th, .szuresvalaszto {
@@ -3978,6 +3990,10 @@ div[id^=tennivalobody-].close {
 
     tr, td {
         padding: 0 !important;
+    }
+
+    tr a {
+        color: #0b0b0b !important;
     }
 
     tr:nth-child(odd) {
