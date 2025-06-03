@@ -14,7 +14,7 @@ if(@$irhat)
             </div>
     
             <div>
-                <?= felhasznaloPicker($felhasznalo, "felhasznalo") ?>
+                <?= felhasznaloPicker($felhasznalo, "felhasznalo", null) ?>
             </div>
     
             <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>

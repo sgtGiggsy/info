@@ -6,7 +6,7 @@ if(@$irhat)
     ?><div class="contentleft">
         <div>
             <form action="<?=$RootPath?>/menu&action=update" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
-                foreach($menu as $menupont)
+                foreach(OLDALAK as $menupont)
                 {
                     ?><div id="mid-<?=$menupont['id']?>" class="menucard<?=($menupont['szulo']) ? "-child" : "" ?>">
                         <div class="menucardtitle"><?=$menupont['menupont']?><a class="help" id="nyil-<?=$menupont['id']?>" onclick="rejtMutat('menupontid-<?=$menupont['id']?>');upDownConversion('nyil-<?=$menupont['id']?>')"><strong>⮟</strong></a></div>

@@ -96,7 +96,7 @@ else
         $oldalcim = "Menük szerkesztése";
 
         $szulo = array();
-        foreach($menu as $x)
+        foreach(OLDALAK as $x)
         {
             $szulo[] = array("id" => $x['id'], "menupont" => $x['menupont']);
         }

@@ -16,7 +16,7 @@ if(@$irhat)
                     <label for="fooldalkijelentkezve">A főoldalon megjelenő menüpont látogatóknak</label><br>
                     <select name="fooldalkijelentkezve">
                         <option value="" selected></option><?php
-                        foreach($menu as $x)
+                        foreach(OLDALAK as $x)
                         {
                             ?><option value="<?=$x['id']?>" <?=($x['gyujtooldal'] && $x['gyujtooldal'] == $beallitas['fooldalkijelentkezve']) ? "selected" : "" ?>><?=$x['menupont']?></option><?php
                         }
@@ -27,7 +27,7 @@ if(@$irhat)
                     <label for="fooldalbejelentkezve">A főoldalon megjelenő menüpont felhasználóknak</label><br>
                     <select name="fooldalbejelentkezve">
                         <option value="" selected></option><?php
-                        foreach($menu as $x)
+                        foreach(OLDALAK as $x)
                         {
                             ?><option value="<?=$x['id']?>" <?=($x['gyujtooldal'] && $x['gyujtooldal'] == $beallitas['fooldalbejelentkezve']) ? "selected" : "" ?>><?=$x['menupont']?></option><?php
                         }

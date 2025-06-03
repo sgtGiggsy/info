@@ -1,6 +1,7 @@
 <?php
 
-header('Content-Type: Content-Type: text/html; charset=utf-8');
+if(!headers_sent())
+    header('Content-Type: Content-Type: text/html; charset=utf-8');
 
 $where = $origvolt = null;
 

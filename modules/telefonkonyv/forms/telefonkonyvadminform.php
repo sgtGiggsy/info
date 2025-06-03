@@ -11,7 +11,7 @@ if(@$irhat)
         {
             ?><div>
                 <label for="sorrend">Felhasználó:</label><br><?php
-                felhasznaloPicker(null, "id");
+                felhasznaloPicker(null, "id", null);
             ?></div><?php
         }
             ?><div>

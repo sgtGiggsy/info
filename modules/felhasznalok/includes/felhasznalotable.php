@@ -1,5 +1,5 @@
 <?php
-$lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, szervezetek.nev AS szervezet
+$lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, szervezetek.nev AS szervezet, descript
     FROM felhasznalok
         LEFT JOIN szervezetek ON felhasznalok.szervezet = szervezetek.id
     $where $csoportwhere
@@ -8,7 +8,7 @@ $lista = mySQLConnect("SELECT felhasznalok.id as felhasznaloid, felhasznalok.nev
 ?><table class="fulltable">
     <thead>
         <tr>
-            <th>Név</th>    
+            <th>Név</th>
             <th>Usernév</th>
             <th>Emailcím</th>
             <th>Telefon</th>

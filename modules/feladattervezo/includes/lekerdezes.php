@@ -92,7 +92,7 @@ $feladatterv  = new MySQLHandler("SELECT rovid, leiras, prioritas, allapot, szul
         CASE WHEN feladatterv_feladatok.befejezett = 1
             THEN ido_tenyleges
         END DESC,
-        vegrehajt ASC
+        vegrehajt IS NULL, vegrehajt ASC
     $lapozas;", ...$paramarr);
 
 // Ha nincs feladatterv, akkor letiltjuk a hozzáférést

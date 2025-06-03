@@ -249,9 +249,9 @@ else
         $beosztasok = getBeosztasListAlt($where);
 
         ?><datalist id="tkonyvfelhasznalok"><?php
-            foreach($tkonyvfelhasznalok as $felhasznalo)
+            foreach($tkonyvfelhasznalok as $felhasznalonev)
             {
-                ?><option><?=$felhasznalo['nev']?></option><?php
+                ?><option><?=$felhasznalonev['nev']?></option><?php
             }
         ?></datalist><?php
 

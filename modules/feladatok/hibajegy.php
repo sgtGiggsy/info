@@ -167,9 +167,10 @@ else
             }
 
             if(!$szakid)
-            {
                 $szakid = "NULL";
-            }
+
+            if($hibajegyszervezet)
+                $hibajegyszervezet =  "AND csoportjogok.szervezet = " . $hibajegyszervezet;
 
             $felelosok = mySQLConnect("SELECT DISTINCT felhasznalok.id AS felhid,
                     felhasznalok.nev AS felhasznalo,
@@ -179,7 +180,7 @@ else
                     INNER JOIN csoportjogok ON csoporttagsagok.csoport = csoportjogok.csoport
                     INNER JOIN csoportok ON csoporttagsagok.csoport = csoportok.id
                     INNER JOIN jogosultsagok ON jogosultsagok.felhasznalo = csoporttagsagok.felhasznalo
-                WHERE menupont = 11 AND iras > 1 AND csoportjogok.szervezet = $hibajegyszervezet AND (csoportok.szak = $szakid OR csoportok.szak IS NULL)");
+                WHERE menupont = 11 AND iras > 1 $hibajegyszervezet AND (csoportok.szak = $szakid OR csoportok.szak IS NULL)");
 
             $kijeloltek = mySQLConnect("SELECT felhasznalok.id AS felhid,
                     felhasznalok.nev AS felhasznalo
@@ -223,7 +224,7 @@ else
         {
             foreach($csoporttagsagok as $csoport)
             {
-                if($csoport['szervezet'] == $hibajegyszervezet || $csoport['szervezet'] == $szervezet)
+                if($csoport['szervezet'] == $hibajegyszervezet)
                 {
                     $irhat = true;
                     break;
@@ -397,7 +398,13 @@ else
                                         <select name="allapottipus" id="allapottipus"><?php
                                         foreach($allapottipusok as $allapottipus)
                                         {
-                                            if($allapottipus['id'] != 0 && (($hibajegy['allapot'] == 1 && $allapottipus['id'] > 20) || ($irhat && $hibajegy['allapot'] == 0 && $allapottipus['id'] == 2) || (!$irhat && $hibajegy['allapot'] == 0 && $allapottipus['id'] == 1)))
+                                            if($allapottipus['id'] != 0
+                                                && (($hibajegy['allapot'] == 1
+                                                    && $allapottipus['id'] > 20)
+                                                    || ($irhat && $hibajegy['allapot'] == 0 && $allapottipus['id'] == 2)
+                                                    || (!$irhat && $hibajegy['allapot'] == 0 && $allapottipus['id'] == 1)
+                                                )
+                                            )
                                             {
                                                 ?><option value="<?=$allapottipus['id']?>"><?=$allapottipus['nev']?></option><?php
                                             }

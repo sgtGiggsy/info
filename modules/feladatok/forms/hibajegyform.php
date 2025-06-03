@@ -13,7 +13,7 @@ if(@$irhat)
                 {
                     ?><div>
                         <label for="felhasznalo">A hiba bejelentője:</label><br><?php
-                        felhasznaloPicker($felhasznalo, "felhasznalo");
+                        felhasznaloPicker($felhasznalo, "felhasznalo", null);
                     ?></div><?php
                     $magyarazat .= "<strong>A hiba bejelentője</strong>
                     <p>A hibát bejelentő felhasználó neve. Kizárólag végrehajtó állomány számára jelenik meg,

@@ -208,7 +208,7 @@ else
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
     }
     
-    $query = mySQLConnect("SELECT felhasznalok.id as felhid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, szervezetek.nev AS szervezet
+    $query = mySQLConnect("SELECT felhasznalok.id as felhid, felhasznalok.nev AS nev, felhasznalonev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript, szervezetek.nev AS szervezet
             FROM felhasznalok
                 LEFT JOIN szervezetek ON felhasznalok.szervezet = szervezetek.id
             WHERE felhasznalok.id = $felhid $csoportwhere;");
@@ -248,6 +248,8 @@ else
                         <div></div>
                         <div>Név:</div>
                         <div><?=$felhasznalo['nev']?></div>
+                        <div>Leírás:</div>
+                        <div><?=$felhasznalo['descript']?></div>
                         <div>Felhasználónév:</div>
                         <div><?=$felhasznalo['felhasznalonev']?></div>
                         <div>Szervezet:</div>

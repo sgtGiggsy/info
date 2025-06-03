@@ -94,7 +94,7 @@ else
         <thead>
             <tr>
                 <th><button type="button" id="f0" onclick="filterTable('f0', '<?=$tipus?>', 0)" value='!' placeholder="" title="">!</button></th><?php
-                    sortTableHeader($oszlopok, $tipus, true, true, false, true, true, 1); 
+                    sortTableHeader($oszlopok, $tipus, true, true, false, false, true, 1); 
                 ?><th></th>
             </tr>
         </thead>

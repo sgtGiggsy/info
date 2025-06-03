@@ -39,7 +39,7 @@ if(@$irhat)
                         <button onclick="switchBeosztas(); return false;">Beosztás szerkesztése</button>
                         <div class="right"><button onclick="delBeosztas(); return false;" class="redbutton" id="beodelbutton">Beosztás törlése</button></div><br>
                         <label for="beosztas">Beosztás*</label>
-                        <select name="beosztas" id="beosztas" onchange="checkIfNew(<?=$felhasznaloid?>);refreshSelections();checkIfAvailable();" required>
+                        <select name="beosztas" id="beosztas" onchange="checkIfNew(<?=$felhasznalo?>);refreshSelections();checkIfAvailable();" required>
                             <option></option>
                             <option value="0" id="ujbeo" <?=($addnew) ? "selected" : "" ?> style="font-size: 1em;">Új beosztás létrehozása</option><?php
                             $elozocsop = 0;

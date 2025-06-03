@@ -9,7 +9,7 @@ if(@$irhat)
                     ?><input type ="hidden" id="id" name="id" value=<?=$_GET['id']?>><?php
                 }
    
-                felhasznaloPicker(null, 'felhasznalo');
+                felhasznaloPicker(null, 'felhasznalo', null);
 
                 ?><div class="submit"><input type="submit" value='<?=$button?>'></div>
             </form>

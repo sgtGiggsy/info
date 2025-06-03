@@ -14,7 +14,7 @@ if(@$irhat)
 
                 <div>
                     <label for="defaultugyintezo">Alapértelmezett ügyintéző:</label><br>
-                    <?=felhasznaloPicker($beallitas['defaultugyintezo'], "defaultugyintezo", false)?>
+                    <?=felhasznaloPicker($beallitas['defaultugyintezo'], "defaultugyintezo", null)?>
                 </div>
 
                 <?php $magyarazat .= "<strong>Alapértelmezett ügyintéző</strong>

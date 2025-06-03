@@ -37,7 +37,7 @@ if(isset($irhat) && $irhat)
     elseif($_GET["action"] == "permissions")
     {
         $felhasznalo = $_POST['id'];
-        foreach($menu as $x)
+        foreach(OLDALAK as $x)
         {
             $menuid = $x['id'];
             // echo "lekér $menuid <br>";
@@ -62,6 +62,7 @@ if(isset($irhat) && $irhat)
                         break;
                     }
                 }
+                
             }
             else
             {
@@ -105,7 +106,7 @@ if(isset($irhat) && $irhat)
                 {
                     $szervezetnevarray = array(); // Gyorsítótárazzuk a szervezetneveket, hogy ne kelljen annyi SQL lekérdezést végrehajtani
                     $felhasznalok = mySQLConnect("SELECT * FROM felhasznalok;");
-                    $stmt = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?');
+                    $stmt = $con->prepare('UPDATE felhasznalok SET nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=?, descript=? WHERE felhasznalonev=?');
                     foreach($felhasznalok as $felhasznalo)
                     {
                         $samaccountname = $felhasznalo['felhasznalonev'];
@@ -139,8 +140,9 @@ if(isset($irhat) && $irhat)
                                 @$telefon = $ldapresults[0]['telephonenumber'][0];
                                 @$beosztas = $ldapresults[0]['title'][0];
                                 @$thumb = $ldapresults[0]['thumbnailphoto'][0];
+                                @$descript = $ldapresults[0]['description'][0];
         
-                                $stmt->bind_param('ssssssss', $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb, $samaccountname);
+                                $stmt->bind_param('sssssssss', $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb, $descript, $samaccountname);
                                 $stmt->execute();
                             }
                             else

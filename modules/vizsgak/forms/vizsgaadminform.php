@@ -8,7 +8,7 @@ if(@$irhat)
             {
                 ?><div>
                     <label for="felhasznalo">Felhasználó kiválasztása:</label><br><?php
-                    felhasznaloPicker(null, 'felhasznalo');
+                    felhasznaloPicker(null, 'felhasznalo', null);
                 ?></div><?php
             }
             else
