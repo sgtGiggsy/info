@@ -2,15 +2,25 @@
 
 function telSzamSzetvalaszt($telszam, $elotaghossz, $telszamhossz)
 {
-    $elotag = substr($telszam, 0, $elotaghossz);
-    $telszam = substr($telszam, $elotaghossz, $telszamhossz);
+    if($telszam == null)
+	{
+		$teljesszam = array(
+			'elotag' => null,
+			'telszam' => null
+		);
+	}
+	else
+	{
 
-    $teljesszam = array(
-        'elotag' => $elotag,
-        'telszam' => $telszam
-    );
+		$elotag = substr($telszam, 0, $elotaghossz);
+		$telszam = substr($telszam, $elotaghossz, $telszamhossz);
 
-    return $teljesszam;
+		$teljesszam = array(
+			'elotag' => $elotag,
+			'telszam' => $telszam
+		);
+	}
+	return $teljesszam;
 }
 
 function formatTelnum($telszam)

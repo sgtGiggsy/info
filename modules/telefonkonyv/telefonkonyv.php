@@ -6,7 +6,8 @@ $contextmenu = array(
     'valtozasok' => array('gyujtooldal' => 'valtozasok', 'oldal' => 'valtozas', 'gyujtooldalnev' => 'Változások', 'oldalnev' => 'Változtatás'),
     'szerkesztok' => array('gyujtooldal' => 'szerkesztok', 'oldal' => 'szerkeszto', 'gyujtooldalnev' => 'Szerkesztők', 'oldalnev' => 'Szerkesztő'),
     'alegysegek' => array('gyujtooldal' => 'alegysegek', 'oldal' => 'alegyseg', 'gyujtooldalnev' => 'Alegységek', 'oldalnev' => 'Alegység'),
-    'osszevetes' => array('gyujtooldal' => 'telefonkonyvosszevet', 'oldal' => 'telefonkonyvosszevet', 'gyujtooldalnev' => 'Összevetés', 'oldalnev' => 'Összevetés')
+    'osszevetes' => array('gyujtooldal' => 'telefonkonyvosszevet', 'oldal' => 'telefonkonyvosszevet', 'gyujtooldalnev' => 'Összevetés', 'oldalnev' => 'Összevetés'),
+    'admegfeleltetes' => array('gyujtooldal' => 'admegfeleltetes', 'oldal' => 'admegfeleltetes', 'gyujtooldalnev' => 'AD megfeleletetés', 'oldalnev' => 'AD megfeleletetés')
 );
 
 $contextmenujogok = array('telefonkonyv' => false, 'valtozasok' => false, 'szerkesztok' => false, 'alegysegek' => false);
@@ -17,7 +18,7 @@ if(@$felhasznaloid)
     // Felhasználó jogosultságainak bekérése
     if($mindir)
     {
-        $contextmenujogok = array('telefonkonyv' => true, 'valtozasok' => true, 'szerkesztok' => true, 'telefonkonyvosszevet' => true, 'alegysegek' => true);
+        $contextmenujogok = array('telefonkonyv' => true, 'valtozasok' => true, 'szerkesztok' => true, 'telefonkonyvosszevet' => true, 'alegysegek' => true, 'admegfeleltetes' => true);
         $globaltelefonkonyvadmin = true;
     }
     else
@@ -34,6 +35,7 @@ if(@$felhasznaloid)
                 $contextmenujogok['szerkesztok'] = true;
                 $contextmenujogok['alegysegek'] = true;
                 $contextmenujogok['telefonkonyvosszevet'] = true;
+                $contextmenujogok['admegfeleltetes'] = true;
                 $globaltelefonkonyvadmin = true;
             }
             else
@@ -117,6 +119,13 @@ else
     {
         $csaksajat = true;
     }
+
+    if(isset($_GET['noad']))
+    {
+        $where .= " AND telefonkonyvfelhasznalok.felhasznalo IS NULL AND telefonkonyvfelhasznalok.nev IS NOT NULL";
+        $where2 .= " AND telefonkonyvfelhasznalok.felhasznalo IS NULL AND telefonkonyvfelhasznalok.nev IS NOT NULL";
+    }
+
     if($nevszerint)
     {
         $where .= " AND telefonkonyvfelhasznalok.nev IS NOT NULL";

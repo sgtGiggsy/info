@@ -32,6 +32,10 @@ if(isset($_GET['kereses']))
             ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv?csaksajat'">Csak a saját kezelésű alegységek mutatása</button><?php
         }
     }
+    if($globaltelefonkonyvadmin)
+    {
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv?noad'">Felismert ActiveDirectory fiók nélküli felhasználók</button><?php
+    }
 ?></div>
 <div class="PrintArea">
     <div class="oldalcim nomargbottom">Telefonkönyv

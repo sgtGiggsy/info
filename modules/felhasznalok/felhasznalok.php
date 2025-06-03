@@ -21,6 +21,14 @@ else
         $keres = "?kereses=" . $keres;
     }
 
+    if(isset($_GET['telefontoad']))
+    {
+        $table = "modules/felhasznalok/includes/telefontoad";
+        $keres = "?telefontoad";
+        if($_GET['telefontoad'] == 'notnull')
+            $keres .= '=notnull';
+    }
+
     if(!$where)
     {
         $where = "WHERE felhasznalok.aktiv = 1";
@@ -43,12 +51,14 @@ else
         $csoportwhere = "AND felhasznalok.aktiv = 1 AND $csoportwhere";
     }
 
-    if($mindir) 
+    if($csoportir) 
     {
         ?><div class="szerkgombsor">
             <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=addnew'">Új felhasználó</button>
             <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=sync'">Meglévő felhasználók AD-val szinkronizálása</button>
             <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalo?action=syncou'">Kiválasztott OU szinkronizálása</button>
+            <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalok?telefontoad'">Telefonkönyv összevetése AD-val</button>
+            <button type="button" onclick="location.href='<?=$RootPath?>/felhasznalok?telefontoad=notnull'">Telefonkönyv összevetése AD-val (csak megtaláltak)</button>
             <button type="button" onclick="generatePassword()">Jelszó generálása</button>
         </div><?php
     }

@@ -15,6 +15,7 @@ munkaprint.php
 terminal.php
 homokozo.php
 .vscode
+.idea
 api/classes
 node_modules
 nodejs/logs

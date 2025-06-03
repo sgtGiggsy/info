@@ -1108,7 +1108,7 @@ function hibajegyErtesites($ertesites, $szoveg, $hibajegyid, $felhasznalo, $szer
 {
 	//! Totális újraírás, még a régi értesítési megoldásokat használja
 	$url = "hibajegy/$hibajegyid";
-	$tipus = "11";
+	$tipus = "2";
 	$con = mySQLConnect(false);
 	$stmt = $con->prepare('INSERT INTO ertesitesek (cim, szoveg, url, tipus) VALUES (?, ?, ?, ?)');
 	$stmt->bind_param('ssss', $ertesites, $szoveg, $url, $tipus);
@@ -1591,16 +1591,18 @@ function purifyArray($array)
 
 function showHelyiseg($szam, $nev = null)
 {
-	($szam) ? $szam . ". helyiség" : "";
-	($szam && $nev) ? " - " : "";
-	echo $nev;
+	$ret = "";
+	$ret .= ($szam) ? $szam . ". helyiség" : "";
+	$ret .= ($szam && $nev) ? " - " . $nev : "";
+	echo $ret;
 }
 
 function showEpulet($szam, $tipus = null)
 {
-	($szam) ? $szam : "";
-	($szam && $tipus) ? ". " : "";
-	echo $tipus;
+	$ret = "";
+	$ret .= ($szam) ? $szam : "";
+	$ret .= ($szam && $tipus) ? ". " . $tipus : "";
+	echo $ret;
 }
 
 function showBreadcumb($eszkoz, $lastlink = false)
@@ -1649,7 +1651,7 @@ function showBreadcumb($eszkoz, $lastlink = false)
 					</li><?php
 				}
 
-				?><?=($eszkoz['beepitesinev'] || $eszkoz['ipcim']) ? "<li><b>></b></li>" : "hh" ?>
+				?><?=($eszkoz['beepitesinev'] || $eszkoz['ipcim']) ? "<li><b>></b></li>" : "" ?>
 				<li property="itemListElement" typeof="ListItem">
 					<span property="name"><?=($eszkoz['beepitesinev']) ? $eszkoz['beepitesinev'] : "" ?> <?=(isset($eszkoz['ipcim']) && $eszkoz['ipcim']) ? "(" . $eszkoz['ipcim'] . ")" : "" ?></span>
 					<meta property="position" content="<?=$i++?>">
@@ -2151,4 +2153,57 @@ function compareObjects($obj1, $obj2)
 	}
 
 	return $elteresek;
+}
+
+function rendOssze($tkonyv, $activedir)
+{
+	$hasonlit = array(
+		'DDTBK' => 'dandártábornok',
+		'EZDS' => 'ezredes',
+		'ALEZ' => 'alezredes',
+		'ŐRGY' => 'őrnagy',
+		'SZDS' => 'százados',
+		'FHDGY' => 'főhadnagy',
+		'HDGY' => 'hadnagy',
+		'FTZLS' => 'főtörzszászlós',
+		'TZLS' => 'törzszászlós',
+		'ZLS' => 'zászlós',
+		'FTŐRM' => 'főtörzsőrmester',
+		'TŐRM' => 'törzsőrmester',
+		'ŐRM' => 'őrmester',
+		'SZKV' => 'szakaszvezető',
+		'TIZ' => 'tizedes',
+		'ŐRV' => 'őrvezető',
+		'KK' => 'közkatona',
+		'FTAN' => 'főtanácsos',
+		'TAN' => 'tanácsos',
+		'HA' => 'honvédelmi alkalmazott',
+		'MT' => 'munkatárs'
+	);
+
+	if($hasonlit[$tkonyv] == mb_strtolower($activedir))
+		return true;
+	else
+		return false;
+}
+
+function telszamOsszevet($adszam, ...$telkszamok)
+{
+	if(($adszam == $telkszamok[0] || $adszam == $telkszamok[1]) && !is_null($adszam))
+		return true;
+	else
+		return false;
+}
+
+function rendfLevag($fullname)
+{
+	$retnev = "";
+	$fullnameexp = explode(' ', $fullname, -1);
+	if(count($fullnameexp) > 1)
+		foreach($fullnameexp as $segment)
+			$retnev .= $segment . " ";
+	else
+		$retnev = $fullname;
+		
+	return trim($retnev, ' ');
 }

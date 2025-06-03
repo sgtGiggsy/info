@@ -134,7 +134,7 @@ else
             $alegyseg = $sor[1];
         else
         {
-            if($sor[10] && $alespoz == 0)
+            if(@$sor[10] && $alespoz == 0)
                 $alegyseg = $sor[10];
 
             $ujtkarray[] = new TKObject($sor[2], $sor[0], $sor[1], $sor[3], $sor[4], $sor[5], $sor[6], $sor[7], $sor[8], $sor[9], $alegyseg);
