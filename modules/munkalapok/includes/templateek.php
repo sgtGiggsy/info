@@ -10,7 +10,7 @@ else
     if($csoportir)
     {
         ?><div class="szerkgombsor">
-            <button type="button" onclick="location.href='<?=$RootPath?>/munkatemplateszerkeszt?action=addnew'">Új template létrehozása</button>
+            <button type="button" onclick="location.href='<?=$RootPath?>/munkalapok/templateszerkeszt?action=addnew'">Új template létrehozása</button>
         </div><?php
     }
     ?><div class="PrintArea">
@@ -18,7 +18,7 @@ else
         <div class="normallist"><?php
             foreach($templatelista as $x)
             {
-                ?><div><a href="<?=$RootPath?>/munkatemplateszerkeszt/<?=$x['id']?>"><?=$x['szoveg']?></a></div><?php
+                ?><div><a href="<?=$RootPath?>/munkalapok/templateszerkeszt/<?=$x['id']?>"><?=$x['szoveg']?></a></div><?php
             }
         ?></div>
     </div><?php

@@ -1,7 +1,7 @@
 
 <?php
 
-if(!$csoportir)
+if(!$contextmenujogok['templateek'])
 {
     getPermissionError();
 }
@@ -12,7 +12,7 @@ else
         $irhat = true;
         include("./modules/munkalapok/db/templatedb.php");
 
-        $targeturl = "$RootPath/munkalaptemplateek";
+        $targeturl = "$RootPath/munkalapok/templateek";
 
         header("Location: $targeturl");
         die;
@@ -22,8 +22,9 @@ else
     $magyarazat = $szoveg = null;
     $form = "modules/munkalapok/forms/templateform";
 
-    if(isset($_GET['id']))
+    if(isset($_GET['param']))
     {
+        $id = $_GET['param'];
         $template = mySQLConnect("SELECT id, szoveg FROM munkalaptemplateek WHERE id = $id;");
         $szoveg = mysqli_fetch_assoc($template)['szoveg'];
         $oldalcim = "Munkalap template szerkesztése";

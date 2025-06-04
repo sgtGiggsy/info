@@ -7,7 +7,7 @@ if(!@$csoportolvas)
 else
 {
     $adattabla = "munkalapok";
-    $oldalnev = "munkalista";
+    $oldalnev = "munkalapok";
     $oldalcim = "Munkalista";
     $table = "modules/munkalapok/includes/munkalistatable";
     
