@@ -8,6 +8,7 @@ else
 {
     $gyarto = $modell = $tipus = $szines = $scanner = $fax = $defadmin = $defpass = $maxmeret = $magyarazat = $fizikaireteg =
     $transzpszabvany = $transzpcsatlakozo = $transzpsebesseg = $lanszabvany = $lancsatlakozo = $lansebesseg = $modellid = $tipusnev = null;
+    $fizikairetegek = $csatlakozok = $sebessegek = $atviteliszabvanyok = array();
 
     if(count($_POST) > 0)
     {

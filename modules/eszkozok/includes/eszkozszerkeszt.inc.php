@@ -343,6 +343,7 @@ else
             case "bovitomodul": $wheretip = "WHERE modellek.tipus > 25 AND modellek.tipus < 31"; break;
             case "szerver": $wheretip = "WHERE modellek.tipus > 30 AND modellek.tipus < 40"; break;
             case "telefonkozpont": $wheretip = "WHERE modellek.tipus = 40"; break;
+            case "szunetmentes": $wheretip = "WHERE modellek.tipus = 45"; break;
         }
     }
     
@@ -394,7 +395,7 @@ else
         $modell = $sorozatszam = $tulajdonos = $varians = $mac = $portszam = 
         $uplinkportok = $szoftver = $nev = $leadva = $hibas = $raktar =
         $megjegyzes = $poe = $ssh = $snmp = $snmpcommunity = $web = $felhasznaloszam = $simtipus =
-        $telefonszam = $pinkod = $pukkod = $magyarazat = $wifi = null;
+        $telefonszam = $pinkod = $pukkod = $magyarazat = $wifi = $tipus = $teljesitmeny = null;
 
         $button = "Új eszköz";
         $oldalcim = "Új " . $currentpage['menupont'] . " létrehozása";
@@ -466,6 +467,14 @@ else
                 $pukkod = @$simkartya['pukkod'];
             }
 
+            if($eszkoztipus == "szunetmentes")
+            {
+                $szunetmentes = mySQLConnect("SELECT * FROM szunetmentesek WHERE eszkoz = $id");
+                $szunetmentes = mysqli_fetch_assoc($szunetmentes);
+                $tipus = $szunetmentes['tipus'];
+                $teljesitmeny = $szunetmentes['teljesitmeny'];
+            }
+
             $modell = $eszkoz['modell'];
             $sorozatszam = $eszkoz['sorozatszam'];
             $tulajdonos = $eszkoz['tulajdonos'];
@@ -477,6 +486,11 @@ else
 
             $button = "Szerkesztés";
             $oldalcim = $currentpage['menupont'] . "  szerkesztése";
+        }
+
+        elseif($eszkoztipus == "aktiveszkoz" || $eszkoztipus == "sohoeszkoz")
+        {
+            $firmwarelista = mySQLConnect("SELECT * FROM firmwarelist ORDER BY nev DESC, kiadasideje DESC;");
         }
 
         include('././templates/edit.tpl.php');
