@@ -37,10 +37,11 @@ if(isset($irhat) && $irhat)
     elseif($_GET["action"] == "permissions")
     {
         $felhasznalo = $_POST['id'];
-        foreach(OLDALAK as $x)
+        $menu = mySQLConnect("SELECT * FROM menupontok ORDER BY menupont ASC");
+        foreach($menu as $x)
         {
             $menuid = $x['id'];
-            // echo "lekér $menuid <br>";
+            //echo "lekér $menuid <br>";
             $xjogosultsag = mySQLConnect("SELECT * FROM jogosultsagok WHERE menupont = $menuid AND felhasznalo = $felhasznalo");
 
             //print_r($xjogosultsag);
