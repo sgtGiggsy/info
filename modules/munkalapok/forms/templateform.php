@@ -2,10 +2,10 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/munkalapok/templateszerkeszt?action=<?=(isset($_GET['param'])) ? 'update' : 'addnew' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
-            if(isset($_GET['param']))
+        <form action="<?=$RootPath?>/munkalapok/templateszerkeszt?action=<?=($elemid) ? 'update' : 'addnew' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+            if($elemid)
             {
-                ?><input type ="hidden" id="id" name="id" value=<?=$_GET['param']?>><?php
+                ?><input type ="hidden" id="id" name="id" value=<?=$elemid?>><?php
             }   
             ?><div>
                 <label for="szoveg">A template szövege:</label><br>

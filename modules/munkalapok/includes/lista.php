@@ -46,7 +46,7 @@ else
 
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/munkaszerkeszt'">Új munka</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/munkalapok/munkaszerkeszt'">Új munka</button><?php
     }
     
     include('././templates/lapozas.tpl.php');

@@ -16,6 +16,7 @@ else
     {
         $irhat = true;
         include("./modules/munkalapok/db/munkadb.php");
+        header(".");
     }
 
     $igenylo = $igenylesideje = $vegrehajtasideje = $munkavegzo2 = $leiras = $eszkoz = null;
@@ -38,11 +39,9 @@ else
     }
     ?></datalist><?php
 
-    if(isset($_GET['id']))
+    if($elemid)
     {
-        $munkaid = $_GET['id'];
-        
-        $munka = mySQLConnect("SELECT *, IF(vegrehajtasideje > date_sub(now(), INTERVAL 31 DAY), 1, 0) AS modenged FROM munkalapok WHERE id = $munkaid");
+        $munka = mySQLConnect("SELECT *, IF(vegrehajtasideje > date_sub(now(), INTERVAL 31 DAY), 1, 0) AS modenged FROM munkalapok WHERE id = $elemid");
         $munka = mysqli_fetch_assoc($munka);
 
         $hely = $munka['hely'];
@@ -55,17 +54,17 @@ else
         $eszkoz = $munka['eszkoz'];
         $ugyintezo = $munka['ugyintezo'];
         $modenged = $munka['modenged'];
-        $munkaprint = "/" . $munkaid . "?print";
+        $munkaprint = "/" . $elemid . "?print";
 
         $button = "Munka szerkesztése";
         $button2 = "Munka szerkesztése és nyomtatása";
 
-        ?><form action="<?=$RootPath?>/munkaszerkeszt&action=update" method="post" onsubmit="beKuld.disabled = true; return true; nyomtat.disabled = true; return true;">
-        <input type ="hidden" id="id" name="id" value=<?=$munkaid?>><?php
+        ?><form action="<?=$RootPath?>/munkalapok/munkaszerkeszt&action=update" method="post" onsubmit="beKuld.disabled = true; return true; nyomtat.disabled = true; return true;">
+        <input type ="hidden" id="id" name="id" value=<?=$elemid?>><?php
     }
     else
     {
-        ?><form action="<?=$RootPath?>/munkaszerkeszt&action=new" method="post" onsubmit="beKuld.disabled = true; return true; nyomtat.disabled = true; return true;"><?php
+        ?><form action="<?=$RootPath?>/munkalapok/munkaszerkeszt&action=new" method="post" onsubmit="beKuld.disabled = true; return true; nyomtat.disabled = true; return true;"><?php
     }
 
     ?><div class="szerkcard">

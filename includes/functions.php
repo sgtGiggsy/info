@@ -2207,3 +2207,33 @@ function rendfLevag($fullname)
 		
 	return trim($retnev, ' ');
 }
+
+function getElem()
+{
+	if(isset($_GET['param']))
+		return $_GET['param'];
+	else
+		return null;
+}
+
+function getAloldal($main)
+{
+	if(isset($_GET['id']))
+		$aloldal = $_GET['id'];
+	elseif(isset($_GET['subpage']) && $_GET['subpage'] != "oldal")
+		$aloldal = $_GET['subpage'];
+	else
+		$aloldal = "lista";
+	
+	$page = @fopen("./modules/$main/includes/$aloldal.php", "r");
+	if(!$page)
+	{
+		http_response_code(404);
+		echo "<h2>A keresett oldal nem található!</h2>";
+		return false;
+	}
+	else
+	{
+		return "./modules/$main/includes/$aloldal.php";
+	}
+}
