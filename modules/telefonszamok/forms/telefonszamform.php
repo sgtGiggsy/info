@@ -2,8 +2,8 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/telefonszam?action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
-            <input type ="hidden" id="id" name="id" value=<?=$id?>>
+        <form action="<?=$RootPath?>/telefonszamok/telefonszam?action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
+            <input type ="hidden" id="id" name="id" value=<?=$elemid?>>
             
             <div>
                 <small style="color: #940e0e;">Importálás során felülírásra kerül!</small><br>

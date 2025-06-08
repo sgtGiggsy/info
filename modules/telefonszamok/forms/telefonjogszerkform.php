@@ -2,10 +2,10 @@
 if(@$irhat)
 {
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/telefonjogszerk?action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
-            if(isset($_GET['id']))
+        <form action="<?=$RootPath?>/telefonszamok/jogosultsagszerkeszt?action=<?=($elemid) ? 'update' : 'new' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+            if($elemid)
             {
-                ?><input type ="hidden" id="origid" name="id" value=<?=$_GET['id']?>><?php
+                ?><input type ="hidden" id="origid" name="id" value=<?=$elemid?>><?php
             }
 
             ?><div>

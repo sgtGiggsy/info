@@ -1,6 +1,6 @@
 <?php
 
-if(@!$mindir)
+if(@!$contextmenujogok['jogosultsagok'])
 {
     //echo $sajatolvas . $csoportolvas . $mindolvas . $sajatir . $csoportir . $mindir;
     echo "Nincs jogosultsága az oldal megtekintésére!";
@@ -13,8 +13,8 @@ else
     {
         $irhat = true;
         include("./modules/telefonszamok/db/telefonjogosultsagdb.php");
-        
-        redirectToGyujto("telefonjogosultsagok");
+
+        redirectToGyujto("jogosultsagok");
     }
     
     $button = "Új telefonjog";
@@ -22,13 +22,11 @@ else
     $form = "modules/telefonszamok/forms/telefonjogszerkform";
     $oldalcim = "Új telefon jogosultság rögzítése";
 
-    if(isset($_GET['id']))
+    if($elemid)
     {
-        $telefonjogid = $_GET['id'];
-        $telefonjogszerk = mySQLConnect("SELECT * FROM telefonjogosultsagok WHERE id = $telefonjogid;");
+        $telefonjogszerk = mySQLConnect("SELECT * FROM telefonjogosultsagok WHERE id = $elemid;");
         $telefonjogszerk = mysqli_fetch_assoc($telefonjogszerk);
 
-        $id = $telefonjogszerk['id'];
         $nev = $telefonjogszerk['nev'];
 
         $button = "Telefonjog szerkesztése";

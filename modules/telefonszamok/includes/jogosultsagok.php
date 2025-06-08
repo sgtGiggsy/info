@@ -1,6 +1,6 @@
 <?php
 
-if(!@$mindolvas)
+if(!@$contextmenujogok['jogosultsagok'])
 {
 	getPermissionError();
 }
@@ -9,7 +9,7 @@ else
     $telefonjogosultsagok = mySQLConnect("SELECT * FROM telefonjogosultsagok;");
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonjogszerk'">Új telefonjogosultság</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonszamok/jogosultsagszerkeszt'">Új telefonjogosultság</button><?php
     }
 
     ?><div class="oldalcim">Telefonjogosultságok listája</div>
@@ -24,7 +24,7 @@ else
     foreach($telefonjogosultsagok as $telefonjogosultsag)
     {
         $telefonjogosultsagid = $telefonjogosultsag['id'];
-        ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/telefonjogszerk/$telefonjogosultsagid'" : "" ?>>
+        ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/telefonszamok/jogosultsagszerkeszt/$telefonjogosultsagid'" : "" ?>>
             <td><?=$telefonjogosultsag['id']?></td>
             <td><?=$telefonjogosultsag['nev']?></td>
         </tr><?php

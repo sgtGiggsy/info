@@ -100,10 +100,9 @@ else
     {
         $id = $szam = $cimke = $port = $jog = $tkozpontport = $megjegyzes = $tipus = $magyarazat = null;
 
-        if(isset($_GET['id']))
+        if($elemid)
         {
-            $telefonszamid = $_GET['id'];
-            $telefonszamszerk = mySQLConnect("SELECT * FROM telefonszamok WHERE id = $telefonszamid;");
+            $telefonszamszerk = mySQLConnect("SELECT * FROM telefonszamok WHERE id = $elemid;");
             $telefonszamszerk = mysqli_fetch_assoc($telefonszamszerk);
 
             $portok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev
@@ -147,7 +146,7 @@ else
     }
 
     // Ha írási művelet nem lesz, ellenőrizni kell, hogy van-e kiválasztott telefonszám. Ha nincs, hiba dobása
-    elseif(!isset($id))
+    elseif(!$elemid)
     {
         getPermissionError();
     }
@@ -179,7 +178,7 @@ else
                 LEFT JOIN epuletek ON vegpontiportok.epulet = epuletek.id
                 LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
                 LEFT JOIN helyisegek ON vegpontiportok.helyiseg = helyisegek.id
-            WHERE telefonszamok.id = $id;");
+            WHERE telefonszamok.id = $elemid;");
         $telefonszam = mysqli_fetch_assoc($telefonszam);
 
         ?><div class="infobox">
