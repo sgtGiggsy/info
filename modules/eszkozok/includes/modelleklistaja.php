@@ -6,10 +6,10 @@ if(!@$mindolvas)
 }
 else
 {
-    $where = $modelltipid = null;
-    if(isset($_GET['id']))
+    $tipus = $where = $modelltipid = null;
+    if($elemid)
     {
-        $modelltipid = $_GET['id'];
+        $modelltipid = $elemid;
         $where = "WHERE eszkoztipusok.nev = ?";
     }
 
@@ -21,40 +21,43 @@ else
             ORDER BY tipus, gyarto, modell;", $modelltipid);
     $modellek = $modellek->Result();
 
+    $oszlopok = array(
+        array('nev' => 'Gyártó', 'tipus' => 's'),
+        array('nev' => 'Modell', 'tipus' => 's')
+    );
+
     if($mindir) 
     {
         ?><button type="button" onclick="location.href='<?=$RootPath?>/modellszerkeszt'">Új modell</button><?php
     }
 
     ?><div class="oldalcim">Modellek listája</div><?php
-    $zar = false;
     foreach($modellek as $modell)
     {
-        if(@$tipus != $modell['tipus'])
+        $kattinthatolink = "$RootPath/eszkozalap/modellszerkeszt/" . $modell['id'];
+        if($tipus != $modell['tipus'])
         {
-            if($zar)
+            if($tipus)
             {
                 ?></tbody>
                 </table><?php
             }
 
             $tipus = $modell['tipus'];
+
             ?><h1 style="text-transform: capitalize;"><?=$tipus?></h1>
             <table id="<?=$tipus?>">
             <thead>
-                <tr>
-                    <th class="tsorth" onclick="sortTable(0, 's', '<?=$tipus?>?>')">Gyártó</th>
-                    <th class="tsorth" onclick="sortTable(1, 's', '<?=$tipus?>?>')">Modell</th>
-                </tr>
+                <tr><?php
+                    sortTableHeader($oszlopok, $tipus);
+                ?></tr>
             </thead>
             <tbody><?php
-            $zar = true;
         }
 
-        $modellid = $modell['id'];
-        ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/modellszerkeszt/$modellid'" : "" ?>>
-            <td><?=$modell['gyarto']?></td>
-            <td><?=$modell['modell']?></td>
+        ?><tr class='trlink'>
+            <td><a href="<?=$kattinthatolink?>"><?=$modell['gyarto']?></a></td>
+            <td><a href="<?=$kattinthatolink?>"><?=$modell['modell']?></a></td>
         </tr><?php
     }
     ?></tbody>

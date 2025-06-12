@@ -2,14 +2,14 @@
 if(@$irhat)
 {
     $javascriptfiles[] = "modules/alap/includes/gettipusok.js";
-    $PHPvarsToJS['modellid'] = $modellid;
+    $PHPvarsToJS['modellid'] = $elemid;
     $PHPvarsToJS['tipus'] = $tipusnev;
 
     ?><div class="contentcenter">
-        <form action="<?=$RootPath?>/modellszerkeszt?action=<?=(isset($_GET['id'])) ? 'update' : 'new' ?>&tipus=<?=$tipusnev?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
-            if(isset($_GET['id']))
+        <form action="<?=$RootPath?>/eszkozalap/modellszerkeszt?action=<?=($elemid) ? 'update' : 'new' ?>&tipus=<?=$tipusnev?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
+            if($elemid)
             {
-                ?><input type ="hidden" id="id" name="id" value=<?=$_GET['id']?>><?php
+                ?><input type ="hidden" id="id" name="id" value=<?=$elemid?>><?php
             }
 
             gyartoPicker($gyarto)

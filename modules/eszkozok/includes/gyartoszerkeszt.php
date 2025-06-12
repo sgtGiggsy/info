@@ -9,7 +9,7 @@ else
     if(count($_POST) > 0)
     {
         $irhat = true;
-        include("./modules/alap/db/gyartodb.php");
+        include("./modules/eszkozok/db/gyartodb.php");
         
         redirectToGyujto("gyartoklistaja");
     }
@@ -17,13 +17,12 @@ else
     $nev = $magyarazat = null;
     $button = "Új gyártó";
     $irhat = true;
-    $form = "modules/alap/forms/gyartoszerkesztform";
-    $oldalcim = "Új gyártó hozzáadása";
+    $form = "modules/eszkozok/forms/gyartoszerkesztform";
+    $oldalcim = "Új gyártó hozzáadása"; 
 
-    if(isset($_GET['id']))
+    if($elemid)
     {
-        $gyartoid = $_GET['id'];
-        $gyarto = new MySQLHandler("SELECT id, nev FROM gyartok WHERE id = ?", $_GET['id']);
+        $gyarto = new MySQLHandler("SELECT id, nev FROM gyartok WHERE id = ?", $elemid);
         $gyarto = $gyarto->Bind($id, $nev);
 
         $button = "Szerkesztés";

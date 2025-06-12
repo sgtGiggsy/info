@@ -6,6 +6,9 @@ if(!@$mindolvas)
 }
 else
 {
+    $oszlopok = array(
+        array('nev' => 'Gyártó', 'tipus' => 's')
+    );
     $gyartok = new MySQLHandler("SELECT * FROM gyartok ORDER BY nev;");
     $gyartok = $gyartok->Result();
     $tipus = "gyartoklistaja";
@@ -18,18 +21,16 @@ else
     ?><div class="oldalcim">Gyártók listája</div>
     <table id="<?=$tipus?>">
         <thead>
-            <tr>
-                <th class="tsorth" onclick="sortTable(0, 'i', '<?=$tipus?>?>')">ID</th>
-                <th class="tsorth" onclick="sortTable(1, 's', '<?=$tipus?>?>')">Gyártó</th>
-            </tr>
+            <tr><?php
+                sortTableHeader($oszlopok, $tipus);
+            ?></tr>
         </thead>
         <tbody><?php
         foreach($gyartok as $gyarto)
         {
-            $gyartoid = $gyarto['id'];
-            ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/gyartoszerkeszt/$gyartoid'" : "" ?>>
-                <td><?=$gyarto['id']?></td>
-                <td><?=$gyarto['nev']?></td>
+            $kattinthatolink = "$RootPath/eszkozalap/gyartoszerkeszt/" . $gyarto['id'];
+            ?><tr class='trlink'>
+                <td><a href="<?=$kattinthatolink?>"><?=$gyarto['nev']?></a></td>
             </tr><?php
         }
         ?></tbody>
