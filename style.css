@@ -991,6 +991,10 @@ textarea {
     color: var(--basefont);
 }
 
+.wideta {
+    width: 80ch;
+}
+
 textarea:focus, input:focus, select:focus {
     outline: 1px solid var(--buttonborder);
     border: 1px solid var(--buttonborder);

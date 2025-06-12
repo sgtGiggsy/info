@@ -8,7 +8,7 @@ else
 {
     if(isset($_GET['action']) && $_GET['action'] == "print")
     {
-        include("./modules/munkalapok/munkaprint.php");
+        include("./modules/munkalapok/includes/munkaprint.php");
         die();
     }
     
