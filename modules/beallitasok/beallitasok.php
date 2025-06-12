@@ -65,8 +65,6 @@ else
         $beallitasfulek[] = array('cimszoveg' => 'Új menüpont', 'formnev' => 'modules/beallitasok/menu', 'getnev' => 'ujmenu');
         $beallitasfulek[] = array('cimszoveg' => 'API beállítások', 'formnev' => 'modules/beallitasok/api', 'getnev' => 'api');
         $beallitasfulek[] = array('cimszoveg' => 'Mail beállítások', 'formnev' => 'modules/beallitasok/forms/mailbeallitasform', 'getnev' => 'mailkuldes');
-        $beallitasfulek[] = array('cimszoveg' => 'Munkalap beállítások', 'formnev' => 'modules/beallitasok/forms/munkalapbeallitasform', 'getnev' => 'munkalapok');
-        $beallitasfulek[] = array('cimszoveg' => 'Switch ellenőrző beállítások', 'formnev' => 'modules/beallitasok/forms/switchcheckbeallitasform', 'getnev' => 'switchcheckbeallitasa');
 
         // A beállítások fő oldala
         ?><div class="szerkcard">

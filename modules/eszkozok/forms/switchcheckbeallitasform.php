@@ -3,7 +3,7 @@ if(@$irhat)
 {
     ?><div class="contentleft">
         <div>
-            <form action="<?=$RootPath?>/beallitasok&action=update" method="post" onsubmit="beKuld.disabled = true; return true;">
+            <form action="" method="post" onsubmit="beKuld.disabled = true; return true;">
                 
                 <?php $magyarazat = "<h2>Switchellenőrző beállítása</h2>
                     <p>Itt találhatóak a switchek állapotának vizsgálatát végző program beállításai.</p>"; ?>
@@ -34,7 +34,7 @@ if(@$irhat)
                 <?php $magyarazat .= "<strong>Switchek online állapotának mutatása</strong>
                     <p>Ezt bekapcsolva jelenik meg az oldalon akárhol a switchek online állapota.</p>"; ?>
 
-            <div class="submit"><input type="submit" name="beKuld" value="<?=$bbutton?>"></div>
+            <div class="submit"><input type="submit" name="beKuld" value="<?=$button?>"></div>
             </form>
             <?= cancelForm() ?>
         </div>
