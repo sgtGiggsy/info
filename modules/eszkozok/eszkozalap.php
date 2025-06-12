@@ -9,14 +9,15 @@ else
     $contextmenu = array(
         'gyartok' => array('gyujtooldal' => 'gyartoklistaja', 'oldal' => 'gyartoszerkeszt', 'gyujtooldalnev' => 'Gyártók', 'oldalnev' => 'Gyártók'),
         'modellek' => array('gyujtooldal' => 'modelleklistaja', 'oldal' => 'modellszerkeszt', 'gyujtooldalnev' => 'Modellek', 'oldalnev' => 'Modellek'),
-        'firmwareek' => array('gyujtooldal' => 'firmwarelista', 'oldal' => 'firmware', 'gyujtooldalnev' => 'Firmwareek', 'oldalnev' => 'Firmware-ek')
+        'firmwareek' => array('gyujtooldal' => 'firmwarelista', 'oldal' => 'firmware', 'gyujtooldalnev' => 'Firmwareek', 'oldalnev' => 'Firmware-ek'),
+        'switchellenorzo' => array('gyujtooldal' => 'switchellenorzo', 'oldal' => 'firmware', 'gyujtooldalnev' => 'Switch ellenőrző beállításai', 'oldalnev' => 'Switch ellenőrző beállításai')
     );
 
-    $contextmenujogok['gyartoklistaja'] = $contextmenujogok['modelleklistaja'] = $contextmenujogok['firmwarelista'] = true;
+    $contextmenujogok['gyartoklistaja'] = $contextmenujogok['modelleklistaja'] = $contextmenujogok['firmwarelista'] = $contextmenujogok['switchellenorzo'] = true;
 
     $elemid = getElem();
-    $aloldal = getAloldal("eszkozok");
+    $betolteni = getAloldal("eszkozok", "gyartoklistaja");
 
-    if($aloldal)
-        include($aloldal);
+    if($betolteni)
+        include($betolteni);
 }

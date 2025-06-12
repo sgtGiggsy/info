@@ -13,7 +13,7 @@ define('DEBUG_MODE', false);
 $RootPath = ROOT_PATH;
 $dbcallcount = 0;
 $loginsuccess = $sajatolvas = $csoportolvas = $mindolvas = $sajatir = $csoportir = $mindir = false;
-$szulonyit = $id = $userid = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = $selectedurl = null;
+$szulonyit = $id = $userid = $felhasznaloid = $loginid = $activitylogid = $gyujtooldal = $selectedurl = $aloldal = null;
 $pagetofind = "fooldal";
 $params = array();
 //$querylist = array();
@@ -275,7 +275,7 @@ if($_SESSION['id'])
             FROM menupontok
                 INNER JOIN jogosultsagok ON menupontok.id = jogosultsagok.menupont
             WHERE jogosultsagok.felhasznalo = ? AND menupontok.aktiv IS NULL OR menupontok.aktiv = 0
-        UNION
+        UNION ALL
             SELECT menupontok.id AS id, menupontok.menupont AS menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, NULL, NULL, NULL AS lathat
             FROM menupontok
             WHERE oldal = 'felhasznalo'

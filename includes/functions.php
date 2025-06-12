@@ -2216,14 +2216,18 @@ function getElem()
 		return null;
 }
 
-function getAloldal($main)
+function getAloldal($main, $first = null)
 {
 	if(isset($_GET['id']))
 		$aloldal = $_GET['id'];
 	elseif(isset($_GET['subpage']) && $_GET['subpage'] != "oldal")
 		$aloldal = $_GET['subpage'];
+	elseif($first)
+		$aloldal = $first;
 	else
 		$aloldal = "lista";
+
+	$GLOBALS['aloldal'] = $aloldal;
 	
 	$page = @fopen("./modules/$main/includes/$aloldal.php", "r");
 	if(!$page)

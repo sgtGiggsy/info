@@ -16,8 +16,8 @@ else
     $contextmenujogok['lista'] = $contextmenujogok['templateek'] = $contextmenujogok['nyomtatasikep'] = $contextmenujogok['beallitasok'] = true;
 
     $elemid = getElem();
-    $aloldal = getAloldal("munkalapok");
+    $betolteni = getAloldal("munkalapok");
 
-    if($aloldal)
-        include($aloldal);
+    if($betolteni)
+        include($betolteni);
 }

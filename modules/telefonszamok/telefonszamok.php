@@ -13,8 +13,8 @@ else
     $contextmenujogok['lista'] = $contextmenujogok['jogosultsagok'] = true;
 
     $elemid = getElem();
-    $aloldal = getAloldal("telefonszamok");
+    $betolteni = getAloldal("telefonszamok");
 
-    if($aloldal)
-        include($aloldal);
+    if($betolteni)
+        include($betolteni);
 }
