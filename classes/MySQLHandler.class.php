@@ -205,7 +205,7 @@ class MySQLHandler
         return $this->siker;
     }
 
-    public function Query(string $query, ...$params) : mysqli_result | false
+    public function Query(string $query, ...$params) : mysqli_result | false | null
     {
         if($this->Prepare($query))
             return $this->Run(...$params);
@@ -216,7 +216,7 @@ class MySQLHandler
         }
     }
 
-    public function Run(...$params) : mysqli_result | false
+    public function Run(...$params) : mysqli_result | false | null
     {
         $start_time = microtime(true);
         $paramcount = count($params);
