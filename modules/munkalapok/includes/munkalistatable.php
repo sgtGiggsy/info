@@ -81,7 +81,7 @@ else
                     <td><?=$munka['leiras']?></td>
                     <td><?=$munka['eszkoz']?></td>
                     <td><?=$munka['munkavegzo1nev']?></td>
-                    <td><a style="cursor: pointer;" onclick="window.open('<?=$RootPath?>/munkalapok/munkaszerkeszt/<?=$munka['id']?>?action=print')"><img src='<?=$RootPath?>/images/print.png' alt='Munkalap nyomtatása' title='Munkalap nyomtatása' /></a></td>
+                    <td><a style="cursor: pointer;" onclick="window.open('<?=$RootPath?>/munkalapok/munkaszerkeszt/<?=$munka['id']?>?print')"><img src='<?=$RootPath?>/images/print.png' alt='Munkalap nyomtatása' title='Munkalap nyomtatása' /></a></td>
                     <td><?=($csoportir && $munka['modenged']) ? "<a href='$RootPath/munkalapok/munkaszerkeszt/$munkid'><img src='$RootPath/images/edit.png' alt='Munka szerkesztése' title='Munka szerkesztése'/></a>" : "" ?></td>
                 </tr><?php
             }

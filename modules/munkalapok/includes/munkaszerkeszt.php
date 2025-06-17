@@ -6,7 +6,7 @@ if(@!$sajatir)
 }
 else
 {
-    if(isset($_GET['action']) && $_GET['action'] == "print")
+    if(isset($_GET['print']))
     {
         include("./modules/munkalapok/includes/munkaprint.php");
         die();
@@ -16,7 +16,7 @@ else
     {
         $irhat = true;
         include("./modules/munkalapok/db/munkadb.php");
-        header(".");
+        redirectToGyujto(null);
     }
 
     $igenylo = $igenylesideje = $vegrehajtasideje = $munkavegzo2 = $leiras = $eszkoz = null;
@@ -26,23 +26,16 @@ else
     $hely = $_SESSION["defaultmunkahely"];
     $ugyintezo = $_SESSION["defaultugyintezo"];
     $munkavegzo1 = $_SESSION['id'];
-    $datalist = mySQLConnect("SELECT DISTINCT leiras FROM munkalapok ORDER BY leiras DESC");
-    $templateek = mySQLConnect("SELECT id, szoveg FROM munkalaptemplateek ORDER BY hasznalva DESC, szoveg ASC;");
+    $templateek = new MySQLHandler("SELECT id, szoveg FROM munkalaptemplateek ORDER BY hasznalva DESC, szoveg ASC;");
+    $templateek = $templateek->Result();
 
     $button = "Munka rögzítése";
     $button2 = "Munka rögzítése és nyomtatása";
 
-    ?><datalist id="munkaleirasok"><?php
-    foreach($datalist as $elem)
-    {
-        ?><option><?=$elem['leiras']?></option><?php
-    }
-    ?></datalist><?php
-
     if($elemid)
     {
-        $munka = mySQLConnect("SELECT *, IF(vegrehajtasideje > date_sub(now(), INTERVAL 31 DAY), 1, 0) AS modenged FROM munkalapok WHERE id = $elemid");
-        $munka = mysqli_fetch_assoc($munka);
+        $munka = new MySQLHandler("SELECT *, IF(vegrehajtasideje > date_sub(now(), INTERVAL 31 DAY), 1, 0) AS modenged FROM munkalapok WHERE id = ?", $elemid);
+        $munka = $munka->Result();
 
         $hely = $munka['hely'];
         $igenylo = $munka['igenylo'];
@@ -131,7 +124,7 @@ else
                             <input type="submit" name="beKuld" value="<?=$button?>">
                         </div>
                         <div class="submit" style="padding-top: 5px;">
-                            <input type="submit" onclick="window.open('<?=$RootPath?>/munkaszerkeszt<?=$munkaprint?>')" name="nyomtat" value="<?=$button2?>">
+                            <input type="submit" onclick="window.open('<?=$RootPath?>/munkalapok/munkaszerkeszt<?=$munkaprint?>')" name="nyomtat" value="<?=$button2?>">
                         </div><?php
                     }
                 ?></form><?php

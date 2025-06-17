@@ -22,11 +22,10 @@ else
     $magyarazat = $szoveg = null;
     $form = "modules/munkalapok/forms/templateform";
 
-    if(isset($_GET['param']))
+    if($elemid)
     {
-        $id = $_GET['param'];
-        $template = mySQLConnect("SELECT id, szoveg FROM munkalaptemplateek WHERE id = $id;");
-        $szoveg = mysqli_fetch_assoc($template)['szoveg'];
+        $template = new MySQLHandler("SELECT id, szoveg FROM munkalaptemplateek WHERE id = ?", $elemid);
+        $szoveg = $template->Fetch()['szoveg'];
         $oldalcim = "Munkalap template szerkesztése";
         $button = "Template szerkesztése";
     }
