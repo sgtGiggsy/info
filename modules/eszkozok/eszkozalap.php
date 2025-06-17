@@ -10,7 +10,7 @@ else
         'gyartok' => array('gyujtooldal' => 'gyartoklistaja', 'oldal' => 'gyartoszerkeszt', 'gyujtooldalnev' => 'Gyártók', 'oldalnev' => 'Gyártók'),
         'modellek' => array('gyujtooldal' => 'modelleklistaja', 'oldal' => 'modellszerkeszt', 'gyujtooldalnev' => 'Modellek', 'oldalnev' => 'Modellek'),
         'firmwareek' => array('gyujtooldal' => 'firmwarelista', 'oldal' => 'firmware', 'gyujtooldalnev' => 'Firmwareek', 'oldalnev' => 'Firmware-ek'),
-        'switchellenorzo' => array('gyujtooldal' => 'switchellenorzo', 'oldal' => 'firmware', 'gyujtooldalnev' => 'Switch ellenőrző beállításai', 'oldalnev' => 'Switch ellenőrző beállításai')
+        'switchellenorzo' => array('gyujtooldal' => 'switchellenorzo', 'oldal' => 'switchellenorzo', 'gyujtooldalnev' => 'Switch ellenőrző beállításai', 'oldalnev' => 'Switch ellenőrző beállításai')
     );
 
     $contextmenujogok['gyartoklistaja'] = $contextmenujogok['modelleklistaja'] = $contextmenujogok['firmwarelista'] = $contextmenujogok['switchellenorzo'] = true;

@@ -15,7 +15,7 @@ else
 
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/gyartoszerkeszt'">Új gyártó</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/eszkozalap/gyartoszerkeszt'">Új gyártó</button><?php
     }
 
     ?><div class="oldalcim">Gyártók listája</div>

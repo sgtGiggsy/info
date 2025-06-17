@@ -28,7 +28,7 @@ else
 
     if($mindir) 
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/modellszerkeszt'">Új modell</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/eszkozalap/modellszerkeszt'">Új modell</button><?php
     }
 
     ?><div class="oldalcim">Modellek listája</div><?php
