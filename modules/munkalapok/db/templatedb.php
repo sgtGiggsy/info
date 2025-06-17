@@ -1,34 +1,33 @@
 <?php
 if(isset($irhat) && $irhat)
 {
-    $con = mySQLConnect(false);
+    $mysql = new MySQLHandler();
+    $mysql->KeepAlive();
+
 
     purifyPost();
 
     if($_GET["action"] == "addnew")
     {
-        $stmt = $con->prepare('INSERT INTO munkalaptemplateek (szoveg) VALUES (?)');
-        $stmt->bind_param('s', $_POST['szoveg']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $mysql->Prepare('INSERT INTO munkalaptemplateek (szoveg) VALUES (?)');
+        $mysql->Run($_POST['szoveg']);
+        if(!$mysql->siker)
         {
-            echo "<h2>A template hozzáadása sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+            echo "<h2>A template hozzáadása sikertelen!</h2>";
         }
         else
         {
             header("Location: $backtosender");
         }
     }
+
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE munkalaptemplateek SET szoveg=? WHERE id=?');
-        $stmt->bind_param('si', $_POST['szoveg'], $_POST['id']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $mysql->Prepare('UPDATE munkalaptemplateek SET szoveg=? WHERE id=?');
+        $mysql->Run($_POST['szoveg'], $_POST['id']);
+        if(!$mysql->siker)
         {
-            echo "<h2>A template szerkesztése sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+            echo "<h2>A template szerkesztése sikertelen!</h2>";
         }
         else
         {
@@ -46,7 +45,7 @@ elseif($csoportir)
         if($_GET['tempid'] && is_numeric($_GET['tempid']))
         {
             $tempid = $_GET['tempid'];
-            mySQLConnect("UPDATE munkalaptemplateek SET hasznalva = hasznalva + 1 WHERE id = $tempid;");
+            $mysql->Query("UPDATE munkalaptemplateek SET hasznalva = hasznalva + 1 WHERE id = ?", $tempid);
         }
         else
         {

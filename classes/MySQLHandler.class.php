@@ -392,6 +392,11 @@ class MySQLHandler
         </table><?php
     }
 
+    public function ConnectionStats()
+    {
+        print_r(mysqli_stat($this->con));
+    }
+
     public function Close($backtosender = null)
     {
         if($this->con)

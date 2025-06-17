@@ -39,8 +39,8 @@ else
     // Ha a kért művelet nem jár adatbázisművelettel, a szerkesztési felület meghívása
     if($irhat || $beallitasful)
     {
-        $con = mySQLConnect();
-        print_r(mysqli_stat($con));
+        $mysql = new MySQLHandler();
+        $mysql->ConnectionStats();
         //echo "<br>";
         //print_r(mysqli_get_connection_stats($con));
 
@@ -50,8 +50,10 @@ else
         $bbutton = "Beállítások mentése";
         $oldalcim = "Főoldal beállítások";
 
-        $beallitassql = mySQLConnect("SELECT * FROM beallitasok");
-        $telephelyek = mySQLConnect("SELECT * FROM telephelyek;");
+        $beallitassql = new MySQLHandler("SELECT * FROM beallitasok");
+        $beallitassql = $beallitassql->Result();
+        $telephelyek = new MySQLHandler("SELECT * FROM telephelyek;");
+        $telephelyek = $telephelyek->Result();
         $beallitas = array();
         foreach($beallitassql as $x)
         {

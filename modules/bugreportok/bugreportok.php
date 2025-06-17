@@ -6,7 +6,7 @@ if(!@$mindolvas)
 }
 else
 {
-    $bugok = mySQLConnect("SELECT bugok.id AS id, cim, leiras, felhasznalok.nev AS felhasznalo, timestamp, oldal, bugtipusok.nev AS tipus, prioritasok.nev AS prioritas, bugok.prioritas AS prioritasid, lezaro, (SELECT nev FROM felhasznalok WHERE id = lezaro) AS lezaronev
+    $bugok = new MySQLHandler("SELECT bugok.id AS id, cim, leiras, felhasznalok.nev AS felhasznalo, timestamp, oldal, bugtipusok.nev AS tipus, prioritasok.nev AS prioritas, bugok.prioritas AS prioritasid, lezaro, (SELECT nev FROM felhasznalok WHERE id = lezaro) AS lezaronev
         FROM bugok
             LEFT JOIN bugtipusok ON bugok.tipus = bugtipusok.id
             LEFT JOIN prioritasok ON bugok.prioritas = prioritasok.id
@@ -15,7 +15,7 @@ else
 
     ?><div class="oldalcim">Buglista</div>
     <form action="<?=$RootPath?>/bugreportdb?action=new" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
-    foreach($bugok as $bug)
+    foreach($bugok->Result() as $bug)
     {
         ?><div style="margin: 0 0 15px 0; padding: 4px; background-color: <?php if(!$bug['lezaro']) { switch($bug['prioritasid']) { case 5: echo 'red'; break; case 4: echo 'orange'; break; case 3: echo 'yellow'; break; case 2: echo 'blue'; break; case 1: echo 'grey'; } } else { echo 'green'; } ?> ">
             <div style="display: grid; grid-template-columns: 1fr 1fr; width: 100%">

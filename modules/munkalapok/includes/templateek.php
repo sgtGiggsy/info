@@ -6,7 +6,7 @@ if(!@$csoportolvas)
 }
 else
 {
-    $templatelista = mySQLConnect("SELECT id, szoveg FROM munkalaptemplateek ORDER BY szoveg ASC;");
+    $templatelista = new MySQLHandler("SELECT id, szoveg FROM munkalaptemplateek ORDER BY szoveg ASC;");
     if($csoportir)
     {
         ?><div class="szerkgombsor">
@@ -16,7 +16,7 @@ else
     ?><div class="PrintArea">
         <div class="oldalcim">A munkalap szöveg template-ek listája</div>
         <div class="normallist"><?php
-            foreach($templatelista as $x)
+            foreach($templatelista->Result() as $x)
             {
                 ?><div><a href="<?=$RootPath?>/munkalapok/templateszerkeszt/<?=$x['id']?>"><?=$x['szoveg']?></a></div><?php
             }
