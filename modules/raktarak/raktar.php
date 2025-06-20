@@ -59,8 +59,8 @@ else
 
         if(isset($_GET['id']))
         {
-            $raktar = mySQLConnect("SELECT * FROM raktarak WHERE id = $id;");
-            $raktar = mysqli_fetch_assoc($raktar);
+            $raktar = new MySQLHandler("SELECT * FROM raktarak WHERE id = ?;", $id);
+            $raktar = $raktar->Fetch();
 
             $nev = $raktar['nev'];
             $helyiseg = $raktar['helyiseg'];
@@ -83,10 +83,10 @@ else
     // Akkor futunk ki erre az ágra, ha van olvasási jog, és kiválasztott épület, de más nincs. Ez a sima megjelenítő felület
     else
     {
-        $szuresek = getWhere("raktarak.id = $id AND ((beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL) OR beepitesek.id IS NULL)");
+        $szuresek = getWhere("raktarak.id = ? AND ((beepitesek.beepitesideje IS NULL OR beepitesek.kiepitesideje IS NOT NULL) OR beepitesek.id IS NULL)");
         $where = $szuresek['where'];
 
-        $mindeneszkoz = mySQLConnect("SELECT
+        $mindeneszkoz = new MySQLHandler("SELECT
                 eszkozok.id AS id,
                 beepitesek.id AS beepid,
                 sorozatszam,
@@ -112,9 +112,9 @@ else
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                 LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
             WHERE $where
-            ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;");
+            ORDER BY modellek.tipus, modellek.gyarto, modellek.modell, varians, sorozatszam;", $id);
 
-        $raktar = mySQLConnect("SELECT raktarak.id AS id,
+        $raktar = new MySQLHandler("SELECT raktarak.id AS id,
                     raktarak.nev AS raktar,
                     epuletek.id AS epid,
                     epuletek.nev AS epuletnev,
@@ -132,8 +132,8 @@ else
                     INNER JOIN szervezetek ON raktarak.szervezet = szervezetek.id
                     INNER JOIN telephelyek ON epuletek.telephely = telephelyek.id
                     INNER JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
-                WHERE raktarak.id = $id");
-        $raktar = mysqli_fetch_assoc($raktar);
+                WHERE raktarak.id = ?;", $id);
+        $raktar = $raktar->Fetch();
         $oszlopok = array(
             array('nev' => 'IP cím', 'tipus' => 's'),
             array('nev' => 'Eszköznév', 'tipus' => 's'),
@@ -194,7 +194,7 @@ else
             <div class="oldalcim"><?=$raktar['raktar']?> raktár <?=$szuresek['szures']?> <?=raktarKeszlet(null, $szuresek['filter'])?></div>
             <div class="raktarak"><?php
                 $zar = false;
-                foreach($mindeneszkoz as $eszkoz)
+                foreach($mindeneszkoz->Result() as $eszkoz)
                 {
                     if(@$tipus != $eszkoz['tipus'])
                     {

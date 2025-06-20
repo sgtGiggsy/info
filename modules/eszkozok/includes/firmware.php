@@ -21,12 +21,13 @@ else
     $form = "modules/eszkozok/forms/firmwareszerkesztform";
     $oldalcim = "Új firmware hozzáadása";
 
-    $eszkoztipuslista = mySQLConnect("SELECT modellek.id AS id, modell, gyartok.nev AS gyarto FROM modellek LEFT JOIN gyartok ON modellek.gyarto = gyartok.id ORDER BY gyarto ASC, modell ASC");
+    $eszkoztipuslista = new MySQLHandler("SELECT modellek.id AS id, modell, gyartok.nev AS gyarto FROM modellek LEFT JOIN gyartok ON modellek.gyarto = gyartok.id ORDER BY gyarto ASC, modell ASC");
+    $eszkoztipuslista = $eszkoztipuslista->Result();
 
     if($elemid)
     {
-        $firmwareszerk = mySQLConnect("SELECT * FROM firmwarelist WHERE id = $elemid;");
-        $firmwareszerkeszt = mysqli_fetch_assoc($firmwareszerk);
+        $firmwareszerkeszt = new MySQLHandler("SELECT * FROM firmwarelist WHERE id = ?;", $elemid);
+        $firmwareszerkeszt = $firmwareszerkeszt->Fetch();
 
         $id = $firmwareszerkeszt['id'];
         $nev = $firmwareszerkeszt['nev'];

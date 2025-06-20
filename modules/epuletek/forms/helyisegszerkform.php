@@ -1,10 +1,11 @@
 <?php
 if(@$irhat)
 {
-    $epuletek = mySQLConnect("SELECT epuletek.id AS id, szam, epuletek.nev AS nev, telephelyek.telephely AS telephely, epulettipusok.tipus AS tipus
+    $epuletek = new MySQLHandler("SELECT epuletek.id AS id, szam, epuletek.nev AS nev, telephelyek.telephely AS telephely, epulettipusok.tipus AS tipus
         FROM epuletek
             LEFT JOIN telephelyek ON epuletek.telephely = telephelyek.id
             LEFT JOIN epulettipusok ON epuletek.tipus = epulettipusok.id;");
+    
     ?><div class="contentcenter">
         <form action="<?=$RootPath?>/helyisegdb?action=<?=($pagetofind == "helyiseg" && isset($id)) ? 'update' : 'new' ?>" method="post" onsubmit="beKuld.disabled = true; return true;"><?php
             if($pagetofind == "helyiseg" && isset($id))
@@ -15,7 +16,7 @@ if(@$irhat)
                 <label for="epulet">Épület:</label><br>
                 <select id="epulet" name="epulet">
                     <option value=""></option><?php
-                    foreach($epuletek as $x)
+                    foreach($epuletek->Result() as $x)
                     {
                         ?><option value="<?=$x["id"]?>" <?=($x['id'] == $epid) ? "selected" : "" ?>><?=$x['szam']?>. <?=$x['tipus']?> (<?=$x['nev']?>)</option><?php
                     }

@@ -27,14 +27,11 @@ function PrevNext($firstid, $previd, $nextid, $lastid, $RootPath, $oldalnev, $ke
 }
 
 if(isset($countquery))
-{
-    $c = new MySQLHandler($countquery, ...$cqueryparams);
-    $count = $c->Fetch()['db'];
-}
+    $count = new MySQLHandler($countquery, ...$cqueryparams);
 else
-{
-    $count = mySQLConnect("SELECT count(*) AS db FROM $adattabla $where")->fetch_assoc()['db'];
-}
+    $count = new MySQLHandler("SELECT count(*) AS db FROM $adattabla $where");
+$count = $count->Fetch()['db'];
+
 $firstid = $previd = $nextid = $lastid = null;
 
 if(isset($_POST['oldalankent']))

@@ -1,19 +1,21 @@
 <?php
+define("DEBUG_MODE", false);
 include("../../../includes/config.inc.php");
 include("../../../includes/functions.php");
+include("../../../Classes/MySQLHandler.class.php");
 include('../../allapotjelentesek/includes/functions.php');
 include('../classes/networkelements.class.php');
 
 $id = $_GET['devid'];
-$allapotjelzesek = mySQLConnect("SELECT snmp_traps.id AS id,
+$allapotjelzesek = new MySQLHandler("SELECT snmp_traps.id AS id,
             snmp_traps.eszkozid AS eszkozid,
             snmp_traps.timestamp AS timestamp,
             event, port, systemuptime,
             severity, message
         FROM snmp_traps
-        WHERE eszkozid = $id AND DATE(snmp_traps.datum) >= DATE_SUB(NOW(), interval 14 DAY)
-        ORDER BY snmp_traps.id DESC");
-$allapotjelentdb = mysqli_num_rows($allapotjelzesek);
+        WHERE eszkozid = ? AND DATE(snmp_traps.datum) >= DATE_SUB(NOW(), interval 14 DAY)
+        ORDER BY snmp_traps.id DESC;", $id);
+$allapotjelentdb = $allapotjelzesek->sorokszama;
 
 ?><table>
     <thead>
@@ -27,7 +29,7 @@ $allapotjelentdb = mysqli_num_rows($allapotjelzesek);
         </tr>
     </thead>
     <tbody><?php
-        foreach($allapotjelzesek as $x)
+        foreach($allapotjelzesek->Result() as $x)
         {
             switch($x['severity'])
             {

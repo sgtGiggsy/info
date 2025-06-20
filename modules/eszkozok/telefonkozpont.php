@@ -34,14 +34,14 @@ else
     }
 
     $kozpontid = $_GET['id'];
-    $helyiseg = mySQLConnect("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
+    $helyiseg = new MySQLHandler("SELECT helyisegek.id AS id, helyisegszam, helyisegnev, emelet, epuletek.id AS epid, epuletek.szam AS epuletszam, epuletek.nev AS epuletnev, epulettipusok.tipus AS tipus, telephelyek.telephely AS telephely, telephelyek.id AS thelyid
         FROM helyisegek
             INNER JOIN beepitesek ON beepitesek.helyiseg = helyisegek.id
             INNER JOIN epuletek ON helyisegek.epulet = epuletek.id
             INNER JOIN epulettipusok ON epuletek.tipus = epulettipusok.id
             INNER JOIN telephelyek ON epuletek.telephely = telephelyek.id
-        WHERE beepitesek.eszkoz = $kozpontid;");
-    $helyiseg = mysqli_fetch_assoc($helyiseg);
+        WHERE beepitesek.eszkoz = ?;", $kozpontid);
+    $helyiseg = $helyiseg->Fetch();
 
     /*$rackek = mySQLConnect("SELECT rackszekrenyek.id AS id, rackszekrenyek.nev AS nev, gyartok.nev AS gyarto, unitszam
         FROM rackszekrenyek
@@ -49,16 +49,16 @@ else
         WHERE rackszekrenyek.id = $rackid;");
     $rack = mysqli_fetch_assoc($rackek);*/
 
-    $portoksqli = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT tkozpontport FROM telefonszamok WHERE tkozpontport = portid LIMIT 1), 1, NULL) AS hasznalatban, telefonszamok.tipus AS tipus, telefonszamok.szam AS szam
+    $portoksqli = new MySQLHandler("SELECT portok.id AS portid, portok.port AS port, IF((SELECT tkozpontport FROM telefonszamok WHERE tkozpontport = portid LIMIT 1), 1, NULL) AS hasznalatban, telefonszamok.tipus AS tipus, telefonszamok.szam AS szam
         FROM tkozpontportok
             LEFT JOIN portok ON tkozpontportok.port = portok.id
             LEFT JOIN telefonszamok ON telefonszamok.tkozpontport = portok.id
-        WHERE tkozpontportok.eszkoz = $kozpontid
-        ORDER BY portok.port;");
+        WHERE tkozpontportok.eszkoz = ?
+        ORDER BY portok.port;", $kozpontid);
     
     //LENGTH(portok.port),
 
-    $portok = mysqliNaturalSort($portoksqli, 'port');
+    $portok = $portoksqli->NaturalSort('port');
 
     $telefonkozpont = mySQLConnect("SELECT
             eszkozok.id AS id,
@@ -145,7 +145,7 @@ else
 
     ?><div class="oldalcim"><?=$telefonkozpont['kozpontnev']?> Telefonközpont</div><?php
 
-    if(mysqli_num_rows($portoksqli) > 0)
+    if($portoksqli->sorokszama > 0)
     {
         ?><div class="oldalcim">Lage portok a központban</div>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;"><?php

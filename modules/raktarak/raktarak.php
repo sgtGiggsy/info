@@ -6,7 +6,7 @@ if(!$sajatolvas)
 }
 else
 {
-    $raktarak = mySQLConnect("SELECT raktarak.id AS id,
+    $raktarak = new MySQLHandler("SELECT raktarak.id AS id,
             raktarak.nev AS raktarnev,
             szervezetek.id AS szervezetid,
             szervezetek.rovid AS szervezet,
@@ -43,7 +43,7 @@ else
             </tr>
         </thead>
         <tbody><?php
-            foreach($raktarak as $raktar)
+            foreach($raktarak->Result() as $raktar)
             {
                 $raktarid = $raktar['id'];
                 $kattinthatolink = $RootPath . '/raktar/' . $raktar['id'];

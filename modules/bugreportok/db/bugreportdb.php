@@ -6,16 +6,15 @@ if(!isset($_SESSION['id']))
 }
 else
 {
-    $con = mySQLConnect(false);
+    $sql = new MySQLHandler();
 
     purifyPost();
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO bugok (cim, leiras, felhasznalo, oldal, tipus, prioritas) VALUES (?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('ssssss', $_POST['cim'], $_POST['leiras'], $felhasznaloid, $_POST['oldal'], $_POST['tipus'],  $_POST['prioritas']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $sql->Prepare('INSERT INTO bugok (cim, leiras, felhasznalo, oldal, tipus, prioritas) VALUES (?, ?, ?, ?, ?, ?)');
+        $sql->Run($_POST['cim'], $_POST['leiras'], $felhasznaloid, $_POST['oldal'], $_POST['tipus'],  $_POST['prioritas']);
+        if(!$sql->siker)
         {
             echo "<h2>A hiba jelentése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
@@ -27,10 +26,9 @@ else
     }
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE rackszekrenyek SET nev=?, gyarto=?, unitszam=?, helyiseg=? WHERE id=?');
-        $stmt->bind_param('ssssi', $_POST['nev'], $_POST['gyarto'], $_POST['unitszam'], $_POST['helyiseg'], $_POST['id']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $sql->Prepare('UPDATE rackszekrenyek SET nev=?, gyarto=?, unitszam=?, helyiseg=? WHERE id=?');
+        $sql->Run($_POST['nev'], $_POST['gyarto'], $_POST['unitszam'], $_POST['helyiseg'], $_POST['id']);
+        if(!$sql->siker)
         {
             echo "<h2>Rack szerkesztése sikertelen!<br></h2>";
             echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);

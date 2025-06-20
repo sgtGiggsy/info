@@ -1161,7 +1161,7 @@ function csoportWhere($csoporttagsagok, $csopwhereset)
 	$szervezetek = array();
     $telephelyek = array();
 
-	foreach($csoporttagsagok as $csoportjog)
+	foreach(CSOPORT_TAGSAGOK as $csoportjog)
     {
         if($csoportjog['szervezet'] && !in_array($csoportjog['szervezet'], $szervezetek))
 		{
@@ -1284,7 +1284,7 @@ function csoportWhere_new($csoporttagsagok, $csopwhereset)
     $telephelyek = array();
 	$paramarr = array();
 
-	foreach($csoporttagsagok as $csoportjog)
+	foreach(CSOPORT_TAGSAGOK as $csoportjog)
     {
         if($csoportjog['szervezet'] && !in_array($csoportjog['szervezet'], $szervezetek))
 		{

@@ -2,10 +2,12 @@
 
 if(isset($irhat) && $irhat)
 {
-    $con = mySQLConnect(false);
+    $sql = new MySQLHandler();
+    $sql->KeepAlive();
 
     if($_GET["action"] == "szamtarsitas") // Verziókövetés kész
     {
+        $sql->Prepare('UPDATE telefonszamok SET port=? WHERE id=?');
         $postid = 1;
         $ujsor = true;
         $nullval = null;
@@ -29,9 +31,7 @@ if(isset($irhat) && $irhat)
                         // nullázáshoz létrehozott input, úgy az adott szám porttársításának törlése
                         if($_POST['telefonszam-' . $postid . "-" . $szamid] == null && isset($_POST['nullid-' . $postid . "-" . $szamid]))
                         {
-                            $stmt = $con->prepare('UPDATE telefonszamok SET port=? WHERE id=?');
-                            $stmt->bind_param('ss', $nullval, $_POST['nullid-' . $postid . "-" . $szamid]);
-                            $stmt->execute();
+                            $sql->Run($nullval, $_POST['nullid-' . $postid . "-" . $szamid]);
                         }
 
                         // Ha új számkirendezés történt egy portra, vagy a számkirendezés módosításra került
@@ -42,14 +42,10 @@ if(isset($irhat) && $irhat)
                             // úgy először töröljük a régi hozzárendelést az előző portról
                             if(isset($_POST['nullid-' . $postid . "-" . $szamid]) && $_POST['nullid-' . $postid . "-" . $szamid] != $_POST['telefonszam-' . $postid . "-" . $szamid])
                             {
-                                $stmt = $con->prepare('UPDATE telefonszamok SET port=? WHERE id=?');
-                                $stmt->bind_param('ss', $nullval, $_POST['nullid-' . $postid . "-" . $szamid]);
-                                $stmt->execute();
+                                $sql->Run($nullval, $_POST['nullid-' . $postid . "-" . $szamid]);
                             }
                             
-                            $stmt = $con->prepare('UPDATE telefonszamok SET port=? WHERE id=?');
-                            $stmt->bind_param('si', $_POST['portid-'.$postid], $_POST['telefonszam-' . $postid . "-" . $szamid]);
-                            $stmt->execute();
+                            $sql->Run($_POST['portid-'.$postid], $_POST['telefonszam-' . $postid . "-" . $szamid]);
                         }
                         if(mysqli_errno($con) != 0)
                         {
@@ -59,6 +55,7 @@ if(isset($irhat) && $irhat)
                     }
                     else
                     {
+                        
                         $ujszam = false;
                     }
                     $szamid++;
