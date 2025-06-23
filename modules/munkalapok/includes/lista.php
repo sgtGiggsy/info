@@ -16,8 +16,10 @@ else
     if(isset($_GET['kereses']))
     {
         $keres = $_GET['kereses'];
-        $where = "WHERE felhasznalok.nev LIKE '%$keres%' OR szervezetek.rovid LIKE '%$keres%' OR mv1.nev LIKE '%$keres%' OR mv2.nev LIKE '%$keres%' OR leiras LIKE '%$keres%' OR eszkoz LIKE '%$keres%'";
+        $where = "WHERE igenylonev LIKE '%$keres%' OR igenyloszervezet LIKE '%$keres%' OR munkavegzo1nev LIKE '%$keres%' OR munkavegzo2nev LIKE '%$keres%' OR leiras LIKE '%$keres%' OR eszkoz LIKE '%$keres%'";
     }
+
+    $keres = "?kereses=" . $keres;
     
     if(!$mindolvas)
     {

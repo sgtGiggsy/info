@@ -257,7 +257,8 @@ if($_SESSION['id'])
             INNER JOIN csoporttagsagok ON csoportok.id = csoporttagsagok.csoport
             LEFT JOIN csoportjogok ON csoportjogok.csoport = csoporttagsagok.csoport
         WHERE felhasznalo = ?", $felhasznaloid);
-    $csoporttagsagok = $csoporttagsagok->Result();
+    $csoporttagsagok = $csoporttagsagok->AsArray();
+    define('CSOPORT_TAGSAGOK', $csoporttagsagok);
 
     $menusql = new MySQLHandler("SELECT id, menupont, szulo, url, oldal, cimszoveg, szerkoldal, aktiv, menuterulet, sorrend, gyujtourl, gyujtocimszoveg, gyujtooldal, dburl, dboldal, apiurl, iras, olvasas, lathat
         FROM

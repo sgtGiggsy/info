@@ -1794,7 +1794,7 @@ td:nth-child(1), .trlink :nth-child(1) a {
     right: 2px;
 }
 
-.trlink svg {
+tr svg {
     height: 2.5em;
     width: 2.5em;
 }
