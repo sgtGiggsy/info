@@ -22,7 +22,7 @@ else
         $csoportwhere = csoportWhere($csoporttagsagok, $csopwhereset);
     }
 
-    $mindeneszkoz = mySQLConnect("SELECT
+    $mindeneszkoz = (new MySQLHandler("SELECT
             eszkozok.id AS id,
             sorozatszam,
             varians,
@@ -54,7 +54,7 @@ else
                 LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
                 LEFT JOIN epuletek ON helyisegek.epulet = epuletek.id
                 LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
-        ORDER BY epuletek.szam + 1, sorozatszam;");
+        ORDER BY epuletek.szam + 1, sorozatszam;"))->Result();
 
     $tipus = 'szunetmentesek';
     $oszlopok = array(

@@ -6,7 +6,7 @@ if(!@$mindolvas)
 }
 else
 {
-    $dokumentumtipusok = mySQLConnect("SELECT * FROM dokumentumtipusok ORDER BY nev;");
+    $dokumentumtipusok = new MySQLHandler("SELECT * FROM dokumentumtipusok ORDER BY nev;");
 
     if($mindir) 
     {
@@ -22,7 +22,7 @@ else
             </tr>
         </thead>
         <tbody><?php
-        foreach($dokumentumtipusok as $dokumentumtipus)
+        foreach($dokumentumtipusok->Result() as $dokumentumtipus)
         {
             $dokumentumtipusid = $dokumentumtipus['id'];
             ?><tr <?=($mindir) ? "class='kattinthatotr'" . "data-href='$RootPath/dokumentumtipus/$dokumentumtipusid?action=edit'" : "" ?>>

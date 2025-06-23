@@ -195,7 +195,8 @@ define('OID_LIST', array(
     "1.3.6.1.4.1.9.10.56.2.0.1"=>"Változás az autentikációs beállításokban",
     "1.3.6.1.4.1.9.9.43.2.0.1"=>"Változás az eszköz beállításaiban",
     "1.3.6.1.4.1.9.9.10.1.3.0.4"=>"Változás egy cserélhető FLASH eszköz állapotában",
-    "1.3.6.1.4.1.9.0.1"=>"Virtuális konzol kapcsolat lezárult"
+    "1.3.6.1.4.1.9.0.1"=>"Virtuális konzol kapcsolat lezárult",
+    "1.3.6.1.4.1.9.9.13.3.0.9"=>"Belső tápegység hibája"
 ));
 
 function kapcsolatTipus($tipus)

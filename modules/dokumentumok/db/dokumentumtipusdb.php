@@ -2,30 +2,26 @@
 
 if(isset($irhat) && $irhat)
 {
-    $con = mySQLConnect(false);
+    $sql = new MySQLHandler();
 
     purifyPost();
 
     if($_GET["action"] == "new")
     {
-        $stmt = $con->prepare('INSERT INTO dokumentumtipusok (nev) VALUES (?)');
-        $stmt->bind_param('s', $_POST['nev']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $sql->Prepare('INSERT INTO dokumentumtipusok (nev) VALUES (?)');
+        $sql->Run($_POST['nev']);
+        if(!$sql->siker)
         {
-            echo "<h2>Dokumentumtipus hozzáadása sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+            echo "<h2>Dokumentumtipus hozzáadása sikertelen!</h2>";
         }
     }
     elseif($_GET["action"] == "update")
     {
-        $stmt = $con->prepare('UPDATE dokumentumtipusok SET nev=? WHERE id=?');
-        $stmt->bind_param('si', $_POST['nev'], $_POST['id']);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $sql->Prepare('UPDATE dokumentumtipusok SET nev=? WHERE id=?');
+        $sql->Run($_POST['nev'], $_POST['id']);
+        if(!$sql->siker)
         {
-            echo "<h2>Dokumentumtipus szerkesztése sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+            echo "<h2>Dokumentumtipus szerkesztése sikertelen!</h2>";
         }
     }
     elseif($_GET["action"] == "delete")

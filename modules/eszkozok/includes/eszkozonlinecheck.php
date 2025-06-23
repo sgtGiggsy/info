@@ -5,11 +5,12 @@ TODO Megoldani, hogy kész lekérdezés után le lehessen kérni további mezők
 */
 include("../../../includes/config.inc.php");
 include("../../../includes/functions.php");
+include("../../../Classes/MySQLHandler.class.php");
 
 $szuresek = getWhere("(modellek.tipus = 1 OR modellek.tipus = 2) AND (aktiveszkoz_allapot.id = (SELECT MAX(ac.id) FROM aktiveszkoz_allapot ac WHERE ac.eszkozid = aktiveszkoz_allapot.eszkozid) OR aktiveszkoz_allapot.id IS NULL)");
 $where = $szuresek['where'];
 
-$query = "SELECT
+$offline = new MySQLHandler("SELECT
             eszkozok.id AS id,
             sorozatszam,
             beepitesek.id AS beepid,
@@ -22,10 +23,9 @@ $query = "SELECT
             LEFT JOIN beepitesek ON beepitesek.eszkoz = eszkozok.id
             LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
             LEFT JOIN aktiveszkoz_allapot ON eszkozok.id = aktiveszkoz_allapot.eszkozid
-        WHERE $where AND aktiveszkoz_allapot.online = 0
-        ORDER BY ipcimek.ipcim;";
+        WHERE $where AND aktiveszkoz_allapot.online = 0 AND aktivbeepites = 1
+        ORDER BY ipcimek.ipcim;");
 
-$offline = mySQLConnect($query);
-$offlinelist = json_encode(mysqliToArray($offline));
+$offlinelist = json_encode($offline->AsArray());
 
 echo $offlinelist;

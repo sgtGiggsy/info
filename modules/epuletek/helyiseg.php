@@ -129,23 +129,22 @@ else
         {
             $helyisegid = $_GET['id'];
             $button = "Helyiség szerkesztése";
-            $helyiseg = mySQLConnect("SELECT * FROM helyisegek WHERE id = $helyisegid;");
-            $helyiseg = mysqli_fetch_assoc($helyiseg);
+            $helyiseg = (new MySQLHandler("SELECT * FROM helyisegek WHERE id = ?;", $helyisegid))->Fetch();
 
             $epid = $helyiseg['epulet'];
             $helyisegszam = $helyiseg['helyisegszam'];
             $helyisegnev = $helyiseg['helyisegnev'];
             $emelet = $helyiseg['emelet'];
 
-            $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port
+            $epuletportok = (new MySQLHandler("SELECT portok.id AS id, portok.port AS port
                 FROM portok
                     INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-                WHERE epulet = $epid AND vegpontiportok.helyiseg IS NULL
+                WHERE epulet = ? AND vegpontiportok.helyiseg IS NULL
             UNION
                 SELECT portok.id AS id, portok.port AS port
                 FROM portok
                     INNER JOIN transzportportok ON transzportportok.port = portok.id
-                WHERE epulet = $epid;");
+                WHERE epulet = ?;", $epid, $epid))->Result();
 
             $helyisegbutton = "Helyiség módosítása";
             $oldalcim = "Helyiség szerkesztése";
@@ -170,12 +169,12 @@ else
     // Akkor futunk ki erre az ágra, ha van olvasási jog, és kiválasztott épület, de más nincs. Ez a sima megjelenítő felület
     else
     {
-        $rackek = mySQLConnect("SELECT rackszekrenyek.id AS id, rackszekrenyek.nev AS nev, gyartok.nev AS gyarto, unitszam
+        $rackek = (new MySQLHandler("SELECT rackszekrenyek.id AS id, rackszekrenyek.nev AS nev, gyartok.nev AS gyarto, unitszam
             FROM rackszekrenyek
                 LEFT JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
-            WHERE helyiseg = $helyisegid;");
+            WHERE helyiseg = ?;", $helyisegid))->Result();
         
-        $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban, szam, vlanok.nev AS vlan, hurok.port AS athurkolas
+        $portok = (new MySQLHandler("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban, szam, vlanok.nev AS vlan, hurok.port AS athurkolas
             FROM portok
                 LEFT JOIN portok hurok ON portok.athurkolas = hurok.id
                 LEFT JOIN rackportok ON rackportok.port = portok.id
@@ -190,10 +189,10 @@ else
                 LEFT JOIN telefonszamok ON telefonszamok.port = portok.id
                 LEFT JOIN vlanok ON switchportok.vlan = vlanok.id OR beepitesek.vlan = vlanok.id
                 LEFT JOIN transzportportok ON transzportportok.port = portok.id
-            WHERE helyisegek.id = $helyisegid AND transzportportok.id IS NULL
-            ORDER BY rackportok.rack ASC, portok.id ASC;");
+            WHERE helyisegek.id = ? AND transzportportok.id IS NULL
+            ORDER BY rackportok.rack ASC, portok.id ASC;", $helyisegid))->Result();
 
-        $eszkozok = mySQLConnect("SELECT
+        $eszkozok = new MySQLHandler("SELECT
                 eszkozok.id AS id,
                 helyisegek.id AS helyisegid,
                 sorozatszam,
@@ -220,11 +219,11 @@ else
                     helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id LEFT JOIN
                     ipcimek ON beepitesek.ipcim = ipcimek.id LEFT JOIN
                     szervezetek ON eszkozok.tulajdonos = szervezetek.id
-            WHERE helyisegek.id = $helyisegid AND kiepitesideje IS NULL
-            ORDER BY rack, pozicio;");
-        if(mysqli_num_rows($eszkozok) > 0)
+            WHERE helyisegek.id = ? AND kiepitesideje IS NULL
+            ORDER BY rack, pozicio;", $helyisegid);
+        if($eszkozok->sorokszama > 0)
         {
-            $rackszam = mysqli_fetch_assoc($eszkozok)['rackszam'];
+            $rackszam = $eszkozok->Fetch()['rackszam'];
         }
         else
         {
@@ -240,7 +239,7 @@ else
             array('nev' => 'Beépítve', 'tipus' => 's')
         );
 
-        if(mysqli_num_rows($rackek) > 0)
+        if(count($rackek) > 0)
         {
             $oszlopokeszk[] = array('nev' => 'Rackszekrény', 'tipus' => 's');
             $oszlopokeszk[] = array('nev' => 'Pozíció', 'tipus' => 'i');
@@ -262,7 +261,7 @@ else
         
         <div class="oldalcim">Eszközök a helyiségben</div><?php
         $ujoldalcim = $ablakcim . " - ". $helyiseg['epuletszam'] . ". " . $helyiseg['tipus'] . " " . $helyiseg['helyisegszam'] . ". helyiség (" . $helyiseg['helyisegnev'] . ")";
-        if(mysqli_num_rows($eszkozok) > 0)
+        if($eszkozok->sorokszama > 0)
         {
             ?><div>
                 <table id="eszkozok">
@@ -278,7 +277,7 @@ else
                         ?></tr>
                     </thead>
                     <tbody><?php
-                        foreach($eszkozok as $eszkoz)
+                        foreach($eszkozok->Result() as $eszkoz)
                         {
                             $beepid = $eszkoz['beepid'];
                             $eszkid = $eszkoz['id'];
@@ -309,7 +308,7 @@ else
             </div><?php
         }
 
-        if(mysqli_num_rows($rackek) > 0)
+        if(count($rackek) > 0)
         {
             ?><div class="oldalcim">Rackszekrények a helyiségben</div>
             <div>

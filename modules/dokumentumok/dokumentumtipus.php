@@ -23,8 +23,8 @@ else
 
     if(isset($_GET['id']))
     {
-        $dokumentumtipus = mySQLConnect("SELECT * FROM dokumentumtipusok WHERE id = $id;");
-        $dokumentumtipus = mysqli_fetch_assoc($dokumentumtipus);
+        $dokumentumtipus = new MySQLHandler("SELECT * FROM dokumentumtipusok WHERE id = ?;", $_GET['id']);
+        $dokumentumtipus = $dokumentumtipus->Fetch();
 
         $id = $dokumentumtipus['id'];
         $nev = $dokumentumtipus['nev'];

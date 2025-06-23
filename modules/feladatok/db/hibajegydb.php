@@ -3,6 +3,8 @@
 if(isset($irhat) && $irhat)
 {
     $con = mySQLConnect(false);
+    $sql = new MySQLHandler();
+    $sql->KeepAlive();
 
     purifyPost();
 
@@ -28,13 +30,13 @@ if(isset($irhat) && $irhat)
             $hibid = $_POST['feladat'];
         }
         
-        $felhasznaloquery = mySQLConnect("SELECT felhasznalok.id AS id, felhasznalok.nev AS nev,
+        $sql->Query("SELECT felhasznalok.id AS id, felhasznalok.nev AS nev,
                     felhasznalok.szervezet AS szervezet, feladatok.szakid AS szak,
                     feladatok.id AS feladatid
                 FROM felhasznalok
                     LEFT JOIN feladatok ON feladatok.felhasznalo = felhasznalok.id
-                WHERE feladatok.pubid = $hibid");
-        $felhasznalo = mysqli_fetch_assoc($felhasznaloquery);
+                WHERE feladatok.pubid = ?;", $hibid);
+        $felhasznalo = $sql->Fetch();
         
         $origfelhasznaloneve = $felhasznalo['nev'];
         $origfelhasznaloid = $felhasznalo['id'];
@@ -47,45 +49,52 @@ if(isset($irhat) && $irhat)
     {
         $feladattipus = "1";
         $pubid = rand(2000000, 15000000); // Kell egy induló pubid, mert ha van null érték a pubid oszlopban, akkor a random generálás nem tud mihez hasonlítani, és ezért nem is generál számot
-        $stmt = $con->prepare('INSERT INTO feladatok (felhasznalo, rovid, bovitett, fajl, eszkozneve, szakid, epulet, helyiseg, feladattipus, pubid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $stmt->bind_param('ssssssssss', $felhid, $_POST['rovid'], $_POST['bovitett'], $_POST['fajl'], $_POST['eszkozneve'], $_POST['szakid'], $_POST['epulet'], $_POST['helyiseg'], $feladattipus, $pubid);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+        $sql->Prepare('INSERT INTO feladatok (felhasznalo, rovid, bovitett, fajl, eszkozneve, szakid, epulet, helyiseg, feladattipus, pubid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $sql->Run($felhid, $_POST['rovid'], $_POST['bovitett'], $_POST['fajl'], $_POST['eszkozneve'], $_POST['szakid'], $_POST['epulet'], $_POST['helyiseg'], $feladattipus, $pubid);
+
+        if(!$sql->siker)
         {
-            echo "<h2>Hibajegy hozzáadása sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+            echo "<h2>Hibajegy hozzáadása sikertelen!</h2>";
         }
 
-        $origid = mysqli_insert_id($con);
+        $origid = $sql->last_insert_id;
 
-        mySQLConnect("UPDATE feladatok SET pubid = (
+        $sql->Query("UPDATE feladatok SET pubid = (
                 SELECT FLOOR(1 + RAND() * 999999) AS random_num 
                 FROM feladatok
                 WHERE 'random_num' NOT IN (SELECT pubid FROM feladatok) LIMIT 1)
-            WHERE id = $origid");
+            WHERE id = ?;", $origid);
 
-        $lastrow = mySQLConnect("SELECT pubid FROM feladatok WHERE id = $origid");
-        $last_id = mysqli_fetch_assoc($lastrow)['pubid'];
+        $ertesitesadatok = (new MySQLHandler("SELECT pubid, felhasznalok.nev AS nev
+                FROM feladatok
+                    INNER JOIN felhasznalok ON feladatok.felhasznalo = felhasznalok.id
+                WHERE feladatok.id = ?;", $origid))->Bind($pubid, $felhasznaloneve);
 
-        $felhasznaloquery = mySQLConnect("SELECT nev FROM felhasznalok WHERE id = $felhid");
-        $felhasznaloneve = mysqli_fetch_assoc($felhasznaloquery)['nev'];
-
-        hibajegyErtesites("$felhasznaloneve új hibajegyet hozott létre", $_POST['rovid'], $last_id, $felhid, $szervezet, $_POST['szakid']);
+        $ertesites = new Ertesites("$felhasznaloneve új hibajegyet hozott létre", $_POST['rovid'], "hibajegy/$hibajegyid", 2);
+        $ertesites->AddFelhasznalo($felhid);
+        $ertesites->Ment();
     }
 
     elseif($_GET["action"] == "update")
     {
         $sorszam = $_POST['id'];
-        $stmt = $con->prepare('UPDATE feladatok SET felhasznalo=?, rovid=?, bovitett=?, fajl=?, eszkozneve=?, szakid=?, epulet=?, helyiseg=? WHERE id=?');
-        $stmt->bind_param('ssssssssi', $_POST['felhasznalo'], $_POST['rovid'], $_POST['bovitett'], $_POST['fajl'], $_POST['eszkozneve'], $_POST['szakid'], $_POST['epulet'], $_POST['helyiseg'], $origid);
-        $stmt->execute();
-        if(mysqli_errno($con) != 0)
+
+        $sql->Prepare('UPDATE feladatok SET felhasznalo=?, rovid=?, bovitett=?, fajl=?, eszkozneve=?, szakid=?, epulet=?, helyiseg=? WHERE id=?');
+        $sql->Run($_POST['felhasznalo'], $_POST['rovid'], $_POST['bovitett'], $_POST['fajl'], $_POST['eszkozneve'], $_POST['szakid'], $_POST['epulet'], $_POST['helyiseg'], $origid);
+    
+        if(!$sql->siker)
         {
-            echo "<h2>Hibajegy szerkesztése sikertelen!<br></h2>";
-            echo "Hibakód:" . mysqli_errno($con) . "<br>" . mysqli_error($con);
+            echo "<h2>Hibajegy szerkesztése sikertelen!</h2>";
         }
 
-        hibajegyErtesites("$valosnev szerkesztette a(z) $sorszam számú hibajegyet", $_POST['rovid'], $sorszam, $origfelhasznaloid, $origszervezet, $_POST['szakid']);
+        $ertesitesadatok = (new MySQLHandler("SELECT felhasznalok.id AS felhasznid, felhasznalok.email AS email
+                FROM feladatok
+                    INNER JOIN felhasznalok ON feladatok.felhasznalo = felhasznalok.id
+                WHERE feladatok.pubid = ?;", $sorszam))->Bind($felhasznid, $email);
+
+        $ertesites = new Ertesites("$valosnev szerkesztette a(z) $sorszam számú hibajegyet", $_POST['rovid'], "hibajegy/$sorszam", 2);
+        $ertesites->AddFelhasznalo(array("felhasznalo" => $felhasznid, "email" => $email));
+        $ertesites->Ment();
     }
 
     elseif($_GET["action"] == "stateupdate")
@@ -99,22 +108,22 @@ if(isset($irhat) && $irhat)
             $szerepkor = 3;
             if($allapottipus == 30)
             {
-                mySQLConnect("UPDATE feladatok SET allapot = 0 WHERE id = $origid;");
+                $sql->Query("UPDATE feladatok SET allapot = 0 WHERE id = ?;", $origid);
             }
             elseif($allapottipus == 2)
             {
-                mySQLConnect("UPDATE feladatok SET allapot = 1 WHERE id = $origid;");
+                $sql->Query("UPDATE feladatok SET allapot = 1 WHERE id = ?;", $origid);
             }
 
             elseif($allapottipus == 27)
             {
                 $hatarido = $_POST['hatarido'];
-                mySQLConnect("UPDATE feladatok SET hatarido = '$hatarido' WHERE id = $origid;");
+                mySQLConnect("UPDATE feladatok SET hatarido = ? WHERE id = ?;", $hatarido, $origid);
             }
             elseif($allapottipus == 28)
             {
                 $elhalasztva = $_POST['elhalasztva'];
-                mySQLConnect("UPDATE feladatok SET elhalasztva = '$elhalasztva', prioritas = 1 WHERE id = $origid;");
+                mySQLConnect("UPDATE feladatok SET elhalasztva = ?, prioritas = 1 WHERE id = ?;", $elhalasztva, $origid);
             }
         }
         else

@@ -132,10 +132,10 @@ else
         $szam = $telephely = $nev = $tipus = $emelet = $magyarazat = $naprakesz = $megjegyzes = null;
         $beuszok = array();
 
-        $telephelyek = mySQLConnect("SELECT * FROM telephelyek;");
-        $epulettipusok = mySQLConnect("SELECT * FROM epulettipusok;");
-        $tulajdonosok = mySQLConnect("SELECT * FROM szervezetek;");
-        $csatlakozok = mySQLConnect("SELECT * FROM csatlakozotipusok;");
+        $telephelyek = (new MySQLHandler("SELECT * FROM telephelyek;"))->Result();
+        $epulettipusok = (new MySQLHandler("SELECT * FROM epulettipusok;"))->Result();
+        $tulajdonosok = (new MySQLHandler("SELECT * FROM szervezetek;"))->Result();
+        $csatlakozok = (new MySQLHandler("SELECT * FROM csatlakozotipusok;"))->Result();
         
         $helyisegbutton = "Új helyiség";
         $button = "Új épület";
@@ -144,9 +144,8 @@ else
         
         if(isset($id))
         {
-            $fizikairetegek = mySQLConnect("SELECT * FROM fizikairetegek;");
-            $epulet = mySQLConnect("SELECT * FROM epuletek WHERE id = $id;");
-            $epulet = mysqli_fetch_assoc($epulet);
+            $fizikairetegek = (new MySQLHandler("SELECT * FROM fizikairetegek;"))->Result();
+            $epulet = (new MySQLHandler("SELECT * FROM epuletek WHERE id = ?;", $id))->Fetch();
 
             $szam = $epulet['szam'];
             $telephely = $epulet['telephely'];
@@ -186,31 +185,32 @@ else
         $where = $magyarazat = null;
         $maxhidra = 4;
 
-        $eptkpquery = mySQLConnect("SELECT telefonkozpont FROM epuletek WHERE id = $id");
-        $epuletkozpont = mysqli_fetch_assoc($eptkpquery)['telefonkozpont'];
+        $eptkpquery = new MySQLHandler("SELECT telefonkozpont FROM epuletek WHERE id = ?;", $id);
+        $epuletkozpont = $eptkpquery->Fetch()['telefonkozpont'];
 
         if($epuletkozpont < 0) // Debug okokból, élesben a < 0-t KIVENNI!!!
         {
             $where = "WHERE tkozpontportok.eszkoz = $epuletkozpont";
         }
         
-        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port
+        $epuletportok = new MySQLHandler("SELECT portok.id AS id, portok.port AS port
                 FROM portok
                     INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-                WHERE epulet = $id
-                ORDER BY portok.port;");
+                WHERE epulet = ?
+                ORDER BY portok.port;", $id);
+
         $telefonszamok = mySQLConnect("SELECT telefonszamok.id AS id, szam, cimke, telefonszamok.port AS port
                 FROM telefonszamok
                     LEFT JOIN tkozpontportok ON telefonszamok.tkozpontport = tkozpontportok.port
                 $where
                 ORDER BY szam;");
 
-        if(mysqli_num_rows($epuletportok) > 150)
+        if($epuletportok->sorokszama > 150)
         {
             $maxhidra = 2;
         }
 
-        $epuletportok = mysqliNaturalSort($epuletportok, 'port');
+        $epuletportok = $epuletportok->NaturalSort('port');
 
         $button = "Portok számmal társítása";
         $oldalcim = "Az épület portjainak telefonszámmal társítása";
@@ -223,21 +223,21 @@ else
     {
         $magyarazat = null;
         
-        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, portok.csatlakozas AS csatlakozas, athurkolas
+        $epuletportok = new MySQLHandler("SELECT portok.id AS id, portok.port AS port, portok.csatlakozas AS csatlakozas, athurkolas
                 FROM portok
                     INNER JOIN transzportportok ON transzportportok.port = portok.id
-                WHERE epulet = $id
-                ORDER BY portok.port;");
+                WHERE epulet = ?
+                ORDER BY portok.port;", $id);
         
-        $masepuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, portok.csatlakozas AS csatlakozas, epuletek.szam AS epuletszam
+        $masepuletportok = (new MySQLHandler("SELECT portok.id AS id, portok.port AS port, portok.csatlakozas AS csatlakozas, epuletek.szam AS epuletszam
                 FROM portok
                     INNER JOIN transzportportok ON transzportportok.port = portok.id
                     LEFT JOIN epuletek ON transzportportok.epulet = epuletek.id
                     LEFT JOIN transzportportok csat ON portok.csatlakozas = csat.port
-                WHERE (portok.csatlakozas IS NULL OR csat.epulet = $id) AND transzportportok.epulet != $id
-                ORDER BY epuletek.szam, portok.port;");
+                WHERE (portok.csatlakozas IS NULL OR csat.epulet = ?) AND transzportportok.epulet != ?
+                ORDER BY epuletek.szam, portok.port;", $id, $id))->Result();
 
-        $epuletportok = mysqliNaturalSort($epuletportok, 'port');
+        $epuletportok = $epuletportok->NaturalSort('port');
 
         $button = "Transzport portok társítása";
         $oldalcim = "Az épület transzport portjainak társítása";
@@ -250,13 +250,13 @@ else
     {
         $magyarazat = null;
         
-        $epuletportok = mySQLConnect("SELECT portok.id AS id, portok.port AS port, portok.csatlakozas AS csatlakozas, athurkolas
+        $epuletportok = new MySQLHandler("SELECT portok.id AS id, portok.port AS port, portok.csatlakozas AS csatlakozas, athurkolas
                 FROM portok
                     INNER JOIN vegpontiportok ON vegpontiportok.port = portok.id
-                WHERE epulet = $id
-                ORDER BY portok.port;");
+                WHERE epulet = ?
+                ORDER BY portok.port;", $id);
 
-        $epuletportok = mysqliNaturalSort($epuletportok, 'port');
+        $epuletportok = $epuletportok->NaturalSort('port');
 
         $button = "Portok összehurkolása";
         $oldalcim = "Az épület portjainak összehurkolása";
@@ -269,18 +269,19 @@ else
     else
     {
         
-        $helyisegek = mySQLConnect("SELECT id, helyisegszam, helyisegnev, emelet
+        $helyisegek = (new MySQLHandler("SELECT id, helyisegszam, helyisegnev, emelet
             FROM helyisegek
-            WHERE epulet = $epid
-            ORDER BY emelet ASC, helyisegszam ASC;");
-        $rackek = mySQLConnect("SELECT rackszekrenyek.id AS id, rackszekrenyek.nev AS nev, gyartok.nev AS gyarto, unitszam, helyisegszam, helyisegnev, emelet
+            WHERE epulet = ?
+            ORDER BY emelet ASC, helyisegszam ASC;", $epid))->Result();
+
+        $rackek = (new MySQLHandler("SELECT rackszekrenyek.id AS id, rackszekrenyek.nev AS nev, gyartok.nev AS gyarto, unitszam, helyisegszam, helyisegnev, emelet
             FROM rackszekrenyek
                 INNER JOIN helyisegek ON rackszekrenyek.helyiseg = helyisegek.id
                 LEFT JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
-            WHERE epulet = $epid
-            ORDER BY emelet, helyisegszam + 0;");
+            WHERE epulet = ?
+            ORDER BY emelet, helyisegszam + 0;", $epid))->Result();
 
-        $portok = mySQLConnect("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban,
+        $portok = (new MySQLHandler("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban,
                 telefonszamok.szam AS szam, vlanok.nev AS vlan, hurok.port AS athurkolas
             FROM portok
                 LEFT JOIN portok hurok ON portok.athurkolas = hurok.id
@@ -293,10 +294,10 @@ else
                 LEFT JOIN epuletek ON vegpontiportok.epulet = epuletek.id
                 LEFT JOIN telefonszamok ON telefonszamok.port = portok.id
                 LEFT JOIN vlanok ON switchportok.vlan = vlanok.id OR beepitesek.vlan = vlanok.id
-            WHERE epuletek.id = $epid
-            ORDER BY portok.port ASC;");
+            WHERE epuletek.id = ?
+            ORDER BY portok.port ASC;", $epid))->Result();
 
-        $eszkozok = mySQLConnect("SELECT
+        $eszkozok = (new MySQLHandler("SELECT
                 eszkozok.id AS id,
                 helyisegek.id AS helyisegid,
                 sorozatszam,
@@ -322,8 +323,8 @@ else
                 LEFT JOIN helyisegek ON beepitesek.helyiseg = helyisegek.id OR rackszekrenyek.helyiseg = helyisegek.id
                 LEFT JOIN ipcimek ON beepitesek.ipcim = ipcimek.id
                 LEFT JOIN szervezetek ON eszkozok.tulajdonos = szervezetek.id
-            WHERE helyisegek.epulet = $epid AND kiepitesideje IS NULL AND (modellek.tipus < 10 OR (modellek.tipus > 19 AND modellek.tipus < 31))
-            ORDER BY rack, pozicio;");
+            WHERE helyisegek.epulet = ? AND kiepitesideje IS NULL AND (modellek.tipus < 10 OR (modellek.tipus > 19 AND modellek.tipus < 31))
+            ORDER BY rack, pozicio;", $epid))->Result();
         
         $oszlopokeszk = array(
             array('nev' => 'IP cím', 'tipus' => 's'),
