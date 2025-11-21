@@ -2241,3 +2241,26 @@ function getAloldal($main, $first = null)
 		return "./modules/$main/includes/$aloldal.php";
 	}
 }
+
+function encPass($plain)
+{
+	$keyplain = $_SESSION['unlockedmaster'];
+	$key = sodium_crypto_generichash($keyplain, '', SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+
+	$nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+	$cipher = sodium_crypto_secretbox($plain, $nonce, $key);
+
+	return base64_encode($nonce . $cipher);
+}
+
+function decPass($enc)
+{
+	$keyplain = $_SESSION['unlockedmaster'];
+	$key = sodium_crypto_generichash($keyplain, '', SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+
+	$data = base64_decode($enc);
+	$nonce_dec = substr($data, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+	$cipher_dec = substr($data, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+
+	return sodium_crypto_secretbox_open($cipher_dec, $nonce_dec, $key);
+}
