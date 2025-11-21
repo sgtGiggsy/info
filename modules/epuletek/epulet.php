@@ -457,6 +457,7 @@ else
             if(mysqli_num_rows($helyisegek) > 0)
             {
                 $zar = false;
+                $emelet = -999;
                 foreach($helyisegek as $helyiseg)
                 {
                     if(@$emelet != $helyiseg['emelet'])

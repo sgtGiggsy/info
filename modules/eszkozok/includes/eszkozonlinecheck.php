@@ -6,6 +6,7 @@ TODO Megoldani, hogy kész lekérdezés után le lehessen kérni további mezők
 include("../../../includes/config.inc.php");
 include("../../../includes/functions.php");
 include("../../../Classes/MySQLHandler.class.php");
+define("DEBUG_MODE", false);
 
 $szuresek = getWhere("(modellek.tipus = 1 OR modellek.tipus = 2) AND (aktiveszkoz_allapot.id = (SELECT MAX(ac.id) FROM aktiveszkoz_allapot ac WHERE ac.eszkozid = aktiveszkoz_allapot.eszkozid) OR aktiveszkoz_allapot.id IS NULL)");
 $where = $szuresek['where'];

@@ -9,6 +9,7 @@ if(isset($irhat) && $irhat)
 
     $beepido = dateTimeLocalToTimeStamp($_POST['beepitesideje']);
     $kiepido = dateTimeLocalToTimeStamp($_POST['kiepitesideje']);
+    $id = $_POST['eszkoz']; //TODO megnézni hogy ez megoldja-e mikor új beépítést követő azonnali betöltéskor az oldal hibát dob
 
     if($_GET["action"] == "new")
     {

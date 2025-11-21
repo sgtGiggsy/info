@@ -38,7 +38,7 @@ if($felhasznaloid)
                     LEFT JOIN szakok ON feladat_hierarchy.szakid = szakok.id
                 WHERE feladatterv_felelosok.felhasznalo_id = ? OR feladat_hierarchy.felvitte = ?
                 GROUP BY feladat_hierarchy.feladat_id
-                ORDER BY path, vegrehajt ASC, prioritas DESC, feladat_id ASC", $felhasznaloid, $felhasznaloid);
+                ORDER BY path IS NULL, path, vegrehajt IS NULL, vegrehajt ASC, prioritas DESC, feladat_id ASC", $felhasznaloid, $felhasznaloid);
     if($feladatok->sorokszama > 0)
     {
         ?><div><?php

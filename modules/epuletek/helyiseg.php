@@ -172,7 +172,7 @@ else
         $rackek = (new MySQLHandler("SELECT rackszekrenyek.id AS id, rackszekrenyek.nev AS nev, gyartok.nev AS gyarto, unitszam
             FROM rackszekrenyek
                 LEFT JOIN gyartok ON rackszekrenyek.gyarto = gyartok.id
-            WHERE helyiseg = ?;", $helyisegid))->Result();
+            WHERE helyiseg = ?;", $helyisegid))->AsArray();
         
         $portok = (new MySQLHandler("SELECT portok.id AS portid, portok.port AS port, IF((SELECT csatlakozas FROM portok WHERE csatlakozas = portid LIMIT 1), 1, NULL) AS hasznalatban, szam, vlanok.nev AS vlan, hurok.port AS athurkolas
             FROM portok
