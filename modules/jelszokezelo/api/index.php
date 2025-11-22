@@ -5,8 +5,9 @@ $masterpass = @$_SESSION['unlockedmaster'];
 $unlockedtime = @$_SESSION['unlockedtime'];
 $jelid = @$_GET['jelid'];
 
-if(false && (!$felhasznaloid || !$masterpass || (time() - $unlockedtime) > 300 || !$jelid))
+if(!$felhasznaloid || !$masterpass || (time() - $unlockedtime) > 300 || !$jelid)
 {
+    $_SESSION['unlockedmaster'] = null;
     if(!$felhasznaloid)
         $uzenet['eredmeny'] = "Hiba! Nem vagy bejelentkezve!";
     elseif(!$masterpass)
