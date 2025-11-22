@@ -5,7 +5,7 @@ if(@$irhat)
         <form action="<?=$RootPath?>/jelszokezelo/beallitasok?action=masterpass" method="post" onsubmit="beKuld.disabled = true; return true;">
             <div>
                 <label for="nev">Régi mester jelszó:</label>
-                <input type="password" name="oldpass" placeholder="Eredeti jelszó" id="jelszo" autocomplete="new-password" required>
+                <input type="password" name="oldpass" placeholder="Eredeti jelszó" id="jelszo" autocomplete="current-password" required>
             </div>
 
             <div>

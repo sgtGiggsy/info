@@ -6,13 +6,13 @@ if(@$irhat)
             if($elemid)
                 ?><input type ="hidden" id="id" name="id" value=<?=$elemid?>><?php
             ?><div>
-                <label for="nev">Felhasználónév:</label>
-                <input type="text" name="uname" placeholder="Felhasználónév" id="uname" value="<?=$uname?>">
+                <label for="uname">Felhasználónév:</label>
+                <input type="text" name="uname" placeholder="Felhasználónév" id="uname" value="<?=$uname?>" autocomplete="one-time-code" />
             </div>
 
             <div>
                 <label for="nev">Jelszó:</label>
-                <input type="password" name="pass" placeholder="Jelszó" id="pass" required>
+                <input type="password" name="pass" placeholder="Jelszó" id="pass"  autocomplete="one-time-code" required />
             </div>
 
             <div>
