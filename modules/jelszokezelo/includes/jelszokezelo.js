@@ -2,7 +2,7 @@ var ido = 300 - unlockedtime;
 const visszaszamlalas = document.getElementById('countd');
 const visszaszulo = visszaszamlalas.parentElement;
 const Alert = Swal.mixin({
-  theme: 'material-ui-dark',   // vagy amit használsz
+  theme: 'material-ui-dark',
 });
 
 pop = JSON.parse(popup);
@@ -90,7 +90,6 @@ function showPass(passid) {
                         });
                     }
                 }
-                
             };
             xhttp.open("GET", RootPath + "/api/unsafe?modulnev=jelszokezelo&jelid=" + passid, true);
             xhttp.send();

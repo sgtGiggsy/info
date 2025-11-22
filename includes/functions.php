@@ -597,7 +597,7 @@ function szervezetPicker($current, $selectnev = 'szervezet', $hosszu = false)
 	$szervezetek = $szervezetek->Result();
 
 	?><div>
-		<label for="<?=$selectnev?>">szervezet:</label><br>
+		<label for="<?=$selectnev?>">Szervezet:</label><br>
 		<select id="<?=$selectnev?>" name="<?=$selectnev?>">
 			<option value="" selected></option><?php
 			foreach($szervezetek as $x)

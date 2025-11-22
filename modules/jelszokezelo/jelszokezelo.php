@@ -10,6 +10,14 @@ elseif(empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off')
 }
 else
 {
+    $contextmenu = array(
+        'jelszavak' => array('gyujtooldal' => 'jelszavak', 'oldal' => 'jelszo', 'gyujtooldalnev' => 'Jelszavak', 'oldalnev' => 'Jelszó'),
+        'beallitasok' => array('gyujtooldal' => 'beallitasok', 'oldal' => 'beallitasok', 'gyujtooldalnev' => 'Beállítások', 'oldalnev' => 'Beállítások'),
+        'countd' => array('gyujtooldal' => '', 'oldal' => '', 'gyujtooldalnev' => 'Feloldás', 'oldalnev' => 'enterMasterPass()')
+    );
+
+    $contextmenujogok['jelszavak'] = $contextmenujogok['beallitasok'] = $contextmenujogok['countd'] = true;
+
     if(!isset($_SESSION['masterbadpasscount']))
         $_SESSION['masterbadpasscount'] = 0;
 
@@ -62,14 +70,6 @@ else
         $_SESSION['unlockedmaster'] = null;
         $_SESSION['unlockedtime'] = null;
     }
-
-    $contextmenu = array(
-        'jelszavak' => array('gyujtooldal' => 'jelszavak', 'oldal' => 'jelszo', 'gyujtooldalnev' => 'Jelszavak', 'oldalnev' => 'Jelszó'),
-        'beallitasok' => array('gyujtooldal' => 'beallitasok', 'oldal' => 'beallitasok', 'gyujtooldalnev' => 'Beállítások', 'oldalnev' => 'Beállítások'),
-        'countd' => array('gyujtooldal' => '', 'oldal' => '', 'gyujtooldalnev' => 'Feloldás', 'oldalnev' => 'enterMasterPass()')
-    );
-
-    $contextmenujogok['jelszavak'] = $contextmenujogok['beallitasok'] = $contextmenujogok['countd'] = true;
 
     $elemid = getElem();
     $betolteni = getAloldal("jelszokezelo", "jelszavak");

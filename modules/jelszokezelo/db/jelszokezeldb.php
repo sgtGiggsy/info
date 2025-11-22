@@ -1,6 +1,6 @@
 <?php
 
-if(isset($irhat) && $irhat)
+if(isset($irhat) && $irhat && isset($_SESSION['unlockedmaster']) && $_SESSION['unlockedmaster'])
 {
     $jelkezeldb = new mySQLHandler();
 
@@ -8,8 +8,9 @@ if(isset($irhat) && $irhat)
     {
         $encoded = encPass($_POST['pass']);
 
-        // Nem hibából raktam ide. A purifyPost eltávolít bizonyos speciális karaktereket a POST tartalmakból, viszont ezek a karakterek a jelszavakban engedélyezettek,
-        // így a purifyPost lehetséges, hogy hibásan tárolná őket
+        // Nem hibából raktam ennyire hátra. A purifyPost eltávolít bizonyos speciális karaktereket a POST tartalmakból,
+        // viszont ezek a karakterek a jelszavakban engedélyezettek, így a purifyPost miatt hibásan kerülnének mentésre.
+        // Az adatbázisba úgyis a kódolt verzió megy, így prepared statement nélkül sem lehetne SQL injection-re használni.
         purifyPost();
 
         if($_GET["action"] == "addnew")
@@ -26,6 +27,8 @@ if(isset($irhat) && $irhat)
     }
     elseif($_GET["action"] == "masterpass" && $mindir)
     {
+        //TODO: Megcsinálni, hogy mesterjelszó váltásnál a rendszer felajánlja az összes meglévő jelszó újrakódolását
+        
         if(!is_null($_POST['newpass']))
         {
             $plainpassword = $_POST['newpass'];
@@ -35,4 +38,9 @@ if(isset($irhat) && $irhat)
     }
 
     $jelkezeldb->Close();
+}
+else
+{
+    $popup['type'] = "error";
+    $popup['message'] = "A jelszókezelő zárolt állapotban van! Ilyenkor nem lehet módosításokat végezni!";
 }

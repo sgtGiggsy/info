@@ -11,12 +11,12 @@ if(@$irhat)
             </div>
 
             <div>
-                <label for="nev">Jelszó:</label>
+                <label for="pass">Jelszó:</label>
                 <input type="password" name="pass" placeholder="Jelszó" id="pass"  autocomplete="one-time-code" required />
             </div>
 
             <div>
-                <label for="nev">Leírás:</label>
+                <label for="leiras">Leírás:</label>
                 <textarea name="leiras" placeholder="Leírás" id="leiras" required><?=$leiras?></textarea>
             </div>
 
