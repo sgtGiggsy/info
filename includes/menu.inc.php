@@ -99,16 +99,33 @@ function ContextMenu()
 	{
 		?><nav class="topmenuarea">
 			<ul class="topmenu"><?php
-			foreach($menuterulet as $menupont)
+			foreach($menuterulet as $key => $menupont)
 			{
-				if(@$contextmenujogok[$menupont['gyujtooldal']] || @$contextmenujogok[$menupont['oldal']])
+				$jsfunc = null;
+				if(@$contextmenujogok[$key] || @$contextmenujogok[$menupont['gyujtooldal']] || @$contextmenujogok[$menupont['oldal']])
 				{
+					if(!$menupont['gyujtooldal'] && !$menupont['oldal'] && $menupont['oldalnev'])
+					{
+						// Ha nincs link, csak oldalnév változó, akkor az oldalnév változó nem egy string,
+						// hanem egy javascript funkcióra történő hivatkozás
+						$jsfunc = $menupont['oldalnev'];
+					}
+
 					$menupont['gyujtooldal'] ? $gyujtooldal = '/' . $menupont['gyujtooldal'] : $gyujtooldal = null;
-					?><li <?=(($aloldal || $menupont['oldal'] == $pagetofind) && ($menupont['oldal'] == $aloldal || $menupont['gyujtooldal'] == $aloldal || (!$aloldal && $menupont['oldal'] == $pagetofind))) ? 'class="topmenuitem-active"' : 'class="topmenuitem"' ?>>
-						<a href="<?=$RootPath?>/<?=$pagetofind?><?=$pagename?><?=$gyujtooldal?>">
-							<?=trim($menupont['gyujtooldalnev'])?>
-						</a>
-					</li><?php
+					?><li <?=(($aloldal || $menupont['oldal'] == $pagetofind) && ($menupont['oldal'] == $aloldal || $menupont['gyujtooldal'] == $aloldal || (!$aloldal && $menupont['oldal'] == $pagetofind))) ? 'class="topmenuitem-active"' : 'class="topmenuitem"' ?>><?php
+						if($jsfunc)
+						{
+							?><span id='<?=$key?>' onclick="<?=$menupont['oldalnev']?>">
+								<?=trim($menupont['gyujtooldalnev'])?>
+							</span><?php
+						}
+						else
+						{
+							?><a id='<?=$key?>' href="<?=$RootPath?>/<?=$pagetofind?><?=$pagename?><?=$gyujtooldal?>">
+								<?=trim($menupont['gyujtooldalnev'])?>
+							</a><?php
+						}
+					?></li><?php
 				}
 			}
 			?></ul>
