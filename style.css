@@ -1852,13 +1852,17 @@ td img {
     .trlink td{
       height: 100%;
     }
-  } 
+  }
 
-.trlink td a {
+.trlink td a, .trlink td span {
     padding: 0.5em 0.3em 0.5em 0.3em;
     display: flex;
     height: 100%;
     align-items: center;
+}
+
+.trlink td span {
+    cursor: pointer;
 }
 
 .normalweightlink {
@@ -2106,11 +2110,11 @@ td img {
     margin: 0;
 }
 
-.topmenuitem, .topmenuitem-active {
+.topmenuitem, .topmenuitem-active, .topmenuitem-nohover {
     display: inline-block;
 }
 
-.topmenuitem a, .topmenuitem-active a {
+.topmenuitem a, .topmenuitem-active a, .topmenuitem span, .topmenuitem-nohover span {
     padding: 15px 10px;
 }
 
@@ -2119,9 +2123,14 @@ td img {
     background-color: var(--menuhover);
 } 
 
-.topmenuitem a:hover {
+.topmenuitem a:hover, .topmenuitem span:hover {
     color: var(--linkhover);
     background-color: var(--menuhover);
+}
+
+.topmenuitem span {
+    cursor: pointer;
+    font-weight: bold;
 }
 
 /* Fejléc lenyíló elemei */
@@ -3254,6 +3263,23 @@ div[id^=tennivalobody-].close {
 
 .csoportlink a {
     color: var(--link) !important;
+}
+
+/* --- Jelszókezelő --- */
+#masterpass-dialog {
+    position: fixed;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--toasterbg);
+    color: var(--fontlight);
+    text-align: center;
+    border-radius: 0.5em;
+    border: 1px solid var(--footerbg);
+    box-shadow: -1px -1px 3px 0px var(--shadow);
+    filter: drop-shadow(4px 8px 5px var(--shadow));
+    padding: 16px;
 }
 
 /* --- Aktív eszköz --- */
