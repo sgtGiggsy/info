@@ -1,4 +1,5 @@
 <div id="masterpass-dialog" style="display:none">
+    <span class="closeol" onclick="enterMasterPass()">&times;</span>
     <form action="<?=$RootPath?>/jelszokezelo" method="POST" autocomplete="off">
         <div>
             <label for="masterpass">Mester jelszó megadása:</label>

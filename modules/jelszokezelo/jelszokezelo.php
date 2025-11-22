@@ -1,5 +1,20 @@
 <?php
 
+###############################################################
+#
+# Leírás:               Egyszerű jelszókezelő. Egy mesterjelszóval titkosítva tárolja a jelszavakat.
+#
+# Speciális igény:      Engedélyezett sodium a php.ini-ben és az Apache bin mappájába be kell másolni a libsodium.dll-t.
+#                       A libsodium.dll NEM egyezik meg a php ext mappájában található php_sodium.dll-lel!
+#
+# Külső függőségek:     SweetAlert2
+#
+# Fejlesztés:           Mesterjelszavak és jelszó pool-ok szétválogatása.
+#                       Jelenleg csak egy mesterjelszó van, de megoldható lenne,
+#                       hogy csoportonként eltérő legyen.
+#
+###############################################################
+
 if(!@$csoportolvas)
 {
 	getPermissionError();
@@ -20,8 +35,6 @@ else
 
     if(!isset($_SESSION['masterbadpasscount']))
         $_SESSION['masterbadpasscount'] = 0;
-
-    //$_SESSION['unlockedmaster'] = null;
 
     $popup = array(
         "type" => null,

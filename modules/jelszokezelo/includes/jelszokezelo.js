@@ -5,6 +5,19 @@ const Alert = Swal.mixin({
   theme: 'material-ui-dark',
 });
 
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  theme: 'material-ui-dark',
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  }
+});
+
 pop = JSON.parse(popup);
 if(pop.type != null) {
     Alert.fire({
@@ -68,7 +81,10 @@ function showPass(passid) {
 
         if(passcell.getAttribute("data-shown")) {
             navigator.clipboard.writeText(passcell.innerText);
-            showToaster("Jelszó a vágólapra lett másolva");
+            Toast.fire({
+                icon: "success",
+                title: "Jelszó a vágólapra lett másolva"
+            });
         }
         else {
             let xhttp = new XMLHttpRequest();
@@ -115,8 +131,12 @@ function hidePasswords(passid) {
 function enterMasterPass() {
     // Ha zárolt, és nincs kizárásra utaló ötperces időzítő, csak akkor jelenítjük meg a belépési dialógust.
     // Szerver oldalon is tiltva van, tehát ha valaki vissza is hozza magának DOM-ból, belépni akkor sem tud a tiltás lejártáig.
-    if(!unlocked && ido < 0) {
-        document.getElementById("masterpass-dialog").style.display = "block";
+    let masterpassdiv = document.getElementById("masterpass-dialog");
+    if(!unlocked && ido < 0 && masterpassdiv.style.display == "none") {
+        masterpassdiv.style.display = "block";
         document.getElementById("masterpass").focus();
+    }
+    else {
+        masterpassdiv.style.display = "none";
     }
 }
