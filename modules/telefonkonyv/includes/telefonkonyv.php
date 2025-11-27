@@ -19,7 +19,7 @@ if(isset($_GET['kereses']))
     <button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv?action=exportexcel'">Telefonkönyv mentése Excel-be</button><?php
     if($globaltelefonkonyvadmin || (isset($csoportjogok) && count($csoportjogok) > 0))
     {
-        ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonszamvaltozas?action=addnew'">Új felhasználó felvétele új beosztásra</button><?php
+        ?><button type="button" onclick="location.href='<?=$RootPath?>/telefonkonyv/valtozas?action=addnew'">Új felhasználó felvétele új beosztásra</button><?php
     }
     if(!$globaltelefonkonyvadmin && (isset($csoportjogok) && count($csoportjogok) > 0))
     {
