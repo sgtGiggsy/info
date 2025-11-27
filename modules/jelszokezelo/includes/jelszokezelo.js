@@ -1,4 +1,5 @@
 var ido = 300 - unlockedtime;
+var unlockedMP = unlocked;
 const visszaszamlalas = document.getElementById('countd');
 const visszaszulo = visszaszamlalas.parentElement;
 const Alert = Swal.mixin({
@@ -51,6 +52,7 @@ function visszaSzamlalo()
     else {
         visszaszamlalas.innerText = "Feloldás";
         visszaszulo.className = "topmenuitem";
+        unlockedMP = false;
     }
 }
 
@@ -132,7 +134,8 @@ function enterMasterPass() {
     // Ha zárolt, és nincs kizárásra utaló ötperces időzítő, csak akkor jelenítjük meg a belépési dialógust.
     // Szerver oldalon is tiltva van, tehát ha valaki vissza is hozza magának DOM-ból, belépni akkor sem tud a tiltás lejártáig.
     let masterpassdiv = document.getElementById("masterpass-dialog");
-    if(!unlocked && ido < 0 && masterpassdiv.style.display == "none") {
+
+    if(!unlockedMP && ido < 1 && masterpassdiv.style.display == "none") {
         masterpassdiv.style.display = "block";
         document.getElementById("masterpass").focus();
     }
