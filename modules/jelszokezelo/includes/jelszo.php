@@ -11,7 +11,7 @@ else
         $irhat = true;
         include("./modules/jelszokezelo/db/jelszokezeldb.php");
 
-        if($jelkezeldb->siker)
+        if(isset($jelkezeldb) && $jelkezeldb->siker)
             redirectToGyujto("jelszavak");
     }
 

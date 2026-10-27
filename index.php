@@ -86,7 +86,7 @@ if(!isset($_SESSION['elozmenyek']))
 }
 else
 {
-    if(!@$_SERVER['HTTP_REFERER'] && $_SERVER['REDIRECT_URL'])
+    if(!@$_SERVER['HTTP_REFERER'] && @$_SERVER['REDIRECT_URL'])
     {
         $backtosender = $_SERVER['REDIRECT_URL'];
         array_push($_SESSION['elozmenyek'], $backtosender);
@@ -161,7 +161,7 @@ if((!isset($_SESSION['id']) || !$_SESSION['id']) && isset($_POST['felhasznalonev
     {
         if(isset($ldapbind) && $ldapbind) // Az LDAP bejelentkezést elvégző modul.
         {
-            if(isset($jelszo)) // Ha létezett már a felhasználó a MySQL adatbázisban, frissítjük az adatait a DC-től kapottakkal
+            if(isset($userid)) // Ha létezett már a felhasználó a MySQL adatbázisban, frissítjük az adatait a DC-től kapottakkal
             {
                 $update = new MySQLHandler('UPDATE felhasznalok SET jelszo=?, nev=?, email=?, osztaly=?, szervezet=?, telefon=?, beosztas=?, profilkep=? WHERE felhasznalonev=?',
                     $hashedpassword, $nev, $email, $osztaly, $szervezet, $telefon, $beosztas, $thumb, $samaccountname);
