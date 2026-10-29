@@ -1,18 +1,13 @@
 /*
 *       Online állapot ellenőrző
-*       Node.js script a meglévő net-ping csomag felhasználásával az aktív eszközök online állapotának ellenőrzésére
+*       Node.js script a meglévő ping csomag felhasználásával az aktív eszközök online állapotának ellenőrzésére
 *
 #       
 #
 */
 
 
-var ping = require ("net-ping");
-var options = {
-	retries: 4,
-	timeout: 3000
-};
-var session = ping.createSession(options);
+var ping = require ("ping");
 var settings = require('./onlinestate_check.json');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0; // Erre azért van szükség, mert máskülönben csak érvényes CERT-eket fogad el HTTPS-es API-knál
 var timestamp = createTimestamp();
@@ -29,28 +24,45 @@ var postheader = {
     "Authorization": settings.postapi.key
 }
 
-async function pingHost(dev)
-{
-    return new Promise((resolve, reject) => {    
-        session.pingHost (dev.ipcim, function (error, target) {
-            let messageitem = {
-                deviceip:   dev.ipcim,
-                eszkid:     dev.id,
-                online:     dev.online,
-                cim:        null,
-                szoveg:     null
-            }
-            if((error && (dev.online == 1) || dev.online === null) || (!error && dev.online == 0)) // Ha az eszköz offline, és eddig online volt, vagy offline, és eddig online volt, értesítés
-            {
-                messageitem.online = error ? 0 : 1;
-                messageitem.cim = "A(z) " + dev.nev + (error ? " elérhetetlen" : " elérhető");
-                messageitem.szoveg = "A(z) " + dev.nev + " (" + dev.ipcim + ") eszköz " + (error ? "elérhetetlenné" : "elérhetővé") + " vált " + timestamp + "-kor.";
-                messageitem.mailbody = "A(z) " + dev.nev + " (" + dev.ipcim + ") eszköz " + (error ? "elérhetetlenné" : "elérhetővé") + " vált " + timestamp + "-kor.";
-            }
-            console.log("A(z) " + dev.nev + (error ? " elérhetetlen" : " elérhető"));
-            resolve(messageitem);
+async function pingHost(dev) {
+    let error = null;
+
+    try {
+        const result = await ping.promise.probe(dev.ipcim, {
+            timeout: 3,
+            min_reply: 1
         });
-    });
+
+        if (!result.alive) {
+            error = new Error("A ping nem kapott választ");
+        }
+    } catch (err) {
+        error = err;
+    }
+
+    const messageitem = {
+        deviceip: dev.ipcim,
+        eszkid: dev.id,
+        online: dev.online,
+        cim: null,
+        szoveg: null
+    };
+
+    if ((error && (dev.online == 1 || dev.online === null)) ||
+        (!error && dev.online == 0)) {
+        messageitem.online = error ? 0 : 1;
+        messageitem.cim = "A(z) " + dev.nev +
+            (error ? " elérhetetlen" : " elérhető");
+        messageitem.szoveg = "A(z) " + dev.nev + " (" + dev.ipcim +
+            ") eszköz " + (error ? "elérhetetlenné" : "elérhetővé") +
+            " vált " + timestamp + "-kor.";
+        messageitem.mailbody = messageitem.szoveg;
+    }
+
+    console.log("A(z) " + dev.nev +
+        (error ? " elérhetetlen" : " elérhető"));
+
+    return messageitem;
 }
 
 async function processItems(devarray)
