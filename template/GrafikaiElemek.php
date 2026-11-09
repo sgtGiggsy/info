@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaloriafalo\template;
+namespace Infoinventory\template;
 
 class GrafikaiElemek
 {

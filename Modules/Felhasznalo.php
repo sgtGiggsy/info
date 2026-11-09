@@ -1,10 +1,10 @@
 <?php
 
-namespace Kaloriafalo\Pages;
+namespace Infoinventory\Modules;
 
-use Kaloriafalo\Classes\FeltoltesHandler;
-use Kaloriafalo\Classes\FormBuilder;
-use Kaloriafalo\Classes\Settings;
+use Infoinventory\Classes\FeltoltesHandler;
+use Infoinventory\Classes\FormBuilder;
+use Infoinventory\Classes\Settings;
 
 class Felhasznalo extends Page
 {
@@ -29,11 +29,11 @@ class Felhasznalo extends Page
         $selecteduser = null;
         $params = $this->ParseGet($params);
         if($this->selectedpage == 'felhasznalo' || $this->selectedpage == 'profil') {
-            if(!Settings::$uid)
+            if(!FELHASZNALO->uid)
                 return new SinglePage(403);
 
             if(!Settings::$admin || (Settings::$admin && !$params['elemid']))
-                $selecteduser = Settings::$uid;
+                $selecteduser = FELHASZNALO->uid;
             else
                 $selecteduser = $params['elemid'];
 
@@ -122,7 +122,7 @@ class Felhasznalo extends Page
             return false;
         }
 
-        if(!Settings::$admin && $_POST['felhasznalo_id'] != Settings::$uid) {
+        if(!Settings::$admin && $_POST['felhasznalo_id'] != FELHASZNALO->uid) {
             $this->mixintext = "Felhasználók csak a saját fiókjukat szerkeszthetik!";
             return false;
         }
@@ -133,7 +133,7 @@ class Felhasznalo extends Page
         }
 
         if(isset($_FILES['profilkep'])) {
-            $profilkep = new FeltoltesHandler($this->mediatypes, 'profilkepek', date('Y'), 'profilkep', Settings::$uid);
+            $profilkep = new FeltoltesHandler($this->mediatypes, 'profilkepek', date('Y'), 'profilkep', FELHASZNALO->uid);
             $profilkep = $profilkep->Feltoltes($_FILES['profilkep']);
             print_r($profilkep);
             if($profilkep['eredmeny']) {

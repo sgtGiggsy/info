@@ -1,11 +1,11 @@
 <?php
 
-namespace Kaloriafalo\template;
+namespace Infoinventory\template;
 
-use Kaloriafalo\Classes\Helpers;
-use Kaloriafalo\Classes\Oldalgyujto;
-use Kaloriafalo\Classes\Settings;
-use Kaloriafalo\includes\Jogszint;
+use Infoinventory\Classes\Helpers;
+use Infoinventory\Classes\Oldalgyujto;
+use Infoinventory\Classes\Settings;
+use Infoinventory\includes\Jogszint;
 
 $navopen = false;
 $parent = null;
@@ -50,7 +50,7 @@ $userszint = Helpers::UserSzint();
                 $url = $RootPath . "/" . $kulcs;
 
             if($kulcs == 'felhasznalo')
-                $menuelem['menupont'] = Settings::$usernev;
+                $menuelem['menupont'] = FELHASZNALO->usernev;
 
             if($gyokerelem && $navopen) {
                 ?></nav></li><?php

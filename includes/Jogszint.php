@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaloriafalo\includes;
+namespace Infoinventory\includes;
 
 enum Jogszint : int {
     case mindenki = 0;

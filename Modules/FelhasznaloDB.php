@@ -1,8 +1,8 @@
 <?php
 
-namespace Kaloriafalo\Pages;
+namespace Infoinventory\Modules;
 
-use Kaloriafalo\Classes\MySQLHandler;
+use Infoinventory\Classes\MySQLHandler;
 
 class FelhasznaloDB
 {

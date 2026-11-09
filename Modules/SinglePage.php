@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaloriafalo\Pages;
+namespace Infoinventory\Modules;
 
 class SinglePage extends Page
 {

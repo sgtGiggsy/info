@@ -1,13 +1,13 @@
 <?php
 
-namespace Kaloriafalo\Pages;
+namespace Infoinventory\Modules;
 
 use HTMLPurifier;
 use HTMLPurifier_Config;
-use Kaloriafalo\Classes\FeltoltesHandler;
-use Kaloriafalo\Classes\FormBuilder;
-use Kaloriafalo\Classes\Helpers;
-use Kaloriafalo\Classes\Settings;
+use Infoinventory\Classes\FeltoltesHandler;
+use Infoinventory\Classes\FormBuilder;
+use Infoinventory\Classes\Helpers;
+use Infoinventory\Classes\Settings;
 
 class Recept extends Page
 {
@@ -227,7 +227,7 @@ class Recept extends Page
             }
         }
         $this->ablakcim = $this->title;
-        include(__DIR__ . "/views/_assets/htmlheader.php");
+        $this->HtmlHeadRender();
     }
 
     public function LdJSON() : void {

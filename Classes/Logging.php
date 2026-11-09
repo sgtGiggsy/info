@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaloriafalo\Classes;
+namespace Infoinventory\Classes;
 
 class Logging
 {
@@ -25,7 +25,7 @@ class Logging
 
         $api = new MySQLHandler("INSERT INTO api_hivasok (request_method, request_uri, sessid, status_code, post_content)
             VALUES (?, ?, ?, ?, ?);",
-            $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], Settings::$session_id, http_response_code(), $postc);
+            $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], Personalvars::$session_id, http_response_code(), $postc);
         return $api->siker;
     }
 
@@ -58,7 +58,7 @@ class Logging
         new MySQLHandler("INSERT INTO oldal_megtekintesek
                     (uri, felhasznalo_id, oldalgeneralas_ideje, session_id, ip_cim, hivatkozas, slug, db_call)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                $_SERVER['REQUEST_URI'], Settings::$uid, $responseTime, $session_id, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? null, Settings::$slug, $dbcallcount
+                $_SERVER['REQUEST_URI'], Personalvars::$uid, $responseTime, $session_id, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? null, Settings::$slug, $dbcallcount
             );
         
         new MySQLHandler("UPDATE sessionok SET bot = ?, bot_pontszam = ?, bot_ok = ? WHERE session_id =?;",
@@ -75,7 +75,7 @@ class Logging
         $hiba = new MySQLHandler("INSERT INTO oldal_hibak
                 (felhasznalo_id, uri, post_content, get_content, session_id, betoltes_ideje, response_code, ip_cim, referrer)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            Settings::$uid, $_SERVER['REQUEST_URI'], $postc, $getc, $session_id, $loadtime, $respnse_code, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? null);
+            Personalvars::$uid, $_SERVER['REQUEST_URI'], $postc, $getc, $session_id, $loadtime, $respnse_code, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? null);
     }
 
     public static function BotDetection(?int &$botscore, ?array &$bot_ok) : void {

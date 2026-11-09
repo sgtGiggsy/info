@@ -1,13 +1,13 @@
 <?php
 
-namespace Kaloriafalo\Classes;
+namespace Infoinventory\Classes;
 use JetBrains\PhpStorm\NoReturn;
-use Kaloriafalo\Classes\APIResult;
-use Kaloriafalo\Pages\Page;
-use Kaloriafalo\Pages\SinglePage;
-use Kaloriafalo\Pages\Autentikacio;
-use Kaloriafalo\Pages\Recept;
-use Kaloriafalo\Pages\Beallitasok;
+use Infoinventory\Classes\APIResult;
+use Infoinventory\Modules\Page;
+use Infoinventory\Modules\SinglePage;
+use Infoinventory\Modules\Autentikacio;
+use Infoinventory\Modules\Recept;
+use Infoinventory\Modules\Beallitasok;
 
 class Controller
 {
@@ -38,7 +38,7 @@ class Controller
         $this->api = $this->kertoldal == 'api';
     }
 
-    public function Run() : void {
+    public function Execute() : void {
         if($this->api) {
             $this->api_result = $this->RunAPI();
         }
@@ -46,6 +46,7 @@ class Controller
             $postresult = null;
             $this->page = self::PageSelect($this->kertoldal);
             $this->page = $this->Router($this->page);
+            //var_dump($_SESSION);
             if($_SERVER['REQUEST_METHOD'] === 'POST' && $this->postenged)
                 $postresult = $this->PostController();
             if($postresult !== null)
@@ -116,6 +117,7 @@ class Controller
     }
     
     private function PostMessage() : void {
+        //var_dump(Helpers::ArrayKeyLetezik($_SESSION, 'eredmeny', 'mixintext', 'muvelet'));
         if(!$_SESSION['mixintext']) {
             $eredmeny = 'sikeres';
             $elemnev = $this->page->cimke;

@@ -1,5 +1,5 @@
 <?php
-use Kaloriafalo\Classes\Settings;
+use Infoinventory\Classes\Settings;
 
 echo "\n";
 ?><script type="text/javascript" nonce="<?=Settings::$nonce?>">

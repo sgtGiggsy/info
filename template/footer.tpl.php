@@ -1,5 +1,5 @@
 <?php
-namespace Kaloriafalo\template;
+namespace Infoinventory\template;
 
 ?><div class="footertop">
     <nav class="usermenu">

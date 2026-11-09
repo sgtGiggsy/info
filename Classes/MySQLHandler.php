@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaloriafalo\Classes;
+namespace Infoinventory\Classes;
 use Exception;
 use mysqli;
 use mysqli_result;
@@ -407,6 +407,10 @@ class MySQLHandler
             $returnarr = mysqli_fetch_all($this->result, MYSQLI_ASSOC);
         }
         return $returnarr;
+    }
+
+    public function RecordAsArray() : array {
+        return mysqli_fetch_all($this->result, MYSQLI_ASSOC)[0];
     }
 
     /**

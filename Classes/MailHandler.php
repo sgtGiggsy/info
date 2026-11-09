@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaloriafalo\Classes;
+namespace Infoinventory\Classes;
 
 require(ROOT_DIR . '/includes/external/PHPMailer/Exception.php');
 require(ROOT_DIR . '/includes/external/PHPMailer/PHPMailer.php');

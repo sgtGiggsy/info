@@ -1,8 +1,8 @@
 <?php
 
-namespace Kaloriafalo\Pages;
+namespace Infoinventory\Modules;
 use Exception;
-use Kaloriafalo\Classes\Settings;
+use Infoinventory\Classes\Settings;
 
 Class Page
 {
@@ -19,28 +19,83 @@ Class Page
     protected ?string $sitedesc = null;
 
     // <--- Funkcionális feladatokat ellátó osztály változók ---> //
-    public ?string $redirtarget = null; // Ha meg van adva, POST után erre a címre irányít a Controller.
-    public string $selectedpage; // Ez választja ki a betöltendő view-t. A $_GET['page'] értéke kerül bele
-    public ?string $muvelet = null; // Ez választja ki a POST folyamatot lebonyolító metódust
-    public ?string $mixintext = null; // POST utáni üzeneteket tartalmazó változó
-    public array $apimethods = []; // Az osztály elérhető API metódusai. Ami ebben nem szerepel, az nem hívható meg API-ként. A GET-re és a POST-ra is külön tömb-öt kell megadni!
-    protected array $lapozas = ['elozo' => null, 'kovetkezo' => null]; // A lapozáshoz (ahol elérhető) használt lapszámok indexei.
-    protected array $params = []; // A GET-ből érkező paraméterek. Csak akkor van használatban, ha a View-nak tudnia kell róla. A Routerben kap értéket
-    protected array $PHPvarsToJS = []; // Változók, amiket a PHP-ból generálunk, de a JS felületen akarunk használni. Közvetlenül a jsfiles tömb előtt kerül renderelésre.
-    protected array $jsfiles = []; // Az osztály által használt JS fájlok elérési útjai. A tömbbe megadott fájlokat a rendszer az oldal legalján tölti be.
-    protected ?string $localCSS = null; // Egyedi CSS fájl, amennyiben egy oldalhoz szükség lenne rá.
-    protected ?string $feltoltesgyoker; // Az oldalhoz tartozó feltöltések uploads mappán belüli mappája. KIZÁRÓLAG A NÉV! Az 'uploads' hardcode-olva van a feltöltésekhez, abból egyik oldal sem tud kitörni.
-    protected ?string $egyedimappa; // Az oldal feltöltésgyökerén belüli egyedi mappa. Pl, ha a feltöltésgyökér a "receptek", akkor az egyedi mappa a '2026'. Tartalmazhat slash-t (mondjuk 2026/04), de path traversal ellen akkor is védett.
-    protected array $validpagemethods = []; // Egy oldal használható metódusai. Ebből tudja a rendszer, hogy egy $_GET-ből érkező tömbelem az ID, vagy valami metódus
-    protected string $viewsgyoker = ROOT_DIR; // Az oldal view fájljainak gyökere
-    protected ?string $view = null; // A jelenleg kiválasztott view fájl
-    protected ?string $headerview = null; // A jelenleg kiválasztott header fájl
-    protected bool $irasjog = false; // Ez a változó tárolja el, hogy az oldalon egy adott felhasználó írhat-e.
-    protected ?string $aloldal = null; // Az aloldal egy view fájl, amit a fő view fájl elé renderel az oldal. Üzenetek átadására szolgál.
-    protected array $views = []; // Az elérhető view fájlok listája, ahol a kulcs a $_GET['page']-ből várt érték, az érték pedig a tényleges PHP fájl neve
-    protected array $headerviews = []; // Az oldal fejlécéhez elérhető view fájlok listája
-    protected array $mediatypes = ['image/jpeg', 'image/png', 'image/bmp', 'image/webp']; // Fájlokat tartalmazó POST esetén ezeket a fájlokat fogadja el a rendszer valid bevitelként. MIME check is történik!
-    public string $form_mediatypes = "'image/jpeg', 'image/png', 'image/bmp', 'image/webp'"; // Itt kell meghatározni, hogy milyen fájlformátumokat fogad a fájlfeltöltő menü a felhasználói UI-n. Csak kozmeztika, és kézzel kell megadni!
+
+    // A POST művelet eredményére adott szöveges üzenet. Hiba/siker/figyelmeztetes/letiltva
+    public ?string $eredmeny = null;
+
+    // Ha meg van adva, POST után erre a címre irányít a Controller.
+    public ?string $redirtarget = null;
+
+    // Ez választja ki a betöltendő view-t. A $_GET['page'] értéke kerül bele
+    public string $selectedpage;
+
+    // Ez választja ki a POST folyamatot lebonyolító metódust
+    public ?string $muvelet = null;
+
+    // POST utáni üzeneteket tartalmazó változó
+    public ?string $mixintext = null;
+
+    // Az osztály elérhető API metódusai. Ami ebben nem szerepel, az nem hívható meg API-ként. A GET-re és a POST-ra is külön tömb-öt kell megadni!
+    public array $apimethods = [];
+
+    // A lapozáshoz (ahol elérhető) használt lapszámok indexei.
+    protected array $lapozas = [
+        'elozo' => null,
+        'kovetkezo' => null
+    ];
+
+    // A GET-ből érkező paraméterek. Csak akkor van használatban, ha a View-nak tudnia kell róla. A Routerben kap értéket
+    protected array $params = [];
+
+    // Változók, amiket a PHP-ból generálunk, de a JS felületen akarunk használni. Közvetlenül a jsfiles tömb előtt kerül renderelésre.
+    protected array $PHPvarsToJS = [];
+
+    // Az osztály által használt JS fájlok elérési útjai. A tömbbe megadott fájlokat a rendszer az oldal legalján tölti be.
+    protected array $jsfiles = [];
+
+    // Egyedi CSS fájl, amennyiben egy oldalhoz szükség lenne rá.
+    protected ?string $localCSS = null;
+
+    // Az oldalhoz tartozó feltöltések uploads mappán belüli mappája. KIZÁRÓLAG A NÉV! Az 'uploads' hardcode-olva van a feltöltésekhez, abból egyik oldal sem tud kitörni.
+    protected ?string $feltoltesgyoker;
+
+    // Az oldal feltöltésgyökerén belüli egyedi mappa. Pl, ha a feltöltésgyökér a "receptek", akkor az egyedi mappa a '2026'. Tartalmazhat slash-t (mondjuk 2026/04), de path traversal ellen akkor is védett.
+    protected ?string $egyedimappa;
+
+    // Egy oldal használható metódusai. Ebből tudja a rendszer, hogy egy $_GET-ből érkező tömbelem az ID, vagy valami metódus
+    protected array $validpagemethods = [];
+
+    // Az oldal view fájljainak gyökere
+    protected string $viewsgyoker = ROOT_DIR . "/views/";
+
+    // A jelenleg kiválasztott view fájl
+    protected ?string $view = null;
+
+    // A jelenleg kiválasztott header fájl
+    protected ?string $headerview = null;
+
+    // Ez a változó tárolja el, hogy az oldalon egy adott felhasználó írhat-e.
+    protected bool $irasjog = false;
+
+    // Az aloldal egy view fájl, amit a fő view fájl elé renderel az oldal. Üzenetek átadására szolgál.
+    protected ?string $aloldal = null;
+
+    // Az elérhető view fájlok listája, ahol a kulcs a $_GET['page']-ből várt érték, az érték pedig a tényleges PHP fájl neve
+    protected array $views = [];
+
+    // Az oldal fejlécéhez elérhető view fájlok listája
+    protected array $headerviews = [];
+
+    // Fájlokat tartalmazó POST esetén ezeket a fájlokat fogadja el a rendszer valid bevitelként. MIME check is történik!
+    protected array $mediatypes = [
+        'image/jpeg',
+        'image/png',
+        'image/bmp',
+        'image/webp'
+    ];
+
+    // Itt kell meghatározni, hogy milyen fájlformátumokat fogad a fájlfeltöltő menü a felhasználói UI-n. Csak kozmeztika, és kézzel kell megadni!
+    public string $form_mediatypes = "'image/jpeg', 'image/png', 'image/bmp', 'image/webp'";
 
     public function __construct(string $type) {
         $this->title = $GLOBALS['ablakcim'];
@@ -54,9 +109,13 @@ Class Page
 
     public function HtmlHead() : void {
         if (function_exists('HtmlHead')) {
-            HtmlHead($this->keywords, $this->canonical, $this->title, $this->ogtype, $this->publishtime, $this->shareimage, $this->robots, $this->ablakcim, $this->sitedesc, $this->cimke);;
-            include(__DIR__ . "/views/_assets/htmlheader.php");
+            HtmlHead($this->keywords, $this->canonical, $this->title, $this->ogtype, $this->publishtime, $this->shareimage, $this->robots, $this->ablakcim, $this->sitedesc, $this->cimke);
+            $this->HtmlHeadRender();
         }
+    }
+
+    protected function HtmlHeadRender() : void {
+        include(ROOT_DIR . "/template/assets/htmlheader.php");
     }
 
     public function LdJSON() : void {
@@ -69,6 +128,7 @@ Class Page
     }
 
     public function Render() : void {
+        //echo $this->viewsgyoker . $this->view;
         if(!file_exists($this->viewsgyoker . $this->view))
             return;
 
@@ -116,7 +176,7 @@ Class Page
     }
 
     protected function Lapozo() : void {
-        include(__DIR__ . "/views/_assets/lapozo.php");
+        include(ROOT_DIR. "/template/assets/lapozo.php");
     }
 
     protected function LapozasPrepare(int &$startindex, int &$elemperoldal, array $params) {

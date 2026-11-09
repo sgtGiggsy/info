@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaloriafalo\Classes;
+namespace Infoinventory\Classes;
 
 class Helpers
 {
@@ -88,7 +88,7 @@ class Helpers
             return 4;
         if(Settings::$admin)
             return 3;
-        if(Settings::$uid)
+        if(Personalvars::$uid)
             return 2;
         else
             return 0;

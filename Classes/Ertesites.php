@@ -1,6 +1,6 @@
 <?php
 
-namespace Kaloriafalo\Classes;
+namespace Infoinventory\Classes;
 
 class Ertesites
 {

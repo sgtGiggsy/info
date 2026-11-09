@@ -1,7 +1,7 @@
 <?php
 
-namespace Kaloriafalo\Pages;
-use Kaloriafalo\Classes\MySQLHandler;
+namespace Infoinventory\Modules;
+use Infoinventory\Classes\MySQLHandler;
 
 class Beallitasok extends Page
 {

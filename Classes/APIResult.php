@@ -1,8 +1,8 @@
 <?php
 
-namespace Kaloriafalo\Classes;
+namespace Infoinventory\Classes;
 
-use Kaloriafalo\Pages\Page;
+use Infoinventory\Modules\Page;
 
 /**
  * API az oldalon belüli AJAX kérések lebonyolítására.
