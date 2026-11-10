@@ -6,8 +6,6 @@ use Infoinventory\Classes\APIResult;
 use Infoinventory\Modules\Page;
 use Infoinventory\Modules\SinglePage;
 use Infoinventory\Modules\Autentikacio;
-use Infoinventory\Modules\Recept;
-use Infoinventory\Modules\Beallitasok;
 
 class Controller
 {
@@ -40,13 +38,12 @@ class Controller
 
     public function Execute() : void {
         if($this->api) {
-            $this->api_result = $this->RunAPI();
+            $this->RunAPI();
         }
         else {
             $postresult = null;
             $this->page = self::PageSelect($this->kertoldal);
             $this->page = $this->Router($this->page);
-            //var_dump($_SESSION);
             if($_SERVER['REQUEST_METHOD'] === 'POST' && $this->postenged)
                 $postresult = $this->PostController();
             if($postresult !== null)
@@ -56,7 +53,7 @@ class Controller
         }
     }
 
-    private function Router($page) : Page {
+    private function Router(Page $page) : Page {
         $getparams = $_GET['params'] ?? '';
         $params = $getparams ? explode('/', $getparams) : [];
         $verifypage = $page->Router($params);
@@ -117,7 +114,6 @@ class Controller
     }
     
     private function PostMessage() : void {
-        //var_dump(Helpers::ArrayKeyLetezik($_SESSION, 'eredmeny', 'mixintext', 'muvelet'));
         if(!$_SESSION['mixintext']) {
             $eredmeny = 'sikeres';
             $elemnev = $this->page->cimke;
@@ -151,8 +147,9 @@ class Controller
     }
 
     public static function PageSelect(?string $type): Page {
+        Oldalgyujto::Inicializal();
         if(!$type) {
-            $class = Recept::class;
+            $class = Oldalgyujto::$oldalak['recept']['handler'] ?? SinglePage::class;
             $type = 'recept';
         }
         elseif (!isset(Oldalgyujto::$oldalak[$type])
