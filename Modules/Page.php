@@ -65,8 +65,11 @@ Class Page
     // Egy oldal használható metódusai. Ebből tudja a rendszer, hogy egy $_GET-ből érkező tömbelem az ID, vagy valami metódus
     protected array $validpagemethods = [];
 
+    // Egy oldal context menüjének menüpontjai. Pl szerkesztés, törlés, új elem gombok. A formátuma: [szoveg => "Gomb felirata", link => "oldal.nev/menupont"]. Nem a deklaráció során kell megadni, hanem a Router()-ben, elemenként hozzáadni az elérhető gombokat
+    public array $contextmenu = [];
+
     // Az oldal view fájljainak gyökere
-    protected string $viewsgyoker = ROOT_DIR . "/views/";
+    protected string $viewsgyoker = __DIR__ . "/views/";
 
     // A jelenleg kiválasztott view fájl
     protected ?string $view = null;
@@ -128,9 +131,11 @@ Class Page
     }
 
     public function Render() : void {
-        //echo $this->viewsgyoker . $this->view;
-        if(!file_exists($this->viewsgyoker . $this->view))
+        if(!file_exists($this->viewsgyoker . $this->view)) {
+            echo "<h2>Nézet fájl nem található!</h2>";
+            //echo "Elérési út: " . $this->viewsgyoker . $this->view;
             return;
+        }
 
         foreach ($this->PHPvarsToJS as $key => $value) {
             Settings::$PHPvarsToJS[$key] = $value;

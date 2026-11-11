@@ -1,6 +1,8 @@
 <?php
 return [
-    'handler' => \Infoinventory\Modules\Autentikacio::class,
+    'nev' => "Autentikáció",
+    'slug' => 'autentikacio',
+    'handler' => \Infoinventory\Modules\Autentikacio\Autentikacio::class,
     'pages' => [
         'belepes' => ['menupont' => 'Belépés', 'lathatosag' => 'vendeg', 'menuben' => true, 'sorrend' => 80],
         'regisztracio' => ['menupont' => 'Regisztráció', 'lathatosag' => 'vendeg', 'menuben' => true, 'sorrend' => 81],

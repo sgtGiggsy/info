@@ -25,5 +25,5 @@ namespace Infoinventory\template;
     </div>
 </div>
 <div class="footerbottom">
-    <small>&copy; <?= date('Y') ?> KalóriaFaló - Minden jog fenntartva!</small>
+    <small>&copy; <?= date('Y') ?> Király Béla - Minden jog fenntartva!</small>
 </div>

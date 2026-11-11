@@ -2,7 +2,7 @@
 
 namespace Infoinventory\Classes;
 
-class Oldalgyujto
+class Oldalkezelo
 {
     public static array $oldalak = [];
     private static bool $inicializalva = false;

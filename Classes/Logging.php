@@ -5,13 +5,13 @@ namespace Infoinventory\Classes;
 class Logging
 {
     public static function LogLogin(int $uid, int $session_id) : bool {
-        $login = new MySQLHandler("INSERT INTO bejelentkezesek (felhasznalo_id, ip_cim, session_id) VALUES (?, ?, ?);", $uid, $_SERVER['REMOTE_ADDR'], $session_id);
+        $login = new MySQLHandler("INSERT INTO core_bejelentkezesek (felhasznalo_id, ip_cim, session_id) VALUES (?, ?, ?);", $uid, $_SERVER['REMOTE_ADDR'], $session_id);
         return $login->siker;
     }
 
     public static function LogFailedLogin(int $session_id) : bool {
         $failed = new MySQLHandler();
-        $failed->Prepare('INSERT INTO bejelentkezesi_hibak (felhasznalo_nev, ip_cim, session_id) VALUES (?, ?, ?)');
+        $failed->Prepare('INSERT INTO core_bejelentkezesi_hibak (felhasznalo_nev, ip_cim, session_id) VALUES (?, ?, ?)');
         $failed->Run($_POST['usernev'], $_SERVER['REMOTE_ADDR'], $session_id);
 
         return $failed->siker;
@@ -23,7 +23,7 @@ class Logging
             $postc = $_POST;
         $postc = json_encode($postc, JSON_UNESCAPED_UNICODE);
 
-        $api = new MySQLHandler("INSERT INTO api_hivasok (request_method, request_uri, sessid, status_code, post_content)
+        $api = new MySQLHandler("INSERT INTO core_api_hivasok (request_method, request_uri, sessid, status_code, post_content)
             VALUES (?, ?, ?, ?, ?);",
             $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], Personalvars::$session_id, http_response_code(), $postc);
         return $api->siker;
@@ -31,11 +31,11 @@ class Logging
 
     public static function SessionDB(?int $uid = null) : ?int {
         $sessidstr = session_id();
-        $letezik = new MySQLHandler("SELECT session_id FROM sessionok WHERE sessidstr = ?;", $sessidstr);
+        $letezik = new MySQLHandler("SELECT session_id FROM core_sessionok WHERE sessidstr = ?;", $sessidstr);
         if($letezik->sorokszama != 0)
             $session_id = $letezik->Fetch()['session_id'];
         else {
-            $sess = new MySQLHandler("INSERT INTO sessionok (sessidstr, felhasznalo_id, user_agent) VALUES (?, ?, ?)", $sessidstr, $uid, $_SERVER['HTTP_USER_AGENT']);
+            $sess = new MySQLHandler("INSERT INTO core_sessionok (sessidstr, felhasznalo_id, user_agent) VALUES (?, ?, ?)", $sessidstr, $uid, $_SERVER['HTTP_USER_AGENT']);
             $session_id = $sess->last_insert_id;
         }
 
@@ -44,7 +44,7 @@ class Logging
 
     public static function SessionSeen(int $session_id) : void {
         $ts = Helpers::TimeStampForSQL();
-	    new MySQLHandler("UPDATE sessionok SET last_seen = ? WHERE session_id = ?", $ts, $session_id);
+	    new MySQLHandler("UPDATE core_sessionok SET last_seen = ? WHERE session_id = ?", $ts, $session_id);
     }
 
     public static function Latogatas(float $responseTime, ?int $botscore, ?array $bot_ok, int $session_id, int $dbcallcount) : void {
@@ -55,13 +55,13 @@ class Logging
         if($botscore > 5)
             $bot = 1;
 
-        new MySQLHandler("INSERT INTO oldal_megtekintesek
+        new MySQLHandler("INSERT INTO core_oldal_megtekintesek
                     (uri, felhasznalo_id, oldalgeneralas_ideje, session_id, ip_cim, hivatkozas, slug, db_call)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                $_SERVER['REQUEST_URI'], Personalvars::$uid, $responseTime, $session_id, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? null, Settings::$slug, $dbcallcount
+                $_SERVER['REQUEST_URI'], FELHASZNALO->uid, $responseTime, $session_id, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? null, Settings::$slug, $dbcallcount
             );
         
-        new MySQLHandler("UPDATE sessionok SET bot = ?, bot_pontszam = ?, bot_ok = ? WHERE session_id =?;",
+        new MySQLHandler("UPDATE core_sessionok SET bot = ?, bot_pontszam = ?, bot_ok = ? WHERE session_id =?;",
             $bot, $botscore, $bot_ok, $session_id);
     }
 
@@ -72,7 +72,7 @@ class Logging
         $getc = json_encode($_GET, JSON_UNESCAPED_UNICODE);
         $respnse_code = http_response_code();
 
-        $hiba = new MySQLHandler("INSERT INTO oldal_hibak
+        $hiba = new MySQLHandler("INSERT INTO core_oldal_hibak
                 (felhasznalo_id, uri, post_content, get_content, session_id, betoltes_ideje, response_code, ip_cim, referrer)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
             Personalvars::$uid, $_SERVER['REQUEST_URI'], $postc, $getc, $session_id, $loadtime, $respnse_code, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? null);

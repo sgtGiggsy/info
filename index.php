@@ -8,15 +8,16 @@ use Infoinventory\Classes\MySQLHandler;
 use Infoinventory\Classes\Controller;
 use Infoinventory\Classes\Helpers;
 use Infoinventory\Classes\Logging;
-use Infoinventory\Classes\Oldalgyujto;
+use Infoinventory\Classes\Oldalkezelo;
 use Infoinventory\Classes\Settings;
 use Infoinventory\Classes\Personalvars;
-use Infoinventory\Modules\Autentikacio;
+use Infoinventory\Modules\Autentikacio\Autentikacio;
 use Infoinventory\Classes\Felhasznalo;
 
 define("ROOT_DIR", __DIR__);
 define("DEBUG_MODE", true);
 define("ROOT_PATH", $GLOBALS['RootPath']);
+define("ABLAK_CIM", $ablakcim);
 $uid = null;
 $dbcallcount = 0;
 

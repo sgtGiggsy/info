@@ -1,14 +1,13 @@
 <?php
 
-namespace Infoinventory\Modules;
+namespace Infoinventory\Modules\Autentikacio;
 
+use Infoinventory\Modules\Page;
 use Infoinventory\Classes\Controller;
 use Infoinventory\Classes\Logging;
 use Infoinventory\Classes\MailHandler;
 use Infoinventory\Classes\Personalvars;
-use Infoinventory\Classes\Settings;
 use Infoinventory\Classes\Felhasznalo;
-use Infoinventory\Modules\Autentikacio\AutentikacioDB;
 
 class Autentikacio extends Page
 {
@@ -102,20 +101,12 @@ class Autentikacio extends Page
                 ldap_set_option(null, LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_DEMAND);
                 $ldapuri = "ldaps://" . $server . "." . $GLOBALS['LDAP_DOMAIN'] . ":" . $GLOBALS['LDAP_PORT'];
                 $ldapconnection = ldap_connect($ldapuri); // LDAP kapcsolat inicializálása
-                //$ldapconnection = ldap_connect("ldaps://{$server}:636");
-                //echo $ldapuri . "<br>";
-                //print_r($GLOBALS);
 
                 ldap_set_option($ldapconnection, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ldapconnection, LDAP_OPT_REFERRALS, 0);
 
-                //var_dump($ldapconnection);
-
                 // LDAP bejelentkezés, mivel nem errort, csak warningot dobhat hiba esetén, el kell nyomni a hibaüzenetet
                 @$ldapbind = ldap_bind($ldapconnection, $ldapusername, $password);
-
-                //var_dump($ldapbind);
-                //echo ldap_error($ldapconnection);
 
                 if($ldapbind) {
                     $this->ldapconnection = $ldapconnection;
@@ -311,8 +302,6 @@ class Autentikacio extends Page
 
         if($ujuserid) {
             $regisztracio = true;
-            HutoszekrenyDB::UjHutoszekreny($ujuserid);
-            ReceptDB::UjSzakacskonyv($ujuserid);
             $this->mixintext = "Sikeres regisztráció!";
             $this->redirtarget = ROOT_PATH . "/regisztracio/sikeres";
 
