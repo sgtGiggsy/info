@@ -1,6 +1,6 @@
 <?php
 
-namespace Infoinventory\Modules;
+namespace Infoinventory\Modules\Core;
 use Exception;
 use Infoinventory\Classes\Settings;
 

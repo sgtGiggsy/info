@@ -1,11 +1,10 @@
 <?php
 
 namespace Infoinventory\Classes;
-use JetBrains\PhpStorm\NoReturn;
+
 use Infoinventory\Classes\APIResult;
-use Infoinventory\Modules\Page;
-use Infoinventory\Modules\SinglePage;
-use Infoinventory\Modules\Autentikacio;
+use Infoinventory\Modules\Core\Page;
+use Infoinventory\Modules\Core\SinglePage;
 
 class Controller
 {

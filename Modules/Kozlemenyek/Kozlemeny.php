@@ -1,12 +1,12 @@
 <?php
 
-namespace Infoinventory\Modules\Kozlemeny;
+namespace Infoinventory\Modules\Kozlemenyek;
 
 use HTMLPurifier;
 use HTMLPurifier_Config;
 use Infoinventory\Classes\FormBuilder;
-use Infoinventory\Modules\Page;
-use Infoinventory\Modules\SinglePage;
+use Infoinventory\Modules\Core\Page;
+use Infoinventory\Modules\Core\SinglePage;
 use Infoinventory\Classes\Helpers;
 
 class Kozlemeny extends Page

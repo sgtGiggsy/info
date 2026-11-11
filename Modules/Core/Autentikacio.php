@@ -1,8 +1,7 @@
 <?php
 
-namespace Infoinventory\Modules\Autentikacio;
+namespace Infoinventory\Modules\Core;
 
-use Infoinventory\Modules\Page;
 use Infoinventory\Classes\Controller;
 use Infoinventory\Classes\Logging;
 use Infoinventory\Classes\MailHandler;
@@ -14,7 +13,7 @@ class Autentikacio extends Page
     private ?\LDAP\Connection $ldapconnection;
     protected bool $megerosit = false;
     protected ?string $megerositokod;
-    protected string $viewsgyoker = __DIR__ . "/views/";
+    protected string $viewsgyoker = __DIR__ . "/assets/autentikacio/views/";
     protected array $views = [
         'belepes' => 'belepes.php',
         'regisztracio' => 'regisztracio.php',
@@ -34,7 +33,7 @@ class Autentikacio extends Page
         $megerositokod = null;
 
         if($this->selectedpage == 'regisztracio') {
-            $this->jsfiles = ['Pages/views/autentikacio/assets/inputValid.js'];
+            $this->jsfiles = ['Modules/Core/assets/autentikacio/js/inputValid.js'];
             if($params['method'] == 'sikeres')
                 $this->view = $this->views['sikeresreg'];
             elseif($params['method'] == 'sikertelen')
@@ -46,12 +45,12 @@ class Autentikacio extends Page
         }
 
         if($this->selectedpage == 'jelszocsere') {
-            $this->jsfiles = ['Pages/views/autentikacio/assets/inputValid.js'];
+            $this->jsfiles = ['Modules/Core/assets/autentikacio/js/inputValid.js'];
         }
 
         if($this->selectedpage == 'elfelejtettjelszo') {
             if($params['method'] == 'megerosit') {
-                $this->jsfiles = ['Pages/views/autentikacio/assets/inputValid.js'];
+                $this->jsfiles = ['Modules/Core/assets/autentikacio/js/inputValid.js'];
                 $this->megerosit = $this->ElfelejtettJelszoMegerosit($params['elemid']);
                 $this->view = $this->views['ujjelszo'];
             }

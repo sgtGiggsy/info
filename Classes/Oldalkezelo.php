@@ -22,7 +22,7 @@ class Oldalkezelo
         }
         self::$inicializalva = true;
 
-        foreach (glob(ROOT_DIR . '/Modules/*/manifest.php') ?: [] as $manifest) {
+        foreach (glob(ROOT_DIR . '/Modules/*/manifest*.php') ?: [] as $manifest) {
             $module = require $manifest;
             if (!is_array($module) || !isset($module['handler'], $module['pages']) || !is_array($module['pages'])) {
                 throw new \UnexpectedValueException("Hibás modul manifest: {$manifest}");

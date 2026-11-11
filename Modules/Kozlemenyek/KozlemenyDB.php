@@ -1,6 +1,6 @@
 <?php
 
-namespace Infoinventory\Modules\Kozlemeny;
+namespace Infoinventory\Modules\Kozlemenyek;
 
 use Infoinventory\Classes\Helpers;
 use Infoinventory\Classes\MySQLHandler;

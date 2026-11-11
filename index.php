@@ -4,14 +4,11 @@ require('./includes/config.inc.php');
 require('./includes/autoload.inc.php');
 require('./includes/external/htmlpurifier/HTMLPurifier.standalone.php');
 
-use Infoinventory\Classes\MySQLHandler;
 use Infoinventory\Classes\Controller;
-use Infoinventory\Classes\Helpers;
 use Infoinventory\Classes\Logging;
-use Infoinventory\Classes\Oldalkezelo;
 use Infoinventory\Classes\Settings;
 use Infoinventory\Classes\Personalvars;
-use Infoinventory\Modules\Autentikacio\Autentikacio;
+use Infoinventory\Modules\Core\Autentikacio;
 use Infoinventory\Classes\Felhasznalo;
 
 define("ROOT_DIR", __DIR__);

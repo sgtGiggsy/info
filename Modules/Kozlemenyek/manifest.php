@@ -2,7 +2,7 @@
 return [
     'nev' => "Közlemények",
     'slug' => 'kozlemenyek',
-    'handler' => \Infoinventory\Modules\Kozlemeny\Kozlemeny::class,
+    'handler' => \Infoinventory\Modules\Kozlemenyek\Kozlemeny::class,
     'pages' => [
         'fooldal' => ['menupont' => 'Főoldal', 'menuben' => true, 'sorrend' => 0, 'ikon' => 'oldalminilogo'],
         'kozlemeny' => ['menupont' => 'Közlemény'],

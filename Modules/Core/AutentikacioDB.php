@@ -1,8 +1,7 @@
 <?php
 
-namespace Infoinventory\Modules\Autentikacio;
+namespace Infoinventory\Modules\Core;
 
-use ArrayObject;
 use Infoinventory\Classes\MySQLHandler;
 use Infoinventory\Classes\Felhasznalo;
 
