@@ -4,7 +4,7 @@ namespace Infoinventory\Classes;
 
 class Felhasznalo
 {
-    public int $uid;
+    public ?int $uid = null;
     public ?string $usernev;
     public ?string $jelszo;
     public ?string $nev;
@@ -31,5 +31,9 @@ class Felhasznalo
         $this->leiras = $leiras;
         $this->profilkep = $profilkep;
         $this->aktiv = ($aktiv == 1);
+    }
+
+    public function CsoportTagsagok() : ?array {
+        return null;
     }
 }

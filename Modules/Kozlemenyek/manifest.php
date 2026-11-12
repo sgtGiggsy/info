@@ -6,6 +6,6 @@ return [
     'pages' => [
         'fooldal' => ['menupont' => 'Főoldal', 'menuben' => true, 'sorrend' => 0, 'ikon' => 'oldalminilogo'],
         'kozlemeny' => ['menupont' => 'Közlemény'],
-        'kozlemenyek' => ['menupont' => 'Közlemények', 'menuben' => true, 'sorrend' => 10]
+        'kozlemenyek' => ['menupont' => 'Közlemények', 'lathatosag' => 'tagok', 'menuben' => true, 'sorrend' => 10]
     ]
 ];

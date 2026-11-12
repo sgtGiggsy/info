@@ -146,18 +146,18 @@ class Controller
     }
 
     public static function PageSelect(?string $type): Page {
-        Oldalkezelo::Inicializal();
+        Modulkezelo::Inicializal();
         if(!$type) {
-            $class = Oldalkezelo::$oldalak['recept']['handler'] ?? SinglePage::class;
-            $type = 'recept';
+            $class = Modulkezelo::$oldalak['kozlemenyek']['handler'] ?? SinglePage::class;
+            $type = 'kozlemenyek';
         }
-        elseif (!isset(Oldalkezelo::$oldalak[$type])
-            || !class_exists(Oldalkezelo::$oldalak[$type]['handler'])) {
+        elseif (!isset(Modulkezelo::$oldalak[$type])
+            || !class_exists(Modulkezelo::$oldalak[$type]['handler'])) {
             $class = SinglePage::class;
             $type = '404';
         }
         else
-            $class = Oldalkezelo::$oldalak[$type]['handler'];
+            $class = Modulkezelo::$oldalak[$type]['handler'];
 
         // Oldal inicializálása
         $initclass = new $class($type);

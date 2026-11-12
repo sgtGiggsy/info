@@ -3,7 +3,7 @@
 namespace Infoinventory\template;
 
 use Infoinventory\Classes\Helpers;
-use Infoinventory\Classes\Oldalkezelo;
+use Infoinventory\Classes\Modulkezelo;
 use Infoinventory\Classes\Settings;
 use Infoinventory\includes\Jogszint;
 
@@ -26,10 +26,10 @@ $userszint = Helpers::UserSzint();
     <li></li>
 </ul>
 <ul class="links" id="linkek"><?php
-    foreach (Oldalkezelo::Menupontok() as $kulcs => $menuelem) {
+    foreach (Modulkezelo::Menupontok() as $kulcs => $menuelem) {
         if($menuelem['menuben']
             && ($menuelem['lathatosag'] == "mindenki"
-                || ($menuelem['lathatosag'] != "vendeg" && Oldalkezelo::$jogszintek[$menuelem['lathatosag']] <= $userszint))
+                || ($menuelem['lathatosag'] != "vendeg" && Modulkezelo::$jogszintek[$menuelem['lathatosag']] <= $userszint))
                 || ($menuelem['lathatosag'] == "vendeg" && $userszint == 0)
             ) {
 

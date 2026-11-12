@@ -1,5 +1,7 @@
 <?php
 return [
+    'nev' => "Beállítások",
+    'slug' => 'beallitasok',
     'handler' => \Infoinventory\Modules\Beallitasok::class,
     'pages' => [
         'adminisztracio' => ['menupont' => 'Adminisztráció', 'lathatosag' => 'adminok', 'menuben' => true, 'sorrend' => 60, 'szulo' => true, 'ikon' => 'fogaskerek'],
