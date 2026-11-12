@@ -2,10 +2,7 @@
 
 namespace Infoinventory\Modules\Kozlemenyek;
 
-use Infoinventory\Classes\Helpers;
 use Infoinventory\Classes\MySQLHandler;
-use Infoinventory\Classes\Settings;
-use Infoinventory\Classes\Personalvars;
 
 class KozlemenyDB
 {

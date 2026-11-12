@@ -1,6 +1,6 @@
 <?php
 
-namespace Infoinventory\Modules;
+namespace Infoinventory\Modules\Core;
 
 use Infoinventory\Classes\MySQLHandler;
 

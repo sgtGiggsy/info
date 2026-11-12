@@ -83,17 +83,6 @@ class Helpers
         return $returnarr;
     }
 
-    public static function UserSzint() {
-        if(Settings::$foadmin)
-            return 4;
-        if(Settings::$admin)
-            return 3;
-        if(Personalvars::$uid)
-            return 2;
-        else
-            return 0;
-    }
-
     public static function SlugGenerator(string $basestring) : ?string {
         if(!$basestring)
             return null;
@@ -220,7 +209,7 @@ class Helpers
         }
     }
 
-    function MultiSelectDropdown(array $elements, array $selected, string $selectnev, string $label, ?int $selectid = null) {
+    public function MultiSelectDropdown(array $elements, array $selected, string $selectnev, string $label, ?int $selectid = null) {
         //TODO: Ha a szülőelemen van overflow:hidden, úgy a legördülő menü nem tud "megszökni" a szülőelem határain kívülre
         //!: A CSP jelenleg tiltja a működését! Átírni EventListenerre, ha szükség lenne rá!!!
         ?><div>
@@ -240,5 +229,33 @@ class Helpers
                 ?></div>
             </div>
         </div><?php
+    }
+
+    public static function ConcatToAssocArray(array $fields, ...$concats)
+    {
+        if(!$concats[0])
+        {
+            return array();
+        }
+
+        $oszlopszam = count($fields);
+        $sorokszama = count(explode(';', $concats[0]));
+        $assoc = array();
+
+        if($oszlopszam != count($concats))
+        {
+            echo "A mezőnevek és értékmezők száma nem egyezik!";
+            return false;
+        }
+        
+        $sorids = explode(';', $concats[0]);
+        for($oszlop = 0; $oszlop < $oszlopszam; $oszlop++) {
+            $temparr = explode(';', $concats[$oszlop]);
+            for($sor = 0; $sor < $sorokszama; $sor++) {
+                $assoc[trim($sorids[$sor])][$fields[$oszlop]] = trim($temparr[$sor]);
+            }
+        }
+
+        return $assoc;
     }
 }

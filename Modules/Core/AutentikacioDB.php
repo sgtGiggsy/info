@@ -65,26 +65,20 @@ class AutentikacioDB
     }
 
     public static function GetUser(int|string $azonosito) : ?array {
+        $where = "usernev";
         if(is_int($azonosito)) {
-            $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv,
-                    GROUP_CONCAT(core_modulok_jogosultsagok.modul_id ORDER BY core_modulok_jogosultsagok.modul_id SEPARATOR '; ') AS modulok,
-                    GROUP_CONCAT(iras ORDER BY core_modulok_jogosultsagok.modul_id SEPARATOR '; ') AS iras,
-                    GROUP_CONCAT(olvasas ORDER BY core_modulok_jogosultsagok.modul_id SEPARATOR '; ') AS olvasas
-                FROM core_felhasznalok
-                	LEFT JOIN core_modulok_jogosultsagok USING (felhasznalo_id)
-                    LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
-                WHERE felhasznalo_id = ?;", $azonosito);
+            $where = "felhasznalo_id";
         }
-        else {
-            $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv,
-                    GROUP_CONCAT(core_modulok_jogosultsagok.modul_id ORDER BY core_modulok_jogosultsagok.modul_id SEPARATOR '; ') AS modulok,
-                    GROUP_CONCAT(iras ORDER BY core_modulok_jogosultsagok.modul_id SEPARATOR '; ') AS iras,
-                    GROUP_CONCAT(olvasas ORDER BY core_modulok_jogosultsagok.modul_id SEPARATOR '; ') AS olvasas
+
+        $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, godadmin,
+                    (SELECT csoport_id FROM core_csoportok_tagsagok WHERE felhasznalo_id = uid AND sajatszervezet = 1) AS sajatszervezet,
+                    GROUP_CONCAT(csoport_id ORDER BY csoport_id SEPARATOR '; ') AS csoporttagsagok,
+                    GROUP_CONCAT(csoport_nev ORDER BY csoport_id SEPARATOR '; ') AS csoportnevek,
+                    GROUP_CONCAT(iras ORDER BY csoport_id SEPARATOR '; ') AS irasjogok
                 FROM core_felhasznalok
-                	LEFT JOIN core_modulok_jogosultsagok USING (felhasznalo_id)
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
-                WHERE usernev = ?;", $azonosito);
-        }
+                    LEFT JOIN core_csoportok USING (csoport_id)
+                WHERE $where = ?;", $azonosito);
 
         if($getuser->sorokszama == 0)
             return null;

@@ -10,7 +10,6 @@ use Infoinventory\includes\Jogszint;
 $navopen = false;
 $parent = null;
 $jobbraigazit = false;
-$userszint = Helpers::UserSzint();
 //print_r(GrafikaiElemek::$ikonok);
 ?><ul class="mobile">
     <li class="dropdown">
@@ -29,8 +28,8 @@ $userszint = Helpers::UserSzint();
     foreach (Modulkezelo::Menupontok() as $kulcs => $menuelem) {
         if($menuelem['menuben']
             && ($menuelem['lathatosag'] == "mindenki"
-                || ($menuelem['lathatosag'] != "vendeg" && Modulkezelo::$jogszintek[$menuelem['lathatosag']] <= $userszint))
-                || ($menuelem['lathatosag'] == "vendeg" && $userszint == 0)
+                || ($menuelem['lathatosag'] != "vendeg" && FELHASZNALO->uid)
+                || ($menuelem['lathatosag'] == "vendeg" && !FELHASZNALO->uid))
             ) {
 
             if($menuelem['ikon']) {

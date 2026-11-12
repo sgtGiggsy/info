@@ -7,7 +7,6 @@ require('./includes/external/htmlpurifier/HTMLPurifier.standalone.php');
 use Infoinventory\Classes\Controller;
 use Infoinventory\Classes\Logging;
 use Infoinventory\Classes\Settings;
-use Infoinventory\Classes\Personalvars;
 use Infoinventory\Modules\Core\Autentikacio;
 use Infoinventory\Classes\Felhasznalo;
 
@@ -55,7 +54,6 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-$n
 // Session adatok bekérése az adatbázisból, és frissítése, ha létezik
 $session_id = Logging::SessionDB();
 Logging::SessionSeen($session_id);
-Personalvars::$session_id = $session_id;
 
 // Alapvető $_GET és $_SESSION műveletek lebonyolítása, és kilépés
 if(isset($_GET['page']) && $_GET['page'] == "kilepes")
@@ -92,26 +90,12 @@ if(isset($_SESSION['uid']) && $_SESSION['uid'])
 		setcookie(session_name(), '', time() - 3600, '/');
 		$_SESSION['uid'] = false;
 	}
-	else
-	{
-		$rang = 3;
-		/*
-		$userverify->Bind($uid, $username, $rang, $profilkep);
-		Personalvars::$username = $username;
-		Personalvars::$profilkep = $profilkep;
-		*/
-
-		switch($rang) {
-			case 3: Settings::$foadmin = true; // fallthrough
-			case 2: Settings::$admin = true; // fallthrough
-			case 1: Personalvars::$uid = $uid;
-		}
-	}
 }
 else
 {
 	$_SESSION['uid'] = false;
 }
+$felhasznalo->session_id = $session_id;
 define("FELHASZNALO", $felhasznalo);
 
 // Alap script fájlok hozzáadása

@@ -25,7 +25,7 @@ class Logging
 
         $api = new MySQLHandler("INSERT INTO core_api_hivasok (request_method, request_uri, sessid, status_code, post_content)
             VALUES (?, ?, ?, ?, ?);",
-            $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], Personalvars::$session_id, http_response_code(), $postc);
+            $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], FELHASZNALO->session_id, http_response_code(), $postc);
         return $api->siker;
     }
 
@@ -75,7 +75,7 @@ class Logging
         $hiba = new MySQLHandler("INSERT INTO core_oldal_hibak
                 (felhasznalo_id, uri, post_content, get_content, session_id, betoltes_ideje, response_code, ip_cim, referrer)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
-            Personalvars::$uid, $_SERVER['REQUEST_URI'], $postc, $getc, $session_id, $loadtime, $respnse_code, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? null);
+            FELHASZNALO->uid, $_SERVER['REQUEST_URI'], $postc, $getc, $session_id, $loadtime, $respnse_code, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_REFERER'] ?? null);
     }
 
     public static function BotDetection(?int &$botscore, ?array &$bot_ok) : void {

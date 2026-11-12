@@ -146,21 +146,27 @@ class Controller
     }
 
     public static function PageSelect(?string $type): Page {
+        $olvasas = $iras = 0;
         Modulkezelo::Inicializal();
         if(!$type) {
             $class = Modulkezelo::$oldalak['kozlemenyek']['handler'] ?? SinglePage::class;
             $type = 'kozlemenyek';
+            $olvasas = Modulkezelo::$oldalak[$type]['olvasas'];
+            $iras = Modulkezelo::$oldalak[$type]['iras'];
         }
         elseif (!isset(Modulkezelo::$oldalak[$type])
             || !class_exists(Modulkezelo::$oldalak[$type]['handler'])) {
             $class = SinglePage::class;
             $type = '404';
         }
-        else
+        else {
             $class = Modulkezelo::$oldalak[$type]['handler'];
+            $olvasas = Modulkezelo::$oldalak[$type]['olvasas'];
+            $iras = Modulkezelo::$oldalak[$type]['iras'];
+        }
 
         // Oldal inicializálása
-        $initclass = new $class($type);
+        $initclass = new $class($type, $olvasas, $iras);
 
         if($initclass->ValidView())
             return $initclass;

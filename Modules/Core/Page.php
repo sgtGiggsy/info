@@ -20,6 +20,12 @@ Class Page
 
     // <--- Funkcionális feladatokat ellátó osztály változók ---> //
 
+    // A felhasználó olvasási jogának szintje a modulon
+    protected int $olvasas;
+
+    // A felhasználó írási jogának szintje a modulon
+    protected int $iras;
+
     // A POST művelet eredményére adott szöveges üzenet. Hiba/siker/figyelmeztetes/letiltva
     public ?string $eredmeny = null;
 
@@ -100,11 +106,13 @@ Class Page
     // Itt kell meghatározni, hogy milyen fájlformátumokat fogad a fájlfeltöltő menü a felhasználói UI-n. Csak kozmeztika, és kézzel kell megadni!
     public string $form_mediatypes = "'image/jpeg', 'image/png', 'image/bmp', 'image/webp'";
 
-    public function __construct(string $type) {
+    public function __construct(string $type, int $olvasas = 0, int $iras = 0) {
         $this->title = $GLOBALS['ablakcim'];
         $this->selectedpage = $type;
         $this->canonical = ROOT_PATH . '/' . $type;
         $this->redirtarget = $_SERVER['REQUEST_URI'];
+        $this->olvasas = $olvasas;
+        $this->iras = $iras;
 
         if(isset($this->views[$type]))
             $this->view = $this->views[$type];
@@ -215,13 +223,13 @@ Class Page
     }
 
     public function GetIrasjog(int|string $elem_id) : bool {
-        if(Settings::$admin)
+        if(FELHASZNALO->godadmin)
             return true;
         return false;
     }
 
     public function GetOlvasasjog(int|string $elem_id) : bool {
-        if(Settings::$admin)
+        if(FELHASZNALO->godadmin)
             return true;
         return false;
     }
@@ -229,4 +237,6 @@ Class Page
     public function ValidView() : bool {
         return isset($this->views[$this->selectedpage]);
     }
+
+
 }

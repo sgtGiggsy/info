@@ -5,8 +5,8 @@ namespace Infoinventory\Modules\Core;
 use Infoinventory\Classes\Controller;
 use Infoinventory\Classes\Logging;
 use Infoinventory\Classes\MailHandler;
-use Infoinventory\Classes\Personalvars;
 use Infoinventory\Classes\Felhasznalo;
+use Infoinventory\Classes\Helpers;
 
 class Autentikacio extends Page
 {
@@ -174,6 +174,11 @@ class Autentikacio extends Page
         $getuser = AutentikacioDB::GetUser($azonosito);
         $felhasznalo = new Felhasznalo($getuser['usernev'], $getuser['nev'], $getuser['email'], $getuser['osztaly'], $getuser['telefon'], $getuser['beosztas'], $getuser['leiras'], $getuser['profilkep']);
         $felhasznalo->uid = $getuser['uid'];
+        $felhasznalo->godadmin = ($getuser['godadmin'] == 1);
+
+        $felhasznalo->SetCsoportTagsagok($getuser['csoporttagsagok'], $getuser['csoportnevek'], $getuser['irasjogok']);
+        $felhasznalo->SetSajatSzervezet($getuser['sajatszervezet']);
+
         return $felhasznalo;
     }
 
@@ -373,7 +378,7 @@ class Autentikacio extends Page
             return false;
         }
 
-        $regijelszo = AutentikacioDB::GetJelszo(Personalvars::$uid);
+        $regijelszo = AutentikacioDB::GetJelszo(FELHASZNALO->uid);
         if(!password_verify($_POST['regijelszo'], $regijelszo)) {
             $this->mixintext = "Hibásan adtad meg a jelenlegi jelszavadat!";
             return false;
@@ -385,7 +390,7 @@ class Autentikacio extends Page
             return false;
         }
 
-        if(AutentikacioDB::JelszoCsere(Personalvars::$uid, $hashedpassword)) {
+        if(AutentikacioDB::JelszoCsere(FELHASZNALO->uid, $hashedpassword)) {
             $this->mixintext = "A jelszavad sikeresen megváltoztattad!";
             return true;
         }

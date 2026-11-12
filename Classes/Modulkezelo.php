@@ -28,6 +28,8 @@ class Modulkezelo
         else
             self::$telepitettmodulok = self::GetAuthorizedModules();
 
+        // print_r(self::$telepitettmodulok);
+
         foreach (glob(ROOT_DIR . '/Modules/*/manifest*.php') ?: [] as $manifest) {
             $module = require $manifest;
             if (!is_array($module) || !isset($module['handler'], $module['pages']) || !is_array($module['pages'])) {
@@ -43,7 +45,7 @@ class Modulkezelo
                     self::$oldalak[$route] = array_replace([
                         'menupont' => '', 'lathatosag' => 'mindenki', 'menuben' => false,
                         'sorrend' => null, 'szulo' => null, 'ikon' => null,
-                    ], $page, ['handler' => $module['handler']]);
+                    ], $page, ['handler' => $module['handler'], 'olvasas' => self::$telepitettmodulok[$module['slug']]['olvasas'], 'iras' => self::$telepitettmodulok[$module['slug']]['iras']]);
                 }
             }
         }
@@ -61,7 +63,7 @@ class Modulkezelo
         if(!empty(self::$telepitettmodulok))
             return self::$telepitettmodulok;
 
-        $telepitve = new MySQLHandler("SELECT slug, modul_id, sorrend
+        $telepitve = new MySQLHandler("SELECT slug, modul_id, sorrend, 0 AS olvasas, 0 AS iras
                 FROM core_modulok
                 WHERE (lathatosag = 0 OR lathatosag = 1)
                     AND telepitve = 1;");
