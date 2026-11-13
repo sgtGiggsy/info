@@ -40,6 +40,7 @@ class FelhasznaloHandlerDB
         $getuser = new MySQLHandler("SELECT core_felhasznalok.felhasznalo_id AS uid, usernev, nev, email,
                 elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras,
                 aktiv, godadmin, sajat.csoport_id AS sajatszervezet,
+                sajatcsoport.csoport_nev AS sajatszervezetnev, aktiv,
                 GROUP_CONCAT(core_csoportok.csoport_id ORDER BY core_csoportok.csoport_id SEPARATOR '; ')
                     AS csoporttagsagok,
                 GROUP_CONCAT(core_csoportok.csoport_nev ORDER BY core_csoportok.csoport_id SEPARATOR '; ')
@@ -50,6 +51,7 @@ class FelhasznaloHandlerDB
     	        LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                 LEFT JOIN core_csoportok USING (csoport_id)
                 LEFT JOIN core_csoportok_tagsagok AS sajat ON sajat.felhasznalo_id = core_felhasznalok.felhasznalo_id AND sajat.sajatszervezet = 1
+                LEFT JOIN core_csoportok AS sajatcsoport ON sajatcsoport.csoport_id = sajat.csoport_id
             WHERE core_felhasznalok.$where = ?;", $azonosito);
 
         if($getuser->sorokszama == 0)
@@ -60,25 +62,28 @@ class FelhasznaloHandlerDB
 
     public static function GetUserList(int $startindex = 0, int $dbszam = 20, ?int ...$olvasjogok) : ?array {
         if(Modulkezelo::ModulJogosultsag('felhasznalok')['olvasas'] == 3) {
-            $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet
+            $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
+                    LEFT JOIN core_csoportok USING (csoport_id)
                 WHERE sajatszervezet = 1
                 LIMIT ?, ?;", $startindex, $dbszam);
         }
         if(Modulkezelo::ModulJogosultsag('felhasznalok')['olvasas'] == 2) {
             $paramplacehold = implode(', ', array_fill(0, count(FELHASZNALO->GetCsoportIDs()), '?'));
 
-            $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet
+            $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
+                    LEFT JOIN core_csoportok USING (csoport_id)
                 WHERE sajatszervezet = 1 AND csoport_id IN ($paramplacehold)
                 LIMIT $startindex, $dbszam;", ...FELHASZNALO->GetCsoportIDs());
         }
         if(Modulkezelo::ModulJogosultsag('felhasznalok')['olvasas'] == 1) {
-            $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet
+            $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
+                    LEFT JOIN core_csoportok USING (csoport_id)
                 WHERE sajatszervezet = 1 AND csoport_id = ?
                 LIMIT ?, ?;", FELHASZNALO->szervezet, $startindex, $dbszam);
         }

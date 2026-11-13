@@ -35,6 +35,7 @@ class Modulkezelo
             if (!is_array($module) || !isset($module['handler'], $module['pages']) || !is_array($module['pages'])) {
                 throw new \UnexpectedValueException("Hibás modul manifest: {$manifest}");
             }
+            $modulnev = $module['nev'] ?? '';
 
             foreach ($module['pages'] as $route => $page) {
                 if ($route === '' || isset(self::$oldalak[$route])) {
@@ -46,10 +47,14 @@ class Modulkezelo
                         'menupont' => '', 'lathatosag' => 'mindenki', 'menuben' => false,
                         'sorrend' => null, 'szulo' => null, 'ikon' => null,
                     ], $page, ['handler' => $module['handler'], 'olvasas' => self::$telepitettmodulok[$module['slug']]['olvasas'], 'iras' => self::$telepitettmodulok[$module['slug']]['iras'], 'kezelomodul' => $module['slug']]);
-                    if(self::$telepitettmodulok[$module['slug']]['olvasas'] === null && (self::$oldalak[$route]['lathatosag'] === 'tagok' || self::$oldalak[$route]['lathatosag'] === 'mindenki')) {
+                    self::$telepitettmodulok[$module['slug']]['modulnev'] = $modulnev;
+
+                    if(self::$telepitettmodulok[$module['slug']]['olvasas'] === null
+                        && (self::$oldalak[$route]['lathatosag'] === 'tagok' || self::$oldalak[$route]['lathatosag'] === 'mindenki')) {
                         self::$telepitettmodulok[$module['slug']]['olvasas'] = 1;
                     }
-                    if(self::$telepitettmodulok[$module['slug']]['iras'] === null&& (self::$oldalak[$route]['lathatosag'] === 'tagok' || self::$oldalak[$route]['lathatosag'] === 'mindenki')) {
+                    if(self::$telepitettmodulok[$module['slug']]['iras'] === null
+                        && (self::$oldalak[$route]['lathatosag'] === 'tagok' || self::$oldalak[$route]['lathatosag'] === 'mindenki')) {
                         self::$telepitettmodulok[$module['slug']]['iras'] = 1;
                     }
                 }
@@ -76,15 +81,18 @@ class Modulkezelo
         return $telepitve->AsArray("slug");
     }
 
-    public static function GetAuthorizedModules() : array {
+    public static function GetAuthorizedModules(?int $felhasznalo_id = null) : array {
         if(!empty(self::$telepitettmodulok))
             return self::$telepitettmodulok;
+
+        if($felhasznalo_id === null)
+            $felhasznalo_id = FELHASZNALO->uid;
 
         $telepitve = new MySQLHandler("SELECT slug, modul_id, sorrend, lathatosag, iras, olvasas
                 FROM core_modulok
                     LEFT JOIN core_modulok_jogosultsagok USING (modul_id)
                 WHERE (felhasznalo_id = ? OR lathatosag = 1 OR lathatosag = 2)
-                    AND telepitve = 1;", FELHASZNALO->uid);
+                AND telepitve = 1;", $felhasznalo_id);
         return $telepitve->AsArray("slug");
     }
 

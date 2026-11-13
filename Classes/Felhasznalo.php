@@ -21,6 +21,7 @@ class Felhasznalo
     public ?int $session_id;
     public bool $godadmin;
     public array $csoporttagsagok;
+    private array $moduljogosultsagok;
 
     public function __construct(?string $usernev = null, ?string $nev = null, ?string $email = null, ?string $elsobelepes = null, ?string $osztaly = null, ?string $telefon = null, ?string $beosztas = null, ?string $leiras = null, ?string $profilkep = null, ?int $aktiv = null)
     {
@@ -49,12 +50,12 @@ class Felhasznalo
         $this->csoporttagsagok = $csoportok;
     }
 
-    public function SetSajatSzervezet(?int $csoportid) : void {
-        if(!$csoportid)
-            return;
+    public function SetSajatSzervezet(int $csoportid, ?string $csoportnev = null) : void {
         $this->szervezet = $csoportid;
-        if(isset($this->csoporttagsagok))
-            $this->szervezetnev = $this->csoporttagsagok[$csoportid]['csoport_nev'];
+        if($csoportnev === null && isset($this->csoporttagsagok)) {
+            $csoportnev = $this->csoporttagsagok[$csoportid]['csoport_nev'] ?? '';
+        }
+        $this->szervezetnev = $csoportnev;
     }
 
     public function GetCsoportIDs() : array {
@@ -68,5 +69,12 @@ class Felhasznalo
                 fn($tagsag) => $tagsag['irasjog'] == true
             )
         );
+    }
+
+    public function GetModulJogosultsagok() : array {
+        if(!isset($this->moduljogosultsagok)) {
+            $this->moduljogosultsagok = Modulkezelo::GetAuthorizedModules($this->uid);
+        }
+        return $this->moduljogosultsagok;
     }
 }

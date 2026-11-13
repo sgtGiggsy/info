@@ -272,18 +272,25 @@ class FelhasznaloHandler extends Page
 
     public static function GetUser(int|string $azonosito) : ?Felhasznalo {
         $getuser = FelhasznaloHandlerDB::GetUser($azonosito);
-        $felhasznalo = new Felhasznalo($getuser['usernev'], $getuser['nev'], $getuser['email'], $getuser['elsobelepes'], $getuser['osztaly'], $getuser['telefon'], $getuser['beosztas'], $getuser['leiras'], $getuser['profilkep']);
+        $felhasznalo = new Felhasznalo($getuser['usernev'], $getuser['nev'], $getuser['email'], $getuser['elsobelepes'], $getuser['osztaly'], $getuser['telefon'], $getuser['beosztas'], $getuser['leiras'], $getuser['profilkep'], $getuser['aktiv']);
         $felhasznalo->uid = $getuser['uid'];
         $felhasznalo->godadmin = ($getuser['godadmin'] == 1);
 
         $felhasznalo->SetCsoportTagsagok($getuser['csoporttagsagok'], $getuser['csoportnevek'], $getuser['irasjogok']);
-        $felhasznalo->SetSajatSzervezet($getuser['sajatszervezet']);
+        $felhasznalo->SetSajatSzervezet($getuser['sajatszervezet'], $getuser['sajatszervezetnev']);
 
         return $felhasznalo;
     }
 
     private function GetUserList() : array {
-        return FelhasznaloHandlerDB::GetUserList();
+        $felhasznalok = [];
+        foreach(FelhasznaloHandlerDB::GetUserList() as $felhasznalo) {
+            $temp = new Felhasznalo($felhasznalo['usernev'], $felhasznalo['nev'], $felhasznalo['email'], $felhasznalo['elsobelepes'], $felhasznalo['osztaly'], $felhasznalo['telefon'], $felhasznalo['beosztas'], $felhasznalo['leiras'], $felhasznalo['profilkep'], $felhasznalo['aktiv']);
+            $temp->uid = $felhasznalo['uid'];
+            $temp->SetSajatSzervezet($felhasznalo['sajatszervezet'], $felhasznalo['sajatszervezetnev']);
+            $felhasznalok[] = $temp;
+        }
+        return $felhasznalok;
     }
 
     private function GetCsoportList() : array {

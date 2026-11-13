@@ -5,8 +5,11 @@ if (!defined('ROOT_PATH')) {
     exit('Forbidden');
 }
 ?><div class="normalcontent">
-    <h1><?=$this->felhasznalo['usernev']?> profiljának szerkesztése</h1>
-    <form action="<?=ROOT_PATH?>/felhasznalo/szerkesztes/<?=$this->felhasznalo['felhasznalo_id']?>" method="post" enctype="multipart/form-data">
+    <h1><?=$this->felhasznalo->nev?> profiljának szerkesztése</h1>
+    <form action="<?=ROOT_PATH?>/felhasznalo/<?=$this->felhasznalo->usernev?>/szerkesztes" method="post" enctype="multipart/form-data">
+        <p>AD felhasználó esetén az adatok szerkesztésének nincs jelentősége,
+            mert a felhasználó következő bejelentkezésekor
+            minden itt megadott adatt felülírásra kerül az AD-ból érkezővel</p>
         <?= $this->form->Render() ?>
         <div>
             <label for="profilkep">Profilkép</label>
