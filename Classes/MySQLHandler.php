@@ -380,31 +380,28 @@ class MySQLHandler
         return $result;
     }
 
-    public function AsArray($arrkey = null, $ondimensional = false)
+    public function AsArray($arrkey = null)
     {
-        if($arrkey || $ondimensional)
+        if($arrkey)
         {
             $returnarr = array();
             foreach($this->result as $sor)
             {
-                if($ondimensional)
-                {
-                    foreach($sor as $value)
-                    {
-                        $returnarr[] = $value;
-                        break;
-                    }
-                }
-                
-                if($arrkey)
-                    $returnarr[$sor[$arrkey]] = $sor;
-                else
-                    $returnarr[] = $sor;
+                $returnarr[$sor[$arrkey]] = $sor;
             }
         }
         else
         {
             $returnarr = mysqli_fetch_all($this->result, MYSQLI_ASSOC);
+        }
+        return $returnarr;
+    }
+
+    public function ArrayForSelect() : array {
+        $returnarr = array();
+        $returnarr[0] = "";
+        foreach($this->result as $sor) {
+            $returnarr[$sor[array_key_first($sor)]] = $sor[array_key_last($sor)];
         }
         return $returnarr;
     }
