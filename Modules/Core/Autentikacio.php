@@ -6,7 +6,6 @@ use Infoinventory\Classes\Controller;
 use Infoinventory\Classes\Logging;
 use Infoinventory\Classes\MailHandler;
 use Infoinventory\Classes\Felhasznalo;
-use Infoinventory\Classes\Helpers;
 
 class Autentikacio extends Page
 {
@@ -117,8 +116,6 @@ class Autentikacio extends Page
         return false;
     }
 
-
-
     private function DBLogin(string $usernev, string $password) : ?bool {
         $loginhandler = AutentikacioDB::LoginHandler($usernev);
         if(!$loginhandler)
@@ -140,46 +137,6 @@ class Autentikacio extends Page
         }
 
         return false;
-    }
-
-    private function GetLDAPUserAttributes($samaccountname) : ?Felhasznalo {
-        $filter = "(&(objectClass=user)(sAMAccountName=$samaccountname))";
-        $ldapsearch = ldap_search($this->ldapconnection, $GLOBALS['LDAP_DIR'], $filter); // A felhasználó adatainak lekérése a DC-től
-        $ldapresults = ldap_get_entries($this->ldapconnection, $ldapsearch);
-        if($ldapresults) {
-            @$email = $ldapresults[0]['mail'][0];
-            @$nev = $ldapresults[0]['displayname'][0];
-            @$osztaly = $ldapresults[0]['department'][0];
-            @$leiras = $ldapresults[0]['description'][0];
-            //@$szervezet = szervezetValaszto($ldapresults[0]['company'][0]);
-            @$telefon = $ldapresults[0]['telephonenumber'][0];
-            @$beosztas = $ldapresults[0]['title'][0];
-            @$profilkep = $ldapresults[0]['thumbnailphoto'][0];
-            $felhasznalo = new Felhasznalo($samaccountname, $nev, $email, $osztaly, $telefon, $beosztas, $leiras, $profilkep);
-            ldap_unbind($this->ldapconnection);
-            return $felhasznalo;
-        }
-        return null;
-    }
-
-    private function CreateUser(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
-        return false;
-    }
-
-    private function UpdateUser(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
-        return AutentikacioDB::UpdateUser($felhasznalo, $hashedpassword);
-    }
-
-    public static function GetUser(int|string $azonosito) : ?Felhasznalo {
-        $getuser = AutentikacioDB::GetUser($azonosito);
-        $felhasznalo = new Felhasznalo($getuser['usernev'], $getuser['nev'], $getuser['email'], $getuser['osztaly'], $getuser['telefon'], $getuser['beosztas'], $getuser['leiras'], $getuser['profilkep']);
-        $felhasznalo->uid = $getuser['uid'];
-        $felhasznalo->godadmin = ($getuser['godadmin'] == 1);
-
-        $felhasznalo->SetCsoportTagsagok($getuser['csoporttagsagok'], $getuser['csoportnevek'], $getuser['irasjogok']);
-        $felhasznalo->SetSajatSzervezet($getuser['sajatszervezet']);
-
-        return $felhasznalo;
     }
 
     protected function Belepes() : bool {
@@ -212,16 +169,16 @@ class Autentikacio extends Page
 
                 // Lekezeljük a két bejelentkezési metódus eredményét. Mivel a $loginsuccess false-ra van inicializálva, csak a sikeres esetekkel kell foglalkozni
                 if($ldapsuccess) {
-                    $felhasznalo = $this->GetLDAPUserAttributes($usernev);
+                    $felhasznalo = FelhasznaloHandler::GetLDAPUserAttributes($usernev, $this->ldapconnection);
                     $hashedpassword = password_hash($jelszo, PASSWORD_DEFAULT); // A jelszó hash-e az adatbázisban tároláshoz
                     if(is_null($dbsuccess)) {
                         // Az LDAP belépés sikerült, a DB felhasználó még nem létezik. Létrehozni a felhasználót a DB-ben
-                        $dbresult = $this->CreateUser($felhasznalo, $hashedpassword);
+                        $dbresult = FelhasznaloHandler::CreateUser($felhasznalo, $hashedpassword);
                         $loginsuccess = true;
                     }
                     else {
                         // Az LDAP belépés sikerült. Frissíteni a felhasználót DB-ben
-                        $dbresult = $this->UpdateUser($felhasznalo, $hashedpassword);
+                        $dbresult = FelhasznaloHandler::UpdateUser($felhasznalo, $hashedpassword);
                         $loginsuccess = true;
                     }
                 }
@@ -230,7 +187,7 @@ class Autentikacio extends Page
                     $loginsuccess = true;
                 }
             }
-            $felhasznalo = $this->GetUser($usernev);
+            $felhasznalo = FelhasznaloHandler::GetUser($usernev);
 
             if(!$loginsuccess) {
                 $session_id = Logging::SessionDB();

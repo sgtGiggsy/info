@@ -5,12 +5,15 @@ namespace Infoinventory\Modules\Core;
 use Infoinventory\Classes\FeltoltesHandler;
 use Infoinventory\Classes\FormBuilder;
 use Infoinventory\Classes\Settings;
+use Infoinventory\Classes\Felhasznalo;
+use Infoinventory\Classes\Modulkezelo;
 
-class Felhasznalo extends Page
+class FelhasznaloHandler extends Page
 {
-    protected array $felhasznalo;
-    protected string $viewsgyoker = __DIR__ . "/views/felhasznalo/";
+    protected Felhasznalo $felhasznalo;
+    protected array $felhasznalok = [];
     protected FormBuilder $form;
+    protected string $viewsgyoker = __DIR__ . "/assets/felhasznalo/views/";
     protected array $views = [
         'felhasznalo' => 'felhasznalo.php',
         'felhasznalok' => 'felhasznalok.php',
@@ -32,18 +35,18 @@ class Felhasznalo extends Page
             if(!FELHASZNALO->uid)
                 return new SinglePage(403);
 
-            if(!Settings::$admin || (Settings::$admin && !$params['elemid']))
+            if(!$params['elemid'])
                 $selecteduser = FELHASZNALO->uid;
             else
                 $selecteduser = $params['elemid'];
 
-            $this->felhasznalo = FelhasznaloDB::GetFelhasznalo($selecteduser);
+            $this->felhasznalo = self::GetUser($selecteduser);
             if(!$params['method']) {
                 $this->view = $this->views['felhasznalo'];
             }
 
             if($params['method'] == 'szerkesztes') {
-                if(!Settings::$foadmin && $this->felhasznalo['szint'] == 3) {
+                if(!$this->GetIrasjog($this->felhasznalo->uid, $this->felhasznalo->szervezet)) {
                     return new SinglePage(403);
                 }
 
@@ -52,14 +55,14 @@ class Felhasznalo extends Page
                 $this->form = $this->Form($this->felhasznalo);
             }
         } elseif ($this->selectedpage == "felhasznalok") {
-            if(!Settings::$admin)
+            if(!$this->GetOlvasasjog())
                 return new SinglePage(403);
 
             $this->view = $this->views['felhasznalok'];
             $startindex = 0;
             $elemperoldal = 20;
             $this->LapozasPrepare($startindex, $elemperoldal, $params);
-            $this->felhasznalo = $this->LapozasFinalize(FelhasznaloDB::GetFelhasznalok($startindex, $elemperoldal), $elemperoldal);
+            $this->felhasznalok = $this->LapozasFinalize(FelhasznaloHandlerDB::GetFelhasznalok($startindex, $elemperoldal), $elemperoldal);
         }
 
         return $this;
@@ -67,33 +70,29 @@ class Felhasznalo extends Page
 
     public function HtmlHead() : void {
         if ($this->selectedpage == "felhasznalo" || $this->selectedpage == "profil") {
-            $this->title .= " - " . $this->felhasznalo['usernev'] . " profilja";
+            $this->title .= " - " . $this->felhasznalo->nev . " profilja";
             $this->sitedesc = "Felhasználói profiloldal";
         } elseif ($this->selectedpage == "felhasznalok") {
-            $this->title .= ' - Hűtőszekrény';
-            $this->sitedesc = "Felhasználói hűtőszekrény";
+            $this->title .= ' - Felhasználók';
+            $this->sitedesc = "Felhasználók listája";
         }
         $this->ablakcim = $this->title;
-        include(__DIR__ . "/views/_assets/htmlheader.php");
+        include(ROOT_DIR . "/template/assets/htmlheader.php");
     }
 
-    protected function Form(array $felhasznalo) : FormBuilder {
+    protected function Form(Felhasznalo $felhasznalo) : FormBuilder {
         $form = (new FormBuilder())
             ->Hidden('felhasznalo_id')
             ->Text('usernev', 'Felhasználónév', true)
             ->Email('email', 'Email cím', true)
-            ->Text('teljesnev', 'Név')
-            ->SetValue('felhasznalo_id', $felhasznalo['felhasznalo_id'])
-            ->SetValue('usernev', $felhasznalo['usernev'])
-            ->SetValue('email', $felhasznalo['email'])
-            ->SetValue('teljesnev', $felhasznalo['teljesnev']);
-        if(Settings::$foadmin) {
-            $form->Select('szint', 'Felhasználói szint', $this->szintek, true)
-                ->SetValue('szint', $felhasznalo['szint']);
-        }
-        if(Settings::$admin) {
-            $form->Select('allapot', 'Fiók állapota', [2 => 'Engedélyezett', 1 => 'Letiltott'], true)
-                ->SetValue('allapot', $felhasznalo['allapot']);
+            ->Text('nev', 'Név')
+            ->SetValue('felhasznalo_id', $felhasznalo->uid)
+            ->SetValue('usernev', $felhasznalo->usernev)
+            ->SetValue('email', $felhasznalo->email)
+            ->SetValue('nev', $felhasznalo->nev);
+        if(FELHASZNALO->godadmin) {
+            $form->Checkbox('godadmin', 'Root admin')
+                ->SetValue('godadmin', $felhasznalo->godadmin);
         }
 
         return $form;
@@ -104,11 +103,6 @@ class Felhasznalo extends Page
         $pkepid = null;
         if(!isset($_POST['felhasznalo_id'])) {
             $this->mixintext = "Nem lett kiválasztva módosítani kívánt felhasználó!";
-            return false;
-        }
-
-        if(!Settings::$foadmin && $this->felhasznalo['szint'] == 3) {
-            $this->mixintext = "Egy főadmin fiókját csak főadmin szerkesztheti!";
             return false;
         }
 
@@ -141,12 +135,52 @@ class Felhasznalo extends Page
             }
         }
 
-        $eredmeny = FelhasznaloDB::FelhasznaloSzerkeszt($_POST, $pkepid);
+        $eredmeny = FelhasznaloHandlerDB::FelhasznaloSzerkeszt($_POST, $pkepid);
         if($eredmeny)
             $this->mixintext = "A fiók módosítása sikerült!";
         else
             $this->mixintext = "A fiók módosítása sikertelen!";
 
         return $eredmeny;
+    }
+
+    public static function GetLDAPUserAttributes(string $samaccountname, ?\LDAP\Connection $ldapconnection) : ?Felhasznalo {
+        $filter = "(&(objectClass=user)(sAMAccountName=$samaccountname))";
+        $ldapsearch = ldap_search($ldapconnection, $GLOBALS['LDAP_DIR'], $filter); // A felhasználó adatainak lekérése a DC-től
+        $ldapresults = ldap_get_entries($ldapconnection, $ldapsearch);
+        if($ldapresults) {
+            @$email = $ldapresults[0]['mail'][0];
+            @$nev = $ldapresults[0]['displayname'][0];
+            @$osztaly = $ldapresults[0]['department'][0];
+            @$leiras = $ldapresults[0]['description'][0];
+            //@$szervezet = szervezetValaszto($ldapresults[0]['company'][0]);
+            @$telefon = $ldapresults[0]['telephonenumber'][0];
+            @$beosztas = $ldapresults[0]['title'][0];
+            @$profilkep = $ldapresults[0]['thumbnailphoto'][0];
+            $felhasznalo = new Felhasznalo($samaccountname, $nev, $email, $osztaly, $telefon, $beosztas, $leiras, $profilkep);
+            ldap_unbind($ldapconnection);
+            return $felhasznalo;
+        }
+        return null;
+    }
+
+    public static function CreateUser(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
+        return false;
+    }
+
+    public static function UpdateUser(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
+        return FelhasznaloHandlerDB::UpdateUser($felhasznalo, $hashedpassword);
+    }
+
+    public static function GetUser(int|string $azonosito) : ?Felhasznalo {
+        $getuser = FelhasznaloHandlerDB::GetUser($azonosito);
+        $felhasznalo = new Felhasznalo($getuser['usernev'], $getuser['nev'], $getuser['email'], $getuser['osztaly'], $getuser['telefon'], $getuser['beosztas'], $getuser['leiras'], $getuser['profilkep']);
+        $felhasznalo->uid = $getuser['uid'];
+        $felhasznalo->godadmin = ($getuser['godadmin'] == 1);
+
+        $felhasznalo->SetCsoportTagsagok($getuser['csoporttagsagok'], $getuser['csoportnevek'], $getuser['irasjogok']);
+        $felhasznalo->SetSajatSzervezet($getuser['sajatszervezet']);
+
+        return $felhasznalo;
     }
 }

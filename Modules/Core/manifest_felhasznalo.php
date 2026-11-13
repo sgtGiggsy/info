@@ -2,7 +2,7 @@
 return [
     'nev' => "Felhasználó",
     'slug' => "felhasznalo",
-    'handler' => \Infoinventory\Modules\Core\Felhasznalo::class,
+    'handler' => \Infoinventory\Modules\Core\FelhasznaloHandler::class,
     'pages' => [
         'felhasznalo' => ['menupont' => 'Felhasználó', 'lathatosag' => 'tagok', 'menuben' => true, 'sorrend' => 70, 'szulo' => true, 'ikon' => 'sefsapka'],
         'profil' => ['menupont' => 'Profil', 'lathatosag' => 'tagok', 'menuben' => true, 'sorrend' => 72, 'szulo' => 'felhasznalo'],

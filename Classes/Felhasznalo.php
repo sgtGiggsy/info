@@ -12,7 +12,7 @@ class Felhasznalo
     public ?string $elsobelepes;
     public ?string $osztaly;
     public ?string $telefon;
-    public ?int $szervezet;
+    public ?int $szervezet = null;
     public ?string $szervezetnev;
     public ?string $beosztas;
     public ?string $leiras;
@@ -37,15 +37,22 @@ class Felhasznalo
         $this->aktiv = ($aktiv == 1);
     }
 
-    public function SetCsoportTagsagok(string $csoporttagsagok, string $csoportnevek, string $irasjogok) : void {
+    public function SetCsoportTagsagok(?string $csoporttagsagok, ?string $csoportnevek, ?string $irasjogok) : void {
+        if(!$csoporttagsagok || !$csoportnevek || !$irasjogok) {
+            $this->csoporttagsagok = null;
+            return;
+        }
         $csoportok = Helpers::ConcatToAssocArray(['csoport_id', 'csoport_nev', 'irasjog'], $csoporttagsagok, $csoportnevek, $irasjogok);
         foreach($csoportok as &$csoport) {
             $csoport['irasjog'] = ($csoport['irasjog'] == 1);
+            $csoport['olvasasjog'] = true; // A csoporttagságoknál az olvasás jog mindig true, ha a felhasználó tagja a csoportnak.
         }
         $this->csoporttagsagok = $csoportok;
     }
 
-    public function SetSajatSzervezet(int $csoportid) : void {
+    public function SetSajatSzervezet(?int $csoportid) : void {
+        if(!$csoportid)
+            return;
         $this->szervezet = $csoportid;
         $this->szervezetnev = $this->csoporttagsagok[$csoportid]['csoport_nev'];
     }

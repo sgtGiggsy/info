@@ -58,34 +58,6 @@ class AutentikacioDB
         return $regijelszo->Fetch()['jelszo'] ?? null;
     }
 
-    public static function UpdateUser(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
-        $updateuser = new MySQLHandler("UPDATE core_felhasznalok SET jelszo = ?, nev = ?, email = ?, osztaly = ?, telefon = ?, beosztas = ?, profilkep = ?, descript = ? WHERE usernev = ?;",
-            $hashedpassword, $felhasznalo->nev, $felhasznalo->email, $felhasznalo->osztaly, $felhasznalo->telefon, $felhasznalo->beosztas, $felhasznalo->profilkep, $felhasznalo->leiras, $felhasznalo->usernev);
-        return $updateuser->siker;
-    }
-
-    public static function GetUser(int|string $azonosito) : ?array {
-        $where = "usernev";
-        if(is_int($azonosito)) {
-            $where = "felhasznalo_id";
-        }
-
-        $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, godadmin,
-                    (SELECT csoport_id FROM core_csoportok_tagsagok WHERE felhasznalo_id = uid AND sajatszervezet = 1) AS sajatszervezet,
-                    GROUP_CONCAT(csoport_id ORDER BY csoport_id SEPARATOR '; ') AS csoporttagsagok,
-                    GROUP_CONCAT(csoport_nev ORDER BY csoport_id SEPARATOR '; ') AS csoportnevek,
-                    GROUP_CONCAT(iras ORDER BY csoport_id SEPARATOR '; ') AS irasjogok
-                FROM core_felhasznalok
-                    LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
-                    LEFT JOIN core_csoportok USING (csoport_id)
-                WHERE $where = ?;", $azonosito);
-
-        if($getuser->sorokszama == 0)
-            return null;
-
-        return $getuser->RecordAsArray();
-    }
-
     public static function UserRegisztracio(string $usernev, string $email, string $hashedpassword, string $verifstring) : int {
         $usernev = htmlspecialchars($usernev, ENT_QUOTES, 'UTF-8');
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);

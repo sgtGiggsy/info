@@ -7,15 +7,16 @@ require('./includes/external/htmlpurifier/HTMLPurifier.standalone.php');
 use Infoinventory\Classes\Controller;
 use Infoinventory\Classes\Logging;
 use Infoinventory\Classes\Settings;
-use Infoinventory\Modules\Core\Autentikacio;
+use Infoinventory\Modules\Core\FelhasznaloHandler;
 use Infoinventory\Classes\Felhasznalo;
 
 define("ROOT_DIR", __DIR__);
 define("DEBUG_MODE", true);
-define("ROOT_PATH", $GLOBALS['RootPath']);
+define("ROOT_PATH", $RootPath);
 define("ABLAK_CIM", $ablakcim);
 $uid = null;
 $dbcallcount = 0;
+$debugmessages = [];
 
 //print_r($_GET);
 
@@ -81,7 +82,7 @@ if(isset($_SESSION['uid']) && $_SESSION['uid'])
 	// vagy nem változott-e a felhasználói szintje
 	// allapot 2 = aktív, 1 = letiltott, 0 = törölt
 	// szint 3 = tulaj, 2 = admin, 1 = regisztrált felhasználó
-	$felhasznalo = Autentikacio::GetUser($_SESSION['uid']);
+	$felhasznalo = FelhasznaloHandler::GetUser($_SESSION['uid']);
 
 	if(is_null($felhasznalo))
 	{
@@ -119,3 +120,8 @@ if(http_response_code() == 200)
 	Logging::Latogatas($responseTime, null, null, $session_id, $dbcallcount);
 else
 	Logging::PageFault($session_id, $responseTime);
+if(DEBUG_MODE && FELHASZNALO->godadmin) {
+	foreach($debugmessages as $message) {
+		echo "<pre style='background-color: #f0f0f0; color: #000; padding: 10px; border: 1px solid #ccc; margin: 10px 0;'>$message</pre>";
+	}
+}

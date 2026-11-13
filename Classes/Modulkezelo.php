@@ -45,7 +45,13 @@ class Modulkezelo
                     self::$oldalak[$route] = array_replace([
                         'menupont' => '', 'lathatosag' => 'mindenki', 'menuben' => false,
                         'sorrend' => null, 'szulo' => null, 'ikon' => null,
-                    ], $page, ['handler' => $module['handler'], 'olvasas' => self::$telepitettmodulok[$module['slug']]['olvasas'], 'iras' => self::$telepitettmodulok[$module['slug']]['iras']]);
+                    ], $page, ['handler' => $module['handler'], 'olvasas' => self::$telepitettmodulok[$module['slug']]['olvasas'], 'iras' => self::$telepitettmodulok[$module['slug']]['iras'], 'kezelomodul' => $module['slug']]);
+                    if(self::$telepitettmodulok[$module['slug']]['olvasas'] === null && (self::$oldalak[$route]['lathatosag'] === 'tagok' || self::$oldalak[$route]['lathatosag'] === 'mindenki')) {
+                        self::$telepitettmodulok[$module['slug']]['olvasas'] = 1;
+                    }
+                    if(self::$telepitettmodulok[$module['slug']]['iras'] === null&& (self::$oldalak[$route]['lathatosag'] === 'tagok' || self::$oldalak[$route]['lathatosag'] === 'mindenki')) {
+                        self::$telepitettmodulok[$module['slug']]['iras'] = 1;
+                    }
                 }
             }
         }
@@ -80,5 +86,23 @@ class Modulkezelo
                 WHERE (felhasznalo_id = ? OR lathatosag = 1 OR lathatosag = 2)
                     AND telepitve = 1;", FELHASZNALO->uid);
         return $telepitve->AsArray("slug");
+    }
+
+    public static function GetModuleSlug(string $page) : string {
+        self::Inicializal();
+        if(!array_key_exists($page, self::$oldalak))
+            return '';
+        else
+            return self::$oldalak[$page]['kezelomodul'];
+    }
+
+    public static function ModulJogosultsag(string $page) : array {
+        self::Inicializal();
+        $slug = self::GetModuleSlug($page);
+        if(!array_key_exists($slug, self::$telepitettmodulok)) {
+            return ['olvasas' => 0, 'iras' => 0];
+        }
+        else
+            return ['olvasas' => self::$telepitettmodulok[$slug]['olvasas'], 'iras' => self::$telepitettmodulok[$slug]['iras']];
     }
 }
