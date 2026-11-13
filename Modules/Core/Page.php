@@ -3,6 +3,8 @@
 namespace Infoinventory\Modules\Core;
 use Exception;
 use Infoinventory\Classes\Settings;
+use Infoinventory\Classes\Felhasznalo;
+use Infoinventory\Classes\Modulkezelo;
 
 Class Page
 {
@@ -84,7 +86,7 @@ Class Page
     protected ?string $headerview = null;
 
     // Ez a változó tárolja el, hogy az oldalon egy adott felhasználó írhat-e.
-    protected bool $irasjog = false;
+    protected ?bool $irasjog = null;
 
     // Az aloldal egy view fájl, amit a fő view fájl elé renderel az oldal. Üzenetek átadására szolgál.
     protected ?string $aloldal = null;
@@ -106,7 +108,9 @@ Class Page
     // Itt kell meghatározni, hogy milyen fájlformátumokat fogad a fájlfeltöltő menü a felhasználói UI-n. Csak kozmeztika, és kézzel kell megadni!
     public string $form_mediatypes = "'image/jpeg', 'image/png', 'image/bmp', 'image/webp'";
 
-    public function __construct(string $type, int $olvasas = 0, int $iras = 0) {
+    public function __construct(string $type, ?int $olvasas = 0, ?int $iras = 0) {
+        if(is_null($olvasas) || is_null($iras))
+            throw new Exception("A Page osztály példányosításához meg kell adni az olvasási és írási jog szintjét!");
         $this->title = $GLOBALS['ablakcim'];
         $this->selectedpage = $type;
         $this->canonical = ROOT_PATH . '/' . $type;
@@ -140,8 +144,7 @@ Class Page
 
     public function Render() : void {
         if(!file_exists($this->viewsgyoker . $this->view)) {
-            echo "<h2>Nézet fájl nem található!</h2>";
-            //echo "Elérési út: " . $this->viewsgyoker . $this->view;
+            $GLOBALS['debugmessages'][] = "A kért view fájl (<strong>$this->view</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->view;
             return;
         }
 
@@ -153,8 +156,10 @@ Class Page
         }
 
         if($this->aloldal) {
-            if(!file_exists($this->viewsgyoker . $this->views[$this->aloldal]))
+            if(!file_exists($this->viewsgyoker . $this->views[$this->aloldal])) {
+                $GLOBALS['debugmessages'][] = "A kért aloldal view fájl (<strong>$this->views[$this->aloldal]</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->views[$this->aloldal];
                 return;
+            }
             include($this->viewsgyoker . $this->views[$this->aloldal]);
         }
         include($this->viewsgyoker . $this->view);
@@ -162,8 +167,10 @@ Class Page
 
     public function Post() : bool {
         $fname = ucfirst($this->muvelet);
-        if(!method_exists($this, $fname))
+        if(!method_exists($this, $fname)) {
+            $GLOBALS['debugmessages'][] = "A kért művelethez (<strong>$fname</strong>) nem található metódus!";
             return false;
+        }
         return $this->$fname();
     }
 
@@ -173,16 +180,16 @@ Class Page
 
         $keys = array_keys($params);
         switch(count($params)) {
-            case 1:
+            case 1: // Csak egy paraméter van, az lehet ID, vagy metódus. Ha a metódus a validpagemethods tömbben van, akkor az a metódus, különben ID.
                 if(is_numeric($params[$keys[0]]))
                     return ['elemid' => (int)$params[$keys[0]], 'method' => null];
                 if(in_array($params[$keys[0]], $this->validpagemethods))
                     return ['method' => $params[$keys[0]], 'elemid' => null];
                 return ['elemid' => $params[$keys[0]], 'method' => null];
-            case 2:
-                if(is_numeric($params[$keys[1]]))
-                    return ['elemid' => (int)$params[$keys[1]], 'method' => $params[$keys[0]]];
-                return ['elemid' => $params[$keys[1]], 'method' => $params[$keys[0]]];
+            case 2: // Két paraméter van, az első az ID a második a metódus.
+                if(is_numeric($params[$keys[0]]))
+                    return ['elemid' => (int)$params[$keys[0]], 'method' => $params[$keys[1]]];
+                return ['elemid' => $params[$keys[0]], 'method' => $params[$keys[1]]];
             default:
                 return ['elemid' => null, 'method' => null];
         }
@@ -222,14 +229,31 @@ Class Page
         return $this;
     }
 
-    public function GetIrasjog(int|string $elem_id) : bool {
-        if(FELHASZNALO->godadmin)
-            return true;
-        return false;
+    public function GetIrasjog(?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
+        return $this->GetJog('iras', $elemfelhasznalo, $elem_csoportid);
     }
 
-    public function GetOlvasasjog(int|string $elem_id) : bool {
+    public function GetOlvasasjog(?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
+        return $this->GetJog('olvasas', $elemfelhasznalo, $elem_csoportid);
+    }
+
+    protected function GetJog(string $tipus, ?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
+        $GLOBALS['debugmessages'][] = "Jog ellenőrzés: $tipus <br>elemfelhasznalo: $elemfelhasznalo<br>elem_csoportid: $elem_csoportid<br>selectedpage: $this->selectedpage<br>felhasznalo: " . FELHASZNALO->uid . "<br>godadmin: " . (FELHASZNALO->godadmin ? 'true' : 'false') . "<br>$tipus: " . Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus];
+        $GLOBALS['debugmessages'][] = print_r(Modulkezelo::ModulJogosultsag($this->selectedpage), true);
+        if($tipus == 'iras')
+            $csoportids = FELHASZNALO->GetIrhatoCsoportIDs();
+        else
+            $csoportids = FELHASZNALO->GetCsoportIDs();
+
         if(FELHASZNALO->godadmin)
+            return true;
+        if(Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus] == 3)
+            return true;
+        if(Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus] == 2
+                && in_array($elem_csoportid, $csoportids))
+            return true;
+        if(Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus] >= 1
+                && $elemfelhasznalo == FELHASZNALO->uid)
             return true;
         return false;
     }

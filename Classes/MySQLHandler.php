@@ -30,10 +30,6 @@ class MySQLHandler
 
     public function __construct(string | null $query = null, ...$params)
 	{
-        if(isset($GLOBALS['felhasznaloid']) && $GLOBALS['felhasznaloid'] == 1)
-        {
-            $this->showdebug = true;
-        }
         try
         {
             $this->con = mysqli_connect($GLOBALS['DATABASE_HOST'], $GLOBALS['DATABASE_USER'], $GLOBALS['DATABASE_PASS'], $GLOBALS['DATABASE_NAME']);
@@ -283,7 +279,7 @@ class MySQLHandler
                     return false;
                 }
 
-                @$GLOBALS['dbcallcount']++;
+                $GLOBALS['dbcallcount']++;
                 $this->affectedrows = $this->stmt->affected_rows;
                 $this->last_insert_id = mysqli_insert_id($this->con);
                 $this->result = $this->stmt->get_result();
@@ -305,6 +301,14 @@ class MySQLHandler
         }
 
         $this->queryruntime = microtime(true) - $start_time;
+        if($this->showdebug) {
+            $GLOBALS['dbcalls'][] = [
+                'query' => $this->querystring,
+                'params' => $params,
+                'runtime' => $this->queryruntime,
+                'affectedrows' => $this->affectedrows
+            ];
+        }
         
         if(!$this->siker)
             $this->ShowException();

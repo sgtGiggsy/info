@@ -20,15 +20,15 @@ class Felhasznalo
     public ?string $profilkep;
     public ?int $session_id;
     public bool $godadmin;
-    public ?array $csoporttagsagok;
+    public array $csoporttagsagok;
 
-    public function __construct(?string $usernev = null, ?string $nev = null, ?string $email = null, ?string $osztaly = null, ?string $telefon = null, ?string $beosztas = null, ?string $leiras = null, ?string $profilkep = null, int $aktiv = 1)
+    public function __construct(?string $usernev = null, ?string $nev = null, ?string $email = null, ?string $elsobelepes = null, ?string $osztaly = null, ?string $telefon = null, ?string $beosztas = null, ?string $leiras = null, ?string $profilkep = null, ?int $aktiv = null)
     {
         $this->usernev = $usernev;
         //$this->jelszo = $jelszo;
         $this->nev = $nev;
         $this->email = $email;
-        //$this->elsobelepes = $elsobelepes;
+        $this->elsobelepes = $elsobelepes;
         $this->osztaly = $osztaly;
         $this->telefon = $telefon;
         $this->beosztas = $beosztas;
@@ -38,14 +38,13 @@ class Felhasznalo
     }
 
     public function SetCsoportTagsagok(?string $csoporttagsagok, ?string $csoportnevek, ?string $irasjogok) : void {
-        if(!$csoporttagsagok || !$csoportnevek || !$irasjogok) {
-            $this->csoporttagsagok = null;
+        if($csoporttagsagok == null || $csoportnevek == null || $irasjogok == null) {
+            $this->csoporttagsagok = array();
             return;
         }
         $csoportok = Helpers::ConcatToAssocArray(['csoport_id', 'csoport_nev', 'irasjog'], $csoporttagsagok, $csoportnevek, $irasjogok);
         foreach($csoportok as &$csoport) {
             $csoport['irasjog'] = ($csoport['irasjog'] == 1);
-            $csoport['olvasasjog'] = true; // A csoporttagságoknál az olvasás jog mindig true, ha a felhasználó tagja a csoportnak.
         }
         $this->csoporttagsagok = $csoportok;
     }
@@ -54,6 +53,20 @@ class Felhasznalo
         if(!$csoportid)
             return;
         $this->szervezet = $csoportid;
-        $this->szervezetnev = $this->csoporttagsagok[$csoportid]['csoport_nev'];
+        if(isset($this->csoporttagsagok))
+            $this->szervezetnev = $this->csoporttagsagok[$csoportid]['csoport_nev'];
+    }
+
+    public function GetCsoportIDs() : array {
+        return array_keys($this->csoporttagsagok);
+    }
+
+    public function GetIrhatoCsoportIDs() : array {
+        return array_keys(
+            array_filter(
+                $this->csoporttagsagok,
+                fn($tagsag) => $tagsag['irasjog'] == true
+            )
+        );
     }
 }

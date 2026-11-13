@@ -32,7 +32,7 @@ class Autentikacio extends Page
         $megerositokod = null;
 
         if($this->selectedpage == 'regisztracio') {
-            $this->jsfiles = ['Modules/Core/assets/autentikacio/js/inputValid.js'];
+            $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
             if($params['method'] == 'sikeres')
                 $this->view = $this->views['sikeresreg'];
             elseif($params['method'] == 'sikertelen')
@@ -44,12 +44,12 @@ class Autentikacio extends Page
         }
 
         if($this->selectedpage == 'jelszocsere') {
-            $this->jsfiles = ['Modules/Core/assets/autentikacio/js/inputValid.js'];
+            $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
         }
 
         if($this->selectedpage == 'elfelejtettjelszo') {
             if($params['method'] == 'megerosit') {
-                $this->jsfiles = ['Modules/Core/assets/autentikacio/js/inputValid.js'];
+                $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
                 $this->megerosit = $this->ElfelejtettJelszoMegerosit($params['elemid']);
                 $this->view = $this->views['ujjelszo'];
             }
@@ -173,12 +173,12 @@ class Autentikacio extends Page
                     $hashedpassword = password_hash($jelszo, PASSWORD_DEFAULT); // A jelszó hash-e az adatbázisban tároláshoz
                     if(is_null($dbsuccess)) {
                         // Az LDAP belépés sikerült, a DB felhasználó még nem létezik. Létrehozni a felhasználót a DB-ben
-                        $dbresult = FelhasznaloHandler::CreateUser($felhasznalo, $hashedpassword);
+                        $dbresult = FelhasznaloHandler::CreateUserFromLDAP($felhasznalo, $hashedpassword);
                         $loginsuccess = true;
                     }
                     else {
                         // Az LDAP belépés sikerült. Frissíteni a felhasználót DB-ben
-                        $dbresult = FelhasznaloHandler::UpdateUser($felhasznalo, $hashedpassword);
+                        $dbresult = FelhasznaloHandler::UpdateUserFromLDAP($felhasznalo, $hashedpassword);
                         $loginsuccess = true;
                     }
                 }

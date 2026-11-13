@@ -46,6 +46,8 @@ class Helpers
     }
 
     public static function SQLTimeStampToDate(?string $timestamp = null, bool $nice = false) {
+        if(!$timestamp)
+            return null;
         if(!$nice)
             return date('Y-m-d', strtotime($timestamp));
         else

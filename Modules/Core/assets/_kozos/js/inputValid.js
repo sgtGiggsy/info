@@ -50,6 +50,8 @@ function updateJelszoBox(score, pwd) {
 function validate() {
     const pwd = jelszo.value;
     const pwd2 = jelszoismetles.value;
+    if (pwd.length === 0 && pwd2.length === 0)
+        return;
 
     const lengthOk = pwd.length >= jelszohossz;
     const lowerOk = /[a-z]/.test(pwd);

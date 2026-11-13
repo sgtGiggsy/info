@@ -16,6 +16,7 @@ define("ROOT_PATH", $RootPath);
 define("ABLAK_CIM", $ablakcim);
 $uid = null;
 $dbcallcount = 0;
+$dbcalls = [];
 $debugmessages = [];
 
 //print_r($_GET);
@@ -120,8 +121,14 @@ if(http_response_code() == 200)
 	Logging::Latogatas($responseTime, null, null, $session_id, $dbcallcount);
 else
 	Logging::PageFault($session_id, $responseTime);
-if(DEBUG_MODE && FELHASZNALO->godadmin) {
+if(DEBUG_MODE && FELHASZNALO->uid == 1) {
+	$debugmessages[] = "Response code: " . http_response_code();
+	$debugmessages[] = "Response time: " . $responseTime . " seconds";
+	$debugmessages[] = "Adatbázis hívások száma: " . $dbcallcount;
 	foreach($debugmessages as $message) {
 		echo "<pre style='background-color: #f0f0f0; color: #000; padding: 10px; border: 1px solid #ccc; margin: 10px 0;'>$message</pre>";
+	}
+	foreach($dbcalls as $dbcall) {
+		echo "<pre style='background-color: #f0f0f0; color: #000; padding: 10px; border: 1px solid #ccc; margin: 10px 0;'>" . print_r($dbcall, true) . "</pre>";
 	}
 }
