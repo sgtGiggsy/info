@@ -121,7 +121,7 @@ class FormBuilder
         return $this;
     }
 
-    public function SetValue(string $name, $value): self {
+    public function SetValue(string $name, mixed $value): self {
         foreach ($this->mezok as &$mezo) {
             if ($mezo['name'] === $name) {
                 if ($mezo['type'] === 'checkbox') {
@@ -129,6 +129,15 @@ class FormBuilder
                 } else {
                     $mezo['value'] = $value;
                 }
+            }
+        }
+        return $this;
+    }
+
+    public function SetHelperText(string $name, string $helperText): self {
+        foreach ($this->mezok as &$mezo) {
+            if ($mezo['name'] === $name) {
+                $mezo['helperText'] = $helperText;
             }
         }
         return $this;
@@ -142,7 +151,7 @@ class FormBuilder
             $hidden = $mezo['type'] == 'hidden';
             if(!$hidden) {
                 $html .= '<div class="inputcont-' . $mezo['type'];
-                $html .= ($checkbradio) ? ' customcbwrapper' : '';
+                $html .= ($checkbradio) ? '"><div class="customcbwrapper' : '';
                 $html .= '">';
             }
 
@@ -198,7 +207,10 @@ class FormBuilder
             }
 
             if($checkbradio && !$hidden)
-                $html .= '<label for="' . $mezo['name'] . '">' . htmlspecialchars($mezo['label']) . '</label>';
+                $html .= '<label for="' . $mezo['name'] . '">' . htmlspecialchars($mezo['label']) . '</label></div>';
+
+            if(isset($mezo['helperText']) && !$hidden)
+                $html .= '<small class="helpertext">' . htmlspecialchars($mezo['helperText']) . '</small>';
 
             if(!$hidden)
                 $html .= '</div>';
