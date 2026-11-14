@@ -73,7 +73,8 @@ class Felhasznalo
 
     public function GetModulJogosultsagok() : array {
         if(!isset($this->moduljogosultsagok)) {
-            $this->moduljogosultsagok = Modulkezelo::GetAuthorizedModules($this->uid);
+            Modulkezelo::Inicializal($this->uid);
+            $this->moduljogosultsagok = Modulkezelo::GetAuthorizedModules();
         }
         return $this->moduljogosultsagok;
     }

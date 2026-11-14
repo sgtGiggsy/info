@@ -1,6 +1,7 @@
 <?php
 
 use Infoinventory\Classes\Helpers;
+use Infoinventory\Classes\Modulkezelo;
 use Infoinventory\Classes\FormBuilder;
 use Infoinventory\Classes\Settings;
 
@@ -63,7 +64,7 @@ if($this->felhasznalo->profilkep) {
                 <h1>Modul jogosultságok</h1>
                 <ul>
                     <?php foreach($this->felhasznalo->GetModulJogosultsagok() as $slug => $modul) { ?>
-                        <li><?=$modul['modulnev']?> (Olvasás: <?=$modul['olvasas']?>, Írás: <?=$modul['iras']?>)</li>
+                        <li><?=$modul['modulnev']?> (Olvasás: <?= Modulkezelo::$jogosultsagnevek[$modul['olvasas']] ?? $modul['olvasas'] ?>, Írás: <?= Modulkezelo::$jogosultsagnevek[$modul['iras']] ?? $modul['iras'] ?>)</li>
                     <?php } ?>
                 </ul>
             </div>

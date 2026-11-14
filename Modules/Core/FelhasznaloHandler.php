@@ -22,7 +22,7 @@ class FelhasznaloHandler extends Page
     ];
 
     public function Router(array $params) : Page {
-        $this->validpagemethods = ['szerkesztes', 'uj'];
+        $this->validpagemethods = ['szerkesztes', 'uj', 'oldal'];
         $selecteduser = null;
         $params = $this->ParseGet($params);
         if($this->selectedpage == 'felhasznalo' || $this->selectedpage == 'profil') {
@@ -70,7 +70,7 @@ class FelhasznaloHandler extends Page
             $startindex = 0;
             $elemperoldal = 20;
             $this->LapozasPrepare($startindex, $elemperoldal, $params);
-            $this->felhasznalok = $this->LapozasFinalize($this->GetUserList(), $elemperoldal);
+            $this->felhasznalok = $this->LapozasFinalize($this->GetUserList($startindex, $elemperoldal), $elemperoldal);
         }
 
         return $this;
@@ -282,9 +282,9 @@ class FelhasznaloHandler extends Page
         return $felhasznalo;
     }
 
-    private function GetUserList() : array {
+    private function GetUserList(?int $startindex = 0, ?int $elemperoldal = 20) : array {
         $felhasznalok = [];
-        foreach(FelhasznaloHandlerDB::GetUserList() as $felhasznalo) {
+        foreach(FelhasznaloHandlerDB::GetUserList($startindex, $elemperoldal) as $felhasznalo) {
             $temp = new Felhasznalo($felhasznalo['usernev'], $felhasznalo['nev'], $felhasznalo['email'], $felhasznalo['elsobelepes'], $felhasznalo['osztaly'], $felhasznalo['telefon'], $felhasznalo['beosztas'], $felhasznalo['leiras'], $felhasznalo['profilkep'], $felhasznalo['aktiv']);
             $temp->uid = $felhasznalo['uid'];
             $temp->SetSajatSzervezet($felhasznalo['sajatszervezet'], $felhasznalo['sajatszervezetnev']);

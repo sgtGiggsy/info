@@ -12,23 +12,35 @@ class Modulkezelo
         'vendeg' => 0,
         'mindenki' => 1,
         'tagok' => 2,
-        'engedelyezettek' => 3,
-        'foadminok' => 4,
+        'engedelyezettek' => 3
     ];
 
-    public static function Inicializal(): void
+    public static array $jogosultsagnevek = [
+        1 => 'saját elemek',
+        2 => 'csoport elemei',
+        3 => 'minden elem'
+    ];
+
+    public static function Inicializal(?int $felhasznalo_id = null): void
     {
+        if(isset($felhasznalo_id)) {
+            self::$oldalak = [];
+            self::$telepitettmodulok = [];
+            self::$inicializalva = false;
+        }
+
         if (self::$inicializalva) {
             return;
         }
         self::$inicializalva = true;
 
-        if(!FELHASZNALO->uid)
+        if($felhasznalo_id === null)
+            $felhasznalo_id = FELHASZNALO->uid;
+
+        if(!$felhasznalo_id)
             self::$telepitettmodulok = self::GetUnauthorizedModules();
         else
-            self::$telepitettmodulok = self::GetAuthorizedModules();
-
-        // print_r(self::$telepitettmodulok);
+            self::$telepitettmodulok = self::GetAuthorizedModules($felhasznalo_id);
 
         foreach (glob(ROOT_DIR . '/Modules/*/manifest*.php') ?: [] as $manifest) {
             $module = require $manifest;
@@ -88,11 +100,15 @@ class Modulkezelo
         if($felhasznalo_id === null)
             $felhasznalo_id = FELHASZNALO->uid;
 
-        $telepitve = new MySQLHandler("SELECT slug, modul_id, sorrend, lathatosag, iras, olvasas
+        $telepitve = new MySQLHandler("SELECT slug, core_modulok.modul_id AS modul_id,
+                    sorrend, lathatosag, iras, olvasas
                 FROM core_modulok
-                    LEFT JOIN core_modulok_jogosultsagok USING (modul_id)
-                WHERE (felhasznalo_id = ? OR lathatosag = 1 OR lathatosag = 2)
-                AND telepitve = 1;", $felhasznalo_id);
+                    LEFT JOIN core_modulok_jogosultsagok ON core_modulok.modul_id = core_modulok_jogosultsagok.modul_id
+                        AND core_modulok_jogosultsagok.felhasznalo_id = ?
+                WHERE telepitve = 1
+                    AND (core_modulok_jogosultsagok.felhasznalo_id IS NOT NULL
+                        OR core_modulok.lathatosag IN (1, 2)
+                    );", $felhasznalo_id);
         return $telepitve->AsArray("slug");
     }
 
