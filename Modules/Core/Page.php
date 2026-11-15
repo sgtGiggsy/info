@@ -2,8 +2,8 @@
 
 namespace Infoinventory\Modules\Core;
 use Exception;
+use Infoinventory\Classes\FormBuilder;
 use Infoinventory\Classes\Settings;
-use Infoinventory\Classes\Felhasznalo;
 use Infoinventory\Classes\Modulkezelo;
 
 Class Page
@@ -93,6 +93,9 @@ Class Page
 
     // Az elérhető view fájlok listája, ahol a kulcs a $_GET['page']-ből várt érték, az érték pedig a tényleges PHP fájl neve
     protected array $views = [];
+
+    // A form builder osztály példánya, ha az oldal használja a FormBuilder osztályt
+    protected FormBuilder $form;
 
     // Az oldal fejlécéhez elérhető view fájlok listája
     protected array $headerviews = [];
@@ -186,7 +189,9 @@ Class Page
                 if(in_array($params[$keys[0]], $this->validpagemethods))
                     return ['method' => $params[$keys[0]], 'elemid' => null];
                 return ['elemid' => $params[$keys[0]], 'method' => null];
-            case 2: // Két paraméter van, az első az ID a második a metódus.
+            case 2: // Két paraméter van, ha az első egy valid metódus, az lesz a metódus, különben az első az ID a második a metódus.
+                if(in_array($params[$keys[0]], $this->validpagemethods))
+                    return ['elemid' => $params[$keys[1]], 'method' => $params[$keys[0]]];
                 if(is_numeric($params[$keys[0]]))
                     return ['elemid' => (int)$params[$keys[0]], 'method' => $params[$keys[1]]];
                 return ['elemid' => $params[$keys[0]], 'method' => $params[$keys[1]]];
@@ -199,7 +204,7 @@ Class Page
         include(ROOT_DIR. "/template/assets/lapozo.php");
     }
 
-    protected function LapozasPrepare(int &$startindex, int &$elemperoldal, array $params) {
+    protected function LapozasPrepare(int &$startindex, int &$elemperoldal, array $params) : void {
         $elemperoldal = 20;
         $startindex = 0;
         if($params['method'] == 'oldal' && isset($params['elemid'])){
@@ -211,6 +216,7 @@ Class Page
         else {
             $this->lapozas['kovetkezo'] = 2;
         }
+        $GLOBALS['debugmessages'][] = "LapozasPrepare: startindex=$startindex, elemperoldal=$elemperoldal, params=" . print_r($params, true);
     }
 
     protected function LapozasFinalize(?array $viewtomb, int $elemperoldal) : array {
@@ -221,12 +227,16 @@ Class Page
         if(count($viewtomb) < $elemperoldal) {
             $this->lapozas['kovetkezo'] = null;
         }
-
         return $viewtomb;
     }
 
     public function Router(array $params) : Page {
         return $this;
+    }
+
+    // Itt a parent osztályban nincs implementálva, a leszármazott osztályokban kell implementálni, ha az oldal tartalmaz generált formot.
+    protected function Form(mixed $elem = null) : FormBuilder {
+        return new FormBuilder();
     }
 
     public function GetIrasjog(?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
@@ -238,23 +248,37 @@ Class Page
     }
 
     protected function GetJog(string $tipus, ?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
+        $moduljog = Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus] ?? 0;
         $GLOBALS['debugmessages'][] = "Jog ellenőrzés: $tipus <br>elemfelhasznalo: $elemfelhasznalo<br>elem_csoportid: $elem_csoportid<br>selectedpage: $this->selectedpage<br>felhasznalo: " . FELHASZNALO->uid . "<br>godadmin: " . (FELHASZNALO->godadmin ? 'true' : 'false') . "<br>$tipus: " . Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus];
-        $GLOBALS['debugmessages'][] = print_r(Modulkezelo::ModulJogosultsag($this->selectedpage), true);
+        $GLOBALS['debugmessages'][] = print_r($moduljog, true);
         if($tipus == 'iras')
             $csoportids = FELHASZNALO->GetIrhatoCsoportIDs();
         else
             $csoportids = FELHASZNALO->GetCsoportIDs();
 
+        // Ha a felhasználó godadmin, akkor mindenhez van joga
         if(FELHASZNALO->godadmin)
             return true;
-        if(Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus] == 3)
+
+        // Ha a modulhoz a felhasználónak 3-as szintű joga van, akkor a modulban bármit írhat/olvashat, függően attól, hogy a $tipus 'iras' vagy 'olvasas'
+        if($moduljog == 3)
             return true;
-        if(Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus] == 2
-                && in_array($elem_csoportid, $csoportids))
+
+        // Ha a modulhoz a felhasználónak 2-es szintű joga van, akkor két eshetőség van
+        if($moduljog == 2) {
+            // Ha nincs elem megadva, akkor azt ellenőrizzük, hogy a felhasználó létrehozhat-e új elemet.
+            if(is_null($elemfelhasznalo) && is_null($elem_csoportid))
+                return true;
+
+            // Ha van elem megadva, akkor azt ellenőrizzük, hogy a részére engedélyezett csoportok egyike ad-e jogot hozzá.
+            if(in_array($elem_csoportid, $csoportids))
+                return true;
+        }
+
+        // Ha a modulhoz a felhasználónak 1-es szintű joga van, akkor csak a saját elemeihez van joga.
+        if($moduljog >= 1 && $elemfelhasznalo == FELHASZNALO->uid)
             return true;
-        if(Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus] >= 1
-                && $elemfelhasznalo == FELHASZNALO->uid)
-            return true;
+
         return false;
     }
 
@@ -262,5 +286,29 @@ Class Page
         return isset($this->views[$this->selectedpage]);
     }
 
+    protected function SetSelectedUj() : Page {
+        if(!$this->GetIrasjog()) {
+            return new SinglePage(403, "Nincs jogosultságod új elem létrehozásához!");
+        }
 
+        $this->irasjog = true;
+        $this->muvelet = 'uj';
+        $this->view = $this->views['uj'];
+        $this->form = $this->Form();
+
+        return $this;
+    }
+
+    protected function SetSelectedSzerkeszt(mixed $elem, string $elemnev = 'elem') : Page {
+        if(!$this->irasjog) {
+            return new SinglePage(403, "A kiválasztott $elemnev szerkesztéséhez nincs jogosultságod!");
+        }
+
+        $this->irasjog = true;
+        $this->muvelet = 'szerkeszt';
+        $this->view = $this->views['szerkeszt'];
+        $this->form = $this->Form($elem);
+
+        return $this;
+    }
 }
