@@ -6,7 +6,7 @@ if (!defined('ROOT_PATH')) {
 }
 ?><div class="normalcontent">
     <h1><?=$this->felhasznalo->nev?> profiljának szerkesztése</h1>
-    <form action="<?=ROOT_PATH?>/felhasznalo/<?=$this->felhasznalo->usernev?>/szerkesztes" method="post" enctype="multipart/form-data">
+    <form action="<?=ROOT_PATH?>/felhasznalo/<?=$this->felhasznalo->usernev?>/szerkeszt" method="post" enctype="multipart/form-data">
         <p>AD felhasználó esetén az adatok szerkesztésének nincs jelentősége,
             mert a felhasználó következő bejelentkezésekor
             minden itt megadott adatt felülírásra kerül az AD-ból érkezővel</p>

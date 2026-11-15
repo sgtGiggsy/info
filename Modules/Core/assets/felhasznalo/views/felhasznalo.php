@@ -24,7 +24,7 @@ if($this->felhasznalo->profilkep) {
     else
     {
         if($this->irasjog) {
-            ?><a class="anchbutton" href="<?= ROOT_PATH . '/felhasznalo/' . $this->felhasznalo->usernev . '/szerkesztes' ?>">
+            ?><a class="anchbutton" href="<?= ROOT_PATH . '/felhasznalo/' . $this->felhasznalo->usernev . '/szerkeszt' ?>">
                 Felhasználó szerkesztése
             </a><?php
         }

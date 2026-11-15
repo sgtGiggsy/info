@@ -164,7 +164,7 @@ class Autentikacio extends Page
                 $dbsuccess = $this->DBLogin($usernev, $jelszo);
 
                 // Ha van megadott LDAP szerver a beállításokban, akkor megpróbáljuk azt használni a belépéshez
-                if(isset($GLOBALS['LDAP_SERVERS']) && !empty($GLOBALS['LDAP_SERVERS']))
+                if(!empty($GLOBALS['LDAP_SERVERS']))
                     $ldapsuccess = $this->LDAPLogin($usernev, $jelszo);
 
                 // Lekezeljük a két bejelentkezési metódus eredményét. Mivel a $loginsuccess false-ra van inicializálva, csak a sikeres esetekkel kell foglalkozni

@@ -45,7 +45,7 @@ class Kozlemeny extends Page
             if(!$this->kozlemeny)
                 return new SinglePage('404');
 
-            $this->irasjog = $this->GetIrasjog($this->kozlemeny['kozlemeny_id']);
+            $this->irasjog = $this->GetIrasjog(null);
 
             if($params['method'] == 'szerkeszt' && FELHASZNALO->uid && $this->irasjog) {
                 $this->muvelet = 'szerkeszt';
@@ -56,7 +56,7 @@ class Kozlemeny extends Page
                 $this->redirtarget = ROOT_PATH . '/kozlemenyek';
                 $this->muvelet = 'torol';
             }
-            elseif($params['method'] != 'szerkeszt' && !$this->GetOlvasasjog($params['elemid']))
+            elseif($params['method'] != 'szerkeszt' && !$this->GetOlvasasjog(null))
                 return new SinglePage('403');
 
             $this->cimke = $this->kozlemeny['cim'];
@@ -95,13 +95,13 @@ class Kozlemeny extends Page
         $this->HtmlHeadRender();
     }
 
-    private function Form(string $muvelet, ?array $kozlemeny = null) : FormBuilder {
+    protected function Form(mixed $kozlemeny = null) : FormBuilder {
         $form = (new FormBuilder())
             ->TextBox('bevezetes', 'Bevezetés')
             ->TextBox('szovegtorzs', 'Közlemény törzs')
             ->Text('cim', 'Cím')
             ->Checkbox('publikalt', 'A közlemény állapota');
-        if($muvelet == 'szerkeszt' && $kozlemeny != null && $this->GetIrasjog($kozlemeny['kozlemeny_id'])) {
+        if($kozlemeny != null && $this->GetIrasjog($kozlemeny['kozlemeny_id'])) {
             $form->Text('slug', 'Link címe')
                 ->Hidden('kozlemeny_id')
                 ->SetValue('kozlemeny_id', $kozlemeny['kozlemeny_id'])

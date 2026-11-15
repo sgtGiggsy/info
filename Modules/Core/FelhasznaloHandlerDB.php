@@ -22,7 +22,7 @@ class FelhasznaloHandlerDB
 
     public static function SzervezetValaszto(string $needle) : ?int {
         if($needle) {
-            $szervezet = new MySQLHandler("SELECT szervezet FROM `szervezetldap` WHERE ? LIKE CONCAT('%', szervezetldap.needle, '%');", $needle);
+            $szervezet = new MySQLHandler("SELECT csoport_id FROM `core_csoportok_ldap` WHERE ? LIKE CONCAT('%', needle, '%');", $needle);
             @$szervezet = $szervezet->Fetch()['szervezet'];
         } else {
             $szervezet = null;
@@ -52,7 +52,8 @@ class FelhasznaloHandlerDB
                 LEFT JOIN core_csoportok USING (csoport_id)
                 LEFT JOIN core_csoportok_tagsagok AS sajat ON sajat.felhasznalo_id = core_felhasznalok.felhasznalo_id AND sajat.sajatszervezet = 1
                 LEFT JOIN core_csoportok AS sajatcsoport ON sajatcsoport.csoport_id = sajat.csoport_id
-            WHERE core_felhasznalok.$where = ?;", $azonosito);
+            WHERE core_felhasznalok.$where = ?
+            GROUP BY core_felhasznalok.felhasznalo_id;", $azonosito);
 
         if($getuser->sorokszama == 0)
             return null;

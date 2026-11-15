@@ -9,36 +9,27 @@ use Infoinventory\Classes\Modulkezelo;
 
 class FelhasznaloHandler extends Page
 {
-    protected Felhasznalo $felhasznalo;
+    protected ?Felhasznalo $felhasznalo;
     protected array $felhasznalok = [];
-    protected FormBuilder $form;
     protected string $viewsgyoker = __DIR__ . "/assets/felhasznalo/views/";
     protected array $views = [
         'felhasznalo' => 'felhasznalo.php',
         'felhasznalok' => 'felhasznalok.php',
         'profil' => 'felhasznalo.php',
         'uj' => 'uj.php',
-        'szerkesztes' => 'szerkesztes.php'
+        'szerkeszt' => 'szerkeszt.php'
     ];
+    protected array $validpagemethods = ['szerkeszt', 'uj', 'oldal'];
 
     public function Router(array $params) : Page {
-        $this->validpagemethods = ['szerkesztes', 'uj', 'oldal'];
+        if(!FELHASZNALO->uid)
+            return new SinglePage(403, "A felhasználó(k) megtekintéséhez be kell jelentkezned!");
         $selecteduser = null;
         $params = $this->ParseGet($params);
         if($this->selectedpage == 'felhasznalo' || $this->selectedpage == 'profil') {
-            if(!FELHASZNALO->uid)
-                return new SinglePage(403);
-
             if($params['method'] == 'uj') {
-                if(Modulkezelo::ModulJogosultsag('felhasznalo')['iras'] < 2) {
-                    return new SinglePage(403);
-                }
-
                 $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
-                $this->muvelet = 'uj';
-                $this->view = $this->views['uj'];
-                $this->form = $this->Form();
-                return $this;
+                return $this->SetSelectedUj();
             }
 
             if(!$params['elemid'])
@@ -47,25 +38,19 @@ class FelhasznaloHandler extends Page
                 $selecteduser = $params['elemid'];
 
             $this->felhasznalo = self::GetUser($selecteduser);
+
+            if(!$this->felhasznalo)
+                return new SinglePage(404, "A kiválasztott felhasználó nem található!");
+
             $this->irasjog = $this->GetIrasjog($this->felhasznalo->uid, $this->felhasznalo->szervezet);
 
-            if(!$params['method']) {
+            if($params['method'] == 'szerkeszt') {
+                return $this->SetSelectedSzerkeszt($this->felhasznalo, 'felhasználó');
+            } else {
                 $this->view = $this->views['felhasznalo'];
             }
-
-            if($params['method'] == 'szerkesztes') {
-                if(!$this->irasjog) {
-                    return new SinglePage(403);
-                }
-
-                $this->muvelet = 'szerkesztes';
-                $this->view = $this->views['szerkesztes'];
-                $this->form = $this->Form($this->felhasznalo);
-            }
         } elseif ($this->selectedpage == "felhasznalok") {
-            if(!FELHASZNALO->uid)
-                return new SinglePage(403);
-
+            $this->irasjog = $this->GetIrasjog();
             $this->view = $this->views['felhasznalok'];
             $startindex = 0;
             $elemperoldal = 20;
@@ -83,7 +68,7 @@ class FelhasznaloHandler extends Page
         } elseif ($this->selectedpage == "felhasznalo" && $this->muvelet == 'uj') {
             $this->title .= " - Új felhasználó felvétele";
             $this->sitedesc = "Új felhasználó felvétele";
-        } elseif ($this->selectedpage == "felhasznalo" && $this->muvelet == 'szerkesztes') {
+        } elseif ($this->selectedpage == "felhasznalo" && $this->muvelet == 'szerkeszt') {
             $this->title .= " - " . $this->felhasznalo->nev . " profiljának szerkesztése";
             $this->sitedesc = "Felhasználó szerkesztése";
         } elseif ($this->selectedpage == "felhasznalok") {
@@ -94,7 +79,7 @@ class FelhasznaloHandler extends Page
         include(ROOT_DIR . "/template/assets/htmlheader.php");
     }
 
-    protected function Form(?Felhasznalo $felhasznalo = null) : FormBuilder {
+    protected function Form(mixed $felhasznalo = null) : FormBuilder {
         $form = (new FormBuilder())
             ->Hidden('felhasznalo_id')
             ->Text('usernev', 'Felhasználónév', true)
@@ -272,6 +257,8 @@ class FelhasznaloHandler extends Page
 
     public static function GetUser(int|string $azonosito) : ?Felhasznalo {
         $getuser = FelhasznaloHandlerDB::GetUser($azonosito);
+        if(!$getuser)
+            return null;
         $felhasznalo = new Felhasznalo($getuser['usernev'], $getuser['nev'], $getuser['email'], $getuser['elsobelepes'], $getuser['osztaly'], $getuser['telefon'], $getuser['beosztas'], $getuser['leiras'], $getuser['profilkep'], $getuser['aktiv']);
         $felhasznalo->uid = $getuser['uid'];
         $felhasznalo->godadmin = ($getuser['godadmin'] == 1);
