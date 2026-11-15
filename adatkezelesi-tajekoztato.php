@@ -7,7 +7,7 @@ function HtmlHead(&$keywords, &$canonical, &$title, &$ogtype, &$publishtime, &$s
     $cimke = "adatkezelesi-tajekoztato";
 }
 
-function Render() : void {
+function Render(?string $egyedihiba = null) : void {
     ?><div class="normalcontent szovegtartalom">
         <h1>Kalóriafaló – Adatkezelési tájékoztató</h1>
         <h2>1. Az adatkezelő adatai</h2>

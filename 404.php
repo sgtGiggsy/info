@@ -10,8 +10,8 @@ function HtmlHead(&$keywords, &$canonical, &$title, &$ogtype, &$publishtime, &$s
     $cimke = "404";
 }
 
-function Render()
+function Render(?string $egyedihiba = null) : void
 {
     ?><h1>404 - Nem található</h1>
-    <p>Itt most semmi finomság nem készül!</p><?php
+    <p><?=($egyedihiba) ? $egyedihiba : "Az általad felkeresni kívánt oldal nem található!" ?></p><?php
 }

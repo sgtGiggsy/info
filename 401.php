@@ -11,8 +11,8 @@ function HtmlHead(&$keywords, &$canonical, &$title, &$ogtype, &$publishtime, &$s
     $cimke = "401";
 }
 
-function Render()
+function Render(?string $egyedihiba = null) : void
 {
     ?><h1>Bejelentkezéshez kötött tartalom</h1>
-    <p>Itt csak belépést követően főzöcskézhetsz!</p><?php
+    <p><?=($egyedihiba) ? $egyedihiba : "Az oldal megtekintése bejelentkezéshez kötött!" ?></p><?php
 }

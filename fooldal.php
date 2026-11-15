@@ -8,7 +8,7 @@ function HtmlHead(&$keywords, &$canonical, &$title, &$ogtype, &$publishtime, &$s
     $cimke = "főoldal";
 }
 
-function Render() : void
+function Render(?string $egyedihiba = null) : void
 {
     ?><h1>Főoldal</h1>
     <p>Itt valami nagyszerű dolog készül!</p><?php

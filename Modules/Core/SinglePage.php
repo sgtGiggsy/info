@@ -4,6 +4,7 @@ namespace Infoinventory\Modules\Core;
 
 class SinglePage extends Page
 {
+    protected ?string $egyedihiba;
     protected array $views = [
         '401' => '401.php',
         '403' => '403.php',
@@ -16,8 +17,9 @@ class SinglePage extends Page
         'kapcsolat' => 'kapcsolat.php'
     ];
 
-    public function __construct(string $type) {
+    public function __construct(string $type, ?string $egyedihiba = null) {
         $this->title = $GLOBALS['ablakcim'];
+        $this->egyedihiba = $egyedihiba;
         $file = $this->views[$type] ?? $this->views['404'];
         $this->selectedpage = $type;
         $this->canonical = ROOT_PATH . '/' . $type;
@@ -26,6 +28,6 @@ class SinglePage extends Page
 
     public function Render() : void {
         if(function_exists('Render'))
-            Render();
+            Render($this->egyedihiba);
     }
 }

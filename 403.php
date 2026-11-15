@@ -11,8 +11,8 @@ function HtmlHead(&$keywords, &$canonical, &$title, &$ogtype, &$publishtime, &$s
     $cimke = "403";
 }
 
-function Render()
+function Render(?string $egyedihiba = null) : void
 {
     ?><h1>403 - Hozzáférés megtagadva</h1>
-    <p>Itt neked nem főztünk ki semmit!</p><?php
+    <p><?=($egyedihiba) ? $egyedihiba : "Ehhez az oldalhoz nincs jogosultságod." ?></p><?php
 }

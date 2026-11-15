@@ -7,7 +7,7 @@ function HtmlHead(&$keywords, &$canonical, &$title, &$ogtype, &$publishtime, &$s
     $cimke = "security";
 }
 
-function Render() {
+function Render(?string $egyedihiba = null) {
     ?><div class="normalcontent szovegtartalom">
         <small>A magyarnyelvű irányelvekért görgess lejjebb</small>
 

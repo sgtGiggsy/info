@@ -7,7 +7,7 @@ function HtmlHead(&$keywords, &$canonical, &$title, &$ogtype, &$publishtime, &$s
     $cimke = "impresszum";
 }
 
-function Render() : void {
+function Render(?string $egyedihiba = null) : void {
     ?><div class="normalcontent">
         <h1>Impresszum</h1>
 

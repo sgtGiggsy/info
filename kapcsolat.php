@@ -7,7 +7,7 @@ function HtmlHead(&$keywords, &$canonical, &$title, &$ogtype, &$publishtime, &$s
     $cimke = "kapcsolat";
 }
 
-function Render() : void {
+function Render(?string $egyedihiba = null) : void {
     ?><div class="normalcontent szovegtartalom">
         <h1>Kapcsolat</h1>
         <div>

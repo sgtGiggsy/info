@@ -8,7 +8,7 @@ function HtmlHead(&$keywords, &$canonical, &$title, &$ogtype, &$publishtime, &$s
     $cimke = "media-ajanlat";
 }
 
-function Render() : void {
+function Render(?string $egyedihiba = null) : void {
     ?><div class="normalcontent">
         <h1>Média ajánlat</h1>
 
