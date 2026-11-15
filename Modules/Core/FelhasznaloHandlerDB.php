@@ -4,7 +4,7 @@ namespace Infoinventory\Modules\Core;
 
 use Infoinventory\Classes\MySQLHandler;
 use Infoinventory\Classes\Felhasznalo;
-use Infoinventory\Classes\Modulkezelo;
+use Infoinventory\Classes\ModuleLoader;
 
 class FelhasznaloHandlerDB
 {
@@ -62,7 +62,7 @@ class FelhasznaloHandlerDB
     }
 
     public static function GetUserList(int $startindex = 0, int $dbszam = 20, ?int ...$olvasjogok) : ?array {
-        if(Modulkezelo::ModulJogosultsag('felhasznalok')['olvasas'] == 3) {
+        if(ModuleLoader::ModulJogosultsag('felhasznalok')['olvasas'] == 3) {
             $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
@@ -70,7 +70,7 @@ class FelhasznaloHandlerDB
                 WHERE sajatszervezet = 1
                 LIMIT ?, ?;", $startindex, $dbszam);
         }
-        if(Modulkezelo::ModulJogosultsag('felhasznalok')['olvasas'] == 2) {
+        if(ModuleLoader::ModulJogosultsag('felhasznalok')['olvasas'] == 2) {
             $paramplacehold = implode(', ', array_fill(0, count(FELHASZNALO->GetCsoportIDs()), '?'));
 
             $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
@@ -80,7 +80,7 @@ class FelhasznaloHandlerDB
                 WHERE sajatszervezet = 1 AND csoport_id IN ($paramplacehold)
                 LIMIT $startindex, $dbszam;", ...FELHASZNALO->GetCsoportIDs());
         }
-        if(Modulkezelo::ModulJogosultsag('felhasznalok')['olvasas'] == 1) {
+        if(ModuleLoader::ModulJogosultsag('felhasznalok')['olvasas'] == 1) {
             $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
@@ -96,7 +96,7 @@ class FelhasznaloHandlerDB
     }
 
     public static function GetCsoportList() : array {
-        $csoportok = new MySQLHandler("SELECT csoport_id, csoport_nev FROM core_csoportok WHERE statusz = 1 ORDER BY csoport_nev ASC;");
+        $csoportok = new MySQLHandler("SELECT csoport_id, csoport_nev FROM core_csoportok WHERE statusz = 1 ORDER BY csoport_nev;");
         if($csoportok->sorokszama == 0)
             return [];
         return $csoportok->ArrayForSelect();

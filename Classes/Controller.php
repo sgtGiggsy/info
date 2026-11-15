@@ -147,28 +147,28 @@ class Controller
 
     public static function PageSelect(?string $type): Page {
         $olvasas = $iras = 0;
-        Modulkezelo::Inicializal();
+        ModuleLoader::Inicializal();
         if(!$type) {
-            $class = Modulkezelo::$oldalak['kozlemenyek']['handler'] ?? SinglePage::class;
+            $class = ModuleLoader::$oldalak['kozlemenyek']['handler'] ?? SinglePage::class;
             $type = 'kozlemenyek';
-            $olvasas = Modulkezelo::$oldalak[$type]['olvasas'] ?? 0;
-            $iras = Modulkezelo::$oldalak[$type]['iras'] ?? 0;
+            $olvasas = ModuleLoader::$oldalak[$type]['olvasas'] ?? 0;
+            $iras = ModuleLoader::$oldalak[$type]['iras'] ?? 0;
         }
-        elseif (!isset(Modulkezelo::$oldalak[$type])
-            || !class_exists(Modulkezelo::$oldalak[$type]['handler'])) {
+        elseif (!isset(ModuleLoader::$oldalak[$type])
+                    || !class_exists(ModuleLoader::$oldalak[$type]['handler'])) {
             if(DEBUG_MODE) {
-                if(!isset(Modulkezelo::$oldalak[$type]))
+                if(!isset(ModuleLoader::$oldalak[$type]))
                     $GLOBALS['debugmessages'][] = "A kért URI-hoz (<strong>$type</strong>) nem található ismert oldal egyik manifestben sem!";
                 else
-                    $GLOBALS['debugmessages'][] = "A kért URI-hoz (<strong>$type</strong>) megadott handler osztály elérési útja hibás: " . Modulkezelo::$oldalak[$type]['handler'];
+                    $GLOBALS['debugmessages'][] = "A kért URI-hoz (<strong>$type</strong>) megadott handler osztály elérési útja hibás: " . ModuleLoader::$oldalak[$type]['handler'];
             }
             $class = SinglePage::class;
             $type = '404';
         }
         else {
-            $class = Modulkezelo::$oldalak[$type]['handler'];
-            $olvasas = Modulkezelo::$oldalak[$type]['olvasas'] ?? 0;
-            $iras = Modulkezelo::$oldalak[$type]['iras'] ?? 0;
+            $class = ModuleLoader::$oldalak[$type]['handler'];
+            $olvasas = ModuleLoader::$oldalak[$type]['olvasas'] ?? 0;
+            $iras = ModuleLoader::$oldalak[$type]['iras'] ?? 0;
         }
 
         // Oldal inicializálása

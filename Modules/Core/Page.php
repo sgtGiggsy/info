@@ -4,7 +4,7 @@ namespace Infoinventory\Modules\Core;
 use Exception;
 use Infoinventory\Classes\FormBuilder;
 use Infoinventory\Classes\Settings;
-use Infoinventory\Classes\Modulkezelo;
+use Infoinventory\Classes\ModuleLoader;
 
 Class Page
 {
@@ -248,8 +248,8 @@ Class Page
     }
 
     protected function GetJog(string $tipus, ?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
-        $moduljog = Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus] ?? 0;
-        $GLOBALS['debugmessages'][] = "Jog ellenőrzés: $tipus <br>elemfelhasznalo: $elemfelhasznalo<br>elem_csoportid: $elem_csoportid<br>selectedpage: $this->selectedpage<br>felhasznalo: " . FELHASZNALO->uid . "<br>godadmin: " . (FELHASZNALO->godadmin ? 'true' : 'false') . "<br>$tipus: " . Modulkezelo::ModulJogosultsag($this->selectedpage)[$tipus];
+        $moduljog = ModuleLoader::ModulJogosultsag($this->selectedpage)[$tipus] ?? 0;
+        $GLOBALS['debugmessages'][] = "Jog ellenőrzés: $tipus <br>elemfelhasznalo: $elemfelhasznalo<br>elem_csoportid: $elem_csoportid<br>selectedpage: $this->selectedpage<br>felhasznalo: " . FELHASZNALO->uid . "<br>godadmin: " . (FELHASZNALO->godadmin ? 'true' : 'false') . "<br>$tipus: " . ModuleLoader::ModulJogosultsag($this->selectedpage)[$tipus];
         $GLOBALS['debugmessages'][] = print_r($moduljog, true);
         if($tipus == 'iras')
             $csoportids = FELHASZNALO->GetIrhatoCsoportIDs();

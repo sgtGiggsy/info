@@ -2,7 +2,7 @@
 
 namespace Infoinventory\Classes;
 
-class Modulkezelo
+class ModuleLoader
 {
     public static array $oldalak = [];
     private static array $telepitettmodulok = [];

@@ -5,7 +5,6 @@ namespace Infoinventory\Modules\Core;
 use Infoinventory\Classes\FeltoltesHandler;
 use Infoinventory\Classes\FormBuilder;
 use Infoinventory\Classes\Felhasznalo;
-use Infoinventory\Classes\Modulkezelo;
 
 class FelhasznaloHandler extends Page
 {

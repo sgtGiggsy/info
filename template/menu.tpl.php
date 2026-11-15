@@ -3,7 +3,7 @@
 namespace Infoinventory\template;
 
 use Infoinventory\Classes\Helpers;
-use Infoinventory\Classes\Modulkezelo;
+use Infoinventory\Classes\ModuleLoader;
 use Infoinventory\Classes\Settings;
 use Infoinventory\includes\Jogszint;
 
@@ -20,12 +20,12 @@ $jobbraigazit = false;
         </button>
     </li>
     <li>
-        <a href="<?=$RootPath?>/"><?=GrafikaiElemek::$ikonok['oldalminilogo']?></a>
+        <a href="<?=ROOT_PATH?>/"><?=GrafikaiElemek::$ikonok['oldalminilogo']?></a>
     </li>
     <li></li>
 </ul>
 <ul class="links" id="linkek"><?php
-    foreach (Modulkezelo::Menupontok() as $kulcs => $menuelem) {
+    foreach (ModuleLoader::Menupontok() as $kulcs => $menuelem) {
         if($menuelem['menuben']
             && ($menuelem['lathatosag'] == "mindenki"
                 || ($menuelem['lathatosag'] != "vendeg" && FELHASZNALO->uid)
@@ -42,11 +42,11 @@ $jobbraigazit = false;
             $gyokerelem = $menuelem['szulo'] === true || $menuelem['szulo'] === null;
 
             if($kulcs == 'fooldal')
-                $url = $RootPath;
+                $url = ROOT_PATH;
             elseif($menuelem['szulo'] === true)
                 $url = "#";
             else
-                $url = $RootPath . "/" . $kulcs;
+                $url = ROOT_PATH . "/" . $kulcs;
 
             if($kulcs == 'felhasznalo')
                 $menuelem['menupont'] = FELHASZNALO->usernev;
