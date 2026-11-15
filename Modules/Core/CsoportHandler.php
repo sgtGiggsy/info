@@ -1,9 +1,7 @@
 <?php
- namespace Modules\Core;
+ namespace Infoinventory\Modules\Core;
 
  use Infoinventory\Classes\FormBuilder;
- use Infoinventory\Modules\Core\Page;
- use Infoinventory\Modules\Core\SinglePage;
 
  class CsoportHandler extends Page
  {
@@ -48,8 +46,18 @@
              $startindex = 0;
              $elemperoldal = 20;
              $this->LapozasPrepare($startindex, $elemperoldal, $params);
-             $this->csoportok = $this->LapozasFinalize($this->GetCsoportList($startindex, $elemperoldal), $elemperoldal);
+             $this->csoportok = $this->LapozasFinalize(self::GetCsoportList($startindex, $elemperoldal), $elemperoldal);
          }
          return $this;
+     }
+
+    public static function GetCsoport(string|int $csoportid) : ?array
+    {
+        return CsoportHandlerDB::GetCsoport($csoportid);
+    }
+
+     public static function GetCsoportList(int $startindex, int $elemperoldal) : array
+     {
+         return CsoportHandlerDB::GetCsoportList($startindex, $elemperoldal);
      }
  }
