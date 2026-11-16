@@ -61,26 +61,37 @@ class FelhasznaloHandlerDB
         return $getuser->RecordAsArray();
     }
 
-    public static function GetUserList(int $jogszint, int ...$queryparams) : ?array {
+    public static function GetUserList(int $jogszint, ?string $kereses, mixed ...$queryparams) : ?array {
         $osszrekord = 0;
+        $phdb = count($queryparams) - 2; // A limit paraméterek nem számítanak a csoport ID-k számába
+        if(is_null($kereses)) {
+            $keresesstring = '';
+        }
+        else {
+            $keresesstring = " AND (usernev LIKE ? OR nev LIKE ? OR email LIKE ?)";
+            $kereses = '%' . $kereses. '%';
+            $limit = array_pop($queryparams);
+            $startindex = array_pop($queryparams);
+            $queryparams = array_merge($queryparams, [$kereses, $kereses, $kereses], [$startindex, $limit]);
+        }
+
         if($jogszint == 3) {
             $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                     LEFT JOIN core_csoportok USING (csoport_id)
-                WHERE sajatszervezet = 1
+                WHERE sajatszervezet = 1 $keresesstring
                 LIMIT ?, ?;", ...$queryparams);
             $osszrekord = $getuser->GetLimitNelkuliDB();
         }
         elseif($jogszint == 2) {
-            $phdb = count($queryparams) - 2;
             $paramplacehold = implode(', ', array_fill(0, $phdb, '?'));
 
             $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                     LEFT JOIN core_csoportok USING (csoport_id)
-                WHERE sajatszervezet = 1 AND csoport_id IN ($paramplacehold)
+                WHERE sajatszervezet = 1 AND csoport_id IN ($paramplacehold) $keresesstring
                 LIMIT ?, ?;", ...$queryparams);
             $osszrekord = $getuser->GetLimitNelkuliDB();
         }
@@ -89,7 +100,7 @@ class FelhasznaloHandlerDB
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                     LEFT JOIN core_csoportok USING (csoport_id)
-                WHERE sajatszervezet = 1 AND csoport_id = ?
+                WHERE sajatszervezet = 1 AND csoport_id = ? $keresesstring
                 LIMIT ?, ?;", ...$queryparams);
             $osszrekord = $getuser->GetLimitNelkuliDB();
         }

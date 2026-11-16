@@ -72,6 +72,9 @@ abstract Class Page
         'osszlapszam' => null
     ];
 
+    // A kereséshez használt placeholder szöveg.
+    protected ?string $keresesplaceholder = "Keresés...";
+
     // A GET-ből érkező paraméterek. Csak akkor van használatban, ha a View-nak tudnia kell róla. A Routerben kap értéket
     protected array $params = [];
 
@@ -266,6 +269,21 @@ abstract Class Page
 
     protected function Lapozo() : void {
         include(ROOT_DIR. "/template/assets/lapozo.php");
+    }
+
+    protected function SetKereses(array $params) : ?string {
+        $this->jsfiles[] = 'template/assets/js/kereses.js';
+        $this->PHPvarsToJS['selectedPage'] = $this->selectedpage;
+        $kereses = $params['kereses'] ?? null;
+        if($kereses) {
+            $this->selectedpage .= "/kereses/$kereses";
+            $this->keresesplaceholder = $kereses;
+        }
+        return $kereses;
+    }
+
+    protected function Kereso() : void {
+        include(ROOT_DIR. "/template/assets/kereso.php");
     }
 
     /** 

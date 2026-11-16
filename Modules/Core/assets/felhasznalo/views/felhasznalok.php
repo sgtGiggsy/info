@@ -7,6 +7,7 @@ if (!defined('ROOT_PATH') || !FELHASZNALO->uid) {
     exit('Forbidden');
 }
 ?><div class="normalcontent">
+    <?=$this->Kereso()?>
     <h1>Felhasználók</h1>
     <table class="regulartable">
         <thead>

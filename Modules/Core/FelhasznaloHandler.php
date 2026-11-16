@@ -49,12 +49,13 @@ class FelhasznaloHandler extends Page
                 $this->view = $this->views['felhasznalo'];
             }
         } elseif ($this->selectedpage == "felhasznalok") {
+            $kereses = $this->SetKereses($params);
             $this->irasjog = $this->GetIrasjog();
             $this->view = $this->views['felhasznalok'];
             $startindex = 0;
             $elemperoldal = 20;
             $this->SetPagingVars($startindex, $elemperoldal, $params);
-            $this->felhasznalok = $this->GetUserList($startindex, $elemperoldal);
+            $this->felhasznalok = $this->GetUserList($startindex, $elemperoldal, $kereses);
             $this->DetectLastPage($this->felhasznalok, $elemperoldal);
         }
 
@@ -71,7 +72,7 @@ class FelhasznaloHandler extends Page
         } elseif ($this->selectedpage == "felhasznalo" && $this->muvelet == 'szerkeszt') {
             $this->title .= " - " . $this->felhasznalo->nev . " profiljának szerkesztése";
             $this->sitedesc = "Felhasználó szerkesztése";
-        } elseif ($this->selectedpage == "felhasznalok") {
+        } elseif (str_contains($this->selectedpage, "felhasznalok")) {
             $this->title .= ' - Felhasználók';
             $this->sitedesc = "Felhasználók listája";
         }
@@ -269,16 +270,16 @@ class FelhasznaloHandler extends Page
         return $felhasznalo;
     }
 
-    private function GetUserList(int $startindex = 0, int $elemperoldal = 20) : array {
+    private function GetUserList(int $startindex = 0, int $elemperoldal = 20, ?string $kereses = null) : array {
         $felhasznalok = [];
         if($this->olvasas == 3 || FELHASZNALO->godadmin) {
-            $dbresult = FelhasznaloHandlerDB::GetUserList(3, $startindex, $elemperoldal);
+            $dbresult = FelhasznaloHandlerDB::GetUserList(3, $kereses, $startindex, $elemperoldal);
         } elseif ($this->olvasas == 2) {
             $paramsfordb = FELHASZNALO->GetCsoportIDs();
             $paramsfordb = array_merge($paramsfordb, [$startindex, $elemperoldal]);
-            $dbresult = FelhasznaloHandlerDB::GetUserList(2, ...$paramsfordb);
+            $dbresult = FelhasznaloHandlerDB::GetUserList(2, $kereses, ...$paramsfordb);
         } else {
-            $dbresult = FelhasznaloHandlerDB::GetUserList(1, FELHASZNALO->szervezet, $startindex, $elemperoldal);
+            $dbresult = FelhasznaloHandlerDB::GetUserList(1, $kereses, FELHASZNALO->szervezet, $startindex, $elemperoldal);
         }
 
         if(!$dbresult)
