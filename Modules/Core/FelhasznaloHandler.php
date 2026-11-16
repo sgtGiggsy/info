@@ -23,7 +23,6 @@ class FelhasznaloHandler extends Page
     public function Router(array $params) : Page {
         if(!FELHASZNALO->uid)
             return new SinglePage(403, "A felhasználó(k) megtekintéséhez be kell jelentkezned!");
-        $selecteduser = null;
         $params = $this->ParseGet($params);
         if($this->selectedpage == 'felhasznalo' || $this->selectedpage == 'profil') {
             if($params['method'] == 'uj') {
@@ -53,8 +52,9 @@ class FelhasznaloHandler extends Page
             $this->view = $this->views['felhasznalok'];
             $startindex = 0;
             $elemperoldal = 20;
-            $this->LapozasPrepare($startindex, $elemperoldal, $params);
-            $this->felhasznalok = $this->LapozasFinalize($this->GetUserList($startindex, $elemperoldal), $elemperoldal);
+            $this->SetPagingVars($startindex, $elemperoldal, $params);
+            $this->felhasznalok = $this->GetUserList($startindex, $elemperoldal);
+            $this->DetectLastPage($this->felhasznalok, $elemperoldal);
         }
 
         return $this;
@@ -260,7 +260,7 @@ class FelhasznaloHandler extends Page
             return null;
         $felhasznalo = new Felhasznalo($getuser['usernev'], $getuser['nev'], $getuser['email'], $getuser['elsobelepes'], $getuser['osztaly'], $getuser['telefon'], $getuser['beosztas'], $getuser['leiras'], $getuser['profilkep'], $getuser['aktiv']);
         $felhasznalo->uid = $getuser['uid'];
-        $felhasznalo->godadmin = ($getuser['godadmin'] == 1);
+        $felhasznalo->SetGodAdmin($getuser['godadmin']);
 
         $felhasznalo->SetCsoportTagsagok($getuser['csoporttagsagok'], $getuser['csoportnevek'], $getuser['irasjogok']);
         $felhasznalo->SetSajatSzervezet($getuser['sajatszervezet'], $getuser['sajatszervezetnev']);
@@ -268,14 +268,29 @@ class FelhasznaloHandler extends Page
         return $felhasznalo;
     }
 
-    private function GetUserList(?int $startindex = 0, ?int $elemperoldal = 20) : array {
+    private function GetUserList(int $startindex = 0, int $elemperoldal = 20) : array {
         $felhasznalok = [];
-        foreach(FelhasznaloHandlerDB::GetUserList($startindex, $elemperoldal) as $felhasznalo) {
+        if($this->olvasas == 3 || FELHASZNALO->godadmin) {
+            $dbresult = FelhasznaloHandlerDB::GetUserList(3, $startindex, $elemperoldal);
+        } elseif ($this->olvasas == 2) {
+            $paramsfordb = FELHASZNALO->GetCsoportIDs();
+            $paramsfordb = array_merge($paramsfordb, [$startindex, $elemperoldal]);
+            $dbresult = FelhasznaloHandlerDB::GetUserList(2, ...$paramsfordb);
+        } else {
+            $dbresult = FelhasznaloHandlerDB::GetUserList(1, FELHASZNALO->szervezet, $startindex, $elemperoldal);
+        }
+
+        if(!$dbresult)
+            return [];
+        
+        foreach($dbresult['dataset'] as $felhasznalo) {
             $temp = new Felhasznalo($felhasznalo['usernev'], $felhasznalo['nev'], $felhasznalo['email'], $felhasznalo['elsobelepes'], $felhasznalo['osztaly'], $felhasznalo['telefon'], $felhasznalo['beosztas'], $felhasznalo['leiras'], $felhasznalo['profilkep'], $felhasznalo['aktiv']);
             $temp->uid = $felhasznalo['uid'];
             $temp->SetSajatSzervezet($felhasznalo['sajatszervezet'], $felhasznalo['sajatszervezetnev']);
             $felhasznalok[] = $temp;
         }
+        $this->SetOsszlapszam($dbresult['osszrekord'], $elemperoldal);
+
         return $felhasznalok;
     }
 

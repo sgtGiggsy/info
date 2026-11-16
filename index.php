@@ -125,8 +125,12 @@ if(DEBUG_MODE && FELHASZNALO->uid == 1) {
 	$debugmessages[] = "Response code: " . http_response_code();
 	$debugmessages[] = "Response time: " . $responseTime . " seconds";
 	$debugmessages[] = "Adatbázis hívások száma: " . $dbcallcount;
-	foreach($debugmessages as $message) {
-		echo "<pre style='background-color: #f0f0f0; color: #000; padding: 10px; border: 1px solid #ccc; margin: 10px 0;'>$message</pre>";
+	foreach($debugmessages as $key => $message) {
+        if(is_array($message) || is_object($message))
+            $message = print_r($message, true);
+		echo "<pre style='background-color: #f0f0f0; color: #000; padding: 10px; border: 1px solid #ccc; margin: 10px 0;'>" .
+            $key . ":<br>" . $message .
+            "</pre>";
 	}
 	foreach($dbcalls as $dbcall) {
 		echo "<pre style='background-color: #f0f0f0; color: #000; padding: 10px; border: 1px solid #ccc; margin: 10px 0;'>" . print_r($dbcall, true) . "</pre>";

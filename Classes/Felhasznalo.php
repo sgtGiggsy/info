@@ -1,32 +1,112 @@
 <?php
 
+/**
+ * 
+ * A Felhasznalo objektumot, és a hozzá tartozó attribútumokat, valamint a felhasználón a futásidőben használható metódosukat tartalmazó osztály
+ * 
+ * 
+*/
 namespace Infoinventory\Classes;
 
 class Felhasznalo
 {
+    // {{{ properties
+    /**
+     * A felhasználó adatbázis azonosítója. Csak nem autentikált felhasználó esetén lehet null
+     * @var ?int $uid
+     */
     public ?int $uid = null;
+    /**
+     * A felhasználó felhasználóneve. Csak nem autentikált felhasználó esetén lehet null
+     * @var ?string $usernev
+     */
     public ?string $usernev;
-    public ?string $jelszo;
+    /**
+     * A felhasználó jelszava. Kizárólag autentikációs céloknál kap értéket. Sosem plain text!!!
+     * @var ?string $usernev
+     */
+    private ?string $jelszo;
+    /**
+     * A felhasználó anyakönyvszerinti neve.
+     * @var ?string $jelszo
+     */
     public ?string $nev;
+    /**
+     * A felhasználó e-mailcíme. Megegyezik az AD mail attribútumával
+     * @var ?string $email
+     */
     public ?string $email;
+    /**
+     * A felhasználó első bejelentkezésénék ideje. NEM egyenlő a fiók létrehozásával, mivel a fiók létrejöhet a felhasználó aktív közreműködése nélkül is
+     * @var ?string $elsobelepes
+     */
     public ?string $elsobelepes;
+    /**
+     * Az osztály, amelyen a felhasználó dolgozik. Megegyezik az AD Department attribútumával
+     * @var ?string $osztaly
+     */
     public ?string $osztaly;
+    /**
+     * A felhasználó telefonszáma. Megegyezik az AD telephoneNumber attribútumával
+     * @var ?string $osztaly
+     */
     public ?string $telefon;
+    /**
+     * A felhasználó szervezetének adatbázis ID-ja. A szervezet MINDEN esetben egy speciális célú csoport, amelyet az adatbázisban a sajatszervezet mező true-ra állításával lehet kiválasztani. Minden felhasználó csak egy szervezet célú csoportnak lehet belső tagja
+     * @var ?int $szervezet
+     */
     public ?int $szervezet = null;
+    /**
+     * A felhasználó szervezetének a neve. Csak olyankor kap értéket, ha a szervezet nevének van jelentősége
+     * @var ?string $szervezetnev
+     */
     public ?string $szervezetnev;
+    /**
+     * A felhasználó beosztásának megnevezése. Megegyezik az AD title mezőjével
+     * @var ?string $beosztas
+     */
     public ?string $beosztas;
+    /**
+     * A felhasználóhoz fűzött leírás. Megegyezik az AD description mezőjével
+     * @var ?string $leiras
+     */
     public ?string $leiras;
+    /**
+     * A felhasználóhoz fiókjának engedélyezettségi állapota.
+     * @var bool $aktiv
+     */
     public bool $aktiv;
+    /**
+     * A felhasználó profilképe. Egyelőre a rendszer képes értelmezni az AD-ból vett BLOB képet is, valamint a profilképek közé feltöltöttet is
+     * @var ?string $profilkep
+     */
     public ?string $profilkep;
+    /**
+     * A felhasználóhoz jelenlegi PHP session-jének az adatbázis azonosítója.
+     * @var ?int $session_id
+     */
     public ?int $session_id;
-    public bool $godadmin;
+    /**
+     * A felhasználó globáladmin jogát jelző flag. True esetén a felhasználó bármi korlátozás nélkül hozzáfér mindenhez, ezért csak a legvégső esetben kaphatja meg valaki.
+     * Minden oldalbetöltéskor ellenőrzésre kerül, és nem módosítható a script-en belül már sehol
+     * @var bool $godadmin
+     */
+    public readonly bool $godadmin;
+    /**
+     * A felhasználó csoporttagságait tartalmazó tömb. A tömb kulcsai az adott csoportok adatbázis azonosítói
+     * @var array $csoporttagsagok
+     */
     public array $csoporttagsagok;
+    /**
+     * A felhasználó moduljogosultságait tartalmazó tömb. A tömb kulcsai az modulok slug-ja, az attribútumok közül pedig az iras és olvasas aminek leginkább van jelentősége
+     * @var array $moduljogosultsagok
+     */
     private array $moduljogosultsagok;
+    // }}}
 
     public function __construct(?string $usernev = null, ?string $nev = null, ?string $email = null, ?string $elsobelepes = null, ?string $osztaly = null, ?string $telefon = null, ?string $beosztas = null, ?string $leiras = null, ?string $profilkep = null, ?int $aktiv = null)
     {
         $this->usernev = $usernev;
-        //$this->jelszo = $jelszo;
         $this->nev = $nev;
         $this->email = $email;
         $this->elsobelepes = $elsobelepes;
@@ -36,6 +116,10 @@ class Felhasznalo
         $this->leiras = $leiras;
         $this->profilkep = $profilkep;
         $this->aktiv = ($aktiv == 1);
+    }
+
+    public function SetGodAdmin(int $dbertek) : void {
+        $this->godadmin = ($dbertek == 1);
     }
 
     public function SetCsoportTagsagok(?string $csoporttagsagok, ?string $csoportnevek, ?string $irasjogok) : void {

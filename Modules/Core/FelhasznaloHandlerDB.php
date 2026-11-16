@@ -61,38 +61,43 @@ class FelhasznaloHandlerDB
         return $getuser->RecordAsArray();
     }
 
-    public static function GetUserList(int $startindex = 0, int $dbszam = 20, ?int ...$olvasjogok) : ?array {
-        if(ModuleLoader::ModulJogosultsag('felhasznalok')['olvasas'] == 3) {
+    public static function GetUserList(int $jogszint, int ...$queryparams) : ?array {
+        $osszrekord = 0;
+        if($jogszint == 3) {
             $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                     LEFT JOIN core_csoportok USING (csoport_id)
                 WHERE sajatszervezet = 1
-                LIMIT ?, ?;", $startindex, $dbszam);
+                LIMIT ?, ?;", ...$queryparams);
+            $osszrekord = $getuser->GetLimitNelkuliDB();
         }
-        if(ModuleLoader::ModulJogosultsag('felhasznalok')['olvasas'] == 2) {
-            $paramplacehold = implode(', ', array_fill(0, count(FELHASZNALO->GetCsoportIDs()), '?'));
+        elseif($jogszint == 2) {
+            $phdb = count($queryparams) - 2;
+            $paramplacehold = implode(', ', array_fill(0, $phdb, '?'));
 
             $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                     LEFT JOIN core_csoportok USING (csoport_id)
                 WHERE sajatszervezet = 1 AND csoport_id IN ($paramplacehold)
-                LIMIT $startindex, $dbszam;", ...FELHASZNALO->GetCsoportIDs());
+                LIMIT ?, ?;", ...$queryparams);
+            $osszrekord = $getuser->GetLimitNelkuliDB();
         }
-        if(ModuleLoader::ModulJogosultsag('felhasznalok')['olvasas'] == 1) {
+        elseif($jogszint == 1) {
             $getuser = new MySQLHandler("SELECT felhasznalo_id AS uid, usernev, nev, email, elsobelepes, osztaly, telefon, beosztas, profilkep, descript AS leiras, aktiv, sajatszervezet, csoport_nev AS sajatszervezetnev, aktiv
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                     LEFT JOIN core_csoportok USING (csoport_id)
                 WHERE sajatszervezet = 1 AND csoport_id = ?
-                LIMIT ?, ?;", FELHASZNALO->szervezet, $startindex, $dbszam);
+                LIMIT ?, ?;", ...$queryparams);
+            $osszrekord = $getuser->GetLimitNelkuliDB();
         }
 
         if(!isset($getuser) || $getuser->sorokszama == 0)
             return null;
 
-        return $getuser->AsArray();
+        return ['dataset' => $getuser->EscapedArray('profilkep'), 'osszrekord' => $osszrekord];
     }
 
     public static function GetCsoportList() : array {
