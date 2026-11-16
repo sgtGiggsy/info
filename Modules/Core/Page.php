@@ -6,7 +6,7 @@ use Infoinventory\Classes\FormBuilder;
 use Infoinventory\Classes\Settings;
 use Infoinventory\Classes\ModuleLoader;
 
-Class Page
+abstract Class Page
 {
     // <--- HTML META TAG-EK ---> //
     public string $cimke = "";
@@ -22,14 +22,32 @@ Class Page
 
     // <--- Funkcionális feladatokat ellátó osztály változók ---> //
 
-    // A felhasználó olvasási jogának szintje a modulon
-    protected int $olvasas;
+    /**
+     * A felhasználó olvasási jogának szintje a modulon. A modul kiválasztása során a rendszer automatikusan beállítja a felhasználó jogosultságai alapján.
+     * Leginkább csak kényelmi feladatokat lát el, mert a ModulKezelo-től bármikor lekérhető lenne az információ
+     * 
+     * Lehetséges értékei: 0: semmi jog, 1: saját tulajdonú elemek, 2: csoporttagságok által engedélyezett elemek, 3: modulon belül bármely elem
+     * 
+     * @var int $olvasas
+     */
+    protected readonly int $olvasas;
 
-    // A felhasználó írási jogának szintje a modulon
-    protected int $iras;
+    /**
+     * A felhasználó írási jogának szintje a modulon. A modul kiválasztása során a rendszer automatikusan beállítja a felhasználó jogosultságai alapján.
+     * Leginkább csak kényelmi feladatokat lát el, mert a ModulKezelo-től bármikor lekérhető lenne az információ
+     * 
+     * Lehetséges értékei: 0: semmi jog, 1: saját tulajdonú elemek, 2: csoporttagságok által engedélyezett elemek, 3: modulon belül bármely elem
+     * 
+     * @var int $iras
+     */
+    protected readonly int $iras;
 
-    // A POST művelet eredményére adott szöveges üzenet. Hiba/siker/figyelmeztetes/letiltva
+    /** 
+     * A POST művelet eredményére adott szöveges üzenet. Hiba/siker/figyelmeztetes/letiltva
+     */
     public ?string $eredmeny = null;
+
+    protected array $debugmessages;
 
     // Ha meg van adva, POST után erre a címre irányít a Controller.
     public ?string $redirtarget = null;
@@ -49,7 +67,8 @@ Class Page
     // A lapozáshoz (ahol elérhető) használt lapszámok indexei.
     protected array $lapozas = [
         'elozo' => null,
-        'kovetkezo' => null
+        'kovetkezo' => null,
+        'osszlapszam' => null
     ];
 
     // A GET-ből érkező paraméterek. Csak akkor van használatban, ha a View-nak tudnia kell róla. A Routerben kap értéket
@@ -118,8 +137,14 @@ Class Page
         $this->selectedpage = $type;
         $this->canonical = ROOT_PATH . '/' . $type;
         $this->redirtarget = $_SERVER['REQUEST_URI'];
-        $this->olvasas = $olvasas;
-        $this->iras = $iras;
+        $GLOBALS['debugmessages'][$type] = [];
+        $this->debugmessages = &$GLOBALS['debugmessages'][$type];
+        if(FELHASZNALO->godadmin) {
+            $this->olvasas = $this->iras = 3;
+        } else {
+            $this->olvasas = $olvasas;
+            $this->iras = $iras;
+        }
 
         if(isset($this->views[$type]))
             $this->view = $this->views[$type];
@@ -147,7 +172,7 @@ Class Page
 
     public function Render() : void {
         if(!file_exists($this->viewsgyoker . $this->view)) {
-            $GLOBALS['debugmessages'][] = "A kért view fájl (<strong>$this->view</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->view;
+            $this->debugmessages[] = "A kért view fájl (<strong>$this->view</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->view;
             return;
         }
 
@@ -160,10 +185,11 @@ Class Page
 
         if($this->aloldal) {
             if(!file_exists($this->viewsgyoker . $this->views[$this->aloldal])) {
-                $GLOBALS['debugmessages'][] = "A kért aloldal view fájl (<strong>$this->views[$this->aloldal]</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->views[$this->aloldal];
-                return;
+                $this->debugmessages[] = "A kért aloldal view fájl (<strong>$this->views[$this->aloldal]</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->views[$this->aloldal];
             }
-            include($this->viewsgyoker . $this->views[$this->aloldal]);
+            else {
+                include($this->viewsgyoker . $this->views[$this->aloldal]);
+            }
         }
         include($this->viewsgyoker . $this->view);
     }
@@ -171,7 +197,7 @@ Class Page
     public function Post() : bool {
         $fname = ucfirst($this->muvelet);
         if(!method_exists($this, $fname)) {
-            $GLOBALS['debugmessages'][] = "A kért művelethez (<strong>$fname</strong>) nem található metódus!";
+            $this->debugmessages[] = "A kért művelethez (<strong>$fname</strong>) nem található metódus!";
             return false;
         }
         return $this->$fname();
@@ -204,10 +230,21 @@ Class Page
         include(ROOT_DIR. "/template/assets/lapozo.php");
     }
 
-    protected function LapozasPrepare(int &$startindex, int &$elemperoldal, array $params) : void {
-        $elemperoldal = 20;
-        $startindex = 0;
-        if($params['method'] == 'oldal' && isset($params['elemid'])){
+    /** 
+     * 
+     * Beállítja a lapozáshoz szükséges változók ($this->lapozas['elozo'] és $this->lapozas['kovetkezo']) értékét,
+     * valamint módosítja a referenciaként megkapott változók ($startindex és $elemperoldal) értékét is a pillanatnyi lap alapján.
+     * 
+     * Az elemperoldal értéke a függvény futásának vége előtt +1-el módosításra kerül, erre az utolsó lap érzékeléséhez van szükség
+     * 
+     * @param int $startindex Az elsőként lekérni kívánt elem indexszáma
+     * @param int $elemperoldal Az egy lapon megjeleníteni kívánt elemek száma
+     * @param array $params A ParseGet függvény által feldolgozott értékek tömbje
+     * @return void
+     * 
+     */
+    protected function SetPagingVars(int &$startindex, int &$elemperoldal, array $params) : void {
+        if(isset($params['method']) && $params['method'] == 'oldal' && isset($params['elemid'])){
             if($params['elemid'] != 1)
                 $startindex = ($params['elemid'] - 1) * $elemperoldal + 1;
             $this->lapozas['elozo'] = ($params['elemid'] > 1) ? $params['elemid'] - 1 : null;
@@ -216,23 +253,44 @@ Class Page
         else {
             $this->lapozas['kovetkezo'] = 2;
         }
-        $GLOBALS['debugmessages'][] = "LapozasPrepare: startindex=$startindex, elemperoldal=$elemperoldal, params=" . print_r($params, true);
+        $elemperoldal++;
+        $this->debugmessages[] = "SetPagingVars: startindex=$startindex, elemperoldal=$elemperoldal, params=" . print_r($params, true);
     }
 
-    protected function LapozasFinalize(?array $viewtomb, int $elemperoldal) : array {
-        if(!$viewtomb) {
-            $viewtomb = [];
-        }
-
-        if(count($viewtomb) < $elemperoldal) {
+    /**
+     * 
+     * Primitív függvény ami megállapítja, hogy a pillanatnyi oldal az utolsó-e.
+     * A SetPagingVars úgy állítja az értékeket, hogy mindig 1-gyel több elemet kérdezzen le a rendszer az adatbázisból, mint amennyit a felhasználó akart. Így tehát ha egy olyan oldalra jutunk, ahol pontosan annyi elem van, amennyit a felhasználó kért, akkor tudjuk, hogy az utolsó oldalon járunk. Hogy megjelenítve pontosan annyi elem legyen, amennyit a felhasználó kért, ha van következő oldal, az utolsó elem törlésre kerül a tömbből
+     * 
+     * @param array $pagecontents Az adatbázis lekrédezés elemeit tartalmazó tömb
+     * @param int $elemperoldal Az adatbázis lekérdezés során használt LIMIT darabszám értéke
+     * @return void
+     * 
+     */
+    protected function DetectLastPage(array &$pagecontents, int $elemperoldal) : void {
+        if(count($pagecontents) < $elemperoldal) {
             $this->lapozas['kovetkezo'] = null;
+        } else {
+            array_pop($pagecontents);
         }
-        return $viewtomb;
     }
 
-    public function Router(array $params) : Page {
-        return $this;
+    /**
+     * Függvény, ami megállapítja, hogy a pillanatnyilag beállított értékek alapján hány oldal van összesen
+     * @param int $osszrekodszam A megadott feltételek melletti összes rekord száma az adatbázisban
+     * @param int $elemperoldal Az egy lapon megjeleníteni kívánt elemek száma
+     * @return void
+     */
+    public function SetOsszlapszam(int $osszrekodszam, int $elemperoldal) : void {
+        $this->lapozas['osszlapszam'] = (int)ceil($osszrekodszam / ($elemperoldal - 1));
+        $this->debugmessages[] = "SetOsszlapszam: osszlapszam=" . $this->lapozas['osszlapszam'] . ", osszrekordszam=$osszrekodszam, elemperoldal=$elemperoldal";
     }
+
+    /**
+     * Függvény, ami kiválasztja a megfelelő aloldalt, a hozzá tartozó jogosultságokat, view fájlt, és megfelelő adatbázis lekérdezést.
+     * @param array $params A $_GET tömb nyers adatait tartalmazó tömb. A ParseGet függvénnyel lehet feldolgozni.
+     */
+    public abstract function Router(array $params) : Page;
 
     // Itt a parent osztályban nincs implementálva, a leszármazott osztályokban kell implementálni, ha az oldal tartalmaz generált formot.
     protected function Form(mixed $elem = null) : FormBuilder {
@@ -247,14 +305,10 @@ Class Page
         return $this->GetJog('olvasas', $elemfelhasznalo, $elem_csoportid);
     }
 
-    protected function GetJog(string $tipus, ?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
-        $moduljog = ModuleLoader::ModulJogosultsag($this->selectedpage)[$tipus] ?? 0;
-        $GLOBALS['debugmessages'][] = "Jog ellenőrzés: $tipus <br>elemfelhasznalo: $elemfelhasznalo<br>elem_csoportid: $elem_csoportid<br>selectedpage: $this->selectedpage<br>felhasznalo: " . FELHASZNALO->uid . "<br>godadmin: " . (FELHASZNALO->godadmin ? 'true' : 'false') . "<br>$tipus: " . ModuleLoader::ModulJogosultsag($this->selectedpage)[$tipus];
-        $GLOBALS['debugmessages'][] = print_r($moduljog, true);
-        if($tipus == 'iras')
-            $csoportids = FELHASZNALO->GetIrhatoCsoportIDs();
-        else
-            $csoportids = FELHASZNALO->GetCsoportIDs();
+    protected function GetJog(string $tipus, ?int $elemfelhasznalo, ?int $elem_csoportid) : bool {
+        $moduljog = $this->$tipus;
+        $this->debugmessages[] = "Jog ellenőrzés: $tipus <br>elemfelhasznalo: $elemfelhasznalo<br>elem_csoportid: $elem_csoportid<br>selectedpage: $this->selectedpage<br>felhasznalo: " . FELHASZNALO->uid . "<br>godadmin: " . (FELHASZNALO->godadmin ? 'true' : 'false') . "<br>$tipus: " . ModuleLoader::ModulJogosultsag($this->selectedpage)[$tipus];
+        $this->debugmessages[] = print_r($moduljog, true);
 
         // Ha a felhasználó godadmin, akkor mindenhez van joga
         if(FELHASZNALO->godadmin)
@@ -263,6 +317,11 @@ Class Page
         // Ha a modulhoz a felhasználónak 3-as szintű joga van, akkor a modulban bármit írhat/olvashat, függően attól, hogy a $tipus 'iras' vagy 'olvasas'
         if($moduljog == 3)
             return true;
+
+        if($tipus == 'iras')
+            $csoportids = FELHASZNALO->GetIrhatoCsoportIDs();
+        else
+            $csoportids = FELHASZNALO->GetCsoportIDs();
 
         // Ha a modulhoz a felhasználónak 2-es szintű joga van, akkor két eshetőség van
         if($moduljog == 2) {
