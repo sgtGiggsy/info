@@ -22,14 +22,15 @@ class MySQLHandler
     private string $types = "";
     private int $vartparam = 0;
     private ?mysqli_stmt $stmt = null;
-    private bool $showdebug = DEBUG_MODE;
+    private bool $showdebug;
     private array $params = array();
     private ?float $queryruntime = null;
-
+    public int $limitnelkulidb;
     private bool $transaction = false;
 
     public function __construct(string | null $query = null, ...$params)
 	{
+        $this->showdebug = DEBUG_MODE;
         try
         {
             $this->con = mysqli_connect($GLOBALS['DATABASE_HOST'], $GLOBALS['DATABASE_USER'], $GLOBALS['DATABASE_PASS'], $GLOBALS['DATABASE_NAME']);
@@ -58,7 +59,7 @@ class MySQLHandler
             mysqli_close($this->con);
     }
 
-    public function ShowQueryDetails()
+    public function ShowQueryDetails() : void
     {
         $params = "";
         foreach($this->params as $p)
@@ -69,7 +70,7 @@ class MySQLHandler
         echo self::FormatSQL($this->querystring) . "<br><br>Paraméterek: " . $params . "<br><br>Query futásideje: " . round($this->queryruntime, 2) . " mp";
     }
 
-    public function ShowException()
+    public function ShowException() : void
     {
         if($this->showdebug)
         {
@@ -117,7 +118,7 @@ class MySQLHandler
         }
     }
 
-    public function StartTransaction()
+    public function StartTransaction() : void
     {
         if($this->con)
         {
@@ -127,7 +128,7 @@ class MySQLHandler
         }
     }
 
-    public function Commit()
+    public function Commit() : void
     {
         if($this->con && $this->transaction)
         {
@@ -135,7 +136,7 @@ class MySQLHandler
         }
     }
 
-    public function Rollback()
+    public function Rollback() : void
     {
         if($this->con && $this->transaction)
         {
@@ -143,7 +144,7 @@ class MySQLHandler
         }
     }
 
-    private function GetType($param)
+    private function GetType($param) : void
     {
         if(is_int($param) || is_bool($param))
         {
@@ -163,7 +164,7 @@ class MySQLHandler
         }
     }
 
-    private function SetTypes(...$params)
+    private function SetTypes(...$params) : void
     {
         $this->types = "";
         if(count($params) > 0)
@@ -175,17 +176,42 @@ class MySQLHandler
         }
     }
 
-    public function Result()
+    public function GetLimitNelkuliDB() : int
+    {
+        if(isset($this->limitnelkulidb))
+            return $this->limitnelkulidb;
+        if(str_contains($this->querystring, "LIMIT ?, ?") && $this->con)
+        {
+            $limitnelkulquery = preg_replace(
+                    '/SELECT\s+.*?\s+FROM/is',
+                    'SELECT COUNT(*) AS db FROM',
+                    $this->querystring
+            );
+            $limitnelkulquery = str_replace(
+                    "LIMIT ?, ?",
+                    "",
+                    $limitnelkulquery
+            );
+            $limitnelkuliparams = array_slice($this->params, 0, -2);
+
+            $db = new MySQLHandler($limitnelkulquery, ...$limitnelkuliparams);
+            $this->limitnelkulidb = $db->Fetch()['db'];
+            return $this->limitnelkulidb;
+        }
+        return $this->sorokszama;
+    }
+
+    public function Result() : mysqli_result | false | null
     {
         return $this->result;
     }
 
-    public function KeepAlive($keepalive = true)
+    public function KeepAlive($keepalive = true) : void
     {
         $this->keepalive = $keepalive;
     }
 
-    public function Fetch()
+    public function Fetch() : array | false
     {
         if($this->result)
         {
@@ -197,7 +223,7 @@ class MySQLHandler
         }
     }
 
-    public function Prepare(string $query)
+    public function Prepare(string $query) : bool
     {
         $this->keepalive = true;
         $this->querystring = $query;
@@ -316,7 +342,7 @@ class MySQLHandler
         return $this->result;
     }
 
-    public function Bind(&...$array)
+    public function Bind(&...$array) : array | false
     {
         $returnarr = array();
         $tobind = mysqli_fetch_assoc($this->result);
@@ -351,7 +377,7 @@ class MySQLHandler
         }
     }
 
-    public function NaturalSort($column, $casesensitive = false, $result = null)
+    public function NaturalSort($column, $casesensitive = false, $result = null) : array
     {
         if(!$result)
         {
@@ -384,7 +410,7 @@ class MySQLHandler
         return $result;
     }
 
-    public function AsArray($arrkey = null)
+    public function AsArray($arrkey = null) : array
     {
         if($arrkey)
         {
@@ -419,7 +445,7 @@ class MySQLHandler
      * A tömbben a sorok kulcsa az ELSŐ mező tartalma. Kényelmi okokból van így,
      * arra figyelni kell, hogy a lekérdezés első mezője mindig primary, vagy legalábbis unique legyen
      *
-     * @param string $htmlfields A mezőnevek, amiket nem akarunk escape-elni.
+     * @param array $htmlfields A mezőnevek, amiket nem akarunk escape-elni.
      * @return array Escapelt adatbázisból vett mezők
      */
     public function EscapedArray(string ...$htmlfields) : array {
@@ -451,7 +477,7 @@ class MySQLHandler
         return $eredmeny[array_key_first($eredmeny)];
     }
 
-    public function ToTable()
+    public function ToTable() : void
     {
         ?><table>
             <thead>
@@ -476,7 +502,7 @@ class MySQLHandler
         </table><?php
     }
 
-    public static function FormatSQL(string $sql)
+    public static function FormatSQL(string $sql) : string
     {
         $sql = str_replace("INNER", "<br>&nbsp&nbsp\n&nbsp&nbspINNER", $sql);
         $sql = str_replace("LEFT", "<br>&nbsp&nbsp\n&nbsp&nbspLEFT", $sql);
@@ -489,12 +515,12 @@ class MySQLHandler
         return $sql;
     }
 
-    public function ConnectionStats()
+    public function ConnectionStats() : void
     {
         print_r(mysqli_stat($this->con));
     }
 
-    public function Close($backtosender = null)
+    public function Close($backtosender = null) : void
     {
         if($this->con)
             //mysqli_close($this->con);
