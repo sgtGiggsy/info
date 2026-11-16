@@ -68,6 +68,7 @@ abstract Class Page
     protected array $lapozas = [
         'elozo' => null,
         'kovetkezo' => null,
+        'aktualis' => null,
         'osszlapszam' => null
     ];
 
@@ -220,6 +221,8 @@ abstract Class Page
                     return ['elemid' => $params[$keys[1]], 'method' => $params[$keys[0]]];
                 if(is_numeric($params[$keys[0]]))
                     return ['elemid' => (int)$params[$keys[0]], 'method' => $params[$keys[1]]];
+                if($params[$keys[0]] == 'oldal' && is_numeric($params[$keys[1]]))
+                    return ['oldal' => (int)$params[$keys[1]]];
                 return ['elemid' => $params[$keys[0]], 'method' => $params[$keys[1]]];
             default:
                 return ['elemid' => null, 'method' => null];
@@ -244,11 +247,12 @@ abstract Class Page
      * 
      */
     protected function SetPagingVars(int &$startindex, int &$elemperoldal, array $params) : void {
-        if(isset($params['method']) && $params['method'] == 'oldal' && isset($params['elemid'])){
-            if($params['elemid'] != 1)
-                $startindex = ($params['elemid'] - 1) * $elemperoldal + 1;
-            $this->lapozas['elozo'] = ($params['elemid'] > 1) ? $params['elemid'] - 1 : null;
-            $this->lapozas['kovetkezo'] = $params['elemid'] + 1;
+        if(isset($params['oldal'])) {
+            $this->lapozas['aktualis'] = $params['oldal'];
+            if($params['oldal'] != 1)
+                $startindex = ($params['oldal'] - 1) * $elemperoldal + 1;
+            $this->lapozas['elozo'] = ($params['oldal'] > 1) ? $params['oldal'] - 1 : null;
+            $this->lapozas['kovetkezo'] = $params['oldal'] + 1;
         }
         else {
             $this->lapozas['kovetkezo'] = 2;
@@ -258,9 +262,10 @@ abstract Class Page
     }
 
     /**
-     * 
      * Primitív függvény ami megállapítja, hogy a pillanatnyi oldal az utolsó-e.
-     * A SetPagingVars úgy állítja az értékeket, hogy mindig 1-gyel több elemet kérdezzen le a rendszer az adatbázisból, mint amennyit a felhasználó akart. Így tehát ha egy olyan oldalra jutunk, ahol pontosan annyi elem van, amennyit a felhasználó kért, akkor tudjuk, hogy az utolsó oldalon járunk. Hogy megjelenítve pontosan annyi elem legyen, amennyit a felhasználó kért, ha van következő oldal, az utolsó elem törlésre kerül a tömbből
+     * A SetPagingVars úgy állítja az értékeket, hogy mindig 1-gyel több elemet kérdezzen le a rendszer az adatbázisból, mint amennyit a felhasználó akart.
+     * Így tehát ha egy olyan oldalra jutunk, ahol pontosan annyi elem van, amennyit a felhasználó kért, akkor tudjuk, hogy az utolsó oldalon járunk.
+     * Hogy megjelenítve pontosan annyi elem legyen, amennyit a felhasználó kért, ha van következő oldal, az utolsó elem törlésre kerül a tömbből
      * 
      * @param array $pagecontents Az adatbázis lekrédezés elemeit tartalmazó tömb
      * @param int $elemperoldal Az adatbázis lekérdezés során használt LIMIT darabszám értéke

@@ -18,7 +18,7 @@ class FelhasznaloHandler extends Page
         'uj' => 'uj.php',
         'szerkeszt' => 'szerkeszt.php'
     ];
-    protected array $validpagemethods = ['szerkeszt', 'uj', 'oldal'];
+    protected array $validpagemethods = ['szerkeszt', 'uj'];
 
     public function Router(array $params) : Page {
         if(!FELHASZNALO->uid)

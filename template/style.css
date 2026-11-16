@@ -798,13 +798,21 @@ footer {
     gap: 1em;
 }
 
-.anchbutton {
+.anchbutton, .anchbutton_active {
     padding: 0.5em 1em;
-    background-color: var(--footerbg);
-    color: var(--footerfont);
     margin-bottom: 1em;
     width: fit-content;
     height: fit-content;
+}
+
+.anchbutton {
+    background-color: var(--footerbg);
+    color: var(--footerfont);
+}
+
+.anchbutton_active {
+    background-color: var(--footerfont);
+    color: var(--footerbg);
 }
 
 .receptadatok {
@@ -1211,6 +1219,10 @@ footer {
 .leftright div {
     flex-grow: 1;
     display: block;
+}
+
+.leftright .center {
+    text-align: center;
 }
 
 .leftright :last-child:not(:only-child) {
