@@ -24,6 +24,7 @@ class FelhasznaloHandler extends Page
         if(!FELHASZNALO->uid)
             return new SinglePage(403, "A felhasználó(k) megtekintéséhez be kell jelentkezned!");
         $params = $this->ParseGet($params);
+        $this->debugmessages[] = "Parsed GET parameters: " . print_r($params, true);
         if($this->selectedpage == 'felhasznalo' || $this->selectedpage == 'profil') {
             if($params['method'] == 'uj') {
                 $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];

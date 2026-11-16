@@ -205,28 +205,63 @@ abstract Class Page
     }
 
     protected function ParseGet(?array $params) : array {
+        function ParseHelper(string $needle, array &$params, array &$returnarray, mixed $type = 'string') : void {
+            $index = array_search($needle, $params);
+            if($index === false)
+                return;
+
+            if(isset($params[$index + 1])) {
+                if($type == "int") {
+                    if(is_numeric($params[$index + 1]))
+                        $val = (int)$params[$index + 1];
+                    else
+                        $val = null;
+                } else
+                    $val = $params[$index + 1];
+                $returnarray[$needle] = $val;
+                array_splice($params, $index, 2);
+            } else {
+                $returnarray[$needle] = null;
+                array_splice($params, $index, 1);
+            }
+        }
+
+        $returnarray = ['elemid' => null, 'method' => null];
+
         if(!$params || count($params) == 0)
-            return ['elemid' => null, 'method' => null];
+            return $returnarray;
+
+        ParseHelper('oldal', $params, $returnarray, 'int');
+        ParseHelper('kereses', $params, $returnarray, 'string');
+
+        if(count($params) == 0)
+            return $returnarray;
 
         $keys = array_keys($params);
         switch(count($params)) {
             case 1: // Csak egy paraméter van, az lehet ID, vagy metódus. Ha a metódus a validpagemethods tömbben van, akkor az a metódus, különben ID.
                 if(is_numeric($params[$keys[0]]))
-                    return ['elemid' => (int)$params[$keys[0]], 'method' => null];
-                if(in_array($params[$keys[0]], $this->validpagemethods))
-                    return ['method' => $params[$keys[0]], 'elemid' => null];
-                return ['elemid' => $params[$keys[0]], 'method' => null];
+                    $returnarray['elemid'] = (int)$params[$keys[0]];
+                elseif(!in_array($params[$keys[0]], $this->validpagemethods))
+                    $returnarray['elemid'] = $params[$keys[0]];
+                else
+                    $returnarray['method'] = $params[$keys[0]];
+                break;
             case 2: // Két paraméter van, ha az első egy valid metódus, az lesz a metódus, különben az első az ID a második a metódus.
-                if(in_array($params[$keys[0]], $this->validpagemethods))
-                    return ['elemid' => $params[$keys[1]], 'method' => $params[$keys[0]]];
-                if(is_numeric($params[$keys[0]]))
-                    return ['elemid' => (int)$params[$keys[0]], 'method' => $params[$keys[1]]];
-                if($params[$keys[0]] == 'oldal' && is_numeric($params[$keys[1]]))
-                    return ['oldal' => (int)$params[$keys[1]]];
-                return ['elemid' => $params[$keys[0]], 'method' => $params[$keys[1]]];
-            default:
-                return ['elemid' => null, 'method' => null];
+                if(in_array($params[$keys[0]], $this->validpagemethods)) {
+                    $returnarray['method'] = $params[$keys[0]];
+                    $returnarray['elemid'] = $params[$keys[1]];
+                }
+                else {
+                    if(is_numeric($params[$keys[0]]))
+                        $returnarray['elemid'] = (int)$params[$keys[0]];
+                    else
+                        $returnarray['elemid'] = $params[$keys[0]];
+                    $returnarray['method'] = $params[$keys[1]];
+                }
+                break;
         }
+        return $returnarray;
     }
 
     protected function Lapozo() : void {
