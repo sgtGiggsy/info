@@ -147,28 +147,27 @@ class Controller
 
     public static function PageSelect(?string $type): Page {
         $olvasas = $iras = 0;
-        ModuleLoader::Inicializal();
+
         if(!$type) {
-            $class = ModuleLoader::$oldalak['kozlemenyek']['handler'] ?? SinglePage::class;
             $type = 'kozlemenyek';
-            $olvasas = ModuleLoader::$oldalak[$type]['olvasas'] ?? 0;
-            $iras = ModuleLoader::$oldalak[$type]['iras'] ?? 0;
+            $class = MODULOK->oldalak[$type]['handler'] ?? SinglePage::class;
+            $olvasas = MODULOK->oldalak[$type]['olvasas'] ?? 0;
+            $iras = MODULOK->oldalak[$type]['iras'] ?? 0;
         }
-        elseif (!isset(ModuleLoader::$oldalak[$type])
-                    || !class_exists(ModuleLoader::$oldalak[$type]['handler'])) {
+        elseif (!isset(MODULOK->oldalak[$type]) || !class_exists(MODULOK->oldalak[$type]['handler'])) {
             if(DEBUG_MODE) {
-                if(!isset(ModuleLoader::$oldalak[$type]))
+                if(!isset(MODULOK->oldalak[$type]))
                     $GLOBALS['debugmessages'][] = "A kért URI-hoz (<strong>$type</strong>) nem található ismert oldal egyik manifestben sem!";
                 else
-                    $GLOBALS['debugmessages'][] = "A kért URI-hoz (<strong>$type</strong>) megadott handler osztály elérési útja hibás: " . ModuleLoader::$oldalak[$type]['handler'];
+                    $GLOBALS['debugmessages'][] = "A kért URI-hoz (<strong>$type</strong>) megadott handler osztály elérési útja hibás: " . MODULOK->oldalak[$type]['handler'];
             }
             $class = SinglePage::class;
             $type = '404';
         }
         else {
-            $class = ModuleLoader::$oldalak[$type]['handler'];
-            $olvasas = ModuleLoader::$oldalak[$type]['olvasas'] ?? 0;
-            $iras = ModuleLoader::$oldalak[$type]['iras'] ?? 0;
+            $class = MODULOK->oldalak[$type]['handler'];
+            $olvasas = MODULOK->oldalak[$type]['olvasas'] ?? 0;
+            $iras = MODULOK->oldalak[$type]['iras'] ?? 0;
         }
 
         // Oldal inicializálása

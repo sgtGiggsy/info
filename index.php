@@ -6,6 +6,7 @@ require('./includes/external/htmlpurifier/HTMLPurifier.standalone.php');
 
 use Infoinventory\Classes\Controller;
 use Infoinventory\Classes\Logging;
+use Infoinventory\Classes\ModuleLoader;
 use Infoinventory\Classes\Settings;
 use Infoinventory\Modules\Core\FelhasznaloHandler;
 use Infoinventory\Classes\Felhasznalo;
@@ -95,7 +96,12 @@ else
 	$felhasznalo->SetGodAdmin();
 	$_SESSION['uid'] = false;
 }
+
 $felhasznalo->session_id = $session_id;
+
+$modulLoader = new ModuleLoader($felhasznalo->uid);
+$felhasznalo->moduljogosultsagok = $modulLoader->felhasznalomodulok;
+define("MODULOK", $modulLoader);
 define("FELHASZNALO", $felhasznalo);
 
 // Alap script fájlok hozzáadása

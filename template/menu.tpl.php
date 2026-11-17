@@ -25,7 +25,7 @@ $jobbraigazit = false;
     <li></li>
 </ul>
 <ul class="links" id="linkek"><?php
-    foreach (ModuleLoader::Menupontok() as $kulcs => $menuelem) {
+    foreach (MODULOK->Menupontok() as $kulcs => $menuelem) {
         if($menuelem['menuben']
             && ($menuelem['lathatosag'] == "mindenki"
                 || ($menuelem['lathatosag'] != "vendeg" && FELHASZNALO->uid)

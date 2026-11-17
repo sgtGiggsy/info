@@ -4,7 +4,6 @@ namespace Infoinventory\Modules\Core;
 use Exception;
 use Infoinventory\Classes\FormBuilder;
 use Infoinventory\Classes\Settings;
-use Infoinventory\Classes\ModuleLoader;
 
 abstract Class Page
 {
@@ -54,6 +53,9 @@ abstract Class Page
 
     // Ez választja ki a betöltendő view-t. A $_GET['page'] értéke kerül bele
     public string $selectedpage;
+
+    // Ezt használja a rendszer a lapozás, és egyéb olyan folyamatok során, ahol a rendszer az oldal alap funkcióin túl más paramétert és át akar adni
+    public string $urlparams = "";
 
     // Ez választja ki a POST folyamatot lebonyolító metódust
     public ?string $muvelet = null;
@@ -140,7 +142,7 @@ abstract Class Page
     public function __construct(string $type, ?int $olvasas = 0, ?int $iras = 0) {
         if(is_null($olvasas) || is_null($iras))
             throw new Exception("A Page osztály példányosításához meg kell adni az olvasási és írási jog szintjét!");
-        $this->title = $GLOBALS['ablakcim'];
+        $this->title = ABLAK_CIM;
         $this->selectedpage = $type;
         $this->canonical = ROOT_PATH . '/' . $type;
         $this->redirtarget = $_SERVER['REQUEST_URI'];
@@ -279,8 +281,10 @@ abstract Class Page
         $this->PHPvarsToJS['selectedPage'] = $this->selectedpage;
         $kereses = $params['kereses'] ?? null;
         if($kereses) {
-            $this->selectedpage .= "/kereses/$kereses";
+            $this->urlparams = $this->selectedpage . "/kereses/$kereses";
             $this->keresesplaceholder = $kereses;
+        } else {
+            $this->urlparams = $this->selectedpage;
         }
         return $kereses;
     }
@@ -366,7 +370,7 @@ abstract Class Page
      * Előkészíti a nyers adatokat, meghívja az adatbázis kapcsolat metódusát, és az adatbázistól kapott eredmények alapján előállítja a feldolgozott tömböt.
      * @param   int       $startindex     A lekérdezés során kért 0. elem indexszáma. NEM a PRIMARY_KEY-e
      * @param   int       $elemperoldal   A lekérdezés során kért elemek száma. Az alap elgondolás, hogy valószínűleg sosem akarjuk majd az összes elemet egyszerre megjeleníteni egy listaoldalon.
-     * @param   string    $kereses        A keresőmezőből vett string értéke. Ha üres, vagy null, akkor nem történik keresés
+     * @param   ?string    $kereses        A keresőmezőből vett string értéke. Ha üres, vagy null, akkor nem történik keresés
      * @return  array A feldolgozott elemek tömbje, vagy üres tömb
      */
     protected function GetList(int $startindex, int $elemperoldal, ?string $kereses) : array {
@@ -383,7 +387,7 @@ abstract Class Page
 
     protected function GetJog(string $tipus, ?int $elemfelhasznalo, ?int $elem_csoportid) : bool {
         $moduljog = $this->$tipus;
-        $this->debugmessages[] = "Jog ellenőrzés: $tipus <br>elemfelhasznalo: $elemfelhasznalo<br>elem_csoportid: $elem_csoportid<br>selectedpage: $this->selectedpage<br>felhasznalo: " . FELHASZNALO->uid . "<br>godadmin: " . (FELHASZNALO->godadmin ? 'true' : 'false') . "<br>$tipus: " . ModuleLoader::ModulJogosultsag($this->selectedpage)[$tipus];
+        $this->debugmessages[] = "Jog ellenőrzés: $tipus <br>elemfelhasznalo: $elemfelhasznalo<br>elem_csoportid: $elem_csoportid<br>selectedpage: $this->selectedpage<br>felhasznalo: " . FELHASZNALO->uid . "<br>godadmin: " . (FELHASZNALO->godadmin ? 'true' : 'false') . "<br>$tipus: " . FELHASZNALO->moduljogosultsagok[$this->selectedpage][$tipus];
         $this->debugmessages[] = print_r($moduljog, true);
 
         // Ha a felhasználó godadmin, akkor mindenhez van joga

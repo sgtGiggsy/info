@@ -4,16 +4,19 @@ namespace Infoinventory\Classes;
 
 class ModuleLoader
 {
-    public static array $oldalak = [];
-    private static array $telepitettmodulok = [];
-    private static bool $inicializalva = false;
+    /**
+     * @var array $modulok A telepített modulok listája, a manifest fájlok alapján
+     */
+    public static array $modulok = [];
+    /**
+     * @var array $oldalak A telepített modulok felhasználó részére engedélyezett oldalainak listája
+     */
+    public readonly array $oldalak;
 
-    public static array $jogszintek = [
-        'vendeg' => 0,
-        'mindenki' => 1,
-        'tagok' => 2,
-        'engedelyezettek' => 3
-    ];
+    /**
+     * @var array $felhasznalomodulok A felhasználó számára engedélyezett modulok listája a Felhasznalo objektum részére
+     */
+    public array $felhasznalomodulok = [];
 
     public static array $jogosultsagnevek = [
         1 => 'saját elemek',
@@ -21,71 +24,86 @@ class ModuleLoader
         3 => 'minden elem'
     ];
 
-    public static function Inicializal(?int $felhasznalo_id = null): void
-    {
-        if(isset($felhasznalo_id)) {
-            self::$oldalak = [];
-            self::$telepitettmodulok = [];
-            self::$inicializalva = false;
+    public function __construct(?int $felhasznalo_id = null) {
+        if(count(self::$modulok) === 0) {
+            self::$modulok = $this->GetAllModules();
         }
 
-        if (self::$inicializalva) {
-            return;
-        }
-        self::$inicializalva = true;
-
-        if($felhasznalo_id === null)
-            $felhasznalo_id = FELHASZNALO->uid;
-
-        if(!$felhasznalo_id)
-            self::$telepitettmodulok = self::GetUnauthorizedModules();
+        if($felhasznalo_id)
+            $usermoduljai = self::DB_GetAuthorizedModules($felhasznalo_id);
         else
-            self::$telepitettmodulok = self::GetAuthorizedModules($felhasznalo_id);
+            $usermoduljai = self::DB_GetUnauthorizedModules();
 
+        $this->GenerateOldalak(self::$modulok, $usermoduljai);
+    }
+
+    private function GetAllModules() : array {
+        $oldalak = [];
         foreach (glob(ROOT_DIR . '/Modules/*/manifest*.php') ?: [] as $manifest) {
             $module = require $manifest;
-            if (!is_array($module) || !isset($module['handler'], $module['pages']) || !is_array($module['pages'])) {
+            if (!is_array($module) || !isset($module['handler'], $module['pages']) || !is_array($module['pages']) || !isset($module['slug']) || !isset($module['nev'])) {
                 throw new \UnexpectedValueException("Hibás modul manifest: {$manifest}");
             }
-            $modulnev = $module['nev'] ?? '';
 
             foreach ($module['pages'] as $route => $page) {
-                if ($route === '' || isset(self::$oldalak[$route])) {
+                if ($route === '' || isset($oldalak[$route])) {
                     throw new \UnexpectedValueException("Üres vagy duplikált útvonal ({$route}) a manifestben: {$manifest}");
                 }
-
-                if(array_key_exists($module['slug'], self::$telepitettmodulok)) {
-                    self::$oldalak[$route] = array_replace([
-                        'menupont' => '', 'lathatosag' => 'mindenki', 'menuben' => false,
-                        'sorrend' => null, 'szulo' => null, 'ikon' => null,
-                    ], $page, ['handler' => $module['handler'], 'modulolvasas' => self::$telepitettmodulok[$module['slug']]['modulolvasas'], 'moduliras' => self::$telepitettmodulok[$module['slug']]['moduliras'], 'kezelomodul' => $module['slug']]);
-                    self::$telepitettmodulok[$module['slug']]['modulnev'] = $modulnev;
-
-                    if(self::$telepitettmodulok[$module['slug']]['modulolvasas'] === null
-                        && (self::$oldalak[$route]['lathatosag'] === 'tagok' || self::$oldalak[$route]['lathatosag'] === 'mindenki')) {
-                        self::$telepitettmodulok[$module['slug']]['modulolvasas'] = 1;
-                    }
-                    if(self::$telepitettmodulok[$module['slug']]['moduliras'] === null
-                        && (self::$oldalak[$route]['lathatosag'] === 'tagok' || self::$oldalak[$route]['lathatosag'] === 'mindenki')) {
-                        self::$telepitettmodulok[$module['slug']]['moduliras'] = 1;
-                    }
-                }
+                $oldalak[$route]['menupont'] = $page['menupont'] ?? '';
+                $oldalak[$route]['lathatosag'] = $page['lathatosag'] ?? 'mindenki';
+                $oldalak[$route]['menuben'] = $page['menuben'] ?? false;
+                $oldalak[$route]['sorrend'] = $page['sorrend'] ?? null;
+                $oldalak[$route]['szulo'] = $page['szulo'] ?? null;
+                $oldalak[$route]['ikon'] = $page['ikon'] ?? null;
+                $oldalak[$route]['handler'] = $module['handler'];
+                $oldalak[$route]['kezelomodul'] = $module['slug'];
+                $oldalak[$route]['kezelonev'] = $module['nev'];
             }
+        }
+
+        return $oldalak;
+    }
+
+    private function GenerateOldalak(array $mindenmodul, array $felhasznalomodulfromdb) : void {
+        $oldalak = [];
+        foreach($mindenmodul as $slug => $modul) {
+            $kezelomodul = $modul['kezelomodul'];
+            if(array_key_exists($kezelomodul, $felhasznalomodulfromdb)) {
+                $oldalak[$slug] = $modul;
+                $this->felhasznalomodulok[$slug]  = $felhasznalomodulfromdb[$kezelomodul];
+                $this->felhasznalomodulok[$slug]['modulolvasas']  = $felhasznalomodulfromdb[$kezelomodul]['modulolvasas'] ?? self::Szintek($modul['lathatosag']);
+                $this->felhasznalomodulok[$slug]['moduliras']  = $felhasznalomodulfromdb[$kezelomodul]['moduliras'] ?? self::Szintek($modul['lathatosag']);
+                $oldalak[$slug]['olvasas'] = $this->felhasznalomodulok[$slug]['modulolvasas'];
+                $oldalak[$slug]['iras'] = $this->felhasznalomodulok[$slug]['moduliras'];
+            }
+        }
+        $this->oldalak = $oldalak;
+    }
+
+    private static function Szintek(string $lathatosag) : int {
+        // A függvény meghívásakor még jó eséllyel nem áll rendelkezésre a FELHASZNALO objektum, ezért a jogosultságot a session alapján ellenőrizzük.
+        if($_SESSION['uid']) {
+            if($lathatosag === 'tagok' || $lathatosag === 'mindenki')
+                return 1;
+            else
+                return 0;
+        }
+        else {
+            if($lathatosag === 'mindenki' || $lathatosag === 'vendeg')
+                return 1;
+            else
+                return 0;
         }
     }
 
-    public static function Menupontok(): array
+    public function Menupontok(): array
     {
-        self::Inicializal();
-        $rendezett = array_filter(self::$oldalak, fn($item) => $item['menuben'] === true);
+        $rendezett = array_filter($this->oldalak, fn($item) => $item['menuben'] === true);
         uasort($rendezett, fn($a, $b) => $a['sorrend'] <=> $b['sorrend']);
         return $rendezett;
     }
 
-    public static function GetUnauthorizedModules() : array {
-        if(!empty(self::$telepitettmodulok))
-            return self::$telepitettmodulok;
-
+    private static function DB_GetUnauthorizedModules() : array {
         $telepitve = new MySQLHandler("SELECT slug, modul_id, sorrend, 0 AS modulolvasas, 0 AS moduliras
                 FROM core_modulok
                 WHERE (lathatosag = 0 OR lathatosag = 1)
@@ -93,13 +111,7 @@ class ModuleLoader
         return $telepitve->AsArray("slug");
     }
 
-    public static function GetAuthorizedModules(?int $felhasznalo_id = null) : array {
-        if(!empty(self::$telepitettmodulok))
-            return self::$telepitettmodulok;
-
-        if($felhasznalo_id === null)
-            $felhasznalo_id = FELHASZNALO->uid;
-
+    private static function DB_GetAuthorizedModules(int $felhasznalo_id) : array {
         $telepitve = new MySQLHandler("SELECT slug, core_modulok.modul_id AS modul_id,
                     sorrend, lathatosag, iras AS moduliras, olvasas AS modulolvasas
                 FROM core_modulok
@@ -113,20 +125,27 @@ class ModuleLoader
     }
 
     public static function GetModuleSlug(string $page) : string {
-        self::Inicializal();
-        if(!array_key_exists($page, self::$oldalak))
+        if(!array_key_exists($page, self::$modulok))
             return '';
         else
-            return self::$oldalak[$page]['kezelomodul'];
+            return self::$modulok[$page]['kezelomodul'];
     }
 
-    public static function ModulJogosultsag(string $page) : array {
-        self::Inicializal();
-        $slug = self::GetModuleSlug($page);
-        if(!array_key_exists($slug, self::$telepitettmodulok)) {
-            return ['modulolvasas' => 0, 'moduliras' => 0];
+    private static function ModulJogForDisplay(array $jogosultsagok) : array {
+        $display = [];
+        foreach($jogosultsagok as $slug => $modul) {
+            if(array_key_exists($slug, self::$modulok))
+                $display[$slug] = [
+                    'nev' => self::$modulok[$slug]['kezelonev'],
+                    'modulolvasas' => ($modul['modulolvasas']) ? self::$jogosultsagnevek[$modul['modulolvasas']] : 'saját elemek',
+                    'moduliras' => ($modul['moduliras']) ? self::$jogosultsagnevek[$modul['moduliras']] : 'saját elemek'
+                ];
         }
-        else
-            return ['modulolvasas' => self::$telepitettmodulok[$slug]['modulolvasas'], 'moduliras' => self::$telepitettmodulok[$slug]['moduliras']];
+        return $display;
+    }
+
+    public static function GetModuleJogosultsagok(int $felhasznalo_id) : array {
+        $jogosultsagok = self::DB_GetAuthorizedModules($felhasznalo_id);
+        return self::ModulJogForDisplay($jogosultsagok);
     }
 }

@@ -18,7 +18,7 @@ class SinglePage extends Page
     ];
 
     public function __construct(string $type, ?string $egyedihiba = null) {
-        $this->title = $GLOBALS['ablakcim'];
+        $this->title = ABLAK_CIM;
         $this->egyedihiba = $egyedihiba;
         $file = $this->views[$type] ?? $this->views['404'];
         $this->selectedpage = $type;

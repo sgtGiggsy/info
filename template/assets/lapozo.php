@@ -2,7 +2,7 @@
     <div><?php
         if($this->lapozas['elozo'])
         {
-            ?><a class="anchbutton" href="<?=ROOT_PATH?>/<?=$this->selectedpage?>/oldal/<?=$this->lapozas['elozo']?>">Előző oldal</a><?php
+            ?><a class="anchbutton" href="<?=ROOT_PATH?>/<?=$this->urlparams?>/oldal/<?=$this->lapozas['elozo']?>">Előző oldal</a><?php
         }
     ?></div>
     <div class="center"><?php
@@ -17,7 +17,7 @@
                         || ($oldal >= $this->lapozas['elozo']
                                 && $oldal <= $this->lapozas['kovetkezo']))
                 {
-                    ?><a class="anchbutton<?=($oldal == $this->lapozas['aktualis'] || ($oldal == 1 && !$this->lapozas['aktualis'])) ? '_active' : ''?>" href="<?=ROOT_PATH?>/<?=$this->selectedpage?>/oldal/<?=$oldal?>"><?=$oldal?></a><?php
+                    ?><a class="anchbutton<?=($oldal == $this->lapozas['aktualis'] || ($oldal == 1 && !$this->lapozas['aktualis'])) ? '_active' : ''?>" href="<?=ROOT_PATH?>/<?=$this->urlparams?>/oldal/<?=$oldal?>"><?=$oldal?></a><?php
                     $utolso = $oldal;
                 }
                 else if(is_int($utolso)
@@ -34,7 +34,7 @@
     <div><?php
         if($this->lapozas['kovetkezo'])
         {
-            ?><a class="anchbutton" href="<?=ROOT_PATH?>/<?=$this->selectedpage?>/oldal/<?=$this->lapozas['kovetkezo']?>">Következő oldal</a><?php
+            ?><a class="anchbutton" href="<?=ROOT_PATH?>/<?=$this->urlparams?>/oldal/<?=$this->lapozas['kovetkezo']?>">Következő oldal</a><?php
         }
     ?></div>
 </div>
