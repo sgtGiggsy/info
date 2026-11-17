@@ -58,16 +58,16 @@ class ModuleLoader
                     self::$oldalak[$route] = array_replace([
                         'menupont' => '', 'lathatosag' => 'mindenki', 'menuben' => false,
                         'sorrend' => null, 'szulo' => null, 'ikon' => null,
-                    ], $page, ['handler' => $module['handler'], 'olvasas' => self::$telepitettmodulok[$module['slug']]['olvasas'], 'iras' => self::$telepitettmodulok[$module['slug']]['iras'], 'kezelomodul' => $module['slug']]);
+                    ], $page, ['handler' => $module['handler'], 'modulolvasas' => self::$telepitettmodulok[$module['slug']]['modulolvasas'], 'moduliras' => self::$telepitettmodulok[$module['slug']]['moduliras'], 'kezelomodul' => $module['slug']]);
                     self::$telepitettmodulok[$module['slug']]['modulnev'] = $modulnev;
 
-                    if(self::$telepitettmodulok[$module['slug']]['olvasas'] === null
+                    if(self::$telepitettmodulok[$module['slug']]['modulolvasas'] === null
                         && (self::$oldalak[$route]['lathatosag'] === 'tagok' || self::$oldalak[$route]['lathatosag'] === 'mindenki')) {
-                        self::$telepitettmodulok[$module['slug']]['olvasas'] = 1;
+                        self::$telepitettmodulok[$module['slug']]['modulolvasas'] = 1;
                     }
-                    if(self::$telepitettmodulok[$module['slug']]['iras'] === null
+                    if(self::$telepitettmodulok[$module['slug']]['moduliras'] === null
                         && (self::$oldalak[$route]['lathatosag'] === 'tagok' || self::$oldalak[$route]['lathatosag'] === 'mindenki')) {
-                        self::$telepitettmodulok[$module['slug']]['iras'] = 1;
+                        self::$telepitettmodulok[$module['slug']]['moduliras'] = 1;
                     }
                 }
             }
@@ -86,7 +86,7 @@ class ModuleLoader
         if(!empty(self::$telepitettmodulok))
             return self::$telepitettmodulok;
 
-        $telepitve = new MySQLHandler("SELECT slug, modul_id, sorrend, 0 AS olvasas, 0 AS iras
+        $telepitve = new MySQLHandler("SELECT slug, modul_id, sorrend, 0 AS modulolvasas, 0 AS moduliras
                 FROM core_modulok
                 WHERE (lathatosag = 0 OR lathatosag = 1)
                     AND telepitve = 1;");
@@ -101,7 +101,7 @@ class ModuleLoader
             $felhasznalo_id = FELHASZNALO->uid;
 
         $telepitve = new MySQLHandler("SELECT slug, core_modulok.modul_id AS modul_id,
-                    sorrend, lathatosag, iras, olvasas
+                    sorrend, lathatosag, iras AS moduliras, olvasas AS modulolvasas
                 FROM core_modulok
                     LEFT JOIN core_modulok_jogosultsagok ON core_modulok.modul_id = core_modulok_jogosultsagok.modul_id
                         AND core_modulok_jogosultsagok.felhasznalo_id = ?
@@ -124,9 +124,9 @@ class ModuleLoader
         self::Inicializal();
         $slug = self::GetModuleSlug($page);
         if(!array_key_exists($slug, self::$telepitettmodulok)) {
-            return ['olvasas' => 0, 'iras' => 0];
+            return ['modulolvasas' => 0, 'moduliras' => 0];
         }
         else
-            return ['olvasas' => self::$telepitettmodulok[$slug]['olvasas'], 'iras' => self::$telepitettmodulok[$slug]['iras']];
+            return ['modulolvasas' => self::$telepitettmodulok[$slug]['modulolvasas'], 'moduliras' => self::$telepitettmodulok[$slug]['moduliras']];
     }
 }

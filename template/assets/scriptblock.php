@@ -32,7 +32,7 @@ echo "\n";
 ?></script><?php echo "\n";
 foreach(Settings::$jsfiles as $js)
 {
-	echo "<script src='$RootPath/$js'></script>\n";
+	echo "<script src='" . ROOT_PATH . "/$js'></script>\n";
 }
 
 if(isset($swaltoaster))

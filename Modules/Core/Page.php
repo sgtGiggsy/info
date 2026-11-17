@@ -30,7 +30,7 @@ abstract Class Page
      * 
      * @var int $olvasas
      */
-    protected readonly int $olvasas;
+    protected readonly int $modulolvasas;
 
     /**
      * A felhasználó írási jogának szintje a modulon. A modul kiválasztása során a rendszer automatikusan beállítja a felhasználó jogosultságai alapján.
@@ -40,7 +40,7 @@ abstract Class Page
      * 
      * @var int $iras
      */
-    protected readonly int $iras;
+    protected readonly int $moduliras;
 
     /** 
      * A POST művelet eredményére adott szöveges üzenet. Hiba/siker/figyelmeztetes/letiltva
@@ -111,6 +111,9 @@ abstract Class Page
     // Ez a változó tárolja el, hogy az oldalon egy adott felhasználó írhat-e.
     protected ?bool $irasjog = null;
 
+    // Ez a változó tárolhatja el, hogy egy elemet/elemeket az adott felhasználó olvashatja-e.
+    protected ?bool $olvasasjog = null;
+
     // Az aloldal egy view fájl, amit a fő view fájl elé renderel az oldal. Üzenetek átadására szolgál.
     protected ?string $aloldal = null;
 
@@ -144,10 +147,10 @@ abstract Class Page
         $GLOBALS['debugmessages'][$type] = [];
         $this->debugmessages = &$GLOBALS['debugmessages'][$type];
         if(FELHASZNALO->godadmin) {
-            $this->olvasas = $this->iras = 3;
+            $this->modulolvasas = $this->moduliras = 3;
         } else {
-            $this->olvasas = $olvasas;
-            $this->iras = $iras;
+            $this->modulolvasas = $olvasas;
+            $this->moduliras = $iras;
         }
 
         if(isset($this->views[$type]))
@@ -201,7 +204,7 @@ abstract Class Page
     public function Post() : bool {
         $fname = ucfirst($this->muvelet);
         if(!method_exists($this, $fname)) {
-            $this->debugmessages[] = "A kért művelethez (<strong>$fname</strong>) nem található metódus!";
+            $this->mixintext = "A kért művelethez (<strong>$fname</strong>) nem található metódus!";
             return false;
         }
         return $this->$fname();
@@ -303,7 +306,7 @@ abstract Class Page
         if(isset($params['oldal'])) {
             $this->lapozas['aktualis'] = $params['oldal'];
             if($params['oldal'] != 1)
-                $startindex = ($params['oldal'] - 1) * $elemperoldal + 1;
+                $startindex = ($params['oldal'] - 1) * $elemperoldal;
             $this->lapozas['elozo'] = ($params['oldal'] > 1) ? $params['oldal'] - 1 : null;
             $this->lapozas['kovetkezo'] = $params['oldal'] + 1;
         }
@@ -350,17 +353,32 @@ abstract Class Page
      */
     public abstract function Router(array $params) : Page;
 
-    // Itt a parent osztályban nincs implementálva, a leszármazott osztályokban kell implementálni, ha az oldal tartalmaz generált formot.
+    /**
+     * Az osztály által generált form(ok)-at beállító metódus. A leszármazott osztályokban implementálni KELL, ha az osztály generált formot akar használni.
+     * @param mixed $elem Bármilyen objektum, tömb, vagy primitív érték, amit az osztály szerkesztésnél használ
+     */
     protected function Form(mixed $elem = null) : FormBuilder {
         return new FormBuilder();
     }
 
+    /**
+     * Az osztály lista megjelenítéshez használt tömbjét előállító metódus. A HASZNÁLATHOZ A LESZÁRMAZOTT OSZTÁLYBAN IMPLEMENTÁLNI KELL!!!
+     * Előkészíti a nyers adatokat, meghívja az adatbázis kapcsolat metódusát, és az adatbázistól kapott eredmények alapján előállítja a feldolgozott tömböt.
+     * @param   int       $startindex     A lekérdezés során kért 0. elem indexszáma. NEM a PRIMARY_KEY-e
+     * @param   int       $elemperoldal   A lekérdezés során kért elemek száma. Az alap elgondolás, hogy valószínűleg sosem akarjuk majd az összes elemet egyszerre megjeleníteni egy listaoldalon.
+     * @param   string    $kereses        A keresőmezőből vett string értéke. Ha üres, vagy null, akkor nem történik keresés
+     * @return  array A feldolgozott elemek tömbje, vagy üres tömb
+     */
+    protected function GetList(int $startindex, int $elemperoldal, ?string $kereses) : array {
+        return [];
+    }
+
     public function GetIrasjog(?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
-        return $this->GetJog('iras', $elemfelhasznalo, $elem_csoportid);
+        return $this->GetJog('moduliras', $elemfelhasznalo, $elem_csoportid);
     }
 
     public function GetOlvasasjog(?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
-        return $this->GetJog('olvasas', $elemfelhasznalo, $elem_csoportid);
+        return $this->GetJog('modulolvasas', $elemfelhasznalo, $elem_csoportid);
     }
 
     protected function GetJog(string $tipus, ?int $elemfelhasznalo, ?int $elem_csoportid) : bool {
@@ -421,10 +439,22 @@ abstract Class Page
             return new SinglePage(403, "A kiválasztott $elemnev szerkesztéséhez nincs jogosultságod!");
         }
 
-        $this->irasjog = true;
         $this->muvelet = 'szerkeszt';
         $this->view = $this->views['szerkeszt'];
         $this->form = $this->Form($elem);
+
+        return $this;
+    }
+
+    protected function SetSelectedLista(array $params, array &$returnarray) : Page {
+        $kereses = $this->SetKereses($params);
+        $this->irasjog = $this->GetIrasjog();
+        $this->view = $this->views[$this->selectedpage];
+        $startindex = 0;
+        $elemperoldal = 20;
+        $this->SetPagingVars($startindex, $elemperoldal, $params);
+        $returnarray = $this->GetList($startindex, $elemperoldal, $kereses);
+        $this->DetectLastPage($returnarray, $elemperoldal);
 
         return $this;
     }

@@ -26,6 +26,10 @@ class SinglePage extends Page
         include(ROOT_DIR . "/" . $file);
     }
 
+    public function Router(array $params): Page {
+        return $this;
+    }
+
     public function Render() : void {
         if(function_exists('Render'))
             Render($this->egyedihiba);

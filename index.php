@@ -12,14 +12,11 @@ use Infoinventory\Classes\Felhasznalo;
 
 define("ROOT_DIR", __DIR__);
 define("DEBUG_MODE", true);
-define("ROOT_PATH", $RootPath);
-define("ABLAK_CIM", $ablakcim);
-$uid = null;
+define("ROOT_PATH", $ROOT_PATH);
+define("ABLAK_CIM", $ABLAK_CIM);
 $dbcallcount = 0;
 $dbcalls = [];
 $debugmessages = [];
-
-//print_r($_GET);
 
 // Cookie biztonság beállítása
 $isHttps =
@@ -85,7 +82,7 @@ if(isset($_SESSION['uid']) && $_SESSION['uid'])
 	// szint 3 = tulaj, 2 = admin, 1 = regisztrált felhasználó
 	$felhasznalo = FelhasznaloHandler::GetUser($_SESSION['uid']);
 
-	if(is_null($felhasznalo))
+	if(is_null($felhasznalo->uid))
 	{
 		session_unset();
 		session_destroy();
@@ -95,6 +92,7 @@ if(isset($_SESSION['uid']) && $_SESSION['uid'])
 }
 else
 {
+	$felhasznalo->SetGodAdmin();
 	$_SESSION['uid'] = false;
 }
 $felhasznalo->session_id = $session_id;
