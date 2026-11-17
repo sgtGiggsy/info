@@ -101,7 +101,7 @@ class Felhasznalo
      * A felhasználó moduljogosultságait tartalmazó tömb. A tömb kulcsai az modulok slug-ja, az attribútumok közül pedig az iras és olvasas aminek leginkább van jelentősége
      * @var array $moduljogosultsagok
      */
-    private array $moduljogosultsagok;
+    public array $moduljogosultsagok;
     // }}}
 
     public function __construct(?string $usernev = null, ?string $nev = null, ?string $email = null, ?string $elsobelepes = null, ?string $osztaly = null, ?string $telefon = null, ?string $beosztas = null, ?string $leiras = null, ?string $profilkep = null, ?int $aktiv = null)
@@ -118,7 +118,7 @@ class Felhasznalo
         $this->aktiv = ($aktiv == 1);
     }
 
-    public function SetGodAdmin(int $dbertek) : void {
+    public function SetGodAdmin(?int $dbertek = null) : void {
         $this->godadmin = ($dbertek == 1);
     }
 
@@ -134,9 +134,9 @@ class Felhasznalo
         $this->csoporttagsagok = $csoportok;
     }
 
-    public function SetSajatSzervezet(int $csoportid, ?string $csoportnev = null) : void {
+    public function SetSajatSzervezet(?int $csoportid, ?string $csoportnev = null) : void {
         $this->szervezet = $csoportid;
-        if($csoportnev === null && isset($this->csoporttagsagok)) {
+        if($csoportnev === null && isset($this->csoporttagsagok) && count($this->csoporttagsagok) > 0) {
             $csoportnev = $this->csoporttagsagok[$csoportid]['csoport_nev'] ?? '';
         }
         $this->szervezetnev = $csoportnev;
@@ -155,11 +155,10 @@ class Felhasznalo
         );
     }
 
-    public function GetModulJogosultsagok() : array {
-        if(!isset($this->moduljogosultsagok)) {
-            ModuleLoader::Inicializal($this->uid);
-            $this->moduljogosultsagok = ModuleLoader::GetAuthorizedModules();
-        }
+    public function GetModulJogLista() : array {
+        if(!isset($this->moduljogosultsagok) || count($this->moduljogosultsagok) == 0)
+            $this->moduljogosultsagok = ModuleLoader::GetModuleJogosultsagok($this->uid);
+
         return $this->moduljogosultsagok;
     }
 }

@@ -2,8 +2,6 @@
 
 use Infoinventory\Classes\Helpers;
 use Infoinventory\Classes\ModuleLoader;
-use Infoinventory\Classes\FormBuilder;
-use Infoinventory\Classes\Settings;
 
 if (!defined('ROOT_PATH')) {
     http_response_code(403);
@@ -63,8 +61,8 @@ if($this->felhasznalo->profilkep) {
             <div class="profiladatok">
                 <h1>Modul jogosultságok</h1>
                 <ul>
-                    <?php foreach($this->felhasznalo->GetModulJogosultsagok() as $slug => $modul) { ?>
-                        <li><?=$modul['modulnev']?> (Olvasás: <?= ModuleLoader::$jogosultsagnevek[$modul['olvasas']] ?? $modul['olvasas'] ?>, Írás: <?= ModuleLoader::$jogosultsagnevek[$modul['iras']] ?? $modul['iras'] ?>)</li>
+                    <?php foreach($this->felhasznalo->moduljogosultsagok as $slug => $modul) { ?>
+                        <li><?=$modul['nev']?> (Olvasás: <?= $modul['modulolvasas'] ?>, Írás: <?= $modul['moduliras'] ?>)</li>
                     <?php } ?>
                 </ul>
             </div>

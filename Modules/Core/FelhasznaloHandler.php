@@ -8,6 +8,7 @@ use Infoinventory\Classes\Felhasznalo;
 
 class FelhasznaloHandler extends Page
 {
+    use FelhasznaloHandlerDB;
     protected ?Felhasznalo $felhasznalo;
     protected array $felhasznalok = [];
     protected string $viewsgyoker = __DIR__ . "/assets/felhasznalo/views/";
@@ -23,8 +24,8 @@ class FelhasznaloHandler extends Page
     public function Router(array $params) : Page {
         if(!FELHASZNALO->uid)
             return new SinglePage(403, "A felhasználó(k) megtekintéséhez be kell jelentkezned!");
+        
         $params = $this->ParseGet($params);
-        $this->debugmessages[] = "Parsed GET parameters: " . print_r($params, true);
         if($this->selectedpage == 'felhasznalo' || $this->selectedpage == 'profil') {
             if($params['method'] == 'uj') {
                 $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
@@ -44,19 +45,15 @@ class FelhasznaloHandler extends Page
             $this->irasjog = $this->GetIrasjog($this->felhasznalo->uid, $this->felhasznalo->szervezet);
 
             if($params['method'] == 'szerkeszt') {
+                if(!$this->irasjog)
+                    return new SinglePage(403, "Nincs jogosultságod ennek a felhasználónak a szerkesztéséhez!");
                 return $this->SetSelectedSzerkeszt($this->felhasznalo, 'felhasználó');
             } else {
+                $this->felhasznalo->GetModulJogLista();
                 $this->view = $this->views['felhasznalo'];
             }
         } elseif ($this->selectedpage == "felhasznalok") {
-            $kereses = $this->SetKereses($params);
-            $this->irasjog = $this->GetIrasjog();
-            $this->view = $this->views['felhasznalok'];
-            $startindex = 0;
-            $elemperoldal = 20;
-            $this->SetPagingVars($startindex, $elemperoldal, $params);
-            $this->felhasznalok = $this->GetUserList($startindex, $elemperoldal, $kereses);
-            $this->DetectLastPage($this->felhasznalok, $elemperoldal);
+            return $this->SetSelectedLista($params, $this->felhasznalok);
         }
 
         return $this;
@@ -124,7 +121,7 @@ class FelhasznaloHandler extends Page
         return $form;
     }
 
-    protected function Szerkesztes() : bool {
+    protected function Szerkeszt() : bool {
         $this->redirtarget = ROOT_PATH . "/felhasznalo";
         if(!isset($_POST['felhasznalo_id'])) {
             $this->mixintext = "Nem lett kiválasztva módosítani kívánt felhasználó!";
@@ -152,7 +149,7 @@ class FelhasznaloHandler extends Page
         }
 
         $pkepid = $this->UploadProfilePicture();
-        $eredmeny = FelhasznaloHandlerDB::FelhasznaloSzerkeszt($_POST, $pkepid);
+        $eredmeny = self::DB_FelhasznaloSzerkeszt($_POST, $pkepid);
         if($eredmeny) {
             $this->mixintext = "A fiók módosítása sikerült!";
             if($_POST['szervezet'] && $_POST['szervezet'] != $this->felhasznalo->szervezet) {
@@ -188,7 +185,7 @@ class FelhasznaloHandler extends Page
         if(isset($_POST['jelszo'])) {
             $hashedpassword = password_hash($_POST['jelszo'], PASSWORD_DEFAULT);
         }
-        $eredmeny = FelhasznaloHandlerDB::UjFelhasznalo($_POST, $hashedpassword, $pkepid);
+        $eredmeny = self::DB_UjFelhasznalo($_POST, $hashedpassword, $pkepid);
 
         if($eredmeny) {
             $this->mixintext = "A fiók létrehozása sikerült!";
@@ -220,11 +217,11 @@ class FelhasznaloHandler extends Page
     }
 
     private function CsoporthozAd(int $felhasznaloid, int $csoportid) : bool {
-        return FelhasznaloHandlerDB::CsoporthozAd($felhasznaloid, $csoportid);
+        return self::DB_CsoporthozAd($felhasznaloid, $csoportid);
     }
 
     private function CsoportbolTorol(int $felhasznaloid) : bool {
-        return FelhasznaloHandlerDB::CsoportbolTorol($felhasznaloid);
+        return self::DB_CsoportbolTorol($felhasznaloid);
     }
 
     public static function GetLDAPUserAttributes(string $samaccountname, ?\LDAP\Connection $ldapconnection) : ?Felhasznalo {
@@ -249,37 +246,40 @@ class FelhasznaloHandler extends Page
     }
 
     public static function CreateUserFromLDAP(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
-        return FelhasznaloHandlerDB::CreateUserFromLDAP($felhasznalo, $hashedpassword);
+        return self::DB_CreateUserFromLDAP($felhasznalo, $hashedpassword);
     }
 
     public static function UpdateUserFromLDAP(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
-        return FelhasznaloHandlerDB::UpdateUserFromLDAP($felhasznalo, $hashedpassword);
+        return self::DB_UpdateUserFromLDAP($felhasznalo, $hashedpassword);
     }
 
     public static function GetUser(int|string $azonosito) : ?Felhasznalo {
-        $getuser = FelhasznaloHandlerDB::GetUser($azonosito);
-        if(!$getuser)
-            return null;
-        $felhasznalo = new Felhasznalo($getuser['usernev'], $getuser['nev'], $getuser['email'], $getuser['elsobelepes'], $getuser['osztaly'], $getuser['telefon'], $getuser['beosztas'], $getuser['leiras'], $getuser['profilkep'], $getuser['aktiv']);
-        $felhasznalo->uid = $getuser['uid'];
-        $felhasznalo->SetGodAdmin($getuser['godadmin']);
-
-        $felhasznalo->SetCsoportTagsagok($getuser['csoporttagsagok'], $getuser['csoportnevek'], $getuser['irasjogok']);
-        $felhasznalo->SetSajatSzervezet($getuser['sajatszervezet'], $getuser['sajatszervezetnev']);
+        $getuser = self::DB_GetUser($azonosito);
+        if(!$getuser) {
+            $felhasznalo = new Felhasznalo();
+            $felhasznalo->SetGodAdmin();
+        } else {
+            $felhasznalo = new Felhasznalo($getuser['usernev'], $getuser['nev'], $getuser['email'], $getuser['elsobelepes'], $getuser['osztaly'], $getuser['telefon'], $getuser['beosztas'], $getuser['leiras'], $getuser['profilkep'], $getuser['aktiv']);
+            $felhasznalo->uid = $getuser['uid'];
+            $felhasznalo->SetGodAdmin($getuser['godadmin']);
+    
+            $felhasznalo->SetCsoportTagsagok($getuser['csoporttagsagok'], $getuser['csoportnevek'], $getuser['irasjogok']);
+            $felhasznalo->SetSajatSzervezet($getuser['sajatszervezet'], $getuser['sajatszervezetnev']);
+        }
 
         return $felhasznalo;
     }
 
-    private function GetUserList(int $startindex = 0, int $elemperoldal = 20, ?string $kereses = null) : array {
+    protected function GetList(int $startindex = 0, int $elemperoldal = 20, ?string $kereses = null) : array {
         $felhasznalok = [];
-        if($this->olvasas == 3 || FELHASZNALO->godadmin) {
-            $dbresult = FelhasznaloHandlerDB::GetUserList(3, $kereses, $startindex, $elemperoldal);
-        } elseif ($this->olvasas == 2) {
+        if($this->modulolvasas == 3 || FELHASZNALO->godadmin) {
+            $dbresult = self::DB_GetUserList(3, $kereses, $startindex, $elemperoldal);
+        } elseif ($this->modulolvasas == 2) {
             $paramsfordb = FELHASZNALO->GetCsoportIDs();
             $paramsfordb = array_merge($paramsfordb, [$startindex, $elemperoldal]);
-            $dbresult = FelhasznaloHandlerDB::GetUserList(2, $kereses, ...$paramsfordb);
+            $dbresult = self::DB_GetUserList(2, $kereses, ...$paramsfordb);
         } else {
-            $dbresult = FelhasznaloHandlerDB::GetUserList(1, $kereses, FELHASZNALO->szervezet, $startindex, $elemperoldal);
+            $dbresult = self::DB_GetUserList(1, $kereses, FELHASZNALO->szervezet, $startindex, $elemperoldal);
         }
 
         if(!$dbresult)
@@ -297,10 +297,10 @@ class FelhasznaloHandler extends Page
     }
 
     private function GetCsoportList() : array {
-        return FelhasznaloHandlerDB::GetCsoportList();
+        return self::DB_GetCsoportList();
     }
 
     private static function SzervezetValaszto(string $needle) {
-        return FelhasznaloHandlerDB::SzervezetValaszto($needle);
+        return self::DB_SzervezetValaszto($needle);
     }
 }

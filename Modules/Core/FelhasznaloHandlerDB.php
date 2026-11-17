@@ -4,23 +4,22 @@ namespace Infoinventory\Modules\Core;
 
 use Infoinventory\Classes\MySQLHandler;
 use Infoinventory\Classes\Felhasznalo;
-use Infoinventory\Classes\ModuleLoader;
 
-class FelhasznaloHandlerDB
+trait FelhasznaloHandlerDB
 {
-    public static function CreateUserFromLDAP(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
+    private static function DB_CreateUserFromLDAP(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
         $createuser = new MySQLHandler("INSERT INTO core_felhasznalok (usernev, nev, email, jelszo, osztaly, telefon, beosztas, profilkep, descript) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);",
             $felhasznalo->usernev, $felhasznalo->nev, $felhasznalo->email, $hashedpassword, $felhasznalo->osztaly, $felhasznalo->telefon, $felhasznalo->beosztas, $felhasznalo->profilkep, $felhasznalo->leiras);
         return $createuser->siker;
     }
 
-    public static function UpdateUserFromLDAP(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
+    private static function DB_UpdateUserFromLDAP(Felhasznalo $felhasznalo, string $hashedpassword) : bool {
         $updateuser = new MySQLHandler("UPDATE core_felhasznalok SET jelszo = ?, nev = ?, email = ?, osztaly = ?, telefon = ?, beosztas = ?, profilkep = ?, descript = ? WHERE usernev = ?;",
             $hashedpassword, $felhasznalo->nev, $felhasznalo->email, $felhasznalo->osztaly, $felhasznalo->telefon, $felhasznalo->beosztas, $felhasznalo->profilkep, $felhasznalo->leiras, $felhasznalo->usernev);
         return $updateuser->siker;
     }
 
-    public static function SzervezetValaszto(string $needle) : ?int {
+    private static function DB_SzervezetValaszto(string $needle) : ?int {
         if($needle) {
             $szervezet = new MySQLHandler("SELECT csoport_id FROM `core_csoportok_ldap` WHERE ? LIKE CONCAT('%', needle, '%');", $needle);
             @$szervezet = $szervezet->Fetch()['szervezet'];
@@ -31,7 +30,7 @@ class FelhasznaloHandlerDB
         return $szervezet;
     }
 
-    public static function GetUser(int|string $azonosito) : ?array {
+    private static function DB_GetUser(int|string $azonosito) : ?array {
         $where = "usernev";
         if(is_int($azonosito)) {
             $where = "felhasznalo_id";
@@ -61,7 +60,7 @@ class FelhasznaloHandlerDB
         return $getuser->RecordAsArray();
     }
 
-    public static function GetUserList(int $jogszint, ?string $kereses, mixed ...$queryparams) : ?array {
+    private static function DB_GetUserList(int $jogszint, ?string $kereses, mixed ...$queryparams) : ?array {
         $osszrekord = 0;
         $phdb = count($queryparams) - 2; // A limit paraméterek nem számítanak a csoport ID-k számába
         if(is_null($kereses)) {
@@ -80,7 +79,8 @@ class FelhasznaloHandlerDB
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                     LEFT JOIN core_csoportok USING (csoport_id)
-                WHERE sajatszervezet = 1 $keresesstring
+                WHERE (sajatszervezet = 1 OR sajatszervezet IS NULL) $keresesstring
+                ORDER BY (sajatszervezet IS NULL), nev
                 LIMIT ?, ?;", ...$queryparams);
             $osszrekord = $getuser->GetLimitNelkuliDB();
         }
@@ -91,7 +91,8 @@ class FelhasznaloHandlerDB
                 FROM core_felhasznalok
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                     LEFT JOIN core_csoportok USING (csoport_id)
-                WHERE sajatszervezet = 1 AND csoport_id IN ($paramplacehold) $keresesstring
+                WHERE (sajatszervezet = 1 OR sajatszervezet IS NULL) AND csoport_id IN ($paramplacehold) $keresesstring
+                ORDER BY (sajatszervezet IS NULL), nev
                 LIMIT ?, ?;", ...$queryparams);
             $osszrekord = $getuser->GetLimitNelkuliDB();
         }
@@ -101,6 +102,7 @@ class FelhasznaloHandlerDB
                     LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                     LEFT JOIN core_csoportok USING (csoport_id)
                 WHERE sajatszervezet = 1 AND csoport_id = ? $keresesstring
+                ORDER BY nev
                 LIMIT ?, ?;", ...$queryparams);
             $osszrekord = $getuser->GetLimitNelkuliDB();
         }
@@ -111,14 +113,14 @@ class FelhasznaloHandlerDB
         return ['dataset' => $getuser->EscapedArray('profilkep'), 'osszrekord' => $osszrekord];
     }
 
-    public static function GetCsoportList() : array {
+    private static function DB_GetCsoportList() : array {
         $csoportok = new MySQLHandler("SELECT csoport_id, csoport_nev FROM core_csoportok WHERE statusz = 1 ORDER BY csoport_nev;");
         if($csoportok->sorokszama == 0)
             return [];
         return $csoportok->ArrayForSelect();
     }
 
-    public static function FelhasznaloSzerkeszt(?array $post, ?int $profilkep = null) : bool {
+    private static function DB_FelhasznaloSzerkeszt(?array $post, ?int $profilkep = null) : bool {
         if(!$post)
             return false;
         $valarr = [];
@@ -156,14 +158,14 @@ class FelhasznaloHandlerDB
             $qstring .= "beosztas = ?, ";
             $valarr[] = $post['beosztas'];
         }
-        if(isset($post['aktiv'])) {
-            $qstring .= "aktiv = ?, ";
-            $valarr[] = $post['aktiv'];
-        }
         if(isset($profilkep)) {
             $qstring .= "profilkep = ?, ";
             $valarr[] = $profilkep;
         }
+        $qstring .= "aktiv = ?, ";
+        $valarr[] = $post['aktiv'] ?? 0;
+        $qstring .= "godadmin = ?, ";
+        $valarr[] = $post['godadmin'] ?? 0;
         $qstring = rtrim($qstring, ', ');
         $qstring .= " WHERE felhasznalo_id = ?;";
         $valarr[] = $post['felhasznalo_id'];
@@ -173,7 +175,7 @@ class FelhasznaloHandlerDB
         return $sql->siker;
     }
 
-    public static function UjFelhasznalo(?array $post, ?string $hashedpassword, ?int $profilkep = null) : bool {
+    private static function DB_UjFelhasznalo(?array $post, ?string $hashedpassword, ?int $profilkep = null) : bool {
         if(!$post)
             return false;
         $valarr = [];
@@ -219,12 +221,12 @@ class FelhasznaloHandlerDB
         return $sql->siker;
     }
 
-    public static function CsoporthozAd(int $felhasznaloid, int $csoportid) : bool {
+    private static function DB_CsoporthozAd(int $felhasznaloid, int $csoportid) : bool {
         $sql = new MySQLHandler("INSERT INTO core_csoportok_tagsagok (felhasznalo_id, csoport_id, sajatszervezet) VALUES (?, ?, ?);", $felhasznaloid, $csoportid, 1);
         return $sql->siker;
     }
 
-    public static function CsoportbolTorol(int $felhasznaloid) : bool {
+    private static function DB_CsoportbolTorol(int $felhasznaloid) : bool {
         $sql = new MySQLHandler("DELETE FROM core_csoportok_tagsagok WHERE felhasznalo_id = ? AND sajatszervezet = ?;", $felhasznaloid, 1);
         return $sql->siker;
     }
