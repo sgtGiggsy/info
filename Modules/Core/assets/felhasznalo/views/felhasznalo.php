@@ -21,11 +21,6 @@ if($this->felhasznalo->profilkep) {
     }
     else
     {
-        if($this->irasjog) {
-            ?><a class="anchbutton" href="<?= ROOT_PATH . '/felhasznalo/' . $this->felhasznalo->usernev . '/szerkeszt' ?>">
-                Felhasználó szerkesztése
-            </a><?php
-        }
         ?><div class="profilcard">
             <div class="profilkep">
                 <div class="imgrightsep">
@@ -48,9 +43,12 @@ if($this->felhasznalo->profilkep) {
                 if(!empty($this->felhasznalo->csoporttagsagok)) {
                     ?><ul><?php
                     foreach($this->felhasznalo->csoporttagsagok as $csoport) {
-                        ?><li><?= ($csoport['csoport_id'] == $this->felhasznalo->szervezet ? '<strong> ' : '') ?>
-                                <?=$csoport['csoport_nev']?> (<?=($csoport['irasjog'] ? 'Írás' : 'Csak olvasás')?>)
-                            <?= ($csoport['csoport_id'] == $this->felhasznalo->szervezet ? '</strong>' : '') ?>
+                        ?><li>
+                            <a href="<?=ROOT_PATH . '/csoport/' . $csoport['slug']?>">
+                                <?= ($csoport['csoport_id'] == $this->felhasznalo->szervezet ? '<strong> ' : '') ?>
+                                    <?=$csoport['csoport_nev']?> (<?=($csoport['irasjog'] ? 'Írás' : 'Csak olvasás')?>)
+                                <?= ($csoport['csoport_id'] == $this->felhasznalo->szervezet ? '</strong>' : '') ?>
+                            </a>
                         </li><?php
                     }
                     ?></ul><?php

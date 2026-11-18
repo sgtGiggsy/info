@@ -49,6 +49,11 @@ class FelhasznaloHandler extends Page
                     return new SinglePage(403, "Nincs jogosultságod ennek a felhasználónak a szerkesztéséhez!");
                 return $this->SetSelectedSzerkeszt($this->felhasznalo, 'felhasználó');
             } else {
+                if($this->irasjog) {
+                    $this->contextmenu = [
+                        ['felirat' => "Felhasználó szerkesztése", 'link' => ROOT_PATH . '/felhasznalo/' . $this->felhasznalo->usernev . '/szerkeszt']
+                    ];
+                }
                 $this->felhasznalo->GetModulJogLista();
                 $this->view = $this->views['felhasznalo'];
             }
@@ -263,7 +268,7 @@ class FelhasznaloHandler extends Page
             $felhasznalo->uid = $getuser['uid'];
             $felhasznalo->SetGodAdmin($getuser['godadmin']);
     
-            $felhasznalo->SetCsoportTagsagok($getuser['csoporttagsagok'], $getuser['csoportnevek'], $getuser['irasjogok']);
+            $felhasznalo->SetCsoportTagsagok($getuser['csoporttagsagok'], $getuser['csoportnevek'], $getuser['irasjogok'], $getuser['slugok']);
             $felhasznalo->SetSajatSzervezet($getuser['sajatszervezet'], $getuser['sajatszervezetnev']);
         }
 

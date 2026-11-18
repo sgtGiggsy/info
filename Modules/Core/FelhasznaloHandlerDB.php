@@ -45,7 +45,9 @@ trait FelhasznaloHandlerDB
                 GROUP_CONCAT(core_csoportok.csoport_nev ORDER BY core_csoportok.csoport_id SEPARATOR '; ')
                     AS csoportnevek,
                 GROUP_CONCAT(core_csoportok_tagsagok.iras ORDER BY core_csoportok_tagsagok.csoport_id SEPARATOR '; ')
-                    AS irasjogok
+                    AS irasjogok,
+                GROUP_CONCAT(core_csoportok.slug ORDER BY core_csoportok_tagsagok.csoport_id SEPARATOR '; ')
+                    AS slugok
 	        FROM core_felhasznalok
     	        LEFT JOIN core_csoportok_tagsagok USING (felhasznalo_id)
                 LEFT JOIN core_csoportok USING (csoport_id)

@@ -98,6 +98,11 @@ class Felhasznalo
      */
     public array $csoporttagsagok;
     /**
+     * A felhasználó írási szintű csoporttagságait tartalmazó tömb. A tömb kulcsai az adott csoportok adatbázis azonosítói
+     * @var array $irhatocsoportok
+     */
+    private array $irhatocsoportok;
+    /**
      * A felhasználó moduljogosultságait tartalmazó tömb. A tömb kulcsai az modulok slug-ja, az attribútumok közül pedig az iras és olvasas aminek leginkább van jelentősége
      * @var array $moduljogosultsagok
      */
@@ -122,12 +127,12 @@ class Felhasznalo
         $this->godadmin = ($dbertek == 1);
     }
 
-    public function SetCsoportTagsagok(?string $csoporttagsagok, ?string $csoportnevek, ?string $irasjogok) : void {
+    public function SetCsoportTagsagok(?string $csoporttagsagok, ?string $csoportnevek, ?string $irasjogok, ?string $slugok) : void {
         if($csoporttagsagok == null || $csoportnevek == null || $irasjogok == null) {
             $this->csoporttagsagok = array();
             return;
         }
-        $csoportok = Helpers::ConcatToAssocArray(['csoport_id', 'csoport_nev', 'irasjog'], $csoporttagsagok, $csoportnevek, $irasjogok);
+        $csoportok = Helpers::ConcatToAssocArray(['csoport_id', 'csoport_nev', 'irasjog', 'slug'], $csoporttagsagok, $csoportnevek, $irasjogok, $slugok);
         foreach($csoportok as &$csoport) {
             $csoport['irasjog'] = ($csoport['irasjog'] == 1);
         }
@@ -147,12 +152,17 @@ class Felhasznalo
     }
 
     public function GetIrhatoCsoportIDs() : array {
-        return array_keys(
+        if(isset($this->irhatocsoportok)) {
+            return $this->irhatocsoportok;
+        }
+
+        $this->irhatocsoportok = array_keys(
             array_filter(
                 $this->csoporttagsagok,
                 fn($tagsag) => $tagsag['irasjog'] == true
             )
         );
+        return $this->irhatocsoportok;
     }
 
     public function GetModulJogLista() : array {
