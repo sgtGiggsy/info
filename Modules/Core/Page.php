@@ -19,54 +19,103 @@ abstract Class Page
     protected ?string $robots = null;
     protected ?string $sitedesc = null;
 
-    // <--- Funkcionális feladatokat ellátó osztály változók ---> //
+    // <--- Jogosultságok ---> //
 
+    /**
+     * Ez a változó tárolja el, hogy az oldalon egy adott felhasználó írhat-e.
+     * Csak kényelmi célokat szolgál, a Router-ben kerül beállításra.
+     * @var bool|null $irasjog
+     */
+    protected ?bool $irasjog = null;
+
+    /**
+     * Ez a változó tárolhatja el, hogy egy elemet/elemeket az adott felhasználó olvashatja-e.
+     * @var bool|null $olvasasjog
+     */
+    protected ?bool $olvasasjog = null;
     /**
      * A felhasználó olvasási jogának szintje a modulon. A modul kiválasztása során a rendszer automatikusan beállítja a felhasználó jogosultságai alapján.
      * Leginkább csak kényelmi feladatokat lát el, mert a ModulKezelo-től bármikor lekérhető lenne az információ
-     * 
+     *
      * Lehetséges értékei: 0: semmi jog, 1: saját tulajdonú elemek, 2: csoporttagságok által engedélyezett elemek, 3: modulon belül bármely elem
-     * 
-     * @var int $olvasas
+     *
+     * @var int $modulolvasas
      */
     protected readonly int $modulolvasas;
 
     /**
      * A felhasználó írási jogának szintje a modulon. A modul kiválasztása során a rendszer automatikusan beállítja a felhasználó jogosultságai alapján.
      * Leginkább csak kényelmi feladatokat lát el, mert a ModulKezelo-től bármikor lekérhető lenne az információ
-     * 
+     *
      * Lehetséges értékei: 0: semmi jog, 1: saját tulajdonú elemek, 2: csoporttagságok által engedélyezett elemek, 3: modulon belül bármely elem
-     * 
-     * @var int $iras
+     *
+     * @var int $moduliras
      */
     protected readonly int $moduliras;
 
-    /** 
+    // <--- Funkcionális feladatokat ellátó osztály változók ---> //
+
+    /**
      * A POST művelet eredményére adott szöveges üzenet. Hiba/siker/figyelmeztetes/letiltva
      */
     public ?string $eredmeny = null;
 
-    protected array $debugmessages;
-
-    // Ha meg van adva, POST után erre a címre irányít a Controller.
+    /**
+     * Ez határozza meg, hogy POST művelet után pontosan milyen címre történjen az átirányítás.
+     * Ha null, akkor a rendszer a $_SERVER['REQUEST_URI']-t használja átirányítási célként.
+     * @var string|mixed|null $redirtarget
+     */
     public ?string $redirtarget = null;
 
     // Ez választja ki a betöltendő view-t. A $_GET['page'] értéke kerül bele
     public string $selectedpage;
 
-    // Ezt használja a rendszer a lapozás, és egyéb olyan folyamatok során, ahol a rendszer az oldal alap funkcióin túl más paramétert és át akar adni
-    public string $urlparams = "";
+    /**
+     * A $debugmessages globális tömb egyszerűbb eléréshez használt helyi változó. A konstruktor a globális tömb pointerére irányítja
+     * @var array $debugmessages
+     */
+    protected array $debugmessages;
 
-    // Ez választja ki a POST folyamatot lebonyolító metódust
+    /**
+     * Ezt használja a rendszer a lapozás, és egyéb olyan folyamatok során, ahol a rendszer az oldal alap funkcióin túl más paramétert is át akar adni
+     * Alapértelmezetten a $selectedpage értékét veszi fel
+     * @var string $urlparams
+     */
+    public string $urlparams;
+
+    /**
+     * Ez választja ki a POST folyamatot lebonyolító metódust
+     * @var string|null $muvelet
+     */
     public ?string $muvelet = null;
 
-    // POST utáni üzeneteket tartalmazó változó
+    /**
+     * POST utáni felugró mixin üzeneteket tartalmazó változó.
+     * Ha nincs megadva, akkor a modul, és a folyamat sikeessége alapján a Controller maga generál helyette üzenetet.
+     * @var string|null $mixintext
+     */
     public ?string $mixintext = null;
 
-    // Az osztály elérhető API metódusai. Ami ebben nem szerepel, az nem hívható meg API-ként. A GET-re és a POST-ra is külön tömb-öt kell megadni!
+    /**
+     * A kereséshez használt placeholder szöveg.
+     *
+     * @var string|null $keresesplaceholder
+     */
+    protected ?string $keresesplaceholder = "Keresés...";
+
+    /**
+     * Az osztály elérhető API metódusai.
+     * Ami ebben nem szerepel, az nem hívható meg API-ként. A GET-re és a POST-ra is külön tömb-öt kell megadni!
+     *
+     * @var array $apimethods
+     */
     public array $apimethods = [];
 
-    // A lapozáshoz (ahol elérhető) használt lapszámok indexei.
+    /**
+     * A lapozáshoz (ahol elérhető) használt lapszámok indexei.
+     * Eltárolja az előző és következő lapok indexét, valamint az aktuális lapot, és az összes lap számát
+     * @var array $lapozas
+     */
     protected array $lapozas = [
         'elozo' => null,
         'kovetkezo' => null,
@@ -74,61 +123,98 @@ abstract Class Page
         'osszlapszam' => null
     ];
 
-    // A kereséshez használt placeholder szöveg.
-    protected ?string $keresesplaceholder = "Keresés...";
-
-    // A GET-ből érkező paraméterek. Csak akkor van használatban, ha a View-nak tudnia kell róla. A Routerben kap értéket
-    protected array $params = [];
-
-    // Változók, amiket a PHP-ból generálunk, de a JS felületen akarunk használni. Közvetlenül a jsfiles tömb előtt kerül renderelésre.
-    protected array $PHPvarsToJS = [];
-
-    // Az osztály által használt JS fájlok elérési útjai. A tömbbe megadott fájlokat a rendszer az oldal legalján tölti be.
-    protected array $jsfiles = [];
-
-    // Egyedi CSS fájl, amennyiben egy oldalhoz szükség lenne rá.
-    protected ?string $localCSS = null;
-
-    // Az oldalhoz tartozó feltöltések uploads mappán belüli mappája. KIZÁRÓLAG A NÉV! Az 'uploads' hardcode-olva van a feltöltésekhez, abból egyik oldal sem tud kitörni.
-    protected ?string $feltoltesgyoker;
-
-    // Az oldal feltöltésgyökerén belüli egyedi mappa. Pl, ha a feltöltésgyökér a "receptek", akkor az egyedi mappa a '2026'. Tartalmazhat slash-t (mondjuk 2026/04), de path traversal ellen akkor is védett.
-    protected ?string $egyedimappa;
-
-    // Egy oldal használható metódusai. Ebből tudja a rendszer, hogy egy $_GET-ből érkező tömbelem az ID, vagy valami metódus
-    protected array $validpagemethods = [];
-
-    // Egy oldal context menüjének menüpontjai. Pl szerkesztés, törlés, új elem gombok. A formátuma: [szoveg => "Gomb felirata", link => "oldal.nev/menupont"]. Nem a deklaráció során kell megadni, hanem a Router()-ben, elemenként hozzáadni az elérhető gombokat
+    /**
+     * Egy oldal context menüjének menüpontjai. Pl szerkesztés, törlés, új elem gombok.
+     * A formátuma: ['felirat' => "Gomb felirata", 'link' => "oldal.nev/menupont"].
+     * Nem a deklaráció során kell megadni, hanem a Router()-ben, elemenként hozzáadni az elérhető gombokat
+     * @var array $contextmenu
+     */
     public array $contextmenu = [];
 
-    // Az oldal view fájljainak gyökere
+    // <--- Viewkkal kapcsolatos osztály változók ---> //
+
+    /**
+     * Az oldal view fájljainak gyökere
+     * @var string $viewsgyoker
+     */
     protected string $viewsgyoker = __DIR__ . "/views/";
 
-    // A jelenleg kiválasztott view fájl
-    protected ?string $view = null;
-
-    // A jelenleg kiválasztott header fájl
-    protected ?string $headerview = null;
-
-    // Ez a változó tárolja el, hogy az oldalon egy adott felhasználó írhat-e.
-    protected ?bool $irasjog = null;
-
-    // Ez a változó tárolhatja el, hogy egy elemet/elemeket az adott felhasználó olvashatja-e.
-    protected ?bool $olvasasjog = null;
-
-    // Az aloldal egy view fájl, amit a fő view fájl elé renderel az oldal. Üzenetek átadására szolgál.
-    protected ?string $aloldal = null;
-
-    // Az elérhető view fájlok listája, ahol a kulcs a $_GET['page']-ből várt érték, az érték pedig a tényleges PHP fájl neve
+    /**
+     * Az elérhető view fájlok listája, ahol a kulcs a $_GET['page']-ből várt érték, az érték pedig a tényleges PHP fájl neve
+     * @var array $views
+     */
     protected array $views = [];
 
-    // A form builder osztály példánya, ha az oldal használja a FormBuilder osztályt
-    protected FormBuilder $form;
+    /**
+     * A jelenleg kiválasztott view fájl
+     * Az oldal törzsét minden esetben ez a view fájl adja.
+     * A Router() metódusban kell beállítani, hogy az adott aloldalhoz melyik view fájl tartozzon.
+     * @var string|null $view
+     */
+    protected ?string $view = null;
 
-    // Az oldal fejlécéhez elérhető view fájlok listája
+    /**
+     * Az oldal fejlécéhez elérhető view fájlok listája
+     * A Router az ebben felsorolt elemek alapján dönti el (ahol használatban van), hogy melyik headerview fájl legyen kiválasztva
+     * @var array $headerviews
+     */
     protected array $headerviews = [];
 
-    // Fájlokat tartalmazó POST esetén ezeket a fájlokat fogadja el a rendszer valid bevitelként. MIME check is történik!
+    /**
+     * A jelenleg kiválasztott header fájl
+     * Ezzel lehet oldalanként, vagy elemenként külön header-t használni
+     * Ha nincs beállítva, úgy az oldal nem kap fejlécet
+     * @var string|null $headerview
+     */
+    protected ?string $headerview = null;
+
+    /**
+     * Üzenetek átadására szolgáló view fájl elérési útja. A mixin üzenetek statikus kiegészítésére használható.
+     * A fő view fájl elé renderel az oldal.
+     * @var string|null $uzenet
+     */
+    protected ?string $uzenet = null;
+
+    /**
+     * Azon változók tömbje, amiket a PHP-ból generálunk, de a JS felületen akarunk használni.
+     * Közvetlenül a jsfiles tömb előtt kerül renderelésre.
+     * @var array $PHPvarsToJS
+     */
+    protected array $PHPvarsToJS = [];
+
+    /**
+     * Az osztály által használt JS fájlok elérési útjai. A tömbbe megadott fájlokat a rendszer az oldal legalján tölti be.
+     * @var array $jsfiles
+     */
+    protected array $jsfiles = [];
+
+    /**
+     * Egyedi CSS fájl, amennyiben egy oldalhoz szükség lenne rá.
+     * @var string|null $localCSS
+     */
+    protected ?string $localCSS = null;
+
+    // <--- Feltöltésekkel kapcsolatos osztály változók ---> //
+
+    /**
+     * Az oldalhoz tartozó feltöltések uploads mappán belüli mappája.
+     * KIZÁRÓLAG A NÉV! Az 'uploads' hardcode-olva van a feltöltésekhez, az UploadHandler osztály by design csak oda hajlandó fájlokat tölteni.
+     * @var string|null $feltoltesgyoker
+     */
+    protected ?string $feltoltesgyoker;
+
+    /**
+     * Az oldal feltöltésgyökerén belüli egyedi mappa.
+     * Pl, ha a feltöltésgyökér a "receptek", akkor az egyedi mappa a '2026'. Tartalmazhat slash-t (mondjuk 2026/04), de path traversal ellen akkor is védett.
+     * @var string|null $egyedimappa
+     */
+    protected ?string $egyedimappa;
+
+    /**
+     * Fájlokat tartalmazó POST esetén ezeket a fájlokat fogadja el a rendszer valid bevitelként.
+     * MIME check is történik! Az a típus, ami nincs fent ezen a listán, a feltöltési folyamat során eldobásra kerül
+     * @var array $mediatypes
+     */
     protected array $mediatypes = [
         'image/jpeg',
         'image/png',
@@ -136,14 +222,63 @@ abstract Class Page
         'image/webp'
     ];
 
-    // Itt kell meghatározni, hogy milyen fájlformátumokat fogad a fájlfeltöltő menü a felhasználói UI-n. Csak kozmeztika, és kézzel kell megadni!
+    /**
+     * A felhasználói UI-n megjelenő elfogadott feltölthető fájlok formátumának string formátumú listája
+     * Csak UX célokat szolgál, a feltöltött fájlok ellenőrzésében nem vesz részt
+     * @var string $form_mediatypes
+     */
     public string $form_mediatypes = "'image/jpeg', 'image/png', 'image/bmp', 'image/webp'";
+
+    // <--- $_GET Parsing ---> //
+
+    /**
+     * A GET-ből érkező paraméterek tömbje.
+     * A Router által meghívott ParseGet függvény tölti fel tartalommal.
+     * @var array $params
+     */
+    protected array $params = [];
+
+    /**
+     * Egy oldal használható metódusai.
+     * Ebből tudja a ParseGet, hogy egy $_GET-ből érkező tömbelem az metódus-e.
+     * A rendszer nem próbál olyan paramétert metódusként használni, ami itt nincs megadva.
+     * @var array $validpagemethods
+     */
+    protected array $validpagemethods = [];
+
+    /**
+     * Egy oldal aloldalai.
+     * Ebből tudja a ParseGet, hogy egy $_GET-ből érkező tömbelem az aloldal-e.
+     * A rendszer nem talál meg olyan aloldalt, ami itt nincs megadva.
+     * @var array $aloldalak
+     */
+    protected array $aloldalak = [];
+
+    // <--- FORM ---> //
+
+    /**
+     * A form builder osztály példánya, ha az oldal használja a FormBuilder osztályt
+     * @var FormBuilder $form
+     */
+    protected FormBuilder $form;
+
+    /**
+     * A 100%-ban generált Formban megjelenő alapadatok
+     * Amennyiben nem kerül megadásra uj, vagy szerkesztes view fájl, úgy a rendszer a Form metódusban előállított Form és ennek a tömbnek a felhasználásával generálja le az oldalt.
+     * @var array|null[]
+     */
+    protected array $formvars = [
+        'pagetitle' => null,
+        'actiontarget' => null,
+        'buttontext' => null
+    ];
 
     public function __construct(string $type, ?int $olvasas = 0, ?int $iras = 0) {
         if(is_null($olvasas) || is_null($iras))
             throw new Exception("A Page osztály példányosításához meg kell adni az olvasási és írási jog szintjét!");
         $this->title = ABLAK_CIM;
         $this->selectedpage = $type;
+        $this->urlparams = $type;
         $this->canonical = ROOT_PATH . '/' . $type;
         $this->redirtarget = $_SERVER['REQUEST_URI'];
         $GLOBALS['debugmessages'][$type] = [];
@@ -159,6 +294,10 @@ abstract Class Page
             $this->view = $this->views[$type];
     }
 
+    /**
+     * A HTML <head> dinamikus részének tartalmát beállító osztály
+     * @return void
+     */
     public function HtmlHead() : void {
         if (function_exists('HtmlHead')) {
             HtmlHead($this->keywords, $this->canonical, $this->title, $this->ogtype, $this->publishtime, $this->shareimage, $this->robots, $this->ablakcim, $this->sitedesc, $this->cimke);
@@ -166,19 +305,37 @@ abstract Class Page
         }
     }
 
+    /**
+     * A HTML <head> részét renderelő osztály
+     * @return void
+     */
     protected function HtmlHeadRender() : void {
         include(ROOT_DIR . "/template/assets/htmlheader.php");
     }
 
+    /**
+     * A HTML <head> LdJSON részét előállító osztály.
+     * Csak SEO célokra van értelme, tehát keresőbotok elől rejtett weboldal esetén nincs értelme foglalkozni vele
+     * @return void
+     */
     public function LdJSON() : void {
     }
 
+    /**
+     * Az oldal <body> részében a <header> részt, tehát a vizuális fejlécet renderelő osztály.
+     * @return void
+     */
     public function RenderHeader() : void {
         if(!$this->headerview || !file_exists($this->viewsgyoker . $this->headerview))
             return;
         include($this->viewsgyoker . $this->headerview);
     }
 
+    /**
+     * Az oldal fő tartalmát renderelő osztály.
+     * Hacsak nincs valami nagyon extra dolog abban, ahogy a modul renderelni akarja az oldalait, nem kell felülírni
+     * @return void
+     */
     public function Render() : void {
         if(!file_exists($this->viewsgyoker . $this->view)) {
             $this->debugmessages[] = "A kért view fájl (<strong>$this->view</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->view;
@@ -192,17 +349,33 @@ abstract Class Page
             Settings::$jsfiles[] = $file;
         }
 
-        if($this->aloldal) {
-            if(!file_exists($this->viewsgyoker . $this->views[$this->aloldal])) {
-                $this->debugmessages[] = "A kért aloldal view fájl (<strong>$this->views[$this->aloldal]</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->views[$this->aloldal];
+        if($this->uzenet) {
+            if(!file_exists($this->viewsgyoker . $this->views[$this->uzenet])) {
+                $this->debugmessages[] = "A kért üzenetátadó view fájl (<strong>$this->views[$this->uzenet]</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->views[$this->uzenet];
             }
             else {
-                include($this->viewsgyoker . $this->views[$this->aloldal]);
+                include($this->viewsgyoker . $this->views[$this->uzenet]);
             }
         }
         include($this->viewsgyoker . $this->view);
     }
 
+    /**
+     * A context menüt renderelő osztály.
+     * Csak akkor csinál bármit, ha a Router-ben lett hozzáadva legalább egy elem.
+     * A context menü az adott oldalon belül elérhető funkciók elérésére szolgál. Tehát új elem, szerkesztés, és hasonlók.
+     * @return void
+     */
+    public function ContextMenu() : void {
+        if(count($this->contextmenu) > 0)
+            include(ROOT_DIR . "/template/assets/contextmenu.php");
+    }
+
+    /**
+     * A Post művelet kiválasztására szolgáló osztály.
+     * A Router állítja be, hogy a GET alapján milyen művelet probál POST-olni (ezért a $this->muvelet nagyon valószínű megegyezik a $this->params['method']-dal)
+     * A POST működéséhez a beérkező kéréssel (tehát kevés kivételtől eltekintve, a $this->params['method'] tartalmával) megegyező nevü metódusnak LÉTEZNIE KELL az osztályban.
+     */
     public function Post() : bool {
         $fname = ucfirst($this->muvelet);
         if(!method_exists($this, $fname)) {
@@ -212,8 +385,15 @@ abstract Class Page
         return $this->$fname();
     }
 
+    /**
+     * A $_GET-ből vett értékeket feldolgozó metódus
+     * A $_GET tömb első eleme MINDIG a kiválasztott modul, így itt a második elemtől kezdődik csak a feldolgozás
+     * A metódus előbb feldolgoz minden felismerhető elemet a tömbből, majd ha marad még benne elem, akkor a 0-at kiválasztja, mint 'elemid'
+     * @param array|null $params A $_GET 1-es indexű elemétől kezdődő tömbje
+     * @return null[] Feldolgozott $paramétereket tartalmazó tömb
+     */
     protected function ParseGet(?array $params) : array {
-        function ParseHelper(string $needle, array &$params, array &$returnarray, mixed $type = 'string') : void {
+        function ParseHelperElem(string $needle, array &$params, array &$returnarray, mixed $type = 'string') : void {
             $index = array_search($needle, $params);
             if($index === false)
                 return;
@@ -234,41 +414,29 @@ abstract Class Page
             }
         }
 
-        $returnarray = ['elemid' => null, 'method' => null];
+        function ParseHelperTomb(array $haystack, array &$params, array &$returnarray, string $getelem) : void {
+            foreach($params as $param) {
+                if(in_array($param, $haystack)) {
+                    $returnarray[$getelem] = $param;
+                    array_splice($params, array_search($param, $params), 1);
+                    break;
+                }
+            }
+        }
+
+        $returnarray = ['elemid' => null, 'aloldal' => null, 'method' => null, 'oldal' => null, 'kereses' => null];
 
         if(!$params || count($params) == 0)
             return $returnarray;
 
-        ParseHelper('oldal', $params, $returnarray, 'int');
-        ParseHelper('kereses', $params, $returnarray, 'string');
+        ParseHelperElem('oldal', $params, $returnarray, 'int');
+        ParseHelperElem('kereses', $params, $returnarray, 'string');
+        ParseHelperTomb($this->validpagemethods, $params, $returnarray, 'method');
+        ParseHelperTomb($this->aloldalak, $params, $returnarray, 'aloldal');
 
-        if(count($params) == 0)
-            return $returnarray;
+        if(count($params) > 0)
+            $returnarray['elemid'] = $params[0];
 
-        $keys = array_keys($params);
-        switch(count($params)) {
-            case 1: // Csak egy paraméter van, az lehet ID, vagy metódus. Ha a metódus a validpagemethods tömbben van, akkor az a metódus, különben ID.
-                if(is_numeric($params[$keys[0]]))
-                    $returnarray['elemid'] = (int)$params[$keys[0]];
-                elseif(!in_array($params[$keys[0]], $this->validpagemethods))
-                    $returnarray['elemid'] = $params[$keys[0]];
-                else
-                    $returnarray['method'] = $params[$keys[0]];
-                break;
-            case 2: // Két paraméter van, ha az első egy valid metódus, az lesz a metódus, különben az első az ID a második a metódus.
-                if(in_array($params[$keys[0]], $this->validpagemethods)) {
-                    $returnarray['method'] = $params[$keys[0]];
-                    $returnarray['elemid'] = $params[$keys[1]];
-                }
-                else {
-                    if(is_numeric($params[$keys[0]]))
-                        $returnarray['elemid'] = (int)$params[$keys[0]];
-                    else
-                        $returnarray['elemid'] = $params[$keys[0]];
-                    $returnarray['method'] = $params[$keys[1]];
-                }
-                break;
-        }
         return $returnarray;
     }
 
@@ -283,8 +451,6 @@ abstract Class Page
         if($kereses) {
             $this->urlparams = $this->selectedpage . "/kereses/$kereses";
             $this->keresesplaceholder = $kereses;
-        } else {
-            $this->urlparams = $this->selectedpage;
         }
         return $kereses;
     }
@@ -444,7 +610,13 @@ abstract Class Page
         }
 
         $this->muvelet = 'szerkeszt';
-        $this->view = $this->views['szerkeszt'];
+        if(isset($this->views['szerkeszt']))
+            $this->view = $this->views['szerkeszt'];
+        else {
+            $this->viewsgyoker = ROOT_DIR;
+            $this->view = "/template/assets/basic_szerkeszt_form.php";
+        }
+
         $this->form = $this->Form($elem);
 
         return $this;
