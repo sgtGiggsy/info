@@ -13,7 +13,7 @@ trait CsoportHandlerDB
             $keresesstring = '';
         }
         else {
-            $keresesstring = "(csoport_nev LIKE ? OR rovid_nev LIKE ? OR leiras LIKE ?)";
+            $keresesstring = "AND (csoport_nev LIKE ? OR rovid_nev LIKE ? OR leiras LIKE ?)";
             $kereses = '%' . $kereses. '%';
             $limit = array_pop($queryparams);
             $startindex = array_pop($queryparams);
@@ -21,17 +21,14 @@ trait CsoportHandlerDB
         }
 
         if($jogszint == 3) {
-            if($keresesstring) {
-                $keresesstring = "WHERE $keresesstring";
-            }
             $getcsoport = new MySQLHandler("SELECT csoport_id, csoport_nev, slug, rovid_nev, statusz, leiras, count(felhasznalo_id) AS tagok_szama
                 FROM core_csoportok
                     LEFT JOIN core_csoportok_tagsagok USING (csoport_id)
-                $keresesstring
+                WHERE redir_id IS NULL $keresesstring
                 GROUP BY csoport_id
                 ORDER BY csoport_nev
                 LIMIT ?, ?;", ...$queryparams);
-            $osszrekord = $getcsoport->GetLimitNelkuliDB();
+            $getcsoport->GetLimitNelkuliDB();
         }
         elseif($jogszint == 2) {
             if($keresesstring) {
@@ -42,7 +39,7 @@ trait CsoportHandlerDB
             $getcsoport = new MySQLHandler("SELECT slug, csoport_id, csoport_nev, rovid_nev, statusz, leiras, count(felhasznalo_id) AS tagok_szama
                 FROM core_csoportok
                     LEFT JOIN core_csoportok_tagsagok USING (csoport_id)
-                WHERE csoport_id IN ($paramplacehold) $keresesstring
+                WHERE redir_id IS NULL AND csoport_id IN ($paramplacehold) $keresesstring
                 GROUP BY csoport_id
                 ORDER BY csoport_nev
                 LIMIT ?, ?;", ...$queryparams);
@@ -60,7 +57,7 @@ trait CsoportHandlerDB
         if(is_int($azonosito))
             $where = "csoport_id";
 
-        $getcsoport = new MySQLHandler("SELECT csoport_id, csoport_nev, slug, rovid_nev, statusz, leiras
+        $getcsoport = new MySQLHandler("SELECT csoport_id, csoport_nev, slug, rovid_nev, statusz, leiras, redir_id
                 FROM core_csoportok
                 WHERE $where = ?;", $azonosito);
         if($getcsoport->sorokszama == 0)
@@ -76,5 +73,10 @@ trait CsoportHandlerDB
                 WHERE csoport_id = ?
                 ORDER BY nev;", $csoport_id);
         return $getusers->EscapedArray();
+    }
+
+    private static function DB_GetLDAPAzonositok(int $csoport_id) : array {
+        $getldap = new MySQLHandler("SELECT needle FROM core_csoportok_ldap WHERE csoport_id = ?;", $csoport_id);
+        return $getldap->EscapedArray();
     }
 }

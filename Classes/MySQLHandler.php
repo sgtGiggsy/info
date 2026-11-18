@@ -195,7 +195,7 @@ class MySQLHandler
             $limitnelkuliparams = array_slice($this->params, 0, -2);
 
             $db = new MySQLHandler($limitnelkulquery, ...$limitnelkuliparams);
-            $this->limitnelkulidb = $db->Fetch()['db'];
+            $this->limitnelkulidb = $db->Fetch()['db'] ?? 0;
             return $this->limitnelkulidb;
         }
         return $this->sorokszama;
@@ -211,7 +211,7 @@ class MySQLHandler
         $this->keepalive = $keepalive;
     }
 
-    public function Fetch() : array | false
+    public function Fetch() : null | array | false
     {
         if($this->result)
         {
