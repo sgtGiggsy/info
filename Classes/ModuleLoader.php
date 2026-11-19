@@ -42,12 +42,16 @@ class ModuleLoader
         foreach (glob(ROOT_DIR . '/Modules/*/manifest*.php') ?: [] as $manifest) {
             $module = require $manifest;
             if (!is_array($module) || !isset($module['handler'], $module['pages']) || !is_array($module['pages']) || !isset($module['slug']) || !isset($module['nev'])) {
-                throw new \UnexpectedValueException("Hibás modul manifest: {$manifest}");
+                $GLOBALS['debugmessages'][] = "Hibás modul manifest: {$manifest}";
+                break;
+                //throw new \UnexpectedValueException("Hibás modul manifest: {$manifest}");
             }
 
             foreach ($module['pages'] as $route => $page) {
                 if ($route === '' || isset($oldalak[$route])) {
-                    throw new \UnexpectedValueException("Üres vagy duplikált útvonal ({$route}) a manifestben: {$manifest}");
+                    $GLOBALS['debugmessages'][] = "Üres vagy duplikált útvonal ({$route}) a manifestben: {$manifest}";
+                    break;
+                    //throw new \UnexpectedValueException();
                 }
                 $oldalak[$route]['menupont'] = $page['menupont'] ?? '';
                 $oldalak[$route]['lathatosag'] = $page['lathatosag'] ?? 'mindenki';
