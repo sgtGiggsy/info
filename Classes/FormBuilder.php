@@ -5,6 +5,12 @@ namespace Infoinventory\Classes;
 class FormBuilder
 {
     private array $mezok = [];
+    private string $elsomezo;
+    private string $format;
+    private string $submit;
+    private string $formhead;
+    private bool $submitmasodik = false;
+
     public function __construct()
     {
         $this->Hidden('csrf_token');
@@ -143,10 +149,94 @@ class FormBuilder
         return $this;
     }
 
-    public function Render(): string {
-        $html = '';
+    /**
+     * Ezzel a metódussal lehet megadni, hogy egy FORM kétoszlopos formában renderelődjön-e
+     * @param string $masodikoszlop_elsoelem Ez a megadott elem lesz a második oszlop első eleme. Nemlétező megadott elem esetén egyoszlopos lesz
+     * @param string $format A kétoszlopos felosztás aránya. Alapértelmezetten 1-1, de lehet 2-1, 3-2 és 3-1 is. Hibás, vagy null érték esetén 1-1-re áll automatikusan
+     */
+    public function SetTwoColForm(?string $masodikoszlop_elsoelem, ?string $format = '1-1') : void {
+        if(!$masodikoszlop_elsoelem)
+            return;
 
         foreach ($this->mezok as $mezo) {
+            if($mezo['name'] === $masodikoszlop_elsoelem) {
+                $this->elsomezo = $masodikoszlop_elsoelem;
+                break;
+            }
+        }
+
+        if(!isset($this->elsomezo))
+            return;
+
+        if(!$format || !in_array($format, ['1-1', '2-1', '3-2', '3-1'])) {
+            $format = '1-1';
+        }
+        $format = "double-" . $format;
+
+        $this->format = $format;
+    }
+
+    /**
+     * Ez a metódus hozzáadja a Submit elemet a FORM-hoz
+     * @param string $buttontext A submit gombon megjelenő szöveg
+     * @param bool $masodikoszlop True-ra állítva a második oszlop utolsó elemének teszi be a Submit elemet, nem középre
+     */
+    public function SetSubmit(string $buttontext, bool $masodikoszlop = false) : void {
+        $this->submit = '<div class="submit"><input type="submit" value="' . $buttontext . '"></div>';
+        $this->submitmasodik = $masodikoszlop;
+    }
+
+    public function SetFormHead(string $formaction) : void {
+        $this->formhead = '<form action="' . $formaction. '" method="post">';
+    }
+
+    private function RenderFormHead() : string {
+        if(isset($this->formhead))
+            return $this->formhead;
+        return '';
+    }
+
+    private function RenderFormFoot() : string {
+        if(isset($this->formhead))
+            return "</form>";
+        return "";
+    }
+
+    private function RenderFormDiv() : string {
+        if(isset($this->format))
+            return '<div class="' . $this->format . '"><div>';
+        return '';
+    }
+
+    private function RenderFormEnd() : string {
+        $retstr = '';
+        if(isset($this->format) && !$this->submitmasodik)
+            $retstr .= "</div>";
+
+        if(isset($this->submit)) {
+            $retstr .= $this->submit;
+            if(isset($this->format) && $this->submitmasodik)
+                $retstr .= "</div>";
+        }
+
+        if(isset($this->format))
+            $retstr .= '</div>';
+        return $retstr;
+    }
+
+    private function RenderNextCol(string $mezonev) : string {
+        if(isset($this->format) && $mezonev == $this->elsomezo)
+            return '</div><div>';
+        return '';
+    }
+
+    public function Render(): string {
+        $html = $this->RenderFormHead();
+        $html .= $this->RenderFormDiv();
+
+        foreach ($this->mezok as $mezo) {
+            $html .= $this->RenderNextCol($mezo['name']);
+
             $checkbradio = $mezo['type'] == 'checkbox' || $mezo['type'] == 'radio';
             $hidden = $mezo['type'] == 'hidden';
             if(!$hidden) {
@@ -210,11 +300,13 @@ class FormBuilder
                 $html .= '<label for="' . $mezo['name'] . '">' . htmlspecialchars($mezo['label']) . '</label></div>';
 
             if(isset($mezo['helperText']) && !$hidden)
-                $html .= '<small class="helpertext">' . htmlspecialchars($mezo['helperText']) . '</small>';
+                $html .= '<small class="helpertext">' . $mezo['helperText'] . '</small>';
 
             if(!$hidden)
                 $html .= '</div>';
         }
+        $html .= $this->RenderFormEnd();
+        $html .= $this->RenderFormFoot();
 
         return $html;
     }

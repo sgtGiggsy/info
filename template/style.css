@@ -574,14 +574,26 @@ footer {
     margin-bottom: 1em;
 }
 
-.doublecolumn, .double2-1 {
+.doublecolumn, .double-1-1, .double-2-1, .double-3-2, .double-3-1  {
     display: grid;
     gap: 1em;
     margin: 0 0.5em;
 }
 
-.doublecolumn {
+.doublecolumn, .double-1-1 {
     grid-template-columns: 1fr 1fr;
+}
+
+.double-2-1 {
+    grid-template-columns: 2fr 1fr;
+}
+
+.double-3-1 {
+    grid-template-columns: 3fr 1fr;
+}
+
+.double-3-1 {
+    grid-template-columns: 3fr 1fr;
 }
 
 .hutolehetosegek {
@@ -601,20 +613,16 @@ footer {
     margin: 0 1em;
 }
 
-.double2-1 {
-    grid-template-columns: 2fr 1fr;
-}
-
 .doublecolumn > :first-child {
     grid-column: 1 / -1;
 }
 
-.doublecolumn > div, .doublecolumn > div > div, .double2-1 > div {
+.doublecolumn > div, .doublecolumn > div > div, .double-2-1 > div {
     display: flex;
     flex-direction: column;
 }
 
-.double2-1 > div {
+.double-2-1 > div {
     gap: 1em;
 }
 
