@@ -262,17 +262,6 @@ abstract Class Page
      */
     protected FormBuilder $form;
 
-    /**
-     * A 100%-ban generált Formban megjelenő alapadatok
-     * Amennyiben nem kerül megadásra uj, vagy szerkesztes view fájl, úgy a rendszer a Form metódusban előállított Form és ennek a tömbnek a felhasználásával generálja le az oldalt.
-     * @var array|null[]
-     */
-    protected array $formvars = [
-        'pagetitle' => null,
-        'actiontarget' => null,
-        'buttontext' => null
-    ];
-
     public function __construct(string $type, ?int $olvasas = 0, ?int $iras = 0) {
         if(is_null($olvasas) || is_null($iras))
             throw new Exception("A Page osztály példányosításához meg kell adni az olvasási és írási jog szintjét!");
@@ -591,24 +580,24 @@ abstract Class Page
         return isset($this->views[$this->selectedpage]);
     }
 
-    protected function SetFullForm(string $formaction, string $buttontext, ?string $masodikoszlop_elsoelem = null, ?string $format = '1-1', bool $masodikoszlop = false) : void {
-        //echo "$formaction, $buttontext, $masodikoszlop_elsoelem, $format, $masodikoszlop";
+    protected function SetFullForm(string $formaction, string $buttontext, ?string $masodikoszlop_elsoelem = null, ?string $format = '1-1', ?int $submitoszlop = 0) : void {
         $this->form->SetFormHead($formaction);
         $this->form->SetTwoColForm($masodikoszlop_elsoelem, $format);
-        $this->form->SetSubmit($buttontext, $masodikoszlop);
+        $this->form->SetSubmit($buttontext, $submitoszlop);
     }
 
     /**
      * Új elem létrehozására szolgáló oldalt kiválasztó, és alapbeállításait elvégző függvény
      * Paraméter nélkül meghívva csak ellenőrzi az írásjogot, beállítja a view fájlt, és legenerálja az alap FORM-ot a Form() függvény alapján.
      * Legalább két paraméterrel ($formaction és $buttontext) meghívva legenerálja az alap FORM oldalt is. Egyszerű, csak elemi beviteli mezőket tartalmazó FORM-ok esetén ez bőven elég.
-     * @param string    $formaction                 A form action='' rész tartalma. Értelemszerűen egy valós link, ami a beküldött FORM tartalmát képes lesz értelmezni
-     * @param string    $buttontext                 A submit gomb felirata
-     * @param string    $masodikoszlop_elsoelem     Ha kétoszlopos megjelenítést akarunk a FORM-nak, itt kell megadni, hogy melyik legyen a második oszlop első eleme. Csak a mező nevét kell megadni.
-     * @param string    $format                     Kétoszlopos megjelenítés esetén itt adhatjuk meg, hogy az oszlopok szélessége milyen eloszlásban legyen. Alapértelmezetten 1-1, de valós érték még a 2-1, 3-1 és 3-2 is.
-     * @param bool      $masodikoszlop              A submit mező alapértelmezetten alul-középen van, de ezt a változót true-ra állítva a második oszlop utolsó eleme lesz
+     * @param string|null $formaction A form action='' rész tartalma. Értelemszerűen egy valós link, ami a beküldött FORM tartalmát képes lesz értelmezni
+     * @param string|null $buttontext A submit gomb felirata
+     * @param string|null $masodikoszlop_elsoelem Ha kétoszlopos megjelenítést akarunk a FORM-nak, itt kell megadni, hogy melyik legyen a második oszlop első eleme. Csak a mező nevét kell megadni.
+     * @param string|null $format Kétoszlopos megjelenítés esetén itt adhatjuk meg, hogy az oszlopok szélessége milyen eloszlásban legyen. Alapértelmezetten 1-1, de valós érték még a 2-1, 3-1 és 3-2 is.
+     * @param int|null $submitoszlop A submit mező alapértelmezetten alul-középen van, de ezt a változót 1-esre, vagy 2-esre állítva megadhatjuk, hogy valamelyik oszlop utolsó eleme legyen
+     * @return Page
      */
-    protected function SetSelectedUj(?string $formaction = null, ?string $buttontext = null, ?string $masodikoszlop_elsoelem = null, ?string $format = null, bool $masodikoszlop = false) : Page {
+    protected function SetSelectedUj(?string $formaction = null, ?string $buttontext = null, ?string $masodikoszlop_elsoelem = null, ?string $format = null, ?int $submitoszlop = 0) : Page {
         if(!$this->GetIrasjog()) {
             return new SinglePage(403, "Nincs jogosultságod új elem létrehozásához!");
         }
@@ -623,7 +612,7 @@ abstract Class Page
         }
         $this->form = $this->Form();
         if($formaction && $buttontext)
-            $this->SetFullForm($formaction, $buttontext, $masodikoszlop_elsoelem, $format, $masodikoszlop);
+            $this->SetFullForm($formaction, $buttontext, $masodikoszlop_elsoelem, $format, $submitoszlop);
 
         return $this;
     }
@@ -632,15 +621,16 @@ abstract Class Page
      * Egy már meglévő elem szerkesztésére szolgáló oldalt kiválasztó, és alapbeállításait elvégző függvény
      * Egy paraméterrel (ami KÖTELEZŐEN a szerkesztendő objektum) meghívva csak ellenőrzi az írásjogot, beállítja a view fájlt, és legenerálja az alap FORM-ot a Form() függvény alapján.
      * Legalább négy paraméterrel ($elem, $elemnev, $formaction és $buttontext) meghívva legenerálja az alap FORM oldalt is. Egyszerű, csak elemi beviteli mezőket tartalmazó FORM-ok esetén ez bőven elég.
-     * @param mixed     $elem                       A szerkeszteni kívánt elem, vagy bármi olyan egyéb változó, ami alapján az osztály Form függvénye tudja, hogy hogyan kell feldolgoznia
-     * @param string    $elemnev                    A 403-as hibaüzenet pontos, menüponthoz illeszkedő szövegének generálásához használt szöveg
-     * @param string    $formaction                 A form action='' rész tartalma. Értelemszerűen egy valós link, ami a beküldött FORM tartalmát képes lesz értelmezni
-     * @param string    $buttontext                 A submit gomb felirata
-     * @param string    $masodikoszlop_elsoelem     Ha kétoszlopos megjelenítést akarunk a FORM-nak, itt kell megadni, hogy melyik legyen a második oszlop első eleme. Csak a mező nevét kell megadni.
-     * @param string    $format                     Kétoszlopos megjelenítés esetén itt adhatjuk meg, hogy az oszlopok szélessége milyen eloszlásban legyen. Alapértelmezetten 1-1, de valós érték még a 2-1, 3-1 és 3-2 is.
-     * @param bool      $masodikoszlop              A submit mező alapértelmezetten alul-középen van, de ezt a változót true-ra állítva a második oszlop utolsó eleme lesz
+     * @param mixed $elem A szerkeszteni kívánt elem, vagy bármi olyan egyéb változó, ami alapján az osztály Form függvénye tudja, hogy hogyan kell feldolgoznia
+     * @param string|null $elemnev A 403-as hibaüzenet pontos, menüponthoz illeszkedő szövegének generálásához használt szöveg
+     * @param string|null $formaction A form action='' rész tartalma. Értelemszerűen egy valós link, ami a beküldött FORM tartalmát képes lesz értelmezni
+     * @param string|null $buttontext A submit gomb felirata
+     * @param string|null $masodikoszlop_elsoelem Ha kétoszlopos megjelenítést akarunk a FORM-nak, itt kell megadni, hogy melyik legyen a második oszlop első eleme. Csak a mező nevét kell megadni.
+     * @param string|null $format Kétoszlopos megjelenítés esetén itt adhatjuk meg, hogy az oszlopok szélessége milyen eloszlásban legyen. Alapértelmezetten 1-1, de valós érték még a 2-1, 3-1 és 3-2 is.
+     * @param int|null $submitoszlop A submit mező alapértelmezetten alul-középen van, de ezt a változót 1-esre, vagy 2-esre állítva megadhatjuk, hogy valamelyik oszlop utolsó eleme legyen
+     * @return Page
      */
-    protected function SetSelectedSzerkeszt(mixed $elem, ?string $elemnev = 'elem', ?string $formaction = null, ?string $buttontext = null, ?string $masodikoszlop_elsoelem = null, ?string $format = null, bool $masodikoszlop = false) : Page {
+    protected function SetSelectedSzerkeszt(mixed $elem, ?string $elemnev = 'elem', ?string $formaction = null, ?string $buttontext = null, ?string $masodikoszlop_elsoelem = null, ?string $format = null, ?int $submitoszlop = 0) : Page {
         if(!$this->irasjog) {
             return new SinglePage(403, "A kiválasztott $elemnev szerkesztéséhez nincs jogosultságod!");
         }
@@ -656,7 +646,7 @@ abstract Class Page
         $this->form = $this->Form($elem);
 
         if($formaction && $buttontext)
-            $this->SetFullForm($formaction, $buttontext, $masodikoszlop_elsoelem, $format, $masodikoszlop);
+            $this->SetFullForm($formaction, $buttontext, $masodikoszlop_elsoelem, $format, $submitoszlop);
 
         return $this;
     }

@@ -9,7 +9,7 @@ class FormBuilder
     private string $format;
     private string $submit;
     private string $formhead;
-    private bool $submitmasodik = false;
+    private int $submitoszlop = 0;
 
     public function __construct()
     {
@@ -127,6 +127,15 @@ class FormBuilder
         return $this;
     }
 
+    public function CustomInputField(string $name, string $inputhtml) : self {
+        $this->mezok[] = [
+            'type' => 'custominputfield',
+            'name' => $name,
+            'inputhtml' => $inputhtml
+        ];
+        return $this;
+    }
+
     public function SetValue(string $name, mixed $value): self {
         foreach ($this->mezok as &$mezo) {
             if ($mezo['name'] === $name) {
@@ -151,8 +160,8 @@ class FormBuilder
 
     /**
      * Ezzel a metódussal lehet megadni, hogy egy FORM kétoszlopos formában renderelődjön-e
-     * @param string $masodikoszlop_elsoelem Ez a megadott elem lesz a második oszlop első eleme. Nemlétező megadott elem esetén egyoszlopos lesz
-     * @param string $format A kétoszlopos felosztás aránya. Alapértelmezetten 1-1, de lehet 2-1, 3-2 és 3-1 is. Hibás, vagy null érték esetén 1-1-re áll automatikusan
+     * @param string|null $masodikoszlop_elsoelem Ez a megadott elem lesz a második oszlop első eleme. Nemlétező megadott elem esetén egyoszlopos lesz
+     * @param string|null $format A kétoszlopos felosztás aránya. Alapértelmezetten 1-1, de lehet 2-1, 3-2, 3-1, 1-2, 1-3 és 2-3 is. Hibás, vagy null érték esetén 1-1-re áll automatikusan
      */
     public function SetTwoColForm(?string $masodikoszlop_elsoelem, ?string $format = '1-1') : void {
         if(!$masodikoszlop_elsoelem)
@@ -168,7 +177,7 @@ class FormBuilder
         if(!isset($this->elsomezo))
             return;
 
-        if(!$format || !in_array($format, ['1-1', '2-1', '3-2', '3-1'])) {
+        if(!in_array($format, ['1-1', '2-1', '3-2', '3-1', '1-2', '1-3', '2-3'])) {
             $format = '1-1';
         }
         $format = "double-" . $format;
@@ -179,11 +188,11 @@ class FormBuilder
     /**
      * Ez a metódus hozzáadja a Submit elemet a FORM-hoz
      * @param string $buttontext A submit gombon megjelenő szöveg
-     * @param bool $masodikoszlop True-ra állítva a második oszlop utolsó elemének teszi be a Submit elemet, nem középre
+     * @param int|null $submitoszlop A submit gomb helye a formban. Alapértelmezetten alul-középen jelenik meg. 1-es értékre állítva a baloldali, 2-esre a jobboldali oszlopban lesz renderelve
      */
-    public function SetSubmit(string $buttontext, bool $masodikoszlop = false) : void {
+    public function SetSubmit(string $buttontext, ?int $submitoszlop = 0) : void {
         $this->submit = '<div class="submit"><input type="submit" value="' . $buttontext . '"></div>';
-        $this->submitmasodik = $masodikoszlop;
+        $this->submitoszlop = $submitoszlop;
     }
 
     public function SetFormHead(string $formaction) : void {
@@ -210,12 +219,12 @@ class FormBuilder
 
     private function RenderFormEnd() : string {
         $retstr = '';
-        if(isset($this->format) && !$this->submitmasodik)
+        if(isset($this->format) && !($this->submitoszlop == 1 || $this->submitoszlop == 2))
             $retstr .= "</div>";
 
-        if(isset($this->submit)) {
+        if(isset($this->submit) && $this->submitoszlop !== 1) {
             $retstr .= $this->submit;
-            if(isset($this->format) && $this->submitmasodik)
+            if(isset($this->format) && $this->submitoszlop == 2)
                 $retstr .= "</div>";
         }
 
@@ -225,9 +234,13 @@ class FormBuilder
     }
 
     private function RenderNextCol(string $mezonev) : string {
-        if(isset($this->format) && $mezonev == $this->elsomezo)
-            return '</div><div>';
-        return '';
+        $retstr = '';
+        if(isset($this->format) && $mezonev == $this->elsomezo) {
+            if($this->submitoszlop == 1)
+                $retstr .= $this->submit;
+            $retstr .= '</div><div>';
+        }
+        return $retstr;
     }
 
     public function Render(): string {
@@ -293,6 +306,10 @@ class FormBuilder
                         $html .= "<option value=\"$val\" $selected>$text</option>";
                     }
                     $html .= '</select>';
+                    break;
+                
+                case 'custominputfield':
+                    $html .= $mezo['inputhtml'];
                     break;
             }
 
