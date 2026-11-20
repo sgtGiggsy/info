@@ -84,10 +84,11 @@ abstract Class Page
     public string $urlparams;
 
     /**
-     * Ez választja ki a POST folyamatot lebonyolító metódust
-     * @var string|null $muvelet
+     * Ez választja ki a POST folyamatot lebonyolító metódust. A Router-ben kell neki értéket adni.
+     * Alapból false-ra inicializálódik. Ha volt POST kérés, a Controller true-ra állítja, és a Router onnan tudja, hogy POST kérést kapott-e.
+     * @var bool|string $post_method
      */
-    public ?string $muvelet = null;
+    public bool|string $post_method = false;
 
     /**
      * POST utáni felugró mixin üzeneteket tartalmazó változó.
@@ -262,6 +263,12 @@ abstract Class Page
      */
     protected FormBuilder $form;
 
+    /**
+     * A másodlagos form változója. Amennyiben van, ebbe kerül bele egy második form, amit az első formmal együtt akarunk megjeleníteni
+     * @var FormBuilder $form2
+     */
+    protected Formbuilder $form2;
+
     public function __construct(string $type, ?int $olvasas = 0, ?int $iras = 0) {
         if(is_null($olvasas) || is_null($iras))
             throw new Exception("A Page osztály példányosításához meg kell adni az olvasási és írási jog szintjét!");
@@ -272,6 +279,8 @@ abstract Class Page
         $this->redirtarget = $_SERVER['REQUEST_URI'];
         $GLOBALS['debugmessages'][$type] = [];
         $this->debugmessages = &$GLOBALS['debugmessages'][$type];
+        $this->params = $this->ParseGet();
+        $this->viewsgyoker = ROOT_DIR . "/Modules/". ucfirst(MODULOK->oldalak[$type]['kezelomodul']) . "/views/";
         if(FELHASZNALO->godadmin) {
             $this->modulolvasas = $this->moduliras = 3;
         } else {
@@ -282,6 +291,8 @@ abstract Class Page
         if(isset($this->views[$type]))
             $this->view = $this->views[$type];
     }
+
+    public abstract function SetRender();
 
     /**
      * A HTML <head> dinamikus részének tartalmát beállító osztály
@@ -362,11 +373,11 @@ abstract Class Page
 
     /**
      * A Post művelet kiválasztására szolgáló osztály.
-     * A Router állítja be, hogy a GET alapján milyen művelet probál POST-olni (ezért a $this->muvelet nagyon valószínű megegyezik a $this->params['method']-dal)
-     * A POST működéséhez a beérkező kéréssel (tehát kevés kivételtől eltekintve, a $this->params['method'] tartalmával) megegyező nevü metódusnak LÉTEZNIE KELL az osztályban.
+     * A Router állítja be, hogy a GET alapján milyen művelet probál POST-olni az oldalon.
+     * A POST működéséhez a routerben kiválasztott $this->post_method nevü metódusnak LÉTEZNIE KELL az osztályban.
      */
     public function Post() : bool {
-        $fname = ucfirst($this->muvelet);
+        $fname = ucfirst($this->post_method);
         if(!method_exists($this, $fname)) {
             $this->mixintext = "A kért művelethez (<strong>$fname</strong>) nem található metódus!";
             return false;
@@ -381,7 +392,7 @@ abstract Class Page
      * @param array|null $params A $_GET 1-es indexű elemétől kezdődő tömbje
      * @return null[] Feldolgozott $paramétereket tartalmazó tömb
      */
-    protected function ParseGet(?array $params) : array {
+    protected function ParseGet() : array {
         function ParseHelperElem(string $needle, array &$params, array &$returnarray, mixed $type = 'string') : void {
             $index = array_search($needle, $params);
             if($index === false)
@@ -412,6 +423,9 @@ abstract Class Page
                 }
             }
         }
+
+        $params = $_GET['params'] ?? '';
+        $params = $params ? explode('/', $params) : [];
 
         $returnarray = ['elemid' => null, 'aloldal' => null, 'method' => null, 'oldal' => null, 'kereses' => null];
 
@@ -508,9 +522,8 @@ abstract Class Page
 
     /**
      * Függvény, ami kiválasztja a megfelelő aloldalt, a hozzá tartozó jogosultságokat, view fájlt, és megfelelő adatbázis lekérdezést.
-     * @param array $params A $_GET tömb nyers adatait tartalmazó tömb. A ParseGet függvénnyel lehet feldolgozni.
      */
-    public abstract function Router(array $params) : Page;
+    public abstract function Router() : Page;
 
     /**
      * Az osztály által generált form(ok)-at beállító metódus. A leszármazott osztályokban implementálni KELL, ha az osztály generált formot akar használni.
@@ -598,12 +611,7 @@ abstract Class Page
      * @return Page
      */
     protected function SetSelectedUj(?string $formaction = null, ?string $buttontext = null, ?string $masodikoszlop_elsoelem = null, ?string $format = null, ?int $submitoszlop = 0) : Page {
-        if(!$this->GetIrasjog()) {
-            return new SinglePage(403, "Nincs jogosultságod új elem létrehozásához!");
-        }
-
         $this->irasjog = true;
-        $this->muvelet = 'uj';
         if(isset($this->views['uj']))
             $this->view = $this->views['uj'];
         else {
@@ -635,7 +643,6 @@ abstract Class Page
             return new SinglePage(403, "A kiválasztott $elemnev szerkesztéséhez nincs jogosultságod!");
         }
 
-        $this->muvelet = 'szerkeszt';
         if(isset($this->views['szerkeszt']))
             $this->view = $this->views['szerkeszt'];
         else {
@@ -654,7 +661,6 @@ abstract Class Page
     protected function SetSelectedLista(array $params, array &$returnarray) : Page {
         $kereses = $this->SetKereses($params);
         $this->irasjog = $this->GetIrasjog();
-        $this->view = $this->views[$this->selectedpage];
         $startindex = 0;
         $elemperoldal = 20;
         $this->SetPagingVars($startindex, $elemperoldal, $params);
@@ -662,5 +668,22 @@ abstract Class Page
         $this->DetectLastPage($returnarray, $elemperoldal);
 
         return $this;
+    }
+
+    public static function FuzzySearchStringGen (string $basestring) : array {
+        $needle = '%'; $needle2 = [];
+        $chars = preg_split('//u', $basestring, -1, PREG_SPLIT_NO_EMPTY);
+        $tmp = '';
+        $limit = min(count($chars), 4);
+        for($i=0; $i < $limit; $i++) {
+            $needle .= $chars[$i] . '_';
+        }
+        for ($i = 0; $i < $limit - 1; $i++) {
+            $tmp = $chars;
+            [$tmp[$i], $tmp[$i + 1]] = [$tmp[$i + 1], $tmp[$i]];
+            $needle2[] = '%' . implode('', $tmp) . '%';
+        }
+
+        return [$basestring . "%", "%" . $basestring . "%" , $needle, ...$needle2];
     }
 }

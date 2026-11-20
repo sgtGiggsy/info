@@ -5,6 +5,7 @@ namespace Infoinventory\Classes;
 use Infoinventory\Classes\APIResult;
 use Infoinventory\Modules\Core\Page;
 use Infoinventory\Modules\Core\SinglePage;
+use JetBrains\PhpStorm\NoReturn;
 
 class Controller
 {
@@ -40,29 +41,27 @@ class Controller
             $this->RunAPI();
         }
         else {
-            $postresult = null;
             $this->page = self::PageSelect($this->kertoldal);
-            $this->page = $this->Router($this->page);
-            if($_SERVER['REQUEST_METHOD'] === 'POST' && $this->postenged)
-                $postresult = $this->PostController();
-            if($postresult !== null)
-                $this->AfterPost($postresult);
-            elseif(Helpers::ArrayKeyLetezik($_SESSION, 'eredmeny', 'mixintext', 'muvelet'))
-                $this->PostMessage();
+            $verifypage = $this->page->Router();
+
+            if($this->page !== $verifypage) {
+                $this->postenged = false;
+                $this->page = $verifypage;
+            }
+
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if($this->postenged)
+                    $this->PostController();
+                else
+                    $this->SetPostMessage(false);
+                return;
+            }
+
+            if(Helpers::ArrayKeyLetezik($_SESSION, 'eredmeny', 'mixintext', 'muvelet'))
+                $this->ShowPostMessage();
+
+            $this->page->SetRender();
         }
-    }
-
-    private function Router(Page $page) : Page {
-        $getparams = $_GET['params'] ?? '';
-        $params = $getparams ? explode('/', $getparams) : [];
-        $verifypage = $page->Router($params);
-
-        if($page !== $verifypage) {
-            $this->postenged = false;
-            return $verifypage;
-        }
-
-        return $verifypage;
     }
 
     private function RunAPI() : void {
@@ -74,7 +73,7 @@ class Controller
             ->Render();
     }
 
-    public function PostController() : bool {
+    public function PostController() : void {
         $this->newuri = explode("?", $_SERVER['REQUEST_URI'])[0]; // Így a legegyszerűbb levágni az esteleges ismeretlen Get-eket
         $eredmeny = "hiba";
 
@@ -83,16 +82,20 @@ class Controller
             $_SESSION['mixintext'] = "Támadás gyanú! A kért tartalom beküldése sikertelen!";
             $_SESSION['eredmeny'] = $eredmeny;
             unset($_SESSION['csrf_token']);
-            return false;
+            return;
         }
         Controller::CSRFGenerator();
         Controller::POSTCleaner();
 
         // A tényleges POST lefolytatása
-        return $this->page->Post();
+        $this->SetPostMessage($this->page->Post());
     }
 
-    private function AfterPost(bool $dberedmeny) : void {
+    /**
+     * @param bool $dberedmeny
+     * @return void
+     */
+    private function SetPostMessage(bool $dberedmeny) : void {
         if($this->page->redirtarget)
             $this->newuri = $this->page->redirtarget;
 
@@ -112,7 +115,7 @@ class Controller
         exit;
     }
     
-    private function PostMessage() : void {
+    private function ShowPostMessage() : void {
         if(!$_SESSION['mixintext']) {
             $eredmeny = 'sikeres';
             $elemnev = $this->page->cimke;

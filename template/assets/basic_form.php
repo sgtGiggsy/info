@@ -6,7 +6,7 @@ if (!defined('ROOT_PATH')) {
 }
 
 ?><div class="normalcontent">
-    <h1><?=$this->sitedesc?></h1>
+    <h1><?= $this->title ?></h1>
         <?= $this->form->Render() ?>
-    </form>
+        <?= isset($this->form2) ? $this->form2->Render() : '' ?>
 </div>
