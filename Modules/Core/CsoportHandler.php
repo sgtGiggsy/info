@@ -12,17 +12,17 @@ class CsoportHandler extends Page
     protected string $viewsgyoker = __DIR__ . "/assets/csoport/views/";
     protected array $views = [
         'csoport' => 'csoport.php',
-        'csoportok' => 'csoportok.php',
-        'uj' => 'uj.php'
+        'csoportok' => 'csoportok.php'
     ];
     protected array $validpagemethods = ['szerkeszt', 'uj'];
     protected array $aloldalak = ['tagok'];
 
     protected array $csoportstatuszok = [
-        0 => 'általános célú csoport, jogosultságok osztásához',
+        0 => 'létesítményhez tartozó csoport',
         1 => 'belső szervezet',
         2 => 'partner szervezet',
-        3 => 'külső szervezet'
+        3 => 'külső szervezet',
+        4 => 'általános célú, nem szervezethez kötött csoport',
     ];
 
     public function Router(array $params) : Page
@@ -33,7 +33,7 @@ class CsoportHandler extends Page
         $params = $this->ParseGet($params);
         if($this->selectedpage == 'csoport') {
             if($params['method'] == 'uj') {
-                return $this->SetSelectedUj();
+                return $this->SetSelectedUj(ROOT_PATH . '/csoport/uj', 'Csoport létrehozás');
             }
 
             if(!isset($params['elemid']))
@@ -50,11 +50,7 @@ class CsoportHandler extends Page
             if($params['method'] == 'szerkeszt') {
                 if(!$this->irasjog)
                     return new SinglePage(403, "Nincs jogosultságod a csoport szerkesztéséhez!");
-                $this->formvars = array_replace($this->formvars,
-                    ['pagetitle' => $this->csoport['csoport_nev'] . ' szerkesztése',
-                    'actiontarget' => ROOT_PATH . '/csoport/' . $this->csoport['slug'] . '/szerkeszt',
-                    'buttontext' => 'Csoport mentése']);
-                return $this->SetSelectedSzerkeszt($this->csoport, 'csoport');
+                return $this->SetSelectedSzerkeszt($this->csoport, 'csoport', ROOT_PATH . '/csoport/' . $this->csoport['slug'] . '/szerkeszt', 'Csoport mentése');
             } else {
                 if(!$this->olvasasjog)
                     return new SinglePage(403, "Nincs jogosultságod a csoport megtekintéséhez!");
@@ -74,6 +70,26 @@ class CsoportHandler extends Page
             return $this->SetSelectedLista($params, $this->csoportok);
         }
         return $this;
+    }
+
+    public function HtmlHead() : void {
+        if ($this->selectedpage == "csoport") {
+            if ($this->muvelet == 'uj') {
+                $this->title .= " - Új csoport felvétele";
+                $this->sitedesc = "Új csoport felvétele";
+            } elseif ($this->muvelet == 'szerkeszt') {
+                $this->title .= " - Csoport: " . $this->csoport['csoport_nev'] . " szerkesztése";
+                $this->sitedesc = "Csoport szerkesztése";
+            } else {
+                $this->title .= " - Csoport: " . $this->csoport['adatok']['csoport_nev'];
+                $this->sitedesc = "Csoport adatai";
+            } 
+        } elseif ($this->selectedpage == "csoportok") {
+            $this->title .= ' - Csoportok';
+            $this->sitedesc = "Csoportok listája";
+        }
+        $this->ablakcim = $this->title;
+        include(ROOT_DIR . "/template/assets/htmlheader.php");
     }
 
     protected static function GetCsoport(string|int $csoportid) : ?array {
@@ -115,8 +131,9 @@ class CsoportHandler extends Page
             ->SetHelperText('csoport_nev', 'A csoport, vagy szervezet teljes, hivatalos megnevezése')
             ->SetHelperText('rovid_nev', 'A csoport, vagy nevének hivatalos rövidített alakja')
             ->SetHelperText('slug', 'Ez az azonosító jelenik meg a címsorban. Bármilyen ékezetek nélküli egyedi szöveg lehet, de ajánlatos, hogy egyértelműen utaljon a csoport nevére')
-            ->SetHelperText('statusz', 'A csoport, vagy szervezet típusa. Az ' . $this->csoportstatuszok[0] . ' lehetőséget csak akkor válasszuk, ha a csoport nem egy TELJES szervezeti elemre utal.')
-            ->SetHelperText('leiras', 'A csoporthoz adható rövid leírás');
+            ->SetHelperText('statusz', 'A csoport, vagy szervezet típusa. Az ' . $this->csoportstatuszok[4] . ' lehetőséget csak akkor válasszuk, ha a csoport nem egy TELJES szervezeti elemre utal.')
+            ->SetHelperText('leiras', 'A csoporthoz adható rövid leírás')
+            ->SetValue('statusz', 1);
         if($csoport) {
             $form->SetValue('csoport_id', $csoport['csoport_id'])
                 ->SetValue('csoport_nev', $csoport['csoport_nev'])
