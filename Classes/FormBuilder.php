@@ -10,6 +10,7 @@ class FormBuilder
     private string $submit;
     private string $formhead;
     private int $submitoszlop = 0;
+    private bool $jsinitialized = false;
 
     public function __construct()
     {
@@ -50,6 +51,12 @@ class FormBuilder
     }
 
     public function TextBox(string $name, string $label, bool $required = false): self {
+        if (!$this->jsinitialized) {
+            Settings::$jsfiles[] = 'includes/external/ckeditor5/ckeditor.js';
+            Settings::$jsfiles[] = 'template/assets/js/ckeditorinitializer.js';
+            $this->jsinitialized = true;
+        }
+        Settings::$PHPvarsToJS['selectornames'][] = $name;
         if ($required)
             $required = 'required';
         else
