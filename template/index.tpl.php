@@ -11,7 +11,7 @@ namespace Infoinventory\template;
     <link rel="shortcut icon" href="<?=ROOT_PATH?>/favicon.ico" type="image/x-icon">
     <?php
     /** @var Controller $page */
-	$page->HtmlHead(); ?>
+	$page->RenderHTMLHeadMetadata(); ?>
 </head>
 
 <body>

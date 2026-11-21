@@ -187,6 +187,7 @@ class FormBuilder
 
     /**
      * Ez a metódus hozzáadja a Submit elemet a FORM-hoz
+     *
      * @param string $buttontext A submit gombon megjelenő szöveg
      * @param int|null $submitoszlop A submit gomb helye a formban. Alapértelmezetten alul-középen jelenik meg. 1-es értékre állítva a baloldali, 2-esre a jobboldali oszlopban lesz renderelve
      */
@@ -195,7 +196,8 @@ class FormBuilder
         $this->submitoszlop = $submitoszlop;
     }
 
-    public function SetFormHead(string $formaction) : void {
+
+    public function SetFormHead(?string $formaction = "") : void {
         $this->formhead = '<form action="' . $formaction. '" method="post">';
     }
 

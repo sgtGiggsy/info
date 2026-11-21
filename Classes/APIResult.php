@@ -109,9 +109,9 @@ class APIResult
 
         $page = Controller::PageSelect($request['page']);
         // Van kiválasztott oldal, de nem létezik, vagy tiltott az elérése
-        if($page->selectedpage == '404' || $page->selectedpage == '403') {
+        if($page->selectedview == '404' || $page->selectedview == '403') {
             $this->message = 'A kért oldal nem érhető el a számodra';
-            $this->status = (int)$page->selectedpage;
+            $this->status = (int)$page->selectedview;
             return false;
         }
 

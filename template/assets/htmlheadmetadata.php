@@ -17,4 +17,3 @@ if($this->shareimage) {
 <meta property="og:description" content="<?=$this->sitedesc?>" />
 <?= $this->localCSS ?>
 <?= $this->robots ?>
-<?= $this->LdJSON() ?>

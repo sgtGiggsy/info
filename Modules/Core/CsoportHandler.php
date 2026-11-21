@@ -26,17 +26,12 @@ class CsoportHandler extends Page
 
     public function Router() : Page
     {
-        $this->viewsgyoker = __DIR__ . "/assets/csoport/views/";
         if(!$this->modulolvasas)
             return new SinglePage(403, "Nincs jogosultságod az oldal megtekintéséhez!");
 
-        if($this->selectedpage == 'csoport') {
+        if($this->selectedview == 'csoport') {
             if($this->params['method'] == 'uj') {
-                $this->irasjog = $this->GetIrasjog();
-                if(!$this->irasjog)
-                    return new SinglePage(403, "Nincs jogosultságod új elem létrehozásához!");
-                $this->post_method = 'UjCsoport';
-                return $this;
+                return $this->SetRouteUj();
             }
 
             if(!isset($this->params['elemid']))
@@ -47,6 +42,7 @@ class CsoportHandler extends Page
             if(!$this->csoport)
                 return new SinglePage(404, "A kiválasztott csoport nem található!");
 
+            //! NEM JÓ A LOGIKA ///
             $this->irasjog = $this->GetIrasjog(FELHASZNALO->uid, $this->csoport['csoport_id']);
             $this->olvasasjog = $this->GetOlvasasjog(FELHASZNALO->uid, $this->csoport['csoport_id']);
 
@@ -75,60 +71,55 @@ class CsoportHandler extends Page
                 $ldap = self::DB_GetLDAPAzonositok($this->csoport['csoport_id']) ?? null;
                 $this->csoport = ['adatok' => $this->csoport, 'tagok' => $tagok, 'ldap' => $ldap];
             }
-        } elseif ($this->selectedpage == 'csoportok') {
+        } elseif ($this->selectedview == 'csoportok') {
             return $this->SetSelectedLista($this->params, $this->csoportok);
         }
         return $this;
     }
 
     public function SetRender() : void {
+        $this->viewsgyoker = __DIR__ . "/assets/csoport/views/";
         if($this->params['method'] == 'uj') {
             $this->title .= " - Új csoport felvétele";
             $this->sitedesc = "Új csoport felvétele";
-            $this->SetSelectedUj(ROOT_PATH . '/csoport/uj', 'Csoport létrehozás');
+            $this->SetViewUj(ROOT_PATH . '/csoport/uj', 'Csoport létrehozás');
         } elseif($this->params['aloldal']) {
             $this->contextmenu[] = ['felirat' => 'Csoport szerkesztése', 'link' => ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/szerkeszt'];
             if ($this->params['aloldal'] == 'tagok') {
-                $this->SetSelectedSzerkeszt($this->csoport['tagok'], 'csoport', ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/tagok/szerkeszt', 'Csoport tagjainak mentése');
+                $this->SetViewSzerkeszt($this->csoport['tagok'], 'csoport', ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/tagok/szerkeszt', 'Csoport tagjainak mentése');
                 $this->title .= " - Csoport: " . $this->csoport['adatok']['csoport_nev'] . " tagjainak szerkesztése";
                 $this->sitedesc = "Csoport tagjainak szerkesztése";
                 $this->contextmenu[] = ['felirat' => 'LDAP azonosítók szerkesztése', 'link' => ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/ldap-azonositok/szerkeszt'];
             } elseif ($this->params['aloldal'] == 'ldap-azonositok') {
-                $this->SetSelectedSzerkeszt($this->csoport['ldap'], 'csoport', ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/ldap-azonositok/szerkeszt', 'LDAP azonosítók mentése');
+                $this->SetViewSzerkeszt($this->csoport['ldap'], 'csoport', ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/ldap-azonositok/szerkeszt', 'LDAP azonosítók mentése');
                 $this->title .= " - Csoport: " . $this->csoport['adatok']['csoport_nev'] . " LDAP azonosítóinak szerkesztése";
                 $this->sitedesc = "Csoport LDAP azonosítóinak szerkesztése";
                 $this->contextmenu[] = ['felirat' => 'Tagok szerkesztése', 'link' => ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/tagok/szerkeszt'];
             }
-        } elseif ($this->selectedpage == "csoport") {
+        } elseif ($this->selectedview == "csoport") {
             $this->contextmenu = [
                 ['felirat' => 'Csoport szerkesztése', 'link' => ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/szerkeszt'],
                 ['felirat' => 'Tagok szerkesztése', 'link' => ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/tagok/szerkeszt'],
-                ['felirat' => 'Csoport szerkesztése', 'link' => ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/ldap-azonositok/szerkeszt']
+                ['felirat' => 'LDAP azonosítók szerkesztése', 'link' => ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/ldap-azonositok/szerkeszt']
             ];
             if($this->params['method'] == 'szerkeszt') {
-                $this->SetSelectedSzerkeszt($this->csoport['adatok'], 'csoport', ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/szerkeszt', 'Csoport mentése');
+                $this->SetViewSzerkeszt($this->csoport['adatok'], 'csoport', ROOT_PATH . '/csoport/' . $this->csoport['adatok']['slug'] . '/szerkeszt', 'Csoport mentése');
                 $this->title .= " - Csoport: " . $this->csoport['adatok']['csoport_nev'] . " szerkesztése";
                 $this->sitedesc = "Csoport szerkesztése";
             } else {
                 $this->title .= " - Csoport: " . $this->csoport['adatok']['csoport_nev'];
                 $this->sitedesc = "Csoport adatlapja";
-                $this->view = $this->views['csoport'];
             }
         } else {
             $this->title .= " - Csoportok";
             $this->sitedesc = "Csoportok listája";
-            $this->view = $this->views['csoportok'];
         }
         $this->ablakcim = $this->title;
     }
 
-    public function HtmlHead() : void {
-        include(ROOT_DIR . "/template/assets/htmlheader.php");
-    }
-
     protected static function GetCsoport(string|int $csoportid) : ?array {
         $csoport = self::DB_GetCsoport($csoportid);
-        if($csoport['redir_id']) // Egy csoport redir_id-ja csak akkor nem null, ha névváltozás történt. Névváltozáskor létrejön egy redir_id-s elem a régi adatokkal, hogy a slug linkelés ne törjön el
+        if($csoport && $csoport['redir_id']) // Egy csoport redir_id-ja csak akkor nem null, ha névváltozás történt. Névváltozáskor létrejön egy redir_id-s elem a régi adatokkal, hogy a slug linkelés ne törjön el
             $csoport = self::DB_GetCsoport($csoport['redir_id']);
 
         return $csoport;

@@ -25,60 +25,59 @@ class Autentikacio extends Page
         'jelszocsere' => 'jelszocsere.php'
     ];
 
-    public function Router(array $params) : Page {
+    public function Router() : Page {
         $this->validpagemethods = ['sikeres', 'megerosit', 'sikertelen'];
-        $params = $this->ParseGet($params);
-        $this->muvelet = $this->selectedpage;
+        $this->muvelet = $this->selectedview;
         $megerositokod = null;
 
-        if($this->selectedpage == 'regisztracio') {
+        if($this->selectedview == 'regisztracio') {
             $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
-            if($params['method'] == 'sikeres')
+            if($this->params['method'] == 'sikeres')
                 $this->view = $this->views['sikeresreg'];
-            elseif($params['method'] == 'sikertelen')
+            elseif($this->params['method'] == 'sikertelen')
                 $this->aloldal = 'sikertelenreg';
-            elseif($params['method'] == 'megerosit') {
-                $this->megerosit =  $this->RegisztracioMegerosit($params);
+            elseif($this->params['method'] == 'megerosit') {
+                $this->megerosit =  $this->RegisztracioMegerosit($this->params);
                 $this->view = $this->views['regmegerosit'];
             }
         }
 
-        if($this->selectedpage == 'jelszocsere') {
+        if($this->selectedview == 'jelszocsere') {
             $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
         }
 
-        if($this->selectedpage == 'elfelejtettjelszo') {
-            if($params['method'] == 'megerosit') {
+        if($this->selectedview == 'elfelejtettjelszo') {
+            if($this->params['method'] == 'megerosit') {
                 $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
-                $this->megerosit = $this->ElfelejtettJelszoMegerosit($params['elemid']);
+                $this->megerosit = $this->ElfelejtettJelszoMegerosit($this->params['elemid']);
                 $this->view = $this->views['ujjelszo'];
             }
-            elseif($params['method'] == 'sikeres')
+            elseif($this->params['method'] == 'sikeres')
                 $this->view = $this->views['jelszoigenyelve'];
         }
         return $this;
     }
 
     public function HtmlHead() : void {
-        $this->canonical = ROOT_PATH . '/' . $this->selectedpage;
+        $this->canonical = ROOT_PATH . '/' . $this->selectedview;
         $this->robots = '<meta name="robots" content="noindex, nofollow">';
-        if($this->selectedpage == "belepes") {
+        if($this->selectedview == "belepes") {
             $this->title .= " - Bejelentkezés";
             $this->sitedesc = "Jelentkezz be az oldal használatához.";
             $this->cimke = "bejelentkezés";
         }
-        elseif($this->selectedpage == "regisztracio") {
+        elseif($this->selectedview == "regisztracio") {
             $this->title .= " - Regisztráció";
             $this->sitedesc = "Regisztrálj, hogy saját tartalommal bővíthesd az oldalt!";
             $this->cimke = "regisztráció";
         }
-        elseif($this->selectedpage == "jelszoemlekezteto") {
+        elseif($this->selectedview == "jelszoemlekezteto") {
             $this->title .= " - Jelszóemlékeztető";
             $this->sitedesc = "Elfelejtett jelszó";
             $this->cimke = "jelszóemlékeztető";
         }
         $this->ablakcim = $this->title;
-        $this->HtmlHeadRender();
+        $this->RenderHTMLHeadMetadata();
     }
 
     public static function CheckLDAPConnection($host) : bool {
@@ -196,7 +195,7 @@ class Autentikacio extends Page
             } else {
                 $this->eredmeny = "siker";
                 $this->mixintext = 'Sikeres bejelentkezés';
-                if($this->selectedpage == "belepes")
+                if($this->selectedview == "belepes")
                     $this->redirtarget = ROOT_PATH;
 
                 //unset($_SESSION);
@@ -415,5 +414,10 @@ class Autentikacio extends Page
             $mail = new MailHandler($message, $email, $mailtargy);
             $mail->Send();
         }
+    }
+
+    public function SetRender(): void
+    {
+        // TODO: Implement SetRender() method.
     }
 }

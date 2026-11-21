@@ -21,17 +21,22 @@ class SinglePage extends Page
         $this->title = ABLAK_CIM;
         $this->egyedihiba = $egyedihiba;
         $file = $this->views[$type] ?? $this->views['404'];
-        $this->selectedpage = $type;
+        $this->selectedview = $type;
         $this->canonical = ROOT_PATH . '/' . $type;
         include(ROOT_DIR . "/" . $file);
     }
 
-    public function Router(array $params): Page {
+    public function Router(): Page {
         return $this;
     }
 
     public function Render() : void {
         if(function_exists('Render'))
             Render($this->egyedihiba);
+    }
+
+    public function SetRender() : void
+    {
+        // TODO: Implement SetRender() method.
     }
 }
