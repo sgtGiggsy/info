@@ -81,7 +81,7 @@ class MySQLHandler
             }
             elseif(!$this->stmt)
             {
-                $message = "<h2>Hibásan megírt SQL query!</h2>" .  $this->exception . "<br>" .  $this->querystring . "<br>Hibakód: " . $this->hibakod . ": " . $this->hibauzenet . "<br>";;
+                $message = "<h2>Hibásan megírt SQL query!</h2>" .  $this->exception . "<br><br>" .  self::FormatSQL($this->querystring) . "<br><br>Hibakód: " . $this->hibakod . ": " . $this->hibauzenet . "<br>";;
             }
             elseif(count($this->params) != strlen($this->types)
                 || count($this->params) != $this->vartparam

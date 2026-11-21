@@ -53,15 +53,17 @@ class ModuleLoader
                     break;
                     //throw new \UnexpectedValueException();
                 }
-                $oldalak[$route]['menupont'] = $page['menupont'] ?? '';
-                $oldalak[$route]['lathatosag'] = $page['lathatosag'] ?? 'mindenki';
-                $oldalak[$route]['menuben'] = $page['menuben'] ?? false;
-                $oldalak[$route]['sorrend'] = $page['sorrend'] ?? null;
-                $oldalak[$route]['szulo'] = $page['szulo'] ?? null;
-                $oldalak[$route]['ikon'] = $page['ikon'] ?? null;
-                $oldalak[$route]['handler'] = $module['handler'];
-                $oldalak[$route]['kezelomodul'] = $module['slug'];
-                $oldalak[$route]['kezelonev'] = $module['nev'];
+                $oldalak[$route] = [
+                    'menupont' => $page['menupont'] ?? '',
+                    'lathatosag' => $page['lathatosag'] ?? 'mindenki',
+                    'menuben' => $page['menuben'] ?? false,
+                    'sorrend' => $page['sorrend'] ?? null,
+                    'szulo' => $page['szulo'] ?? null,
+                    'ikon' => $page['ikon'] ?? null,
+                    'handler' => $module['handler'],
+                    'kezelomodul' => $module['slug'],
+                    'kezelonev' => $module['nev']
+                ];
             }
         }
 
@@ -75,8 +77,6 @@ class ModuleLoader
             if(array_key_exists($kezelomodul, $felhasznalomodulfromdb)) {
                 $oldalak[$slug] = $modul;
                 $this->felhasznalomodulok[$slug]  = $felhasznalomodulfromdb[$kezelomodul];
-                $this->felhasznalomodulok[$slug]['modulolvasas']  = $felhasznalomodulfromdb[$kezelomodul]['modulolvasas'] ?? self::Szintek($modul['lathatosag']);
-                $this->felhasznalomodulok[$slug]['moduliras']  = $felhasznalomodulfromdb[$kezelomodul]['moduliras'] ?? self::Szintek($modul['lathatosag']);
                 $oldalak[$slug]['olvasas'] = $this->felhasznalomodulok[$slug]['modulolvasas'];
                 $oldalak[$slug]['iras'] = $this->felhasznalomodulok[$slug]['moduliras'];
             }
@@ -84,47 +84,34 @@ class ModuleLoader
         $this->oldalak = $oldalak;
     }
 
-    private static function Szintek(string $lathatosag) : int {
-        // A függvény meghívásakor még jó eséllyel nem áll rendelkezésre a FELHASZNALO objektum, ezért a jogosultságot a session alapján ellenőrizzük.
-        if($_SESSION['uid']) {
-            if($lathatosag === 'tagok' || $lathatosag === 'mindenki')
-                return 1;
-            else
-                return 0;
-        }
-        else {
-            if($lathatosag === 'mindenki' || $lathatosag === 'vendeg')
-                return 1;
-            else
-                return 0;
-        }
-    }
-
-    public function Menupontok(): array
-    {
+    public function Menupontok(): array {
         $rendezett = array_filter($this->oldalak, fn($item) => $item['menuben'] === true);
         uasort($rendezett, fn($a, $b) => $a['sorrend'] <=> $b['sorrend']);
         return $rendezett;
     }
 
     private static function DB_GetUnauthorizedModules() : array {
-        $telepitve = new MySQLHandler("SELECT slug, modul_id, sorrend, 0 AS modulolvasas, 0 AS moduliras
+        $telepitve = new MySQLHandler("SELECT slug, modul_id, sorrend, 2 AS modulolvasas, 0 AS moduliras
                 FROM core_modulok
                 WHERE (lathatosag = 0 OR lathatosag = 1)
-                    AND telepitve = 1;");
+                    AND telepitve = 1
+            UNION
+                SELECT slug, modul_id, sorrend, 0 AS modulolvasas, 0 AS moduliras
+                    FROM core_modulok
+                    WHERE (lathatosag = 2 OR lathatosag = 3)
+                        AND telepitve = 1;");
         return $telepitve->AsArray("slug");
     }
 
     private static function DB_GetAuthorizedModules(int $felhasznalo_id) : array {
         $telepitve = new MySQLHandler("SELECT slug, core_modulok.modul_id AS modul_id,
-                    sorrend, lathatosag, iras AS moduliras, olvasas AS modulolvasas
+                    sorrend, lathatosag, IF(iras, iras, 0) AS moduliras, IF(olvasas, olvasas, 0) AS modulolvasas
                 FROM core_modulok
                     LEFT JOIN core_modulok_jogosultsagok ON core_modulok.modul_id = core_modulok_jogosultsagok.modul_id
                         AND core_modulok_jogosultsagok.felhasznalo_id = ?
                 WHERE telepitve = 1
                     AND (core_modulok_jogosultsagok.felhasznalo_id IS NOT NULL
-                        OR core_modulok.lathatosag IN (1, 2)
-                    );", $felhasznalo_id);
+                        OR core_modulok.lathatosag IN (1, 2));", $felhasznalo_id);
         return $telepitve->AsArray("slug");
     }
 

@@ -480,6 +480,7 @@ abstract Class Page
             'A jelen felhasználó GodAdmin' => (FELHASZNALO->godadmin) ? 'igen' : 'nem',
             'A modul szerint felhasználó szintje' => $moduljog,
             'A felhasználó szerint a felhasználó szintje' => FELHASZNALO->moduljogosultsagok[$this->selectedview][$jogtipus],
+            'A felhasználó jognak megfelelő csoportjai' => [],
             'Az elem tulajdonosának ID-je' => $elemfelhasznalo,
             'Az elem csoportjának ID-je' => $elem_csoportid,
             'Kiválasztott oldal' => $this->selectedview
@@ -495,14 +496,14 @@ abstract Class Page
         // Ha a felhasználó godadmin, akkor mindenhez van joga
         if(FELHASZNALO->godadmin) {
             $debugmsg['Eredmény'] = "A felhasználó godadmin, így mindenhez van joga.";
-            $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+            $this->debugmessages['Jogellenőrzés-' . $jogtipus] = $debugmsg;
             return true;
         }
 
         // Ha a modulhoz a felhasználónak 3-as szintű joga van, akkor a modulban bármit írhat/olvashat, függően attól, hogy a $tipus 'iras' vagy 'olvasas'
         if($moduljog == 3) {
             $debugmsg['Eredmény'] = "A felhasználó a modulhoz 3-as szintű joggal rendelkezik, így mindenhez van joga.";
-            $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+            $this->debugmessages['Jogellenőrzés-' . $jogtipus] = $debugmsg;
             return true;
         }
 
@@ -510,20 +511,21 @@ abstract Class Page
             $csoportids = FELHASZNALO->GetIrhatoCsoportIDs();
         else
             $csoportids = FELHASZNALO->GetCsoportIDs();
+        $debugmsg['A felhasználó jognak megfelelő csoportjai'] = implode(', ', $csoportids);
 
         // Ha a modulhoz a felhasználónak 2-es szintű joga van, akkor két eshetőség van
         if($moduljog == 2) {
             // Ha nincs elem megadva, akkor azt ellenőrizzük, hogy a felhasználó létrehozhat-e új elemet.
             if(is_null($elemfelhasznalo) && is_null($elem_csoportid)) {
                 $debugmsg['Eredmény'] = "A felhasználó a modulhoz 2-es szintű joggal rendelkezik, így új elemet hozhat létre.";
-                $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+                $this->debugmessages['Jogellenőrzés-' . $jogtipus] = $debugmsg;
                 return true;
             }
 
             // Ha van elem megadva, akkor azt ellenőrizzük, hogy a részére engedélyezett csoportok egyike ad-e jogot hozzá.
-            if($elem_csoportid && in_array($elem_csoportid, $csoportids)) {
+            if(!is_null($elem_csoportid) && in_array($elem_csoportid, $csoportids)) {
                 $debugmsg['Eredmény'] = "A felhasználó a modulhoz 2-es szintű joggal rendelkezik, és az elem csoportja az engedélyezett csoportjai között van, így hozzáférhet az elemhez.";
-                $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+                $this->debugmessages['Jogellenőrzés-' . $jogtipus] = $debugmsg;
                 return true;
             }
         }
@@ -531,12 +533,12 @@ abstract Class Page
         // Ha a modulhoz a felhasználónak 1-es szintű joga van, akkor csak a saját elemeihez van joga.
         if(($moduljog == 1 || $moduljog == 2) && $elemfelhasznalo == FELHASZNALO->uid) {
             $debugmsg['Eredmény'] = "A felhasználó az elem tulajdonosa, így hozzáférhet az elemhez.";
-            $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+            $this->debugmessages['Jogellenőrzés-' . $jogtipus] = $debugmsg;
             return true;
         }
 
         $debugmsg['Eredmény'] = "A felhasználónak nincs joga az elemhez.";
-        $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+        $this->debugmessages['Jogellenőrzés-' . $jogtipus] = $debugmsg;
         return false;
     }
 

@@ -121,6 +121,8 @@ class Felhasznalo
         $this->leiras = $leiras;
         $this->profilkep = $profilkep;
         $this->aktiv = ($aktiv == 1);
+        $this->csoporttagsagok = [0 => ['csoport_id' => 0, 'csoport_nev' => 'Nincs csoporttagság', 'irasjog' => false, 'slug' => 'nincs-csoporttagsag']];
+        $this->irhatocsoportok = [0];
     }
 
     public function SetGodAdmin(?int $dbertek = null) : void {
@@ -152,10 +154,6 @@ class Felhasznalo
     }
 
     public function GetIrhatoCsoportIDs() : array {
-        if(isset($this->irhatocsoportok)) {
-            return $this->irhatocsoportok;
-        }
-
         $this->irhatocsoportok = array_keys(
             array_filter(
                 $this->csoporttagsagok,
