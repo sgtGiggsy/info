@@ -11,7 +11,6 @@ class FelhasznaloHandler extends Page
     use FelhasznaloHandlerDB;
     protected ?Felhasznalo $felhasznalo;
     protected array $felhasznalok = [];
-    protected string $viewsgyoker = __DIR__ . "/assets/felhasznalo/views/";
     protected array $views = [
         'felhasznalo' => 'felhasznalo.php',
         'felhasznalok' => 'felhasznalok.php',
@@ -21,21 +20,19 @@ class FelhasznaloHandler extends Page
     ];
     protected array $validpagemethods = ['szerkeszt', 'uj'];
 
-    public function Router(array $params) : Page {
+    public function Router() : Page {
         if(!FELHASZNALO->uid)
             return new SinglePage(403, "A felhasználó(k) megtekintéséhez be kell jelentkezned!");
-        
-        $params = $this->ParseGet($params);
-        if($this->selectedpage == 'felhasznalo' || $this->selectedpage == 'profil') {
-            if($params['method'] == 'uj') {
-                $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
-                return $this->SetSelectedUj();
+
+        if($this->selectedview == 'felhasznalo' || $this->selectedview == 'profil') {
+            if($this->params['method'] == 'uj') {
+                return $this->SetRouteUj('felhasználó', 'UjFelhasznalo');
             }
 
-            if(!$params['elemid'])
+            if(!$this->params['elemid'])
                 $selecteduser = FELHASZNALO->uid;
             else
-                $selecteduser = $params['elemid'];
+                $selecteduser = $this->params['elemid'];
 
             $this->felhasznalo = self::GetUser($selecteduser);
 
@@ -44,42 +41,55 @@ class FelhasznaloHandler extends Page
 
             $this->irasjog = $this->GetIrasjog($this->felhasznalo->uid, $this->felhasznalo->szervezet);
 
-            if($params['method'] == 'szerkeszt') {
-                if(!$this->irasjog)
+            if($this->params['method'] == 'szerkeszt') {
+                if(!$this->irasjog) {
                     return new SinglePage(403, "Nincs jogosultságod ennek a felhasználónak a szerkesztéséhez!");
-                return $this->SetSelectedSzerkeszt($this->felhasznalo, 'felhasználó');
-            } else {
-                if($this->irasjog) {
-                    $this->contextmenu = [
-                        ['felirat' => "Felhasználó szerkesztése", 'link' => ROOT_PATH . '/felhasznalo/' . $this->felhasznalo->usernev . '/szerkeszt']
-                    ];
                 }
+                $this->post_method = 'szerkeszt';
+            } else {
                 $this->felhasznalo->GetModulJogLista();
-                $this->view = $this->views['felhasznalo'];
             }
-        } elseif ($this->selectedpage == "felhasznalok") {
-            return $this->SetSelectedLista($params, $this->felhasznalok);
+        } elseif ($this->selectedview == "felhasznalok") {
+            return $this->SetSelectedLista($this->params, $this->felhasznalok);
         }
 
         return $this;
     }
 
-    public function HtmlHead() : void {
-        if (($this->selectedpage == "felhasznalo" || $this->selectedpage == "profil") && $this->muvelet != 'uj') {
-            $this->title .= " - " . $this->felhasznalo->nev . " profilja";
-            $this->sitedesc = "Felhasználói profiloldal";
-        } elseif ($this->selectedpage == "felhasznalo" && $this->muvelet == 'uj') {
+    public function SetRender() : void {
+        $this->viewsgyoker = __DIR__ . "/assets/felhasznalo/views/";
+        if($this->irasjog
+            && in_array($this->selectedview, ['felhasznalo', 'profil'])
+            && $this->params['method'] != 'szerkeszt')
+        {
+            $this->contextmenu = [
+                ['felirat' => "Felhasználó szerkesztése", 'link' => ROOT_PATH . '/felhasznalo/' . $this->felhasznalo->usernev . '/szerkeszt']
+            ];
+        }
+
+        if($this->params['method'] == 'uj') {
+            $this->SetViewUj();
+            $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
             $this->title .= " - Új felhasználó felvétele";
             $this->sitedesc = "Új felhasználó felvétele";
-        } elseif ($this->selectedpage == "felhasznalo" && $this->muvelet == 'szerkeszt') {
-            $this->title .= " - " . $this->felhasznalo->nev . " profiljának szerkesztése";
-            $this->sitedesc = "Felhasználó szerkesztése";
-        } elseif (str_contains($this->selectedpage, "felhasznalok")) {
+        }
+
+        elseif (in_array($this->selectedview, ['felhasznalo', 'profil'])) {
+            if ($this->params['method'] == 'szerkeszt') {
+                $this->title .= " - " . $this->felhasznalo->nev . " profiljának szerkesztése";
+                $this->sitedesc = "Felhasználó szerkesztése";
+                $this->SetViewSzerkeszt($this->felhasznalo, 'felhasználó');
+
+            } else {
+                $this->title .= " - " . $this->felhasznalo->nev . " profilja";
+                $this->sitedesc = "Felhasználói profiloldal";
+            }
+
+        } elseif ($this->selectedview == "felhasznalok") {
             $this->title .= ' - Felhasználók';
             $this->sitedesc = "Felhasználók listája";
         }
         $this->ablakcim = $this->title;
-        include(ROOT_DIR . "/template/assets/htmlheader.php");
     }
 
     protected function Form(mixed $felhasznalo = null) : FormBuilder {
@@ -127,7 +137,7 @@ class FelhasznaloHandler extends Page
     }
 
     protected function Szerkeszt() : bool {
-        $this->redirtarget = ROOT_PATH . "/felhasznalo";
+        $this->redirtarget = ROOT_PATH . "/felhasznalo/" . $this->felhasznalo->usernev;
         if(!isset($_POST['felhasznalo_id'])) {
             $this->mixintext = "Nem lett kiválasztva módosítani kívánt felhasználó!";
             return false;
@@ -138,12 +148,12 @@ class FelhasznaloHandler extends Page
             return false;
         }
 
-        if(isset($_POST['aktiv']) && !$this->GetIrasjog($_POST['felhasznalo_id'])) {
+        if(isset($_POST['aktiv']) && !$this->irasjog) {
             $this->mixintext = "Fiókot engedélyezni, vagy letiltani kizárólag adminok tudnak!";
             return false;
         }
 
-        if(!$this->GetIrasjog($_POST['felhasznalo_id']) && $_POST['felhasznalo_id'] != FELHASZNALO->uid) {
+        if(!$this->irasjog && $_POST['felhasznalo_id'] != FELHASZNALO->uid) {
             $this->mixintext = "Felhasználók csak a saját fiókjukat szerkeszthetik!";
             return false;
         }
@@ -275,16 +285,16 @@ class FelhasznaloHandler extends Page
         return $felhasznalo;
     }
 
-    protected function GetList(int $startindex = 0, int $elemperoldal = 20, ?string $kereses = null) : array {
+    protected function GetList(int $startindex = 0, ?string $kereses = null) : array {
         $felhasznalok = [];
         if($this->modulolvasas == 3 || FELHASZNALO->godadmin) {
-            $dbresult = self::DB_GetUserList(3, $kereses, $startindex, $elemperoldal);
+            $dbresult = self::DB_GetUserList(3, $kereses, $startindex, $this->elemperoldal);
         } elseif ($this->modulolvasas == 2) {
             $paramsfordb = FELHASZNALO->GetCsoportIDs();
-            $paramsfordb = array_merge($paramsfordb, [$startindex, $elemperoldal]);
+            $paramsfordb = array_merge($paramsfordb, [$startindex, $this->elemperoldal]);
             $dbresult = self::DB_GetUserList(2, $kereses, ...$paramsfordb);
         } else {
-            $dbresult = self::DB_GetUserList(1, $kereses, FELHASZNALO->szervezet, $startindex, $elemperoldal);
+            $dbresult = self::DB_GetUserList(1, $kereses, FELHASZNALO->szervezet, $startindex, $this->elemperoldal);
         }
 
         if(!$dbresult)
@@ -296,7 +306,7 @@ class FelhasznaloHandler extends Page
             $temp->SetSajatSzervezet($felhasznalo['sajatszervezet'], $felhasznalo['sajatszervezetnev']);
             $felhasznalok[] = $temp;
         }
-        $this->SetOsszlapszam($dbresult['osszrekord'], $elemperoldal);
+        $this->SetOsszlapszam($dbresult['osszrekord']);
 
         return $felhasznalok;
     }
