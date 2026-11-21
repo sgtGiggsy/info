@@ -11,88 +11,81 @@ use Infoinventory\Classes\Helpers;
 
 class Kozlemeny extends Page
 {
-    protected string $viewsgyoker = __DIR__ . "/views/";
-    protected FormBuilder $form;
+    use KozlemenyDB;
     protected array $views = [
         'kozlemeny' => 'kozlemeny.php',
-        'kozlemenyek' => 'kozlemenyek.php',
-        'szerkeszt' => 'szerkeszt.php',
-        'uj' => 'uj.php'
+        'kozlemenyek' => 'kozlemenyek.php'
     ];
+    protected array $validpagemethods = ['uj', 'szerkeszt', 'torol'];
     public ?array $kozlemeny = null;
 
-    public function Router(array $params) : Page {
-        $this->validpagemethods = ['uj', 'szerkeszt', 'torol'];
-        $params = $this->ParseGet($params);
-        $this->params = $params;
-
-        if($this->selectedpage == "kozlemeny") {
-            if($params['method'] == 'uj' && FELHASZNALO->uid) {
-                $this->muvelet = 'uj';
-                $this->form = $this->Form('uj');
-                $this->view = $this->views['uj'];
-                return $this;
+    public function Router() : Page {
+        if($this->selectedview == "kozlemeny") {
+            if($this->params['method'] == 'uj') {
+                return $this->SetRouteUj();
             }
 
-            if(!isset($params['elemid'])) {
-                $kozlemeny = new Kozlemeny('kozlemenyek');
-                $kozlemeny->Router($params);
-                return $kozlemeny;
+            if(!isset($this->params['elemid'])) {
+                return new SinglePage(404, "Nincs kiválasztott közlemény!");
             }
 
-            $this->kozlemeny = KozlemenyDB::GetKozlemeny($params['elemid']);
+            $this->kozlemeny = $this->GetKozlemeny($this->params['elemid'], 1);
 
             if(!$this->kozlemeny)
-                return new SinglePage('404');
+                return new SinglePage(404, "A kiválasztott közlemény nem található!");
 
-            $this->irasjog = $this->GetIrasjog(null);
+            $this->irasjog = $this->GetIrasjog($this->kozlemeny['felhasznalo_id'], $this->kozlemeny['csoport_id']);
+            $this->olvasasjog = $this->GetOlvasasjog($this->kozlemeny['felhasznalo_id'], $this->kozlemeny['csoport_id']);
 
-            if($params['method'] == 'szerkeszt' && FELHASZNALO->uid && $this->irasjog) {
-                $this->muvelet = 'szerkeszt';
-                $this->form = $this->Form('szerkeszt', $this->kozlemeny['kozlemeny_id']);
-                $this->view = $this->views['szerkeszt'];
+            if(!$this->olvasasjog)
+                return new SinglePage(403, "Nincs jogosultságod a közlemény megtekintéséhez!");
+
+            if($this->params['method'] == 'szerkeszt') {
+                if (!$this->irasjog)
+                    return new SinglePage(403, "Nincs jogosultságod a közlemény szerkesztéséhez!");
+
+                $this->post_method = 'Szerkeszt';
             }
-            elseif($params['method'] == 'torol' && FELHASZNALO->uid && $this->irasjog) {
-                $this->redirtarget = ROOT_PATH . '/kozlemenyek';
-                $this->muvelet = 'torol';
-            }
-            elseif($params['method'] != 'szerkeszt' && !$this->GetOlvasasjog(null))
-                return new SinglePage('403');
-
-            $this->cimke = $this->kozlemeny['cim'];
-            $this->view = $this->views['kozlemeny'];
-        }
-        elseif($this->selectedpage == "kozlemenyek") {
-            $this->kozlemeny = KozlemenyDB::GetKozlemenyLista();
-            $this->view = $this->views['kozlemenyek'];
         }
 
-        //print_r($this->kozlemeny);
+        elseif($this->selectedview == "kozlemenyek") {
+            $this->irasjog = $this->GetIrasjog();
+            $this->kozlemeny = $this->GetKozlemenyLista(0, 4, $this->modulolvasas, FELHASZNALO->csoporttagsagok, 1);
+        }
+
         return $this;
     }
 
-    public function HtmlHead() : void {
+    public function SetRender() : void {
         $this->title .= ' - ';
-        //ucfirst($this->cimke);
-        if ($this->selectedpage == "kozlemeny") {
+        if($this->params['method'] == 'uj') {
+            $this->title .= 'Új közlemény rögzítése';
+            $this->sitedesc = "Új közlemény létrehozása";
+            $this->SetViewUj(ROOT_PATH . '/kozlemeny/uj', 'Közlemény létrehozás', 'cim', '2-1', 2);
+        }
+
+        elseif ($this->selectedview == "kozlemeny") {
+            $this->canonical = ROOT_PATH . '/kozlemeny/' . $this->kozlemeny['slug'];
             $this->title .= 'Közlemény: ';
-            if ($this->muvelet == "uj") {
-                $this->title .= 'Új rögzítése';
-                $this->sitedesc = "Új közlemény létrehozása";
+            if($this->params['method'] == 'szerkeszt') {
+                $this->SetViewSzerkeszt($this->kozlemeny, 'közlemény', ROOT_PATH . '/kozlemeny/' . $this->kozlemeny['slug'] . '/szerkeszt', 'Közlemény mentése');
+                $this->title .= ucfirst(Helpers::NeveloHatarozo($this->kozlemeny['cim'])) . ' szerkesztése';
+                $this->sitedesc = "A közlemény szerkesztése";
             } else {
-                if ($this->muvelet == "szerkeszt"){
-                    $this->title .= ucfirst(Helpers::NeveloHatarozo($this->kozlemeny['nev'])) . 'szerkesztése';
-                    $this->sitedesc = "Az alapanyag szerkesztése";
-                }
-                else {
-                    $this->title .= $this->kozlemeny['cim'];
-                    $this->sitedesc = $this->title;
-                }
-                $this->canonical = ROOT_PATH . '/kozlemeny/' . $this->kozlemeny['slug'];
+                if($this->irasjog)
+                    $this->contextmenu[] = ['felirat' => 'Közlemény szerkesztése', 'link' => ROOT_PATH . '/kozlemeny/' . $this->kozlemeny['slug'] . '/szerkeszt'];
+                $this->title .= $this->kozlemeny['cim'];
+                $this->sitedesc = $this->title;
             }
         }
-        $this->ablakcim = $this->title;
-        $this->HtmlHeadRender();
+
+        else {
+            if($this->irasjog)
+                $this->contextmenu[] = ['felirat' => 'Új közlemény', 'link' => ROOT_PATH . '/kozlemeny/uj'];
+            $this->view = $this->views['kozlemenyek'];
+            $this->title .= 'Közlemények';
+            $this->sitedesc = "A közlemények listája";
+        }
     }
 
     protected function Form(mixed $kozlemeny = null) : FormBuilder {
@@ -101,7 +94,7 @@ class Kozlemeny extends Page
             ->TextBox('szovegtorzs', 'Közlemény törzs')
             ->Text('cim', 'Cím')
             ->Checkbox('publikalt', 'A közlemény állapota');
-        if($kozlemeny != null && $this->GetIrasjog($kozlemeny['kozlemeny_id'])) {
+        if($kozlemeny != null && $this->irasjog) {
             $form->Text('slug', 'Link címe')
                 ->Hidden('kozlemeny_id')
                 ->SetValue('kozlemeny_id', $kozlemeny['kozlemeny_id'])
@@ -114,4 +107,11 @@ class Kozlemeny extends Page
         return $form;
     }
 
+    protected function GetKozlemeny(int|string $kozlemeny_id, ?int $publikalt = 1) : ?array {
+        return self::DB_GetKozlemeny($kozlemeny_id, $publikalt);
+    }
+
+    protected function GetKozlemenyLista(int $startindex, int $limit, int $moduljog, array $csoporttagsagok, int $publikalt) : ?array {
+        return self::DB_GetKozlemenyLista($startindex, $limit, $moduljog, $csoporttagsagok, $publikalt);
+    }
 }
