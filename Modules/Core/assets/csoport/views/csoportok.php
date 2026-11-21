@@ -7,7 +7,7 @@ if (!defined('ROOT_PATH') || !FELHASZNALO->uid) {
     exit('Forbidden');
 }
 ?><div class="normalcontent">
-    <?=$this->Kereso()?>
+    <?=$this->RenderKereso()?>
     <h1>Csoportok</h1>
     <table class="regulartable">
         <thead>
@@ -28,5 +28,5 @@ if (!defined('ROOT_PATH') || !FELHASZNALO->uid) {
             }
         ?></tbody>
     </table>
-    <?=$this->Lapozo()?>
+    <?=$this->RenderLapozo()?>
 </div>

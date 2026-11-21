@@ -126,6 +126,7 @@ abstract Class Page
 
     /**
      * A lapozáshoz (ahol elérhető) használt lapszámok indexei.
+     *
      * Eltárolja az előző és következő lapok indexét, valamint az aktuális lapot, és az összes lap számát
      * @var array $lapozas
      */
@@ -135,6 +136,11 @@ abstract Class Page
         'aktualis' => null,
         'osszlapszam' => null
     ];
+
+    /**
+     * @var int $elemperoldal A lapozás során egy oldalon megjelenő elemek száma.
+     */
+    protected int $elemperoldal = 20;
 
     /**
      * Egy oldal context menüjének menüpontjai. Pl szerkesztés, törlés, új elem gombok.
@@ -280,6 +286,8 @@ abstract Class Page
      */
     protected Formbuilder $form2;
 
+    // <--- CORE METÓDUSOK ---> //
+
     public function __construct(string $page, ?int $olvasas = null, ?int $iras = null) {
         $this->title = ABLAK_CIM;
         $this->selectedview = $page;
@@ -302,98 +310,25 @@ abstract Class Page
     }
 
     /**
-     * Az oldalak renderelése során használt elmeinek előkészítéséért felelős metódus.
-     * Az írási és olvasási jogok ellenőrzésének már a Router-ben meg kell történnie, ide már csak olyan felhasználó juthat, akinek a kiválasztott erőforráshoz engedélye van.
-     * A jogok újboli ellenőrzére így itt már nincs szükség, a Router()-ben beállított jogosultságokat kell használni a megjelenő elemek kiválasztásához.
-     * !!! JOGOSULTSÁGI HIBA MIATTI EXCEPTIONT ITT MÁR NEM SZABAD DOBNI !!!
-     * HA EGY FELHASZNÁLÓ NEM RENDELKEZIK VALAMI SZÜKSÉGES JOGGAL, IDE NEM JUTHAT EL!!!
-     * @return void
-     */
-    public abstract function SetRender() :void;
-
-    /**
-     * A HTML <head> dinamikus részének tartalmát beállító osztály
-     * @return void
-     */
-    protected function SetHTMLHeadMetaData() : void {
-        if (function_exists('HtmlHead')) {
-            HtmlHead($this->keywords, $this->canonical, $this->title, $this->ogtype, $this->publishtime, $this->shareimage, $this->robots, $this->ablakcim, $this->sitedesc, $this->cimke);
-            $this->RenderHTMLHeadMetadata();
-        }
-    }
-
-    /**
-     * A HTML <head> részét renderelő osztály
-     * @return void
-     */
-    public function RenderHTMLHeadMetadata() : void {
-        include(ROOT_DIR . "/template/assets/htmlheadmetadata.php");
-        $this->LdJSON();
-    }
-
-    /**
-     * A HTML <head> LdJSON részét előállító osztály.
+     * A modulon belüli útválasztásért felelős metódus.
      *
-     * Kizárólag SEO célokat szolgál, tehát keresőbotok elől rejtett weboldal esetén nincs értelme foglalkozni vele
-     * @return void
+     * A Router() választja ki az aloldalt, metódust, betölteni kívánt elemet, valamint elvégzi a lekérdezést és a jogosultságok ellenőrzését.
+     * Adatbázis lekérdezés KIZÁRÓLAG a Router()-ben történhet.
+     * Az írási és olvasási jogosultságok ellenőrzése KIZÁRÓLAG ITT TÖRTÉNHET!!!
+     *
+     * Kötelező felülírni!
      */
-    public function LdJSON() : void {
-    }
+    public abstract function Router() : Page;
 
     /**
-     * Az oldal <body> részében a <header> részt, tehát a vizuális fejlécet renderelő osztály.
+     * API hívások esetén a modulon belüli útválasztásért felelős metódus.
      *
-     * @return void
+     * Adatbázis lekérdezés KIZÁRÓLAG a Router()-ben történhet.
+     * Az írási és olvasási jogosultságok ellenőrzése KIZÁRÓLAG ITT TÖRTÉNHET!!!
+     *
+     * Kötelező felülírni!
      */
-    public function RenderHeader() : void {
-        if(!$this->headerview || !file_exists($this->viewsgyoker . $this->headerview))
-            return;
-        include($this->viewsgyoker . $this->headerview);
-    }
-
-    /**
-     * Az oldal fő tartalmát renderelő osztály.
-     *
-     * Hacsak nincs valami nagyon extra dolog abban,
-     * ahogy a modul renderelni akarja az oldalait, nem kell felülírni
-     * @return void
-     */
-    public function Render() : void {
-        if(!file_exists($this->viewsgyoker . $this->view)) {
-            $this->debugmessages[] = "A kért view fájl (<strong>$this->view</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->view;
-            return;
-        }
-
-        foreach ($this->PHPvarsToJS as $key => $value) {
-            Settings::$PHPvarsToJS[$key] = $value;
-        }
-        foreach ($this->jsfiles as $file) {
-            Settings::$jsfiles[] = $file;
-        }
-
-        if($this->uzenet) {
-            if(!file_exists($this->viewsgyoker . $this->views[$this->uzenet])) {
-                $this->debugmessages[] = "A kért üzenetátadó view fájl (<strong>$this->views[$this->uzenet]</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->views[$this->uzenet];
-            }
-            else {
-                include($this->viewsgyoker . $this->views[$this->uzenet]);
-            }
-        }
-        include($this->viewsgyoker . $this->view);
-    }
-
-    /**
-     * A context menüt renderelő osztály.
-     *
-     * Csak akkor csinál bármit, ha a Router-ben hozzá lett adva legalább egy elem.
-     *
-     * A context menü az adott oldalon belül elérhető funkciók elérésére szolgál. Tehát új elem, szerkesztés, és hasonlók.
-     * @return void
-     */
-    public function ContextMenu() : void {
-        if(count($this->contextmenu) > 0)
-            include(ROOT_DIR . "/template/assets/contextmenu.php");
-    }
+    public function APIRouter() : Page { return $this; }
 
     /**
      * A Post művelet kiválasztására szolgáló osztály.
@@ -420,7 +355,7 @@ abstract Class Page
      * @return null[] Feldolgozott $paramétereket tartalmazó tömb
      */
     protected function ParseGet() : array {
-        function ParseHelperElem(string $needle, array &$params, array &$returnarray, mixed $type = 'string') : void {
+         $parsElem = static function (string $needle, array &$params, array &$returnarray, mixed $type = 'string') : void {
             $index = array_search($needle, $params);
             if($index === false)
                 return;
@@ -439,9 +374,9 @@ abstract Class Page
                 $returnarray[$needle] = null;
                 array_splice($params, $index, 1);
             }
-        }
+        };
 
-        function ParseHelperTomb(array $haystack, array &$params, array &$returnarray, string $getelem) : void {
+        $parseTomb = static function (array $haystack, array &$params, array &$returnarray, string $getelem) : void {
             foreach($params as $param) {
                 if(in_array($param, $haystack)) {
                     $returnarray[$getelem] = $param;
@@ -449,7 +384,7 @@ abstract Class Page
                     break;
                 }
             }
-        }
+        };
 
         $params = $_GET['params'] ?? '';
         $params = $params ? explode('/', $params) : [];
@@ -459,175 +394,15 @@ abstract Class Page
         if(!$params || count($params) == 0)
             return $returnarray;
 
-        ParseHelperElem('oldal', $params, $returnarray, 'int');
-        ParseHelperElem('kereses', $params, $returnarray, 'string');
-        ParseHelperTomb($this->validpagemethods, $params, $returnarray, 'method');
-        ParseHelperTomb($this->aloldalak, $params, $returnarray, 'aloldal');
+        $parsElem('oldal', $params, $returnarray, 'int');
+        $parsElem('kereses', $params, $returnarray, 'string');
+        $parseTomb($this->validpagemethods, $params, $returnarray, 'method');
+        $parseTomb($this->aloldalak, $params, $returnarray, 'aloldal');
 
         if(count($params) > 0)
             $returnarray['elemid'] = $params[0];
 
         return $returnarray;
-    }
-
-    protected function Lapozo() : void {
-        include(ROOT_DIR. "/template/assets/lapozo.php");
-    }
-
-    protected function SetKereses(array $params) : ?string {
-        $this->jsfiles[] = 'template/assets/js/kereses.js';
-        $this->PHPvarsToJS['selectedPage'] = $this->selectedview;
-        $kereses = $params['kereses'] ?? null;
-        if($kereses) {
-            $this->urlparams = $this->selectedview . "/kereses/$kereses";
-            $this->keresesplaceholder = $kereses;
-        }
-        return $kereses;
-    }
-
-    protected function Kereso() : void {
-        include(ROOT_DIR. "/template/assets/kereso.php");
-    }
-
-    /** 
-     * Függvény a lapozáshoz szükséges változók értékének beállítására
-     *
-     * Itt kap értéket a ($this->lapozas['elozo'] és $this->lapozas['kovetkezo']),
-     * valamint itt kerül módosításra a referenciaként megkapott változók ($startindex és $elemperoldal) értékét is a pillanatnyi lap alapján.
-     * 
-     * Az elemperoldal értéke a függvény futásának vége előtt +1-el módosításra kerül, erre az utolsó lap érzékeléséhez van szükség
-     * 
-     * @param int $startindex Az elsőként lekérni kívánt elem indexszáma
-     * @param int $elemperoldal Az egy lapon megjeleníteni kívánt elemek száma
-     * @param array $params A ParseGet függvény által feldolgozott értékek tömbje
-     * @return void
-     * 
-     */
-    protected function SetPagingVars(int &$startindex, int &$elemperoldal, array $params) : void {
-        if(isset($params['oldal'])) {
-            $this->lapozas['aktualis'] = $params['oldal'];
-            if($params['oldal'] != 1)
-                $startindex = ($params['oldal'] - 1) * $elemperoldal;
-            $this->lapozas['elozo'] = ($params['oldal'] > 1) ? $params['oldal'] - 1 : null;
-            $this->lapozas['kovetkezo'] = $params['oldal'] + 1;
-        }
-        else {
-            $this->lapozas['kovetkezo'] = 2;
-        }
-        $elemperoldal++;
-        $this->debugmessages[] = "SetPagingVars: startindex=$startindex, elemperoldal=$elemperoldal, params=" . print_r($params, true);
-    }
-
-    /**
-     * Primitív függvény ami megállapítja, hogy a pillanatnyi oldal az utolsó-e.
-     *
-     * A SetPagingVars úgy állítja az értékeket, hogy mindig 1-gyel több elemet kérdezzen le a rendszer az adatbázisból, mint amennyit a felhasználó akart.
-     * Így tehát ha egy olyan oldalra jutunk, ahol pontosan annyi elem van, amennyit a felhasználó kért, akkor tudjuk, hogy az utolsó oldalon járunk.
-     * Hogy megjelenítve pontosan annyi elem legyen, amennyit a felhasználó kért, ha van következő oldal, az utolsó elem törlésre kerül a tömbből
-     * 
-     * @param array $pagecontents Az adatbázis lekrédezés elemeit tartalmazó tömb
-     * @param int $elemperoldal Az adatbázis lekérdezés során használt LIMIT darabszám értéke
-     * @return void
-     * 
-     */
-    protected function DetectLastPage(array &$pagecontents, int $elemperoldal) : void {
-        if(count($pagecontents) < $elemperoldal) {
-            $this->lapozas['kovetkezo'] = null;
-        } else {
-            array_pop($pagecontents);
-        }
-    }
-
-    /**
-     * Függvény, ami megállapítja, hogy a pillanatnyilag beállított értékek alapján hány oldal van összesen
-     *
-     * @param int $osszrekodszam A megadott feltételek melletti összes rekord száma az adatbázisban
-     * @param int $elemperoldal Az egy lapon megjeleníteni kívánt elemek száma
-     * @return void
-     */
-    public function SetOsszlapszam(int $osszrekodszam, int $elemperoldal) : void {
-        $this->lapozas['osszlapszam'] = (int)ceil($osszrekodszam / ($elemperoldal - 1));
-        $this->debugmessages[] = "SetOsszlapszam: osszlapszam=" . $this->lapozas['osszlapszam'] . ", osszrekordszam=$osszrekodszam, elemperoldal=$elemperoldal";
-    }
-
-    /**
-     * Függvény, ami kiválasztja a megfelelő aloldalt, a hozzá tartozó jogosultságokat, és elvégzi a megfelelő adatbázis lekérdezés(eke)t.
-     *
-     * Kötelező felülírni!
-     */
-    public abstract function Router() : Page;
-
-    /**
-     * Az osztály által generált form(ok)-at beállító metódus.
-     *
-     * A leszármazott osztályokban implementálni KELL, ha az osztály generált formot akar használni.
-     *
-     * @param mixed $elem Bármilyen objektum, tömb, vagy primitív érték, amit az osztály szerkesztésnél használ
-     */
-    protected function Form(mixed $elem = null) : FormBuilder {
-        return new FormBuilder();
-    }
-
-    /**
-     * Az osztály lista megjelenítéshez használt tömbjét előállító metódus.
-     *
-     * A HASZNÁLATHOZ A LESZÁRMAZOTT OSZTÁLYBAN IMPLEMENTÁLNI KELL!!!
-     * Előkészíti a nyers adatokat, meghívja az adatbázis kapcsolat metódusát, és az adatbázistól kapott eredmények alapján előállítja a feldolgozott tömböt.
-     *
-     * @param   int       $startindex     A lekérdezés során kért 0. elem indexszáma. NEM a PRIMARY_KEY-e
-     * @param   int       $elemperoldal   A lekérdezés során kért elemek száma. Az alap elgondolás, hogy valószínűleg sosem akarjuk majd az összes elemet egyszerre megjeleníteni egy listaoldalon.
-     * @param   ?string    $kereses        A keresőmezőből vett string értéke. Ha üres, vagy null, akkor nem történik keresés
-     * @return  array A feldolgozott elemek tömbje, vagy üres tömb
-     */
-    protected function GetList(int $startindex, int $elemperoldal, ?string $kereses) : array {
-        return [];
-    }
-
-    public function GetIrasjog(?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
-        return $this->GetJog('moduliras', $elemfelhasznalo, $elem_csoportid);
-    }
-
-    public function GetOlvasasjog(?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
-        return $this->GetJog('modulolvasas', $elemfelhasznalo, $elem_csoportid);
-    }
-
-    protected function GetJog(string $jogtipus, ?int $elemfelhasznalo, ?int $elem_csoportid) : bool {
-        $moduljog = $this->$jogtipus;
-        $this->debugmessages[] = "Jog ellenőrzés: $jogtipus <br>szint: $moduljog .  $elemfelhasznalo: $elemfelhasznalo<br>elem_csoportid: $elem_csoportid<br>selectedpage: $this->selectedview<br>felhasznalo: " . FELHASZNALO->uid . "<br>godadmin: " . (FELHASZNALO->godadmin ? 'true' : 'false') . "<br>$jogtipus: " . FELHASZNALO->moduljogosultsagok[$this->selectedview][$jogtipus];
-        $this->debugmessages[] = print_r($moduljog, true);
-
-        // Ha a felhasználó godadmin, akkor mindenhez van joga
-        if(FELHASZNALO->godadmin)
-            return true;
-
-        // Ha a modulhoz a felhasználónak 3-as szintű joga van, akkor a modulban bármit írhat/olvashat, függően attól, hogy a $tipus 'iras' vagy 'olvasas'
-        if($moduljog == 3)
-            return true;
-
-        if($jogtipus == 'iras')
-            $csoportids = FELHASZNALO->GetIrhatoCsoportIDs();
-        else
-            $csoportids = FELHASZNALO->GetCsoportIDs();
-
-        // Ha a modulhoz a felhasználónak 2-es szintű joga van, akkor két eshetőség van
-        if($moduljog == 2) {
-            // Ha nincs elem megadva, akkor azt ellenőrizzük, hogy a felhasználó létrehozhat-e új elemet.
-            if(is_null($elemfelhasznalo) && is_null($elem_csoportid))
-                return true;
-
-            // Ha van elem megadva, akkor azt ellenőrizzük, hogy a részére engedélyezett csoportok egyike ad-e jogot hozzá.
-            if(in_array($elem_csoportid, $csoportids))
-                return true;
-
-        }
-
-        // Ha a modulhoz a felhasználónak 1-es szintű joga van, akkor csak a saját elemeihez van joga.
-        if($moduljog >= 1 && $elemfelhasznalo == FELHASZNALO->uid)
-            return true;
-
-        print_r($this->debugmessages);
-        die;
-        return false;
     }
 
     /**
@@ -639,8 +414,267 @@ abstract Class Page
         if(isset($this->views[$this->selectedview]))
             return true;
 
-        $this->debugmessages[] = "A kiválasztott view fájl: $this->selectedview nem szerepel a this->views tömb elemei között!";
+        $this->debugmessages['View hiba'] = "A kiválasztott view fájl: $this->selectedview nem szerepel a this->views tömb elemei között!";
         return false;
+    }
+
+
+    /**
+     * Új elem létrehozására szolgáló oldalt kiválasztó, és alapbeállításait elvégző függvény
+     *
+     * Csak a boilerplate-et végzi el.
+     *
+     * @param string $elemnev
+     * @param string $post_method
+     * @return Page|$this
+     */
+    protected function SetRouteUj(string $elemnev = 'elem', string $post_method = 'Uj') : Page {
+        $this->irasjog = $this->GetIrasjog();
+        if(!$this->irasjog)
+            return new SinglePage(403, "Nincs jogosultságod új $elemnev létrehozásához!");
+        $this->post_method = $post_method;
+        return $this;
+    }
+
+    // <--- JOGOOSULTSÁGELLENŐRZÉST VÉGZŐ METÓDUSOK ---> //
+
+    /**
+     * A felhasználó írási jogát ellenőrző metódus.
+     *
+     * A metódus a felhasználó modulhoz tartozó írási jogszintjét valamint csoporttagságait
+     * és az elem tulajdonosát valamint csoportját vizsgálja,
+     * és ennek alapján dönti el, hogy a felhasználó írhatja-e az elemet.
+     *
+     * A vizsgálat adatbázis művelettel nem jár, kizárólag a már elérhető információk alapján hoz döntést.
+     *
+     * @param int|null $elemfelhasznalo A vizsgált elem tulajdonosának felhasználói azonosítója
+     * @param int|null $elem_csoportid A vizsgált elemhez tartozó csoport azonosítója
+     * @return bool A felhasználó írási jogát jelző logikai érték
+     */
+    public function GetIrasjog(?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
+        return $this->GetJog('moduliras', $elemfelhasznalo, $elem_csoportid);
+    }
+
+    /**
+     * A felhasználó olvasási jogát ellenőrző metódus.
+     *
+     *  A metódus a felhasználó modulhoz tartozó olvasási jogszintjét valamint csoporttagságait
+     *  és az elem tulajdonosát valamint csoportját vizsgálja,
+     *  és ennek alapján dönti el, hogy a felhasználó olvashatja-e az elemet.
+     *
+     *  A vizsgálat adatbázis művelettel nem jár, kizárólag a már elérhető információk alapján hoz döntést.
+     *
+     * @param int|null $elemfelhasznalo A vizsgált elem tulajdonosának felhasználói azonosítója
+     * @param int|null $elem_csoportid A vizsgált elemhez tartozó csoport azonosítója
+     * @return bool A felhasználó olvasási jogát jelző logikai érték
+     */
+    public function GetOlvasasjog(?int $elemfelhasznalo = null, ?int $elem_csoportid = null) : bool {
+        return $this->GetJog('modulolvasas', $elemfelhasznalo, $elem_csoportid);
+    }
+
+    private function GetJog(string $jogtipus, ?int $elemfelhasznalo, ?int $elem_csoportid) : bool {
+        $moduljog = $this->$jogtipus;
+        $debugmsg = [
+            'Az ellenőrzés típusa' => $jogtipus,
+            'A jelen felhasználó ID-je' => FELHASZNALO->uid,
+            'A jelen felhasználó GodAdmin' => (FELHASZNALO->godadmin) ? 'igen' : 'nem',
+            'A modul szerint felhasználó szintje' => $moduljog,
+            'A felhasználó szerint a felhasználó szintje' => FELHASZNALO->moduljogosultsagok[$this->selectedview][$jogtipus],
+            'Az elem tulajdonosának ID-je' => $elemfelhasznalo,
+            'Az elem csoportjának ID-je' => $elem_csoportid,
+            'Kiválasztott oldal' => $this->selectedview
+        ];
+
+        if($moduljog != FELHASZNALO->moduljogosultsagok[$this->selectedview][$jogtipus]) {
+            $debugmsg['Figyelmeztetés'] = "A modulhoz tartozó jogszint ($moduljog) nem egyezik a felhasználó jogosultságával (" . FELHASZNALO->moduljogosultsagok[$this->selectedview][$jogtipus] . ")";
+            $debugmsg['Eredmény'] = "Az anomália miatt a hozzáférés megtagadva!";
+            $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+            return false;
+        }
+
+        // Ha a felhasználó godadmin, akkor mindenhez van joga
+        if(FELHASZNALO->godadmin) {
+            $debugmsg['Eredmény'] = "A felhasználó godadmin, így mindenhez van joga.";
+            $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+            return true;
+        }
+
+        // Ha a modulhoz a felhasználónak 3-as szintű joga van, akkor a modulban bármit írhat/olvashat, függően attól, hogy a $tipus 'iras' vagy 'olvasas'
+        if($moduljog == 3) {
+            $debugmsg['Eredmény'] = "A felhasználó a modulhoz 3-as szintű joggal rendelkezik, így mindenhez van joga.";
+            $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+            return true;
+        }
+
+        if($jogtipus == 'moduliras')
+            $csoportids = FELHASZNALO->GetIrhatoCsoportIDs();
+        else
+            $csoportids = FELHASZNALO->GetCsoportIDs();
+
+        // Ha a modulhoz a felhasználónak 2-es szintű joga van, akkor két eshetőség van
+        if($moduljog == 2) {
+            // Ha nincs elem megadva, akkor azt ellenőrizzük, hogy a felhasználó létrehozhat-e új elemet.
+            if(is_null($elemfelhasznalo) && is_null($elem_csoportid)) {
+                $debugmsg['Eredmény'] = "A felhasználó a modulhoz 2-es szintű joggal rendelkezik, így új elemet hozhat létre.";
+                $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+                return true;
+            }
+
+            // Ha van elem megadva, akkor azt ellenőrizzük, hogy a részére engedélyezett csoportok egyike ad-e jogot hozzá.
+            if($elem_csoportid && in_array($elem_csoportid, $csoportids)) {
+                $debugmsg['Eredmény'] = "A felhasználó a modulhoz 2-es szintű joggal rendelkezik, és az elem csoportja az engedélyezett csoportjai között van, így hozzáférhet az elemhez.";
+                $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+                return true;
+            }
+        }
+
+        // Ha a modulhoz a felhasználónak 1-es szintű joga van, akkor csak a saját elemeihez van joga.
+        if(($moduljog == 1 || $moduljog == 2) && $elemfelhasznalo == FELHASZNALO->uid) {
+            $debugmsg['Eredmény'] = "A felhasználó az elem tulajdonosa, így hozzáférhet az elemhez.";
+            $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+            return true;
+        }
+
+        $debugmsg['Eredmény'] = "A felhasználónak nincs joga az elemhez.";
+        $this->debugmessages['Jogellenőrzés'] = $debugmsg;
+        return false;
+    }
+
+    // <--- RENDERELÉST ELŐKÉSZÍTŐ METÓDUSOK ---> //
+
+    /**
+     * Az oldalak renderelése során használt elmeinek előkészítéséért felelős metódus.
+     * Az írási és olvasási jogok ellenőrzésének már a Router-ben meg kell történnie, ide már csak olyan felhasználó juthat, akinek a kiválasztott erőforráshoz engedélye van.
+     * A jogok újboli ellenőrzére így itt már nincs szükség, a Router()-ben beállított jogosultságokat kell használni a megjelenő elemek kiválasztásához.
+     * !!! JOGOSULTSÁGI HIBA MIATTI EXCEPTIONT ITT MÁR NEM SZABAD DOBNI !!!
+     * HA EGY FELHASZNÁLÓ NEM RENDELKEZIK VALAMI SZÜKSÉGES JOGGAL, IDE NEM JUTHAT EL!!!
+     * @return void
+     */
+    public abstract function SetRender() :void;
+
+    /**
+     * Az osztály által generált form(ok)-at beállító metódus.
+     *
+     * A leszármazott osztályokban implementálni KELL, ha az osztály generált formot akar használni.
+     *
+     * @param mixed $elem Bármilyen objektum, tömb, vagy primitív érték, amit az osztály szerkesztésnél használ
+     */
+    protected function Form(mixed $elem = null) : FormBuilder { return new FormBuilder(); }
+
+    /**
+     * Az osztály lista megjelenítéshez használt tömbjét előállító metódus.
+     *
+     * A HASZNÁLATHOZ A LESZÁRMAZOTT OSZTÁLYBAN IMPLEMENTÁLNI KELL!!!
+     * Előkészíti a nyers adatokat, meghívja az adatbázis kapcsolat metódusát, és az adatbázistól kapott eredmények alapján előállítja a feldolgozott tömböt.
+     *
+     * @param   int       $startindex     A lekérdezés során kért 0. elem indexszáma. NEM a PRIMARY_KEY-e
+     * @param   ?string    $kereses        A keresőmezőből vett string értéke. Ha üres, vagy null, akkor nem történik keresés
+     * @return  array A feldolgozott elemek tömbje, vagy üres tömb
+     */
+    protected function GetList(int $startindex, ?string $kereses) : array {
+        return [];
+    }
+
+    /**
+     * A HTML <head> dinamikus részének tartalmát beállító osztály
+     * @return void
+     */
+    protected function SetHTMLHeadMetaData() : void {
+        if (function_exists('HtmlHead')) {
+            HtmlHead($this->keywords, $this->canonical, $this->title, $this->ogtype, $this->publishtime, $this->shareimage, $this->robots, $this->ablakcim, $this->sitedesc, $this->cimke);
+            $this->RenderHTMLHeadMetadata();
+        }
+    }
+
+    /**
+     * A HTML <head> LdJSON részét előállító osztály.
+     *
+     * Kizárólag SEO célokat szolgál, tehát keresőbotok elől rejtett weboldal esetén nincs értelme foglalkozni vele
+     * @return void
+     */
+    public function SetLdJSON() : void {}
+
+    /**
+     * Függvény a lapozáshoz szükséges változók értékének beállítására
+     *
+     * Itt kap értéket a ($this->lapozas['elozo'] és $this->lapozas['kovetkezo']),
+     * valamint itt kerül módosításra a referenciaként megkapott változók ($startindex és $elemperoldal) értékét is a pillanatnyi lap alapján.
+     *
+     * Az elemperoldal értéke a függvény futásának vége előtt +1-el módosításra kerül, erre az utolsó lap érzékeléséhez van szükség
+     *
+     * @param int $startindex Az elsőként lekérni kívánt elem indexszáma
+     * @param array $params A ParseGet függvény által feldolgozott értékek tömbje
+     * @return void
+     *
+     */
+    protected function SetPagingVars(int &$startindex, array $params) : void {
+        if(isset($params['oldal'])) {
+            $this->lapozas['aktualis'] = $params['oldal'];
+            if($params['oldal'] != 1)
+                $startindex = ($params['oldal'] - 1) * $this->elemperoldal;
+            $this->lapozas['elozo'] = ($params['oldal'] > 1) ? $params['oldal'] - 1 : null;
+            $this->lapozas['kovetkezo'] = $params['oldal'] + 1;
+        }
+        else {
+            $this->lapozas['kovetkezo'] = 2;
+        }
+        $this->elemperoldal++;
+        $this->debugmessages['Lapozás'] = [
+            'Kezdő index' => $startindex,
+            'Oldalankénti elemek' => $this->elemperoldal,
+            'params' => print_r($params, true)
+        ];
+    }
+
+    /**
+     * A kereséshez használt változók beállításáért felelős metódus.
+     *
+     * @param array $params A ParseGet függvény által feldolgozott értékek tömbje
+     * @return string|null A keresési kifejezés, ha van, egyébként null
+     */
+    protected function SetKereses(array $params) : ?string {
+        $this->jsfiles[] = 'template/assets/js/kereses.js';
+        $this->PHPvarsToJS['selectedPage'] = $this->selectedview;
+        $kereses = $params['kereses'] ?? null;
+        if($kereses) {
+            $this->urlparams = $this->selectedview . "/kereses/$kereses";
+            $this->keresesplaceholder = $kereses;
+        }
+        return $kereses;
+    }
+
+    /**
+     * Primitív függvény ami megállapítja, hogy a pillanatnyi oldal az utolsó-e.
+     *
+     * A SetPagingVars úgy állítja az értékeket, hogy mindig 1-gyel több elemet kérdezzen le a rendszer az adatbázisból, mint amennyit a felhasználó akart.
+     * Így tehát ha egy olyan oldalra jutunk, ahol pontosan annyi elem van, amennyit a felhasználó kért, akkor tudjuk, hogy az utolsó oldalon járunk.
+     * Hogy megjelenítve pontosan annyi elem legyen, amennyit a felhasználó kért, ha van következő oldal, az utolsó elem törlésre kerül a tömbből
+     *
+     * @param array $pagecontents Az adatbázis lekrédezés elemeit tartalmazó tömb
+     * @return void
+     *
+     */
+    protected function DetectLastPage(array &$pagecontents) : void {
+        if(count($pagecontents) < $this->elemperoldal) {
+            $this->lapozas['kovetkezo'] = null;
+        } else {
+            array_pop($pagecontents);
+        }
+    }
+
+    /**
+     * Függvény, ami megállapítja, hogy a pillanatnyilag beállított értékek alapján hány oldal van összesen
+     *
+     * @param int $osszrekodszam A megadott feltételek melletti összes rekord száma az adatbázisban
+     * @return void
+     */
+    public function SetOsszlapszam(int $osszrekodszam) : void {
+        $this->lapozas['osszlapszam'] = (int)ceil($osszrekodszam / ($this->elemperoldal - 1));
+        $this->debugmessages['Lapozás paraméterek'] = [
+            'osszlapszam' => $this->lapozas['osszlapszam'],
+            'osszrekordszam' =>$osszrekodszam,
+            'elemperoldal' =>$this->elemperoldal
+            ];
     }
 
     /**
@@ -662,18 +696,12 @@ abstract Class Page
         $this->form->SetSubmit($buttontext, $submitoszlop);
     }
 
-    protected function SetRouteUj(string $elemnev = 'elem', string $post_method = 'Uj') : Page {
-        $this->irasjog = $this->GetIrasjog();
-        if(!$this->irasjog)
-            return new SinglePage(403, "Nincs jogosultságod új $elemnev létrehozásához!");
-        $this->post_method = $post_method;
-        return $this;
-    }
-
     /**
      * Új elem létrehozására szolgáló oldalt kiválasztó, és alapbeállításait elvégző függvény
+     *
      * Paraméter nélkül meghívva csak ellenőrzi az írásjogot, beállítja a view fájlt, és legenerálja az alap FORM-ot a Form() függvény alapján.
      * Legalább két paraméterrel ($formaction és $buttontext) meghívva legenerálja az alap FORM oldalt is. Egyszerű, csak elemi beviteli mezőket tartalmazó FORM-ok esetén ez bőven elég.
+     *
      * @param string|null $formaction A form action='' rész tartalma. Értelemszerűen egy valós link, ami a beküldött FORM tartalmát képes lesz értelmezni
      * @param string|null $buttontext A submit gomb felirata
      * @param string|null $masodikoszlop_elsoelem Ha kétoszlopos megjelenítést akarunk a FORM-nak, itt kell megadni, hogy melyik legyen a második oszlop első eleme. Csak a mező nevét kell megadni.
@@ -698,8 +726,10 @@ abstract Class Page
 
     /**
      * Egy már meglévő elem szerkesztésére szolgáló oldalt kiválasztó, és alapbeállításait elvégző függvény
+     *
      * Egy paraméterrel (ami KÖTELEZŐEN a szerkesztendő objektum) meghívva csak ellenőrzi az írásjogot, beállítja a view fájlt, és legenerálja az alap FORM-ot a Form() függvény alapján.
      * Legalább négy paraméterrel ($elem, $elemnev, $formaction és $buttontext) meghívva legenerálja az alap FORM oldalt is. Egyszerű, csak elemi beviteli mezőket tartalmazó FORM-ok esetén ez bőven elég.
+     *
      * @param mixed $elem A szerkeszteni kívánt elem, vagy bármi olyan egyéb változó, ami alapján az osztály Form függvénye tudja, hogy hogyan kell feldolgoznia
      * @param string|null $elemnev A 403-as hibaüzenet pontos, menüponthoz illeszkedő szövegének generálásához használt szöveg
      * @param string|null $formaction A form action='' rész tartalma. Értelemszerűen egy valós link, ami a beküldött FORM tartalmát képes lesz értelmezni
@@ -733,14 +763,97 @@ abstract Class Page
         $kereses = $this->SetKereses($params);
         $this->irasjog = $this->GetIrasjog();
         $startindex = 0;
-        $elemperoldal = 20;
-        $this->SetPagingVars($startindex, $elemperoldal, $params);
-        $returnarray = $this->GetList($startindex, $elemperoldal, $kereses);
-        $this->DetectLastPage($returnarray, $elemperoldal);
+        $this->SetPagingVars($startindex, $params);
+        $returnarray = $this->GetList($startindex, $kereses);
+        $this->DetectLastPage($returnarray);
 
         return $this;
     }
 
+    // <--- RENDERELÉST VÉGZŐ METÓDUSOK ---> //
+
+    /**
+     * A HTML <head> részét renderelő osztály
+     * @return void
+     */
+    public function RenderHTMLHeadMetadata() : void {
+        include(ROOT_DIR . "/template/assets/htmlheadmetadata.php");
+        $this->SetLdJSON();
+    }
+
+    /**
+     * Az oldal <body> részében a <header> részt, tehát a vizuális fejlécet renderelő osztály.
+     *
+     * @return void
+     */
+    public function RenderHeader() : void {
+        if(!$this->headerview || !file_exists($this->viewsgyoker . $this->headerview))
+            return;
+        include($this->viewsgyoker . $this->headerview);
+    }
+
+    /**
+     * Az oldal fő tartalmát renderelő osztály.
+     *
+     * Hacsak nincs valami nagyon extra dolog abban, ahogy a modul renderelni akarja az oldalait, nem kell felülírni
+     * @return void
+     */
+    public function Render() : void {
+        if(!file_exists($this->viewsgyoker . $this->view)) {
+            $this->debugmessages['View hiba'] = "A kért view fájl (<strong>$this->view</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->view;
+            return;
+        }
+
+        foreach ($this->PHPvarsToJS as $key => $value) {
+            Settings::$PHPvarsToJS[$key] = $value;
+        }
+        foreach ($this->jsfiles as $file) {
+            Settings::$jsfiles[] = $file;
+        }
+
+        if($this->uzenet) {
+            if(!file_exists($this->viewsgyoker . $this->views[$this->uzenet])) {
+                $this->debugmessages['Üzenet view hiba'] = "A kért üzenetátadó view fájl (<strong>$this->views[$this->uzenet]</strong>) nem található a megadott elérési útvonalon: " . $this->viewsgyoker . $this->views[$this->uzenet];
+            }
+            else {
+                include($this->viewsgyoker . $this->views[$this->uzenet]);
+            }
+        }
+        include($this->viewsgyoker . $this->view);
+    }
+
+    /**
+     * A context menüt renderelő osztály.
+     *
+     * Csak akkor csinál bármit, ha a Router-ben hozzá lett adva legalább egy elem.
+     *
+     * A context menü az adott oldalon belül elérhető funkciók elérésére szolgál. Tehát új elem, szerkesztés, és hasonlók.
+     * @return void
+     */
+    public function RenderContextMenu() : void {
+        if(count($this->contextmenu) > 0)
+            include(ROOT_DIR . "/template/assets/contextmenu.php");
+    }
+
+    /**
+     * A lapozó gombokat renderelő osztály.
+     *
+     * @return void
+     */
+    protected function RenderLapozo() : void {
+        include(ROOT_DIR. "/template/assets/lapozo.php");
+    }
+
+    protected function RenderKereso() : void {
+        include(ROOT_DIR. "/template/assets/kereso.php");
+    }
+
+    /**
+     * Egy fuzzy kereséshez szükséges stringeket generáló statikus függvény.
+     *
+     * @param string $basestring A kiinduló string.
+     * @return array A generált stringek tömbje.
+     */
     public static function FuzzySearchStringGen (string $basestring) : array {
         $needle = '%'; $needle2 = [];
         $chars = preg_split('//u', $basestring, -1, PREG_SPLIT_NO_EMPTY);

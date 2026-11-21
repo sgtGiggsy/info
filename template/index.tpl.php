@@ -27,7 +27,7 @@ namespace Infoinventory\template;
 
     <!--Tartalom-->
     <main><?php
-        $page->ContextMenu();
+        $page->RenderContextMenu();
         $page->Render();
     ?></main>
 
