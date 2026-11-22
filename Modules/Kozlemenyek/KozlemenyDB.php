@@ -6,7 +6,16 @@ use Infoinventory\Classes\MySQLHandler;
 
 trait KozlemenyDB
 {
-    public static function DB_GetKozlemenyLista(int $startindex = 0, int $limit = 4, int $moduljog = 0, ?array $csoporttagsagok = null, ?int $publikalt = 1) : ?array {
+    protected static function DB_GetCimkeLista() : ?array {
+        $cimkek = new MySQLHandler("SELECT kozlemenycimke_id, nev FROM kozlemenyek_cimkek ORDER BY nev;");
+
+        if(!$cimkek->siker || $cimkek->sorokszama == 0)
+            return null;
+        else
+            return $cimkek->ArrayForSelect();
+    }
+
+    protected static function DB_GetKozlemenyLista(int $startindex = 0, int $limit = 4, int $moduljog = 0, ?array $csoporttagsagok = null, ?int $publikalt = 1) : ?array {
         $querystring = "SELECT kozlemeny_id, slug, core_felhasznalok.felhasznalo_id AS felhasznalo_id, nev, cim, bevezetes, szovegtorzs, ido, cimke, IF(csoport_id, csoport_id, 0) AS csoport_id
             FROM kozlemenyek_kozlemenyek
                 INNER JOIN core_felhasznalok USING (felhasznalo_id)";
@@ -35,7 +44,7 @@ trait KozlemenyDB
             return $kozlemenyek->AsArray();
     }
 
-    public static function DB_GetKozlemeny(int|string $azonosito, ?int $publikalt = 1) : ?array {
+    protected static function DB_GetKozlemeny(int|string $azonosito, ?int $publikalt = 1) : ?array {
         $where = "slug";
         if(is_int($azonosito))
             $where = "kozlemeny_id";
@@ -51,5 +60,20 @@ trait KozlemenyDB
             return null;
         else
             return $kozlemeny->RecordAsArray();
+    }
+
+    protected static function DB_UpdateKozlemeny(string $table, string $wherecolumn, mixed $wherevalue, array $data) : bool {
+        $update = new MySQLHandler();
+        $update->AutoBuildUpdateRecord($table, $wherecolumn, $wherevalue, $data);
+        return $update->siker;
+    }
+
+    protected static function DB_InsertKozlemeny(string $table, array $data) : bool|int {
+        $insert = new MySQLHandler();
+        $insert->AutoBuildInsertRecord($table, $data);
+        if($insert->siker)
+            return $insert->last_insert_id;
+        else
+            return false;
     }
 }

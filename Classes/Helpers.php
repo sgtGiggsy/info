@@ -96,15 +96,11 @@ class Helpers
 
     public static function SlugVerifier(string $slug, $function) : string {
         $ujslug = $slug;
-        $ind = 1;
-        while(true) {
-            if(call_user_func($function, $ujslug) !== null) {
-                $ujslug = $slug . '-' . $ind;
-                $ind++;
+        $date = date('Y-m-d');
+        if(call_user_func($function, $ujslug) !== null) {
+                $ujslug = $slug . '-' . $date;
             }
-            else
-                break;
-        }
+
         return $ujslug;
     }
 
