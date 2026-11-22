@@ -182,18 +182,6 @@ class Controller
             return new SinglePage('404');
     }
 
-    public static function RequiredValidator(mixed ...$params) : bool {
-        $eredmeny = true;
-        foreach ($params as $mezo) {
-            if (!array_key_exists($mezo, $_POST) || $_POST[$mezo] === '') {
-                $eredmeny = false;
-                break;
-            }
-        }
-
-        return $eredmeny;
-    }
-
     public static function CSRFValidator() : bool {
         if(!isset($_SESSION['csrf_token']) || !isset($_POST['csrf_token']))
             return false;

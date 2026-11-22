@@ -337,12 +337,48 @@ abstract Class Page
      * A POST működéséhez a routerben kiválasztott $this->post_method értékével azonos nevü metódusnak LÉTEZNIE KELL az osztályban.
      */
     public function Post() : bool {
+        if(!$this->irasjog) {
+            $this->mixintext = "Nincs jogosultságod a művelet végrehajtásához!";
+            return false;
+        }
         $fname = ucfirst($this->post_method);
         if(!method_exists($this, $fname)) {
             $this->mixintext = "A kért művelethez (<strong>$fname</strong>) nem található metódus!";
             return false;
         }
         return $this->$fname();
+    }
+
+    /**
+     * A $_POST-ból érkező adatok validálására és DB metódusok meghívására szolgáló metódus.
+     *
+     * A leszármazott osztályokban implementálni kell a működéshez.
+     * Mivel a Post() hívja meg, ezért az írásjog validációval itt már nem kell foglalkozni.
+     *
+     * @return bool Az adatbázis művelet sikerességét jelző logikai érték.
+     */
+    protected function Uj (): bool { return false; }
+
+    /**
+     * A $_POST-ból érkező adatok validálására és DB metódusok meghívására szolgáló metódus.
+     *
+     * A leszármazott osztályokban implementálni kell a működéshez.
+     * Mivel a Post() hívja meg, ezért az írásjog validációval itt már nem kell foglalkozni.
+     *
+     * @return bool Az adatbázis művelet sikerességét jelző logikai érték.
+     */
+    protected function Szerkeszt(): bool { return false; }
+
+    /**
+     * Segédmetódus annak validálására, hogy egy kötelező mező szerepelt-e a $_POST-ban
+     * @param string ...$params A kötelező mezők nevei
+     * @return bool
+     */
+    public static function RequiredValidator(string ...$params) : bool {
+        return array_all(
+            $params,
+            fn($mezo) => array_key_exists($mezo, $_POST) && $_POST[$mezo] !== ''
+        );
     }
 
     /**
