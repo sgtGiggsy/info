@@ -27,6 +27,7 @@ class MySQLHandler
     private ?float $queryruntime = null;
     public int $limitnelkulidb;
     private bool $transaction = false;
+    private ?array $autoquery_tables = null;
 
     public function __construct(string | null $query = null, ...$params)
 	{
@@ -542,5 +543,46 @@ class MySQLHandler
             }
         }
         return $finalarray;
+    }
+
+    public function SetAutoQueryTables(array $tables) : void {
+        $this->autoquery_tables = $tables;
+    }
+
+    public function AutoBuildUpdateRecord(string $tablename, string $wherecolumn, mixed $wherevalue, array $data) : bool {
+        if(str_starts_with($tablename, "core_")) {
+            $this->hibauzenet = "A core_ táblák nem módosíthatóak generált query-vel!";
+            $this->siker = false;
+            return false;
+        }
+        $set = [];
+        foreach($data as $column => $value) {
+            $set[] = "$column = ?";
+        }
+        $setstring = implode(', ', $set);
+
+        $querystring = "UPDATE $tablename SET $setstring WHERE $wherecolumn = ?;";
+        $queryparams = array_merge(array_values($data), [$wherevalue]);
+
+        $this->Query($querystring, ...$queryparams);
+
+        return $this->siker;
+    }
+
+    public function AutoBuildInsertRecord(string $tablename, array $data) : bool|null|int {
+        if(str_starts_with($tablename, "core_")) {
+            $this->hibauzenet = "A core_ táblák nem módosíthatóak generált query-vel!";
+            $this->siker = false;
+            return false;
+        }
+
+        $columns = implode(', ', array_keys($data));
+        $placeholders = implode(', ', array_fill(0, count($data), '?'));
+        $querystring = "INSERT INTO $tablename ($columns) VALUES ($placeholders);";
+        $queryparams = array_values($data);
+
+        $this->Query($querystring, ...$queryparams);
+
+        return $this->last_insert_id;
     }
 }
