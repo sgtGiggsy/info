@@ -2,17 +2,14 @@
 
 namespace Infoinventory\Modules\Core;
 
-use Infoinventory\Classes\Controller;
 use Infoinventory\Classes\Logging;
 use Infoinventory\Classes\MailHandler;
-use Infoinventory\Classes\Felhasznalo;
 
 class Autentikacio extends Page
 {
     private ?\LDAP\Connection $ldapconnection;
     protected bool $megerosit = false;
     protected ?string $megerositokod;
-    protected string $viewsgyoker = __DIR__ . "/assets/autentikacio/views/";
     protected array $views = [
         'belepes' => 'belepes.php',
         'regisztracio' => 'regisztracio.php',
@@ -24,59 +21,72 @@ class Autentikacio extends Page
         'ujjelszo' => 'ujjelszo.php',
         'jelszocsere' => 'jelszocsere.php'
     ];
+    protected array $validpagemethods = ['sikeres', 'megerosit', 'sikertelen'];
 
     public function Router() : Page {
-        $this->validpagemethods = ['sikeres', 'megerosit', 'sikertelen'];
-        $this->muvelet = $this->selectedview;
-        $megerositokod = null;
+        $this->post_method = $this->selectedview;
+        $this->irasjog = true;
 
-        if($this->selectedview == 'regisztracio') {
-            $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
-            if($this->params['method'] == 'sikeres')
-                $this->view = $this->views['sikeresreg'];
-            elseif($this->params['method'] == 'sikertelen')
-                $this->aloldal = 'sikertelenreg';
-            elseif($this->params['method'] == 'megerosit') {
-                $this->megerosit =  $this->RegisztracioMegerosit($this->params);
-                $this->view = $this->views['regmegerosit'];
-            }
+        if($this->selectedview == 'regisztracio' && $this->params['method'] == 'megerosit') {
+            $this->megerosit =  $this->RegisztracioMegerosit($this->params);
         }
 
-        if($this->selectedview == 'jelszocsere') {
-            $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
-        }
+        if($this->selectedview == 'elfelejtettjelszo' && $this->params['method'] == 'megerosit') {
+            $this->megerosit = $this->ElfelejtettJelszoMegerosit($this->params['elemid']);
 
-        if($this->selectedview == 'elfelejtettjelszo') {
-            if($this->params['method'] == 'megerosit') {
-                $this->jsfiles = ['Modules/Core/assets/_kozos/js/inputValid.js'];
-                $this->megerosit = $this->ElfelejtettJelszoMegerosit($this->params['elemid']);
-                $this->view = $this->views['ujjelszo'];
-            }
-            elseif($this->params['method'] == 'sikeres')
-                $this->view = $this->views['jelszoigenyelve'];
         }
         return $this;
     }
 
-    public function HtmlHead() : void {
+    public function SetRender(): void {
+        $this->viewsgyoker = __DIR__ . "/assets/autentikacio/views/";
         $this->canonical = ROOT_PATH . '/' . $this->selectedview;
         $this->robots = '<meta name="robots" content="noindex, nofollow">';
+
+        if($this->selectedview == 'jelszocsere'
+                || $this->selectedview == "regisztracio"
+                || $this->params['method'] == 'megerosit')
+        {
+            $this->jsfiles[] = 'Modules/Core/assets/_kozos/js/inputValid.js';
+        }
+
         if($this->selectedview == "belepes") {
             $this->title .= " - Bejelentkezés";
             $this->sitedesc = "Jelentkezz be az oldal használatához.";
             $this->cimke = "bejelentkezés";
         }
+
         elseif($this->selectedview == "regisztracio") {
+            if($this->params['method'] == 'sikeres')
+                $this->view = $this->views['sikeresreg'];
+            elseif($this->params['method'] == 'sikertelen')
+                $this->uzenet = 'sikertelenreg';
+            elseif($this->params['method'] == 'megerosit') {
+                $this->view = $this->views['regmegerosit'];
+            }
             $this->title .= " - Regisztráció";
             $this->sitedesc = "Regisztrálj, hogy saját tartalommal bővíthesd az oldalt!";
             $this->cimke = "regisztráció";
         }
+
         elseif($this->selectedview == "jelszoemlekezteto") {
             $this->title .= " - Jelszóemlékeztető";
             $this->sitedesc = "Elfelejtett jelszó";
             $this->cimke = "jelszóemlékeztető";
         }
+
+        if($this->selectedview == 'elfelejtettjelszo') {
+            if ($this->params['method'] == 'megerosit') {
+                $this->view = $this->views['ujjelszo'];
+            } elseif ($this->params['method'] == 'sikeres') {
+                $this->view = $this->views['jelszoigenyelve'];
+            }
+        }
+
         $this->ablakcim = $this->title;
+    }
+
+    public function HtmlHead() : void {
         $this->RenderHTMLHeadMetadata();
     }
 
@@ -217,7 +227,7 @@ class Autentikacio extends Page
         $this->mixintext = "A regisztráció nem sikerült!";
         $this->redirtarget = ROOT_PATH . "/regisztracio/sikertelen";
 
-        if(!Controller::RequiredValidator('usernev', 'jelszo', 'jelszoismetles', 'email', 'beleegyezes')) {
+        if(!self::RequiredValidator('usernev', 'jelszo', 'jelszoismetles', 'email', 'beleegyezes')) {
             $this->mixintext = "Nem töltöttél ki minden kötelező mezőt!";
             return false;
         }
@@ -280,7 +290,7 @@ class Autentikacio extends Page
             $ret = AutentikacioDB::ElfelejtettJelszo($verifstring, $_POST['email']);
             $this->Mailer($_POST['email'], $verifstring);
         }
-        elseif(Controller::RequiredValidator('megerosit', 'jelszo', 'jelszoismetles')) {
+        elseif(self::RequiredValidator('megerosit', 'jelszo', 'jelszoismetles')) {
             if(!$this->ElfelejtettJelszoMegerosit($_POST['megerosit'])) {
                 $this->mixintext = "A megerősítőkód nem egyezik!";
                 $this->redirtarget = ROOT_PATH . "/elfelejtettjelszo/sikertelen";
@@ -315,7 +325,7 @@ class Autentikacio extends Page
     protected function Jelszocsere() : bool {
         $this->mixintext = "A jelszó frissítése nem sikerült!";
         $this->redirtarget = $_SERVER['REQUEST_URI'];
-        if(!Controller::RequiredValidator('regijelszo', 'ujjelszo', 'ujjelszoismetles')) {
+        if(!self::RequiredValidator('regijelszo', 'ujjelszo', 'ujjelszoismetles')) {
             $this->mixintext = "Nem adtál meg egy kötelező mezőt!";
             return false;
         }
@@ -382,7 +392,6 @@ class Autentikacio extends Page
         else
             $this->mixintext = "A felhasználói fiók megerősítése nem sikerült!";
 
-        $this->muvelet = 'Felhasználói fiók megerősítése';
         $this->eredmeny = $this->megerosit;
 
         return $this->megerosit;
@@ -414,10 +423,5 @@ class Autentikacio extends Page
             $mail = new MailHandler($message, $email, $mailtargy);
             $mail->Send();
         }
-    }
-
-    public function SetRender(): void
-    {
-        // TODO: Implement SetRender() method.
     }
 }

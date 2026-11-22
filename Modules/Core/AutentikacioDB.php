@@ -61,7 +61,7 @@ class AutentikacioDB
     public static function UserRegisztracio(string $usernev, string $email, string $hashedpassword, string $verifstring) : int {
         $usernev = htmlspecialchars($usernev, ENT_QUOTES, 'UTF-8');
         $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-        $newuser = new MySQLHandler("INSERT INTO core_felhasznalok (usernev, email, jelszo, allapot, verifstring, verifstring_hatarido)
+        $newuser = new MySQLHandler("INSERT INTO core_felhasznalok (usernev, email, jelszo, aktiv, verifstring, verifstring_hatarido)
             VALUES (?, ?, ?, ?, ?, NOW() + INTERVAL 1 HOUR)",
             $usernev, $email, $hashedpassword, 1, $verifstring);
         return $newuser->last_insert_id;
@@ -94,7 +94,7 @@ class AutentikacioDB
     }
 
     public static function UserMegerosit(int $felhasznalo_id) : bool {
-        $meger = new MySQLHandler("UPDATE core_felhasznalok SET allapot = 2, verifstring = ? WHERE felhasznalo_id = ?;", null, $felhasznalo_id);
+        $meger = new MySQLHandler("UPDATE core_felhasznalok SET aktiv = 2, verifstring = ? WHERE felhasznalo_id = ?;", null, $felhasznalo_id);
         return $meger->siker;
     }
 

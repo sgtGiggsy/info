@@ -103,6 +103,13 @@ abstract Class Page
     public bool|string $post_method = false;
 
     /**
+     * POST utáni felugró mixin üzenetek automatikus generálásban segítő változó.
+     * Ha nincs megadva $mixintext, akkor a modul, és a folyamat sikeressége alapján a Controller maga generál helyette üzenetet.
+     * @var string|null $muvelet
+     */
+    public ?string $muvelet = null;
+
+    /**
      * POST utáni felugró mixin üzeneteket tartalmazó változó.
      * Ha nincs megadva, akkor a modul, és a folyamat sikeessége alapján a Controller maga generál helyette üzenetet.
      * @var string|null $mixintext
@@ -297,6 +304,7 @@ abstract Class Page
         $GLOBALS['debugmessages'][$page] = [];
         $this->debugmessages = &$GLOBALS['debugmessages'][$page];
         $this->params = $this->ParseGet();
+        $this->muvelet = $this->params['method'] ?? null;
         $this->viewsgyoker = ROOT_DIR . "/Modules/". ucfirst(MODULOK->oldalak[$page]['kezelomodul']) . "/views/";
         if(FELHASZNALO->godadmin) {
             $this->modulolvasas = $this->moduliras = 3;
