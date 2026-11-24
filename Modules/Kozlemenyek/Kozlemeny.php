@@ -18,7 +18,6 @@ class Kozlemeny extends Page
     ];
     protected array $validpagemethods = ['uj', 'szerkeszt', 'torol'];
     public ?array $kozlemeny = null;
-    protected array $dbwhitelist = ['cim', 'bevezetes', 'szovegtorzs', 'publikalt', 'felhasznalo_id', 'cimke', 'csoport_id'];
 
     public function Router() : Page {
         if($this->selectedview == "kozlemeny") {

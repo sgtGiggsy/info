@@ -295,17 +295,19 @@ abstract Class Page
 
     // <--- CORE METÓDUSOK ---> //
 
-    public function __construct(string $page, ?int $olvasas = null, ?int $iras = null) {
+    public function __construct(?string $page = null, ?int $olvasas = null, ?int $iras = null) {
         $this->title = ABLAK_CIM;
-        $this->selectedview = $page;
-        $this->urlparams = $page;
-        $this->canonical = ROOT_PATH . '/' . $page;
         $this->redirtarget = $_SERVER['REQUEST_URI'];
-        $GLOBALS['debugmessages'][$page] = [];
-        $this->debugmessages = &$GLOBALS['debugmessages'][$page];
         $this->params = $this->ParseGet();
         $this->muvelet = $this->params['method'] ?? null;
-        $this->viewsgyoker = ROOT_DIR . "/Modules/". ucfirst(MODULOK->oldalak[$page]['kezelomodul']) . "/views/";
+        if(isset($page)) {
+            $this->selectedview = $page;
+            $this->urlparams = $page;
+            $this->canonical = ROOT_PATH . '/' . $page;
+            $GLOBALS['debugmessages'][$page] = [];
+            $this->debugmessages = &$GLOBALS['debugmessages'][$page];
+            $this->viewsgyoker = ROOT_DIR . "/Modules/" . ucfirst(MODULOK->oldalak[$page]['kezelomodul']) . "/views/";
+        }
         if(FELHASZNALO->godadmin) {
             $this->modulolvasas = $this->moduliras = 3;
         } else {
@@ -313,7 +315,7 @@ abstract Class Page
             $this->moduliras = $iras;
         }
 
-        if(isset($this->views[$page]))
+        if(isset($page) && isset($this->views[$page]))
             $this->view = $this->views[$page];
     }
 
@@ -376,6 +378,8 @@ abstract Class Page
      * @return bool Az adatbázis művelet sikerességét jelző logikai érték.
      */
     protected function Szerkeszt(): bool { return false; }
+
+    protected function Install(): bool { return false; }
 
     /**
      * Segédmetódus annak validálására, hogy egy kötelező mező szerepelt-e a $_POST-ban
@@ -557,16 +561,17 @@ abstract Class Page
             $csoportids = FELHASZNALO->GetCsoportIDs();
         $debugmsg['A felhasználó jognak megfelelő csoportjai'] = implode(', ', $csoportids);
 
-        // Ha a modulhoz a felhasználónak 2-es szintű joga van, akkor két eshetőség van
-        if($moduljog == 2) {
-            // Ha nincs elem megadva, akkor azt ellenőrizzük, hogy a felhasználó létrehozhat-e új elemet.
-            if(is_null($elemfelhasznalo) && is_null($elem_csoportid)) {
-                $debugmsg['Eredmény'] = "A felhasználó a modulhoz 2-es szintű joggal rendelkezik, így új elemet hozhat létre.";
-                $this->debugmessages['Jogellenőrzés-' . $jogtipus] = $debugmsg;
-                return true;
-            }
 
-            // Ha van elem megadva, akkor azt ellenőrizzük, hogy a részére engedélyezett csoportok egyike ad-e jogot hozzá.
+        // Ha nincs elem megadva, akkor azt ellenőrizzük, hogy a felhasználó létrehozhat-e új elemet, illetve olvashatja-e magát a menüpont tartalmát.
+        if(is_null($elemfelhasznalo) && is_null($elem_csoportid)
+                && ($moduljog == 1 || $moduljog == 2)) {
+            $debugmsg['Eredmény'] = "A felhasználó a modulhoz 1-es vagy 2-es szintű joggal rendelkezik, így olvashatja a menüpont tartalmát vagy új elemet hozhat létre.";
+            $this->debugmessages['Jogellenőrzés-' . $jogtipus] = $debugmsg;
+            return true;
+        }
+
+        // Ha van elem megadva, akkor azt ellenőrizzük, hogy a felhasználó részére engedélyezett csoportok egyike ad-e jogot hozzá.
+        if($moduljog == 2) {
             if(!is_null($elem_csoportid) && in_array($elem_csoportid, $csoportids)) {
                 $debugmsg['Eredmény'] = "A felhasználó a modulhoz 2-es szintű joggal rendelkezik, és az elem csoportja az engedélyezett csoportjai között van, így hozzáférhet az elemhez.";
                 $this->debugmessages['Jogellenőrzés-' . $jogtipus] = $debugmsg;
@@ -581,7 +586,7 @@ abstract Class Page
             return true;
         }
 
-        $debugmsg['Eredmény'] = "A felhasználónak nincs joga az elemhez.";
+        $debugmsg['Eredmény'] = "A felhasználónak nincs joga az elemhez vagy menüponthoz.";
         $this->debugmessages['Jogellenőrzés-' . $jogtipus] = $debugmsg;
         return false;
     }
