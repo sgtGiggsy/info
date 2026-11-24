@@ -26,7 +26,7 @@ class ModuleLoader
 
     public function __construct(?int $felhasznalo_id = null) {
         if(count(self::$modulok) === 0) {
-            self::$modulok = $this->GetAllModules();
+            self::$modulok = self::GetAllModules();
         }
 
         if($felhasznalo_id)
@@ -37,7 +37,7 @@ class ModuleLoader
         $this->GenerateOldalak(self::$modulok, $usermoduljai);
     }
 
-    private function GetAllModules() : array {
+    public static function GetAllModules(bool $deduped = false) : array {
         $oldalak = [];
         foreach (glob(ROOT_DIR . '/Modules/*/manifest*.php') ?: [] as $manifest) {
             $module = require $manifest;
@@ -47,23 +47,34 @@ class ModuleLoader
                 //throw new \UnexpectedValueException("Hibás modul manifest: {$manifest}");
             }
 
+            if($deduped) {
+                $oldalak[$module['slug']] = [
+                    'nev' => $module['nev'],
+                    'slug' => $module['slug'],
+                    'handler' => $module['handler']
+                ];
+            }
+
             foreach ($module['pages'] as $route => $page) {
                 if ($route === '' || isset($oldalak[$route])) {
                     $GLOBALS['debugmessages'][] = "Üres vagy duplikált útvonal ({$route}) a manifestben: {$manifest}";
                     break;
                     //throw new \UnexpectedValueException();
                 }
-                $oldalak[$route] = [
-                    'menupont' => $page['menupont'] ?? '',
-                    'lathatosag' => $page['lathatosag'] ?? 'mindenki',
-                    'menuben' => $page['menuben'] ?? false,
-                    'sorrend' => $page['sorrend'] ?? null,
-                    'szulo' => $page['szulo'] ?? null,
-                    'ikon' => $page['ikon'] ?? null,
-                    'handler' => $module['handler'],
-                    'kezelomodul' => $module['slug'],
-                    'kezelonev' => $module['nev']
-                ];
+                if(!$deduped) {
+                    $oldalak[$route] = [
+                        'nev' => $module['nev'],
+                        'menupont' => $page['menupont'] ?? '',
+                        'lathatosag' => $page['lathatosag'] ?? 'mindenki',
+                        'menuben' => $page['menuben'] ?? false,
+                        'sorrend' => $page['sorrend'] ?? null,
+                        'szulo' => $page['szulo'] ?? null,
+                        'ikon' => $page['ikon'] ?? null,
+                        'handler' => $module['handler'],
+                        'kezelomodul' => $module['slug'],
+                        'kezelonev' => $module['nev']
+                    ];
+                }
             }
         }
 
