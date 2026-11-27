@@ -16,7 +16,7 @@
     --mainmenubg: #ebce5b;
     --mainmenufont: #2f2e2e;
     --footerbg: #3a2f1f;
-    --footerfont: #cccca6;
+    --footerfont: #c1c19b;
     --footerborder: #454545;
     --dropdownbg: #f9f9f9;
     --dropdownhover: #ececec;
@@ -27,8 +27,8 @@
     --buttonbg: #ebce5b;
     --buttonfont: var(--footerbg);
     --ministatbg: #41414130;
-    --trocolor: #fdfdfd;
-    --trecolor: #f8f8f8;
+    --trocolor: #fdfdd1;
+    --trecolor: #dadabb;
     --matchbg: #fafafa;
     --matchfont: var(--footerbg);
     --matchborder: #e3e3e3;
@@ -126,6 +126,7 @@ table {
     border-collapse: collapse;
     overflow: hidden;
     text-align: left;
+    justify-items: center;
 }
 
 table caption {
@@ -136,12 +137,42 @@ table caption {
     display: none;
 }
 
+table thead {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+table td a,
+table th {
+    height: 40px;
+}
+
+table th {
+    padding: 0.3em 0.3em 0.3em inherit;
+}
+
 tr a {
     text-decoration: none;
     color: inherit;
 }
 
-tbody tr:hover {
+table tbody tr, table tfoot tr {
+    border-top: var(--footerborder) 1px solid;
+}
+
+table thead tr {
+    border-bottom: var(--footerborder) 1px solid;
+}
+
+table tbody > tr:nth-child(odd) {
+    background-color: var(--trocolor);
+}
+
+table tbody > tr:nth-child(even) {
+    background-color: var(--trecolor);
+}
+
+table tbody tr:hover {
     filter: brightness(0.9);
 }
 
@@ -159,9 +190,27 @@ td, th {
 }
 
 td a {
-    display: block;
+    display: flex;
+    align-items: center;
+    color: inherit;
     height: 100%;
     width: 100%;
+}
+
+tbody .anchbutton, tbody .anchbutton:active {
+    margin: 0.5em 0;
+}
+
+.pictable tbody tr > td:first-child {
+    width: 50px;
+    padding: 0.3em;
+}
+
+.pictable tbody tr > td:first-child a {
+    border-radius: 50%;
+    overflow: hidden;
+    width: 45px;
+    height: 45px;
 }
 
 form, form > div, form > div {
@@ -428,6 +477,10 @@ nav.mainmenu ul.links li {
 
 }
 
+.bold {
+    font-weight: bold;
+}
+
 #overlay {
     position: absolute;
     top: 0;
@@ -657,57 +710,6 @@ footer {
     text-align: right;
 }
 
-.regulartable {
-    justify-items: center;
-}
-
-.regulartable tbody tr, .regulartable tfoot tr {
-    border-top: var(--footerborder) 1px solid;
-}
-
-.regulartable thead tr {
-    border-bottom: var(--footerborder) 1px solid;
-}
-
-.regulartable tbody > tr:nth-child(odd) {
-    background-color: var(--trocolor);
-}
-
-.regulartable tbody > tr:nth-child(even) {
-    background-color: var(--trecolor);
-}
-
-.regulartable tbody tr > td:first-child {
-    width: 50px;
-    padding: 0.3em;
-}
-
-.regulartable tbody tr > td:first-child a {
-    border-radius: 50%;
-    overflow: hidden;
-    width: 45px;
-    height: 45px;
-}
-
-.bold {
-    font-weight: bold;
-}
-
-.regulartable td a,
-.regulartable th {
-    height: 40px;
-}
-
-.regulartable th {
-    padding: 0.3em 0.3em 0.3em inherit;
-}
-
-.regulartable td a {
-    display: flex;
-    align-items: center;
-    color: inherit;
-}
-
 .receptlista {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -835,6 +837,12 @@ footer {
     margin-bottom: 1em;
     width: fit-content;
     height: fit-content;
+}
+
+.anchbutton:disabled{
+    background-color: var(--footerfont);
+    color: var(--footerbg);
+    cursor: initial;
 }
 
 .anchbutton {

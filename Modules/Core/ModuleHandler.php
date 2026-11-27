@@ -8,6 +8,14 @@ use Infoinventory\Classes\FormBuilder;
 use Infoinventory\Classes\ModuleLoader;
 use Infoinventory\Classes\Helpers;
 
+/**
+ * class ModuleHandler
+ *
+ * Az osztály a modulok telepítéséért, és a jogosultságok felhasználók részére történő kiosztásáért felelős.
+ * A modulok telepítéséhez a felhasználónak 3-as szintű joggal kell rendelkeznie.
+ * A modulhoz 2-es joggal rendelkező felhasználók más felhasználók részére adhatnak hozzáférést a modulhoz (2-es szintig)
+ */
+
 class ModuleHandler extends Page
 {
     use ModuleHandlerDB;
@@ -17,23 +25,34 @@ class ModuleHandler extends Page
     ];
     protected array $validpagemethods = ['telepit', 'kikapcsol', 'install', 'uninstall'];
     protected ?array $modulok = null;
+    protected ?string $modulnev = null;
     protected ?array $telepitett = null;
     public ?array $modul = null;
+    protected array $jogszintek = [
+        0 => 'Nincs hozzáférés',
+        1 => 'Csak saját tartalmak',
+        2 => 'Saját csoportok tartalmai',
+        3 => 'Teljes hozzáférés'
+    ];
+    protected array $lathatosagok = [
+        0 => 'Csak vendégek',
+        1 => 'Mindenki',
+        2 => 'Bármely regisztrált felhasználó',
+        3 => 'Csak jogosult felhasználók'
+    ];
 
     public function Router() : Page {
-        // A modulok globális mivolta miatt csak 3-as jogosultsággal van értelme a hozzáférésnek,
-        // így ennél összetettebb ellenőrzésre itt nincs szükség.
-        $this->irasjog = $this->moduliras == 3;
-        $this->olvasasjog = $this->modulolvasas == 3;
+        $this->irasjog = $this->moduliras >= 2;
+        $this->olvasasjog = $this->modulolvasas >= 2;
 
         if(!$this->olvasasjog)
-            return new SinglePage(403, "Nincs jogosultságod a modul megtekintéséhez!");
+            return new SinglePage(403, "Nincs jogosultságod a modulok megtekintéséhez!");
         if(!$this->irasjog)
             return new SinglePage(403, "Nincs jogosultságod a modulok kezeléséhez!");
 
         if($this->selectedview == "modul") {
             if($this->params['method'] == 'install') {
-                if(!$this->irasjog)
+                if($this->moduliras != 3)
                     return new SinglePage(403, "Nincs jogosultságod a modul telepítéséhez!");
 
                 if(!isset($this->params['elemid'])) {
@@ -53,6 +72,7 @@ class ModuleHandler extends Page
             }
 
             $this->modul = self::GetModul($this->params['elemid'], 1);
+            var_dump($this->modul);
         }
 
         elseif($this->selectedview == "modulok") {
@@ -66,22 +86,16 @@ class ModuleHandler extends Page
     public function SetRender() : void {
         $this->viewsgyoker = ROOT_DIR . '/Modules/Core/assets/modul/views/';
         $this->title .= ' - ';
-        if($this->params['method'] == 'uj') {
-            $this->title .= 'Új modul rögzítése';
-            $this->sitedesc = "Új modul létrehozása";
-            $this->SetViewUj(ROOT_PATH . '/modul/uj', 'Modul létrehozás', 'cim', '2-1', 2);
+        if ($this->selectedview == "modul") {
+            $this->modulnev = MODULOK->GetModuleDetails($this->params['elemid'])['nev'];
+            $this->view = $this->views['modul'];
+            $this->title .= $this->modulnev;
+            $this->sitedesc = "A modul részletes adatai";
         }
-
-        elseif ($this->selectedview == "modul") {
-
-        }
-
         else {
-            if($this->irasjog)
-                $this->contextmenu[] = ['felirat' => 'Új modul', 'link' => ROOT_PATH . '/modul/uj'];
             $this->view = $this->views['modulok'];
             $this->title .= 'Modulok';
-            $this->sitedesc = "A modulok listája";
+            $this->sitedesc = "Az elérhető modulok listája";
         }
     }
 

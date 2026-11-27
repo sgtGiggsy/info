@@ -9,7 +9,7 @@ if (!defined('ROOT_PATH') || !FELHASZNALO->uid) {
 ?><div class="normalcontent">
     <?=$this->RenderKereso()?>
     <h1>Felhasználók</h1>
-    <table class="regulartable">
+    <table class="pictable">
         <thead>
             <tr>
                 <th></th>

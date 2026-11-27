@@ -8,6 +8,7 @@ class ModuleLoader
      * @var array $modulok A telepített modulok listája, a manifest fájlok alapján
      */
     public static array $modulok = [];
+
     /**
      * @var array $oldalak A telepített modulok felhasználó részére engedélyezett oldalainak listája
      */
@@ -149,5 +150,12 @@ class ModuleLoader
     public static function GetModuleJogosultsagok(int $felhasznalo_id) : array {
         $jogosultsagok = self::DB_GetAuthorizedModules($felhasznalo_id);
         return self::ModulJogForDisplay($jogosultsagok);
+    }
+
+    public static function GetModuleDetails(string $slug) : ?array {
+        if(!array_key_exists($slug, self::$modulok))
+            return null;
+        else
+            return self::$modulok[$slug];
     }
 }

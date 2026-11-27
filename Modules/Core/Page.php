@@ -32,18 +32,26 @@ abstract Class Page
 
     /**
      * Ez a változó tárolja el, hogy az oldalon egy adott felhasználó írhat-e.
-     * Csak kényelmi célokat szolgál, a Router-ben kerül beállításra.
+     *
+     * A Router()-ben kell beállítani. A readonly tulajdonság azért van, hogy kikényszerítésre kerüljön
+     * oldalbetöltésenként csak egyetlen alkalommal legyen ellenőrizve, és ne lehessen utólag módosítani.
      * @var bool|null $irasjog
      */
-    protected ?bool $irasjog = null;
+    protected readonly ?bool $irasjog;
 
     /**
      * Ez a változó tárolhatja el, hogy egy elemet/elemeket az adott felhasználó olvashatja-e.
+     *
+     * A Router()-ben kell beállítani. A readonly tulajdonság azért van, hogy kikényszerítésre kerüljön
+     * oldalbetöltésenként csak egyetlen alkalommal legyen ellenőrizve az olvasási jogosultság, és ne lehessen utólag módosítani.
      * @var bool|null $olvasasjog
      */
-    protected ?bool $olvasasjog = null;
+    protected readonly ?bool $olvasasjog;
+
     /**
-     * A felhasználó olvasási jogának szintje a modulon. A modul kiválasztása során a rendszer automatikusan beállítja a felhasználó jogosultságai alapján.
+     * A felhasználó olvasási jogának szintje a modulon.
+     *
+     * A modul kiválasztása során a rendszer automatikusan beállítja a felhasználó jogosultságai alapján.
      * Leginkább csak kényelmi feladatokat lát el, mert a ModulKezelo-től bármikor lekérhető lenne az információ
      *
      * Lehetséges értékei: 0: semmi jog, 1: saját tulajdonú elemek, 2: csoporttagságok által engedélyezett elemek, 3: modulon belül bármely elem
@@ -53,7 +61,9 @@ abstract Class Page
     protected readonly int $modulolvasas;
 
     /**
-     * A felhasználó írási jogának szintje a modulon. A modul kiválasztása során a rendszer automatikusan beállítja a felhasználó jogosultságai alapján.
+     * A felhasználó írási jogának szintje a modulon.
+     *
+     * A modul kiválasztása során a rendszer automatikusan beállítja a felhasználó jogosultságai alapján.
      * Leginkább csak kényelmi feladatokat lát el, mert a ModulKezelo-től bármikor lekérhető lenne az információ
      *
      * Lehetséges értékei: 0: semmi jog, 1: saját tulajdonú elemek, 2: csoporttagságok által engedélyezett elemek, 3: modulon belül bármely elem
@@ -96,7 +106,9 @@ abstract Class Page
     public string $urlparams;
 
     /**
-     * Ez választja ki a POST folyamatot lebonyolító metódust. A Router-ben kell neki értéket adni.
+     * Ez választja ki a POST folyamatot lebonyolító metódust.
+     *
+     * A Router-ben kell neki értéket adni.
      * Alapból false-ra inicializálódik. Ha volt POST kérés, a Controller true-ra állítja, és a Router onnan tudja, hogy POST kérést kapott-e.
      * @var bool|string $post_method
      */
@@ -104,14 +116,25 @@ abstract Class Page
 
     /**
      * POST utáni felugró mixin üzenetek automatikus generálásban segítő változó.
-     * Ha nincs megadva $mixintext, akkor a modul, és a folyamat sikeressége alapján a Controller maga generál helyette üzenetet.
+     *
+     * Ha nincs megadva $mixintext, akkor Controller a modul neve, a $muvelet-be kerülő string,
+     * és a folyamat sikeressége alapján maga generál helyette üzenetet.
+     *
+     * A $muvelet-et a konstruktor automatikusan beállítja, így ha nincs külön okunk rá, nem kell piszkálni.
+     *
+     * Üzenetek átadására a $mixintext változót használjuk, ne ezt.
      * @var string|null $muvelet
      */
     public ?string $muvelet = null;
 
     /**
      * POST utáni felugró mixin üzeneteket tartalmazó változó.
-     * Ha nincs megadva, akkor a modul, és a folyamat sikeessége alapján a Controller maga generál helyette üzenetet.
+     *
+     * Ha nincs megadva, akkor Controller a modul neve, a $muvelet-be kerülő string,
+     * és a folyamat sikeressége alapján maga generál helyette üzenetet.
+     *
+     * Ha NEM AKARUNK egy post művelet után felugró üzenetet,
+     * úgy állítsuk a $mixintext változó értékét 'no-mixin'-re.
      * @var string|null $mixintext
      */
     public ?string $mixintext = null;
@@ -125,7 +148,12 @@ abstract Class Page
 
     /**
      * Az osztály elérhető API metódusai.
-     * Ami ebben nem szerepel, az nem hívható meg API-ként. A GET-re és a POST-ra is külön tömb-öt kell megadni!
+     * Ami ebben nem szerepel, az nem hívható meg API-ként.
+     *
+     * !!! A GET-re és a POST-ra is külön tömb-öt kell megadni !!!
+     *
+     * Ha létezik egy metódus GET típusú kérésre, de POST kérés érkezik rá,
+     * akkor a rendszer 405-ös hibát ad vissza, úgy, mintha egyáltalán nem is létezne.
      *
      * @var array $apimethods
      */
@@ -151,6 +179,7 @@ abstract Class Page
 
     /**
      * Egy oldal context menüjének menüpontjai. Pl szerkesztés, törlés, új elem gombok.
+     *
      * A formátuma: ['felirat' => "Gomb felirata", 'link' => "oldal.nev/menupont"].
      * Nem a deklaráció során kell megadni, hanem a SetRender()-ben, elemenként hozzáadni az elérhető gombokat
      * @var array $contextmenu
@@ -161,26 +190,34 @@ abstract Class Page
 
     /**
      * Az oldal view fájljainak gyökere
+     *
+     * A konstruktor állítja be, hozzányúlni csak akkor kell, ha nem a modul szabványos views mappáját akarjuk használni
      * @var string $viewsgyoker
      */
     protected string $viewsgyoker;
 
     /**
-     * Az elérhető view fájlok listája, ahol a kulcs a $_GET['page']-ből várt érték, az érték pedig a tényleges PHP fájl neve
+     * Az elérhető view fájlok listája
+     *
+     * A kulcs a $_GET['page']-ből várt érték, az érték pedig a tényleges PHP fájl neve
      * @var array $views
      */
     protected array $views = [];
 
     /**
      * Az oldal törzsét adó kiválasztott view fájl neve.
-     * A SetRender()-ben kell beállítani az értékét, de csak akkor szükséges, ha a $_GET['page'] értékétől eltérő nevű view fájlt akarunk használni.
+     *
+     * A SetRender()-ben kell beállítani az értékét, de csak akkor szükséges,
+     * ha a $_GET['page'] értékétől eltérő nevű view fájlt akarunk használni.
      * @var string|null $view
      */
     protected ?string $view = null;
 
     /**
      * Az oldal fejlécéhez elérhető view fájlok listája
-     * A Router az ebben felsorolt elemek alapján dönti el (ahol használatban van), hogy melyik headerview fájl legyen kiválasztva
+     *
+     * A SetRender() az ebben felsorolt elemek alapján dönti el (ahol használatban van),
+     * hogy melyik headerview fájl legyen kiválasztva.
      * @var array $headerviews
      */
     protected array $headerviews = [];
@@ -194,7 +231,9 @@ abstract Class Page
     protected ?string $headerview = null;
 
     /**
-     * Üzenetek átadására szolgáló view fájl elérési útja. A mixin üzenetek statikus kiegészítésére használható.
+     * Üzenetek átadására szolgáló view fájl elérési útja.
+     *
+     * A mixin üzenetek statikus kiegészítésére használható.
      * A fő view fájl elé renderel az oldal.
      * @var string|null $uzenet
      */
@@ -202,13 +241,16 @@ abstract Class Page
 
     /**
      * Azon változók tömbje, amiket a PHP-ból generálunk, de a JS felületen akarunk használni.
+     *
      * Közvetlenül a jsfiles tömb előtt kerül renderelésre.
      * @var array $PHPvarsToJS
      */
     protected array $PHPvarsToJS = [];
 
     /**
-     * Az osztály által használt JS fájlok elérési útjai. A tömbbe megadott fájlokat a rendszer az oldal legalján tölti be.
+     * Az osztály által használt JS fájlok elérési útjai.
+     *
+     * A tömbbe megadott fájlokat a rendszer az oldal legalján tölti be.
      * @var array $jsfiles
      */
     protected array $jsfiles = [];
@@ -223,6 +265,7 @@ abstract Class Page
 
     /**
      * Az oldalhoz tartozó feltöltések uploads mappán belüli mappája.
+     *
      * KIZÁRÓLAG A NÉV! Az 'uploads' hardcode-olva van a feltöltésekhez, az UploadHandler osztály by design csak oda hajlandó fájlokat tölteni.
      * @var string|null $feltoltesgyoker
      */
@@ -230,6 +273,7 @@ abstract Class Page
 
     /**
      * Az oldal feltöltésgyökerén belüli egyedi mappa.
+     *
      * Pl, ha a feltöltésgyökér a "receptek", akkor az egyedi mappa a '2026'. Tartalmazhat slash-t (mondjuk 2026/04), de path traversal ellen akkor is védett.
      * @var string|null $egyedimappa
      */
@@ -237,6 +281,7 @@ abstract Class Page
 
     /**
      * Fájlokat tartalmazó POST esetén ezeket a fájlokat fogadja el a rendszer valid bevitelként.
+     *
      * MIME check is történik! Az a típus, ami nincs fent ezen a listán, a feltöltési folyamat során eldobásra kerül
      * @var array $mediatypes
      */
@@ -248,7 +293,8 @@ abstract Class Page
     ];
 
     /**
-     * A felhasználói UI-n megjelenő elfogadott feltölthető fájlok formátumának string formátumú listája
+     * A felhasználói UI-n megjelenő elfogadott feltölthető fájlok formátumának string formátumú listája.
+     *
      * Csak UX célokat szolgál, a feltöltött fájlok ellenőrzésében nem vesz részt
      * @var string $form_mediatypes
      */
@@ -265,6 +311,7 @@ abstract Class Page
 
     /**
      * Egy oldal használható metódusai.
+     *
      * Ebből tudja a ParseGet, hogy egy $_GET-ből érkező tömbelem az metódus-e.
      * A rendszer nem próbál olyan paramétert metódusként használni, ami itt nincs megadva.
      * @var array $validpagemethods
@@ -273,8 +320,13 @@ abstract Class Page
 
     /**
      * Egy oldal aloldalai.
+     *
      * Ebből tudja a ParseGet, hogy egy $_GET-ből érkező tömbelem az aloldal-e.
      * A rendszer nem talál meg olyan aloldalt, ami itt nincs megadva.
+     *
+     * Aloldalnak azok az oldalak számítanak, amik egy elem nézetét osztják lapokra.
+     * Pl.: oldalgyoker/menupont/elemid/aloldal, de a ParseGet működése miatt
+     * az oldalgyoker/menupont/aloldal/elemid is valid elérési útvonal.
      * @var array $aloldalak
      */
     protected array $aloldalak = [];
@@ -283,12 +335,20 @@ abstract Class Page
 
     /**
      * A form builder osztály példánya, ha az oldal használja a FormBuilder osztályt
+     *
+     * Ha több formot akarunk használni külön view-kban, akkor a Form metódust úgy írjuk meg,
+     * hogy dinamikusan kapjon értéket.
+     *
+     * Ha egy oldalon belül több formot akarunk használni,
+     * akkor a SetRender()-ben a $form2 változót is be kell állítani.
      * @var FormBuilder $form
      */
     protected FormBuilder $form;
 
     /**
-     * A másodlagos form változója. Amennyiben van, ebbe kerül bele egy második form, amit az első formmal együtt akarunk megjeleníteni
+     * A másodlagos form változója.
+     *
+     * Amennyiben van, ebbe kerül bele egy második form, amit az első formmal együtt akarunk megjeleníteni
      * @var FormBuilder $form2
      */
     protected Formbuilder $form2;
@@ -383,6 +443,7 @@ abstract Class Page
 
     /**
      * Segédmetódus annak validálására, hogy egy kötelező mező szerepelt-e a $_POST-ban
+     *
      * @param string ...$params A kötelező mezők nevei
      * @return bool
      */
@@ -399,8 +460,7 @@ abstract Class Page
      * A $_GET tömb első eleme MINDIG a kiválasztott modul, így itt a második elemtől kezdődik csak a feldolgozás
      * A metódus előbb feldolgoz minden felismerhető elemet a tömbből, majd ha marad még benne elem, akkor a 0-at kiválasztja, mint 'elemid'
      *
-     * @param array|null $params A $_GET 1-es indexű elemétől kezdődő tömbje
-     * @return null[] Feldolgozott $paramétereket tartalmazó tömb
+     * @return array Feldolgozott paramétereket tartalmazó tömb
      */
     protected function ParseGet() : array {
          $parsElem = static function (string $needle, array &$params, array &$returnarray, mixed $type = 'string') : void {
@@ -465,7 +525,6 @@ abstract Class Page
         $this->debugmessages['View hiba'] = "A kiválasztott view fájl: $this->selectedview nem szerepel a this->views tömb elemei között!";
         return false;
     }
-
 
     /**
      * Új elem létrehozására szolgáló oldalt kiválasztó, és alapbeállításait elvégző függvény
@@ -595,10 +654,17 @@ abstract Class Page
 
     /**
      * Az oldalak renderelése során használt elmeinek előkészítéséért felelős metódus.
-     * Az írási és olvasási jogok ellenőrzésének már a Router-ben meg kell történnie, ide már csak olyan felhasználó juthat, akinek a kiválasztott erőforráshoz engedélye van.
-     * A jogok újboli ellenőrzére így itt már nincs szükség, a Router()-ben beállított jogosultságokat kell használni a megjelenő elemek kiválasztásához.
+     *
+     * Az írási és olvasási jogok ellenőrzésének már a Router-ben meg kell történnie,
+     * ide már csak olyan felhasználó juthat, akinek a kiválasztott erőforráshoz engedélye van.
+     * Az olvasási jogok újboli ellenőrzére így itt már nincs szükség,
+     * a Router()-ben beállított jogosultságokat kell használni a megjelenő elemek kiválasztásához.
+     *
+     * Az ide eljutó felhasználó minden lekért erőforrást olvashat,
+     * UX célú jogosultságellenőrzés azonban végezhető itt (hogy írhatja is az erőforrást, vagy csak olvashatja).
+     *
      * !!! JOGOSULTSÁGI HIBA MIATTI EXCEPTIONT ITT MÁR NEM SZABAD DOBNI !!!
-     * HA EGY FELHASZNÁLÓ NEM RENDELKEZIK VALAMI SZÜKSÉGES JOGGAL, IDE NEM JUTHAT EL!!!
+     * HA EGY FELHASZNÁLÓ NEM RENDELKEZIK AZ ITT SZÜKSÉGES JOGGAL, IDE NEM JUTHAT EL!!!
      * @return void
      */
     public abstract function SetRender() :void;
